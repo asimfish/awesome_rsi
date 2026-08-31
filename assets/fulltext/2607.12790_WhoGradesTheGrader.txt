@@ -1,0 +1,1652 @@
+Who Grades the Grader?
+Co-Evolving Evaluation Metrics and Skills for Self-Improving LLM Agents
+Xing Zhang1, Guanghui Wang1, Yanwei Cui1, Ziyuan Li2, Wei Qiu2, Bing Zhu2, Peiyang He1∗
+1AWS Generative AI Innovation Center
+2HSBC Holdings Plc., HSBC Technology Center, China
+Abstract
+Self-evolving agent systems create, revise, and retire their own
+skills, but every such loop assumes a reliable evaluation metric
+already exists. In many real applications none does. We show
+the metric itself can be the evolving object: our loop searches
+compositions of small typed drawback detectors under a full
+evolutionary lifecycle, selecting for agreement with a ten-item
+anchored reference set and regularizing by consensus over un-
+labeled outputs. What evolves is the function that grades one
+output, never the fixed task sets it is scored on, and what comes
+out is an inspectable expression rather than an opaque judge.
+It is also valid: on code generation it gains 0.21 agreement
+with hidden ground truth on a locked set that metric selection
+never reads (paired p = 0.014), beating the bare LLM judge
+it contains. Validity is where safety lives: removing the anchor
+guards collapses the metric into a vacuous always-pass detec-
+tor while removing the detector lifecycle does not, inverting
+the lesson from skill evolution. That collapse warns this line
+of work that downstream task score cannot validate a self-
+evolved evaluator, since the collapsed metric trains skills just
+as well. Task score answers only sufficiency, and an evolved
+metric suffices: Double Ratchet, co-evolving the metric with
+a lifecycle-managed skill loop, retains 88–110% of the lift
+ground truth or a hand-written rubric buys, across MBPP+,
+Spider 2.0-Snow, and report generation. When evolved skills
+gamed the report rubric, an independent judge caught it and
+one added detector repaired it.
+Introduction
+Agent self-evolution is now a standard recipe: a frozen lan-
+guage model is wrapped in a loop that writes skills, measures
+their contribution, and retires the ones that hurt (Zhang et al.
+2026b; Wang et al. 2024a; Shinn et al. 2023). Every round
+consumes one expensive ingredient: an evaluation signal de-
+ciding whether an attempt passed or failed. Unit tests supply
+it free on code benchmarks; in deployed systems it is the
+bottleneck. Industry products fill the gap by hand, one rubric
+or demonstration at a time: Claude’s managed agents have
+developers write outcome rubrics for a separate grader (An-
+thropic 2026), and Codex’s Record & Replay has a human
+demonstrate each workflow once (OpenAI 2026). This paper
+automates that step.1
+∗Corresponding author: peiyan@amazon.com
+1Code:
+https://github.com/amazon-science/Self-Evolving-
+Agents-Double-Ratchet.
+The question is direct: if skills can be evolved, why not
+the metric? To our knowledge this is the first system to treat
+the evaluation metric as a first-class evolving object under a
+full evolutionary lifecycle in the sparse-anchor regime: no
+evaluator exists to score the search, only ten anchored items
+with golden references. Sparse is not unsupervised, and those
+ten items are what the method turns on. Existing evolution-
+ary search over objectives is scored by a downstream metric
+assumed valid, and learned evaluators assume exactly the
+ground truth we remove; here selection sees only agreement
+with a ten-item anchor plus consensus over unlabeled out-
+puts, and what comes out is an inspectable expression rather
+than an opaque scalar.
+Two clarifications determine how every result should be
+read. First, the metric is the function that scores one solver
+output, and it is the only thing that evolves: not the bench-
+mark, whose tasks and references are fixed before any loop
+starts, so no result here can come from an easier test. Second,
+an evolved metric is judged on validity, not on the task
+score it produces: agreement with a locked reference is the
+claim, while how well skills trained on it perform is weaker
+evidence, since a metric that passes everything still leaves
+useful practice behind. That second point is not a caveat we
+inherited but a result we measured, and it is strong enough
+to constrain how this literature should run its experiments at
+all.
+Concretely (Figure 1), the metric is an expression tree over
+a pool of small drawback detectors, each checking one fail-
+ure class, synthesized from clustered failures, gated at birth,
+scored by marginal contribution, and retired when useless.
+One stance underpins the design: we rarely know what good
+is, but given an output we can usually find drawbacks, so a
+clean verdict means no known drawback was found, not certi-
+fied correctness. That is what makes bootstrap possible, and
+mostly deterministic detectors, which fail differently from
+the LLM being graded, resist the shared-blind-spot collusion
+a bare LLM judge invites. Because a metric grading the loop
+that produced it is a Goodhart hazard (Goodhart 1984; Gao,
+Schulman, and Hilton 2023), anchor discipline is strict: the
+tiny dev set is the only supervised signal, and no part of
+metric evolution reads the locked set.
+The hypothesis comes from the skill side: Ratchet (Zhang
+et al. 2026b,a) found unmanaged skill libraries drift and that
+lifecycle management is what makes skill evolution work at
+arXiv:2607.12790v2  [cs.AI]  30 Jul 2026
+
+all. Do evaluators need the same discipline? Two ablations
+judged on validity locate which ingredient carries the load,
+and the answer is not the one the skill literature predicts. Of
+our three task families, MBPP+ and Spider 2.0-Snow carry
+exact ground truth, so validity and sufficiency are both mea-
+surable; report generation is the intended target, having no
+golden metric at all, and there we add the layer a deployment
+would keep, an independent stronger judge comparing final
+outputs pairwise against the pre-evolution baseline. That au-
+dit caught a real Goodhart failure, and auditing the judge
+exposed a second one. Verifier-free self-improvement is fea-
+sible, but only inside an architecture that expects its own
+metric to be gamed and its own judge miscalibrated, and can
+catch both.
+Our contributions are as follows.
+• Metric evolution. We formulate the grading function,
+rather than the task set, as the evolving object: anchored
+search over compositions of atomic drawback detectors
+under a full lifecycle of synthesis, birth gating, marginal-
+contribution scoring, and retirement.
+• An objective that works without a downstream met-
+ric. Recall-weighted tiny-anchor agreement paired with
+reliability-weighted consensus over unlabeled outputs, so
+consensus regularizes transfer without ever selecting a
+metric on its own.
+• Where safety lives, and why task score cannot find it.
+Anchor discipline, not the pool lifecycle, is load-bearing
+for evaluators, inverting the skill-evolution lesson; and
+since the collapsed metric matches the working one on
+task score, validating a self-evolved evaluator by down-
+stream performance is unsound, a caution for co-evolved-
+judge designs generally.
+• Double Ratchet. Co-evolution of the metric with a skill
+loop, with evidence that an evolved metric suffices in
+place of ground truth inside the loop, plus an end-to-end
+Goodhart catch, its repair, and a judge audit.
+Related Work
+Three lines of work meet here, and in each the metric is what
+our method does not get for free.
+Self-evolving agents assume the metric.
+These agents
+grow skill libraries, revise from failure traces, and bank
+reusable experience (Wang et al. 2024a; Shinn et al. 2023;
+Madaan et al. 2023; Zhao et al. 2024; Chen et al. 2024b;
+Wang et al. 2024c; Park et al. 2023), a landscape two surveys
+map (Zhang et al. 2025; Wang et al. 2024b), and a recent
+wave evolves and benchmarks such libraries (Wu et al. 2025;
+Yang et al. 2026; Xia et al. 2026; Ni et al. 2026; Zhang et al.
+2026c; Wang, Ren, and Zhang 2026; Li et al. 2026). Ratchet
+(Zhang et al. 2026b,a) showed unmanaged libraries drift and
+that a minimal lifecycle of retirement, bounded capacity, and
+meta-skill guidance restores the gains; that published loop
+is adopted unchanged here as the skill-side component, not
+a contribution of this work. Others search agent code itself,
+in the tradition of neural architecture search (Hu, Lu, and
+Clune 2025; Elsken, Metzen, and Hutter 2019), or optimize
+prompts and pipelines (Khattab et al. 2024; Yang et al. 2024;
+Yuksekgonul et al. 2024; Fernando et al. 2024). All optimize
+against a given evaluation signal. We evolve that signal, and
+ask which part of the discipline carries the safety load once
+the evaluator moves.
+Searched objectives are scored by a metric that exists.
+CSE-Autoloss evolves losses, AutoML-Zero whole learning
+algorithms, Pruner-Zero pruning metrics, AlphaEvolve pro-
+gram code against supplied evaluators (Liu et al. 2021; Real
+et al. 2020; Dong et al. 2024a; Novikov et al. 2025). The
+search space is analogous, primitives composed into a pro-
+gram, but they evolve the artifact being graded and fitness
+differs in kind: each is scored by a metric taken as valid,
+AlphaEvolve stating outright that progress must be machine-
+gradable, the precondition our regime lacks. This paper sup-
+plies that missing foothold: anchored agreement plus con-
+sensus in place of a downstream score. The distinction is not
+cosmetic. When fitness is a trusted external number, a de-
+generate candidate is caught by construction, since it simply
+scores badly; when fitness is assembled from the candidate’s
+own agreement with a ten-item anchor and with its peers, de-
+generacy has to be excluded by explicit guards, which is why
+the guards and not the lifecycle turn out to be load-bearing
+here.
+Learned graders trade the assumption for opacity.
+Re-
+ward design is delicate even in classical RL (Ng, Harada, and
+Russell 1999); learned reward models are over-optimized by
+the policies they train, and misspecification produces system-
+atic gaming (Ouyang et al. 2022; Gao, Schulman, and Hilton
+2023; Pan, Bhatia, and Steinhardt 2022; Skalse et al. 2022;
+Amodei et al. 2016), while AI-feedback and self-rewarding
+setups let the model judge itself (Bai et al. 2022; Yuan et al.
+2024). We share the hazard but not the structure: our grader
+is a composition of typed detectors optimized to predict an
+anchor it never trains on, so it can be read and repaired by
+hand, and it is never a reward the agent optimizes directly.
+LLM judges, and auditing them.
+LLM judges are stan-
+dard evaluation infrastructure and widely audited for posi-
+tion, verbosity, and self-preference bias (Zheng et al. 2023;
+Dubois et al. 2023; Gu et al. 2024; Chen et al. 2024a). We
+confine LLM judgment to three narrow guarded roles: soft
+labels on the ten dev items, one semantic-mismatch detec-
+tor class, and a position-debiased pairwise audit outside all
+loops. Agent-as-judge co-evolution (Zhuge et al. 2024) is
+closest in spirit and validates the judge through the system
+it grades, which our ablations show a vacuous grader also
+passes. Our own results add a caution to this literature that
+we could not have anticipated: the audit needs to know the
+task’s output contract, or it will score a required format as a
+defect (§The Goodhart Episode).
+Reference-free evaluators for our task families.
+The
+evaluators nearest our tasks fix in advance what we synthe-
+size, gate, and retire. CodeScore (Dong et al. 2024b) predicts
+functional correctness from the execution-labeled supervi-
+sion we take to be missing, and SQLHD (Yang et al. 2025)
+needs no ground truth but fixes a hand-authored family of
+metamorphic relations (Chen, Cheung, and Yiu 1998). Ei-
+ther could be registered as one typed op in our pool and would
+
+Figure 1: The evaluation metric is the evolving object; the task sets are fixed and never altered. Center: from a frozen solver,
+no metric, and ten anchored items (left), the metric loop synthesizes typed drawback detectors behind a birth gate, composes
+them into an expression selected by anchor agreement and consensus, and curates the pool by marginal contribution. What
+comes out is a readable expression, not a learned scalar. Right: the skill loop is Ratchet (Zhang et al. 2026b), adopted unchanged,
+and the evolved metric grades its training, giving Double Ratchet. Bottom right: the splits metric evolution never trains on.
+then compete for selection on the anchor like any other, so
+we read them as components rather than competitors. Agen-
+tic text-to-SQL pipelines (Deng et al. 2025) improve the
+solver, an orthogonal axis: a better solver changes which fail-
+ures remain, which is precisely the variable our detectability
+analysis isolates.
+Benchmarks.
+MBPP+ supplies unit-tested Python tasks
+(Austin et al. 2021; Liu et al. 2023), in the execution-graded
+tradition of HumanEval (Chen et al. 2021), and Spider 2.0
+supplies enterprise text-to-SQL over real warehouses with
+execution-based grading (Lei et al. 2025). We use both as
+hard anchors for certifying an evolved metric rather than as
+leaderboard entries: our solver is a single LLM call with no
+tools or iteration, so absolute pass rates are far below what
+agentic systems report and are not meant to be compared
+with them.
+Problem Setup
+Let a task family come with tasks t and a frozen solver
+mapping t to an output y. A metric M maps (t, y) to a
+verdict in {pass, fail, abstain}. It is M that we search over,
+with the tasks and references held fixed. Three disjoint splits
+play the usual roles with one twist each.
+• train, large and unlabeled: solver outputs here expose
+where candidate metrics disagree or abstain, and in co-
+evolution the evolved metric grades these tasks for the
+skill loop. No reference of any kind is attached to a train
+task.
+• dev, tiny and anchored, ten items throughout: each carries
+a golden reference against which a teacher emits soft
+pass/fail labels, the only supervised signal any loop reads.
+Those references are not themselves a metric, grading
+only the ten tasks that carry them while the evolved metric
+must grade arbitrary outputs on tasks that have none.
+• test, locked against the metric: it holds the strongest avail-
+able reference (unit tests, official execution comparison,
+the report rubric), and no part of metric evolution reads
+it, so metric-validity numbers are fully out of sample.
+The skill loop is the one component that touches the locked
+set, for held-out scoring and rollback, as published (Zhang
+et al. 2026b) and kept unchanged because a deployed agent
+rolls back against the cases it is judged on. The guaran-
+tee is thus asymmetric, and it is worth being explicit about
+which claim rests on which split. Metric-validity numbers
+are strictly out of sample: nothing in synthesis, gating, selec-
+tion, or retirement ever reads the locked set, so an agreement
+figure there is an honest generalization estimate. Skill-side
+task scores are not out of sample in the same sense: they are
+the pass rate of a loop that rolls back on that set. They remain
+comparable across arms because every arm rolls back iden-
+tically against the same set, which is what the head-to-head
+comparison uses them for, and they are never used to certify
+a metric. Dev is deliberately small because sparse anchoring
+is realistic: fresh labels in deployed systems arrive as a trickle
+of demos and incident reviews, not as a labeled corpus.
+
+Metrics as Compositions of Drawback Detectors
+An op is an atomic drawback detector o(t, y, c)
+→
+{drawback, clean, abstain} with c a shared context,
+checking exactly one failure class and abstaining otherwise.
+A task family starts from a handful covering its obvious fail-
+ure modes, cheap to write by hand or have an LLM draft from
+the spec, and the lifecycle grows the pool from there. Ops
+come in three cost tiers: static ops parse the artifact, execu-
+tion ops run it (sandbox for code, live warehouse for SQL),
+and judge ops ask an LLM one narrow question. A fixed
+non-evolving root per family validates basic structure (code
+parses, a report has a title) and caches the parsed artifact the
+other ops read.
+A metric expression composes op verdicts with logical
+operators. Writing v(e) ∈{1, 0, ⊥} for the verdict of ex-
+pression e on (t, y), where 1 denotes drawback, 0 denotes
+clean, and ⊥denotes abstain, the grammar is
+e ::= o
+ W
+i≤k ei
+ V
+i≤k ei
+ ¬e
+  P
+i≤k v(ei) ≥K
+   P
+i≤k wi v(ei) ≥θ
+
+,
+(1)
+where | separates the alternative node forms rather than de-
+noting disjunction: a node is a leaf op, a disjunction (a draw-
+back if any child finds one), a conjunction (only if all children
+agree), a negation, an unweighted K-of-k vote, or a weighted
+vote against threshold θ, so applied recursively a metric is
+a tree of such nodes. Abstaining children are excluded from
+their combinator, and a node whose children all abstain ab-
+stains itself. The output passes when the root finds no draw-
+back, the final verdict being the fixed root conjoined with
+the evolved expression. Ops are pure functions of (t, y), so
+verdicts are cached, evaluation is a set of table lookups, and
+a metric is reproducible from its expression string plus the
+registered op pool. Negation and weighted votes stay avail-
+able throughout, but every metric selected in our runs uses
+only disjunction, conjunction, and votes.
+Keeping the metric mostly deterministic is a safety choice
+rather than an efficiency one. A bare LLM judge shares failure
+modes with the LLM solver it grades, so the two can drift
+into agreement before any optimization pressure exists, and
+the agreement is invisible from the outside because there
+is nothing to read. A composition of typed detectors fails
+differently, one leaf at a time, and each leaf names the failure
+class it fired on. That property is what turned a rubric-gaming
+episode into a one-line diagnosis later in this paper.
+The Metric Loop
+Algorithm 1 sketches one round. Two signals feed synthesis:
+misses, dev items the current metric passes although their
+soft label is fail, and gaps, train outputs on which the op
+pool abstains entirely or splits. Both are clustered by failure
+class under a closed task-specific taxonomy, and a synthesizer
+authors a typed op spec for any recurring cluster. A new op
+must pass a birth gate: fire on at least half its cluster and
+stay clean on known-good outputs. Ops born from anchored
+misses enter active (selectable), their birth evidence already
+tying them to the anchor; ops born only from unlabeled gaps
+enter as shadows, which record verdicts every round but
+cannot be selected, since nothing yet shows they track quality
+rather than consensus noise. A shadow is promoted once its
+verdicts raise dev agreement.
+Candidates come from an LLM composer that sees the
+op catalog, the current gaps, and an elite history of the
+best expressions with their shortcomings, plus mutations and
+crossovers of those elites. Selection keeps the best-so-far can-
+didate by
+S(e) = Adev(e) · Atrain(e)w −λ C(e),
+(2)
+where Adev(e) is e’s agreement with the dev soft labels,
+Atrain(e) its agreement with the consensus verdict of the
+opining pool ops on unlabeled train outputs, C(e) expression
+size, and w, λ small constants. Consensus is the regularizer: a
+metric memorizing ten dev items but behaving erratically on
+the broad distribution loses, while a degenerate always-fail
+metric loses on dev. Two guards apply: selection fails closed
+(a candidate with no usable dev opinion is unselectable), and
+a validity gate drops candidates that pass, fail, or abstain on
+everything. Per-op fitness is the leave-one-out marginal of
+the incumbent expression, and non-positive ops retire after
+a grace period. Every constant, including the exponent w,
+the complexity charges, and the grace length, is listed in
+Appendix C.
+Both agreement terms are weighted, each weighting a
+safety choice rather than a tuning knob. Dev agreement is
+recall-weighted: Adev is the weighted mean of the two per-
+class recalls, (wfrfail + wprpass)/(wf + wp) with wf = 2,
+wp = 1, over the items the metric opines on, so a missed
+drawback costs twice a false alarm and no candidate reaches
+Adev = 1 by acing the easier class alone. Consensus is
+reliability-weighted: each opining op’s vote is scaled by
+1 + κ max(0, mo) for mo that op’s anchored leave-one-
+out marginal, so anchor-proven ops lead and unproven ops
+vote near-neutrally. Otherwise a bloc of correlated detectors,
+cheap to synthesize and liable to share a blind spot, would
+define the very pseudo-label the regularizer rewards agreeing
+with. Atrain is thus a transfer regularizer pulled toward the
+anchor, not a popularity vote, and entering multiplicatively
+against a fail-closed Adev it never selects a metric alone.
+Co-Evolution with the Skill Loop: Double Ratchet
+The skill loop adopted here (Zhang et al. 2026b) needs one
+thing our setting does not supply: a grader for its training
+tasks. Co-evolution hands it the current best evolved metric,
+giving Double Ratchet (Figure 1). The loops alternate under
+a fixed front-loaded curriculum, metric phases longest early
+when coverage is worst: the evolved metric grades train at-
+tempts, and failures become capsules whose error text feeds
+skill synthesis. Held-out evaluation and the rollback anchor
+stay pinned to the locked test set, which the evolved met-
+ric never touches, so a corrupted metric slows skill learning
+without corrupting the measurement. The comparison is the
+reference skill loop, identical machinery handed the ground-
+truth metric (or best available rubric) for free.
+Two ablations, one per safety ingredient.
+The naive arm
+disables the anchor guards (fail-closed anchoring, the va-
+lidity gate, and skill-loop rollback) with the detector lifecy-
+cle fully on, the collusion-prone configuration unanchored
+
+Algorithm 1 One round of metric evolution. Only the au-
+dit step reads the locked test set, and it never feeds back.
+Constants and the full lifecycle are in Appendix C.
+1: Sense (where is the metric wrong?)
+2:
+misses ←dev items the incumbent passes but the soft
+label fails
+3:
+gaps ←train outputs where the pool abstains or splits
+4: Grow (expand the op pool)
+5:
+cluster misses ∪gaps by failure class; author one typed
+op per recurring cluster
+6:
+birth gate: fires on ≥half its cluster and clean on
+known-good ⇒admit (active if anchored, else shadow)
+7: Select (recombine, keep the best)
+8:
+candidates ←LLM compositions over the pool, plus
+mutations and crossovers of elites
+9:
+keep arg maxe S(e) over candidates and the incum-
+bent, behind the validity gate (Eq. 2)
+10: Curate (merit-based lifecycle)
+11:
+retire ops with non-positive leave-one-out marginal;
+promote shadow ops that raise dev agreement
+12: Audit (measurement only, never a training signal)
+13:
+report agreement against the locked test set
+agent-judge co-evolution implicitly runs. The no-lifecycle
+arm does the opposite, keeping the guards but disabling the
+birth gate and merit-based retirement so every synthesized
+detector enters active and nothing retires: the metric-side
+analog of an unmanaged skill library. The two arms are de-
+liberately not a factorial. Each isolates one ingredient against
+an otherwise complete system, which is what a claim about
+which ingredient is load-bearing needs; a fully crossed de-
+sign would add an arm with neither guard nor lifecycle whose
+collapse is already implied by the naive arm.
+Independent final judge.
+Where no accurate metric ex-
+ists, rubric scores are references and not truth, so a final audit
+sits outside all loops: a stronger LLM compares each final
+output pairwise against the pre-evolution baseline, judged
+twice with positions swapped, a win counting only when
+both orders agree. It mimics the human acceptance step a
+deployment keeps, and exposed a proxy-gaming failure the
+loops could not see. The judge is an audit and never a train-
+ing signal: no gradient, capsule, hint, or selection decision
+anywhere in the system reads it.
+Experimental Setup
+Task families.
+MBPP+ (Austin et al. 2021; Liu et al.
+2023), Python function synthesis with hidden unit tests as the
+hard anchor, and Spider 2.0-Snow (Lei et al. 2025), enter-
+prise text-to-SQL over real Snowflake warehouses anchored
+by official execution-result comparison, are the validation
+tasks: their exact ground truth makes both metric validity
+and the reference-loop match measurable. Report genera-
+tion is the target task, a deployment-style workload in which
+a pipeline writes analyst-report sections from audited evi-
+dence cards. No golden metric exists for it: the available
+rubric score (RAQS) plus golden demonstrations is a partial
+reference signal, not ground truth. Task cards are in Ap-
+pendix A; tables abbreviate the tasks as MBPP+, Spider, and
+Report.
+Hard-subset construction.
+For MBPP+ and Spider 2.0 we
+screen every task with five frozen-solver samples, drop those
+passed on every sample (no lift room), and stratify the rest by
+screen pass rate. Splits are 60/10/40 for MBPP+, 59/10/40 for
+Spider 2.0, and 73/10/48 for reports, whose tasks derive from
+golden demonstrations and need no screening. Dev always
+holds ten items, five clear failures and five clean positives.
+The solver is a single direct LLM call with no tools, so
+absolute numbers are not comparable to leaderboard agents.
+Roles and models.
+All experiments use Claude models:
+every in-loop role (solver, skill synthesizers, teachers, judge
+ops) is Claude Opus 4.7, the sole exception being the report
+task’s final judge, the stronger Claude Opus 4.8 kept outside
+all loops. A same-family teacher is not a circular self-grader:
+it compares candidate outputs against golden references on
+dev rather than judging unaided, and never sees the locked
+anchor. Skill loops run 100 rounds; co-evolution interleaves
+metric phases of 15/8/5/2 rounds between four 25-round skill
+phases, matching the reference loop’s skill budget. Every role
+is bound per call from a role-to-model table, so repeating any
+experiment under a different or mixed model assignment is
+a configuration change rather than a code change; we hold
+that table uniform here to keep the comparisons clean (Ap-
+pendix H).
+Results
+The findings run along two axes, in a deliberate order: first
+metric validity, agreement with a locked reference no part
+of metric evolution reads, which is the claim and which the
+guard ablations then localize; then task score, which we show
+cannot certify a metric and so use only to ask whether an
+evolved one suffices in place of ground truth. Each run uses
+three seeds, reported as mean and sample standard deviation,
+with loop comparisons adding the seed-level difference and
+a 95% bootstrap interval. Three seeds and held-out sets of
+tens of items make those means coarse, so metric claims
+are also tested paired, exact McNemar over matched per-
+item verdicts, since evolution rescores the same locked items
+and two rounds differ only in the grader. That test pools three
+seeds over one 40-item set, so its unit is the seed-item verdict,
+not an independent task: it shows the change of grader is not
+noise, not a task-level population effect. Per-round noise runs
+near five points, so we report peak and final-rounds values
+(mean of the last ten) against each run’s round-0 baseline.
+Peak is a locked-set argmax and so optimistic; the final-
+rounds column is fixed in advance and is the unselected
+estimate, which is why the paired test is run at both. Bold
+rows are our proposed configuration.
+The Evolved Metric Lifts and Transfers
+Figure 2c is the mechanism made concrete: every distinct
+metric the MBPP+ loop selected, in order, as the expression
+
+Task
+Seed Born
+Rejected
+Pool
+In metric
+MBPP+
+10
+2–4
+997–1014 12–14
+3
+Spider
+9
+24–30
+612–785
+33–39
+1–2
+Report
+11
+11–15
+172–188
+22–26
+2
+Table 1: The birth gate rejects orders of magnitude more
+detectors than it admits, and selection composes only one
+to three survivors. Metric-loop op lifecycle, anchored arm,
+100 rounds. Seed: hand-authored detectors. Born: synthe-
+sized and admitted during the run. Pool: seed plus born. In
+metric: leaves in the final expression. Three-seed min–max;
+a bare number means all seeds agree. Skill-side counterpart:
+Table 6 in Appendix F.
+it actually is. The objective rises from 0.16 to 0.52 while the
+expression shrinks from six ops to three, the lifecycle work-
+ing as designed rather than a search accumulating checks,
+and the birth gate is the busy part, 998 candidate detectors
+rejected against 2 admitted on this seed. Table 1 puts that
+ratio in context across tasks: the pools stay small, the gate
+does most of the work, and the selected expression is one to
+three leaves everywhere. What rises monotonically is what
+selection optimizes: best-so-far selection makes S(e) never
+fall, on all nine runs (full 100-round budget, early stopping
+off, last improvement by round 63). Held-out agreement,
+which selection never sees, is not monotone: five of nine
+runs end below their own mid-run peak, the ordinary gen-
+eralization gap of optimizing a ten-item proxy, and why we
+report the locked column instead of selecting on it. Conver-
+gence is always to a composition: (any spec_mismatch
+crash returns_not_print_only) on MBPP+ and
+two-op
+forms
+such
+as
+(any missing_group_by
+spec_sql_mismatch) elsewhere (Appendix E).
+What the lift is measured against.
+These compositions
+beat the bare LLM judge op they contain, the natural base-
+line for a grader built without ground truth: peak agree-
+ment 0.625 ± 0.050 versus 0.55 ± 0.04 on MBPP+ and
+0.500±0.026 versus 0.45±0.07 on Spider (no ground truth
+exists to score a standalone judge on Report). Round 0 brack-
+ets the evolved metric from the other side, being the hand-
+authored seed composition, at 0.417 ± 0.058 on MBPP+, so
+the +0.21 over it is lift over static engineering rather than
+lift over nothing. Two baselines would split the remaining
+credit and neither is run here: a prompt-tuned judge on the
+same ten items, which would separate anchored composition
+from anchored prompting, and random composition in place
+of the LLM composer, which would separate the composer
+from the search space it draws on.
+Three tasks, three roles.
+The tasks are not three attempts
+at one claim. MBPP+ is the positive case, the only measurable
+held-out lift; Report starts at ceiling from round 0, where
+subset seeding already supplies a near-optimal composition,
+so it carries sufficiency and the safety ablations rather than
+lift; Spider sits near chance despite a robust objective climb,
+the detectability boundary taken up in §The Detectability
+Spectrum. Absolute agreement is not comparable across the
+three, since each sits on its own locked set with its own
+reference and class balance, which is why the within-task
+Spider contrast carries the detectability claim and a cross-
+task ranking would not.
+The lift survives a paired test.
+On MBPP+ the paired
+test puts the lift beyond seed noise: across 120 matched ver-
+dicts, evolution corrects 61 items against 36 broken at peak
+(p = 0.014) and 36 against 20 at the end (p = 0.044), ev-
+ery seed net positive. It finds nothing on Spider, that task’s
+regime rather than a sample-size artifact, since the same test
+on the same set size detects the MBPP+ effect. Nor is the ten-
+item anchor fragile: replaying report selection offline on 200
+stratified subsamples per size, rescoring every candidate the
+live run considered, gives held-out agreement 0.871±0.063,
+0.882 ± 0.051, and 0.874 ± 0.041 at four, six, and eight an-
+chored items against 0.854 at the full ten. Smaller anchors
+are noisier but their means do not fall, so recall weighting
+plus the consensus regularizer keep even a four-item anchor
+off degenerate metrics. The standard deviations tell the oper-
+ational story: any single four-item anchor is a lottery, while
+the mean over draws shows selection is not leaning on one
+marginal item (protocol in Appendix G).
+Which Guard Carries the Load, and Why Task
+Score Cannot Tell
+Table 2 contrasts three arms of the report metric loop, where
+the anchor is softest and collusion pressure highest. Dis-
+abling the anchor guards (naive) collapses the metric on
+three of three seeds: selection latches onto a detector that al-
+most never fires, fail-open scoring reports a vacuous perfect
+objective, and the metric passes 0.97–1.00 of everything it
+grades. Disabling the lifecycle does not: objectives and held-
+out agreement stay in the anchored band, and although the
+pool grows (23–31 ops against 22–26 anchored), the extra
+ops are inert, since an op never selected never grades any-
+thing. This inverts the skill-evolution literature’s emphasis:
+for skills, lifecycle management is the key finding; for evalu-
+ators under anchored selection, anchor discipline carries the
+safety load, so the metric-side analog of library drift is anchor
+drift, not pool drift. Structurally, a junk skill gets routed into
+prompts and hurts, while a junk op matters only if selection
+picks it. The lifecycle is not therefore worthless: it keeps the
+pool and its per-round verdict cost bounded (Table 1). It is
+simply not what stands between this system and a worthless
+grader.
+The collapsed arm also carries a warning past this paper,
+drawn out in Figure 3. Its metric is worthless, yet its co-loop
+scores as well as the anchored one and on two tasks slightly
+better (Table 3). Neither number is wrong: an always-pass
+metric reduces training to unfiltered practice, which on its
+own improves skills, and measurement never passes through
+the metric, so the score survives what the grader does not.
+The consequence is methodological. Downstream task per-
+formance cannot validate a self-evolved evaluator, and the
+experiment this literature reaches for first, co-evolve a judge
+with a policy and report that the policy improved, would
+have certified a grader that passes everything. Validating the
+evaluator needs a held-out reference it never reads, as above,
+
+Figure 2: An evolved metric buys most of the lift ground truth would have, and what evolves stays readable. (a) Lift Double
+Ratchet retains as a fraction of the reference loop’s; 100% means the evolved metric bought everything ground truth would have.
+(b) Locked-set learning curves (mean ± std, three seeds): reference loop orange, Double Ratchet blue, frozen solver dotted. (c)
+Every distinct metric the MBPP+ loop selected, in order. The objective rises while the expression shortens from six ops to three;
+the locked column is reported, never read. Numbers from Tables 3 and 4.
+Arm
+Objective
+Held-out
+Train
+Outcome
+anchored
+0.865±0.002
+0.830±0.012 .78–.82 composes
+naive
+1.000 (vacuous)
+fail-open
+.97–1.0
+collapses
+no-lifecycle
+0.896±0.072
+0.868±0.061
+n/a
+no collapse
+Table 2: Removing the anchor guards collapses the metric
+into a vacuous always-pass grader; removing the lifecy-
+cle does not. Metric-validity ablations on report generation,
+final-rounds values over three seeds. Objective: the selection
+score of Eq. 2. Held-out: agreement with the locked refer-
+ence. Train: fraction of training attempts the metric passes.
+The naive arm scores 1.000 because fail-open scoring credits
+a detector that never fires; it passes essentially everything, so
+its held-out entry is a behavior rather than a number. Which
+guard each arm disables is specified in Appendix C.
+which is also what a deployment triaging or gating on it
+depends on.
+The asymmetry is worth stating in both directions, because
+it is easy to over-read. A high task score does not certify the
+grader, as the naive arm shows. But a low task score does not
+condemn one either, since a grader can be right and still drive
+a loop into a capability ceiling it cannot reach, which is what
+happens on Spider below. Task score and metric validity are
+simply different measurements of different objects, and the
+practice of substituting the first for the second is what we are
+arguing against.
+Co-Evolution: Is the Evolved Metric Sufficient?
+With validity established independently (§Which Guard Car-
+ries the Load), the remaining question is sufficiency: can a
+metric evolved from ten reference examples drive a skill
+loop that ground truth would otherwise drive? It can. Double
+Ratchet retains 106%, 110%, and 88% of the reference loop’s
+lift on MBPP+, Spider, and Report (Table 3; Figure 2a–b):
+within noise on the ground-truth tasks, and a small gap where
+the reference is itself a partial rubric, which is why the inde-
+pendent final judge below carries more weight there. Table 4
+gives the underlying init / peak / final-rounds triples, and
+the ordering of arms at the unselected final-rounds column
+matches the ordering at peak, so retention is not an artifact
+of taking an argmax on the locked set.
+Spider’s absolute lift is smallest for both loops in Figure 2b,
+one ceiling binding them alike: a single-call solver’s residual
+failures mostly need live exploration no guidance-text skill
+
+Figure 3: Metric validity and downstream task score dissociate, so task score cannot certify a self-evolved grader. The
+same three report-generation arms, measured two ways. (a) Metric validity on an absolute 0-to-1 scale against a locked reference
+no metric loop reads: the arms separate sharply, and the naive arm is vacuous rather than merely worse. (b) The task score of
+the skill loop each grader trained, on a zoomed axis: all three land within .038, and the worthless grader is the higher of the two
+co-evolved arms. Both readings are correct, which is the problem: certifying a grader by the performance of the policy it trained
+would have certified the hatched bar. Values from Tables 2 and 3.
+expresses. Aggregates also hide a task-level result: both loops
+solve held-out problems the frozen solver never solves, and
+on both hard-anchor tasks Double Ratchet converts more of
+them than the reference loop (Table 3, Improved). That settles
+how good a metric must be to suffice here: not very. Spider’s
+metric agrees with ground truth only at 0.500 ± 0.026 yet
+its co-loop retains the full reference lift, because the metric’s
+training role is directional: it decides which attempts become
+failure capsules, whose concrete error text does not depend
+on the label being perfect. Metric-graded training accuracy
+stays in a realistic band (0.78–0.82 on Report, 0.41–0.83 on
+Spider), so the metric is really grading, and a weak one slows
+learning without corrupting measurement.
+That robustness has a sharp edge, visible on Spider at the
+seed level: two of three co-evolution seeds selected a weak
+single-op metric with train agreement 0.41–0.44, yet reached
+peak evaluations of 0.45–0.50, indistinguishable from the
+sibling seed carrying a two-op metric (Appendix G). A skill
+loop is a forgiving consumer of grades. The reasons to build
+a metric well therefore lie elsewhere, in the uses a skill loop
+does not exercise: triage, where a grader decides which out-
+puts a human sees; gating, where it decides which ship; and
+repairability, where its structure decides whether a failure
+can be localized at all. The next subsection puts repairability
+under load.
+The Goodhart Episode and the Final-Judge 2×2
+The report task produced the paper’s most instructive se-
+quence (Table 5), the clearest evidence that an inspectable
+metric is worth having. The rubric’s metric-discipline di-
+mension counts inline evidence tags, and the first skill runs
+raised the rubric score by +0.26 partly by gaming exactly
+this: evolved skills wrote the tag in place of the number
+(about 30% of tags at peak rounds had no value beside them)
+and invented confident forecasts for a style dimension. The
+independent judge preferred the baseline in 88% of decided
+pairs, citing unrendered placeholders and fabrication. This
+is a fact about the setup rather than about our system: the
+rubric was the best available reference signal on this task,
+hand-written by the pipeline’s authors, and gamed within a
+hundred rounds by skills optimizing against it. Any design
+that treats such a rubric as ground truth inherits that outcome
+silently.
+The repair was one coupled change: a vocabulary-aware
+value-erasure check in the capsule gate (a tag whose regis-
+tered metric has a numeric value but no numeral nearby is
+a defect) plus the failure hints that teach value-plus-tag, the
+hint being how the detector’s verdict reaches synthesis. We
+claim the pair, not the detector alone, since separating them
+needs a detector-only and hints-only rerun we did not do.
+The rerun cut erased tags to about 1% while the rubric score
+rose to 0.850±0.010, so nothing was traded away for the fix.
+Reading the metric is what localized the defect to a name-
+able check, an intervention a learned scalar does not admit: a
+
+MBPP+
+Spider
+Report
+Peak: skill
+0.700±0.025 0.483±0.038 0.850±0.010
+Peak: co
+0.717±0.038 0.458±0.038 0.812±0.006
+Peak: co naive†
+0.742±0.014 0.458±0.029 0.841±0.003
+Lift retention (co)
+106%
+110%
+88%
+∆peak (co −skill)
++.02
+−.03
+−.04
+95% CI
+[−.03, .06]
+[−.08, .03]
+[−.05, −.03]
+Improved: skill
+16/23
+4/12
+99%
+Improved: co
+19/23
+6/12
+99%
+Table 3: Double Ratchet retains 88–110% of the lift
+ground truth or a hand-written rubric would have
+bought. Held-out task score, three seeds, 40–48-item locked
+sets. skill: the reference loop, trained on ground truth
+(MBPP+, Spider) or the best-available rubric (Report). co:
+Double Ratchet. co naive: the anchor-guards-off ablation,
+seed-matched to co, whose metric is vacuous (†; Table 2) yet
+scores as well, which is why this table answers sufficiency but
+cannot certify a grader (Figure 3). Lift retention: co’s peak
+lift over round 0 as a fraction of skill’s. ∆peak: the seed-level
+difference with a 95% bootstrap CI, containing zero on both
+ground-truth tasks. Improved: never-passed tasks solved at
+least once, or (Report) sections ending above round 0.
+reward model that had absorbed the same rubric would have
+shown a number going up, with no place to put the repair.
+The judge itself then needed auditing. The pipeline re-
+quires raw evidence tags in its output, a format contract the
+original generic rubric did not know, so its loss rationales
+blamed that syntax and the repair barely moved the win rate
+(0.122 to 0.126). A task-aware rubric stating the contract,
+still treating valueless tags and fabricated figures as defects,
+re-judged the same stored pairs: down that column the fix
+moves the win rate from 0.515 (271 of 526 decided) to 0.770
+(435 of 565), real content quality, while across each row
+the jump measures convention-blindness. That rubric was
+written after reading the generic judge’s rationales, so it di-
+agnoses the audit rather than independently confirming the
+repair; its pre-repair cell is the control, both cells re-judging
+identical stored outputs. Both directions matter: self-evolved
+metrics need an outer audit, and the audit needs the task con-
+tract. A deployment that had stopped at the generic column
+would have concluded the repair did nothing and reverted it.
+The Detectability Spectrum
+One variable organizes the results above: how mechani-
+cally detectable the solver’s failures are. MBPP+ failures
+are crashes and wrong outputs cheap ops see directly, and
+reports have a closed failure taxonomy behind their anchor
+(Appendix B), so transfer is strong on both. Spider 2.0 turns
+that into an in-task controlled contrast. Under our first prompt
+most failures were compile errors and the evolved metric
+reached 0.85 held-out agreement, but grounding the prompt
+with typed schemas raised the solver’s baseline by half and
+left residual failures that are semantically wrong values un-
+der clean execution, invisible to deterministic ops, so agree-
+ment fell to 0.500 ± 0.026 even as the objective lifted. Same
+Task
+Loop
+Init
+Peak
+End
+MBPP+ skill
+0.275±0.050 0.700±0.025 0.592±0.039
+co
+0.267±0.038 0.717±0.038 0.652±0.034
+co naive 0.317±0.058 0.742±0.014 0.632±0.023
+Spider
+skill
+0.317±0.038 0.483±0.038 0.327±0.010
+co
+0.275±0.043 0.458±0.038 0.323±0.038
+co naive 0.292±0.052 0.458±0.029 0.343±0.028
+Report
+skill
+0.562±0.001 0.850±0.010 0.802±0.024
+co
+0.557±0.006 0.812±0.006 0.767±0.015
+co naive 0.559±0.003 0.841±0.003 0.811±0.015
+Table 4: The arms stay ordered at the unselected End
+column exactly as at peak, so retention is not an artifact
+of the peak argmax. Per-loop scores behind Table 3, mean ±
+std over three seeds. Init is round 0, Peak the best round on the
+locked set, End the mean of each run’s last ten rounds. Frozen
+single-call baselines are ≈0.27 (MBPP+), 0.285 (Spider 2.0),
+and 0.56 (Report). Bold rows are our proposed configuration.
+Generic judge
+Task-aware judge
+pre-repair (gamed proxy)
+0.122
+0.515
+post-repair (erasure fixed)
+0.126
+0.770
+Table 5: Reading down a column shows what the repair
+bought; reading across a row shows how much the judge
+penalized a required output format. Final-judge win rate
+of evolved report outputs over their pre-evolution baselines,
+over decided pairs (both position orders agreeing); ties are
+39–50% of the 864 pre-repair and 1,056 post-repair pairs.
+All four cells re-judge the same stored outputs. Both rubrics
+and the pairing protocol are in Appendix D.
+method, same task, different failure distribution: a semantic
+regime shifts the burden onto judge ops and outer audits,
+and the sharper the solver, the more of this regime is left.
+What evolves stays legible either way, which is what made
+the repair possible.
+Figure 4 lays the three task families on that axis and keeps
+the controlled comparison separate from the cross-task place-
+ment, because only the former is a measurement. The place-
+ment of MBPP+, Report, and Spider on the spectrum is an
+interpretation of where each family’s failures sit; their agree-
+ment numbers are not comparable to one another, since each
+is computed against a different locked reference on a different
+set. The Spider band underneath is the actual evidence: one
+task, one method, two solver prompts, and the metric’s held-
+out agreement moving from 0.85 to 0.500 as the residual
+failures move from mechanical to semantic.
+The practical reading is a scoping rule. Where failures are
+mechanically checkable, cheap deterministic detectors carry
+the metric and an evolved composition transfers; where they
+are purely semantic, the composition still evolves and still
+names what it finds, but its agreement with truth is bounded
+by the judge ops inside it, and the outer audit stops being
+optional. The uncomfortable corollary is that this boundary
+moves in the direction of harder, not easier: every improve-
+
+Figure 4: Whether an evolved metric transfers is governed by how mechanically detectable the solver’s failures are.
+Top: the three task families on the axis from mechanically checkable failures to purely semantic ones, each with its evolved
+metric’s peak held-out agreement. Those three numbers sit on three different references, so the placement is an interpretation,
+not a measurement. Middle, the measurement: a within-task Spider 2.0-Snow contrast. Grounding the solver prompt with typed
+schemas pushes the residual failures from compile errors into clean-executing wrong values, and the same metric loop’s held-out
+agreement falls from 0.85 to 0.500. Bottom: what each end of the axis implies for practice.
+ment to the solver retires the failures a static op could catch
+and leaves behind the ones only judgment can.
+Discussion
+The anchor cannot be manufactured.
+Evolution expands
+coverage but never creates ground truth. With no anchor the
+loop optimizes noise, which is what the naive arm demon-
+strates from the inside: remove the guards that tie selection to
+ten real labels and the search finds the cheapest way to look
+perfect. Anchor quality therefore matters as much as its exis-
+tence, and hardening soft anchors into checkable ones is the
+highest-leverage investment available. Ten items is few; ten
+items with golden references and a strict soft-labeling pro-
+tocol were enough on all three families, and the subsample
+replay says four would often have been.
+Validity and sufficiency are different questions.
+The two
+axes of the results section are not two views of one number.
+Sufficiency asks whether a loop trained on the evolved metric
+reaches where ground truth would take it, and the answer is
+largely yes, because a skill loop consumes grades direction-
+ally. Validity asks whether the grader is right, and it is the
+question every use outside a training loop turns on. Conflat-
+ing them is not a philosophical error but a measurable one:
+Figure 3 shows a grader that answers the first well and the
+second not at all.
+Where the method helps.
+Metric evolution buys the most
+where the solver’s failures are mechanically detectable, as
+the within-task Spider contrast quantifies (§The Detectability
+Spectrum). It buys least where they are semantic, and there
+its value shifts from agreement to legibility: an expression
+that names its verdicts supports triage and repair even when
+it barely beats chance at predicting truth.
+Limitations
+This is a mechanism study, not a scaling result. Three task
+families spanning the detectability axis including its negative
+end, one model family, rounds in the low hundreds, and
+held-out sets of tens of items, though graded every round
+by every candidate (52,600 item-level verdicts against the
+locked reference and 5,743 birth-gate decisions). Nothing in
+the design is model-specific, and every LLM role is bound
+from a configuration table, but we have not run a cross-family
+replication and cannot claim one.
+Several specific gaps are worth naming. Teacher quality
+is held fixed, so how anchor quality degrades with a weaker
+teacher is untested. The paired McNemar test pools seeds
+over a single 40-item locked set, so it licenses a claim about
+graders, not about tasks. Peak values are locked-set argmaxes
+
+and therefore optimistic, which is why the final-rounds col-
+umn, fixed in advance, is reported beside them everywhere.
+The Goodhart repair is claimed as a coupled pair of detec-
+tor and hints, since we did not run the detector-only and
+hints-only arms that would separate them. The task-aware
+rubric was written after reading the generic judge’s ratio-
+nales, so it is a diagnosis and not an independent confirma-
+tion. Guidance-text skills cannot substitute for capabilities
+that need interaction, such as live schema exploration, which
+is the ceiling Spider’s absolute lift runs into for both loops.
+And metamorphic detectors (Chen, Cheung, and Yiu 1998),
+the natural next op family for exactly the semantic regime
+where our current pool is weakest, are built but unexercised
+here.
+Conclusion
+The evaluation metric can itself be the evolving object, and it
+evolves into something valid: +0.21 held-out agreement on
+MBPP+ against a locked reference no part of selection reads,
+ahead of the bare judge it contains, and beyond seed noise
+under a paired test. Anchor discipline, not the pool lifecy-
+cle, makes that hold, inverting the lesson the skill-evolution
+literature would predict, and the arm without it warns that
+task score certifies nothing, a worthless metric training skills
+just as well. Read for sufficiency rather than validity, Double
+Ratchet retains 88–110% of the supervised lift across code,
+enterprise SQL, and report writing. On the one task where
+no golden metric exists, an outer judge caught the loop gam-
+ing its own reference, one detector plus its hints repaired it
+without cost to the score, and auditing the judge caught the
+audit mistaking a required output format for a defect. Who
+grades the grader: an anchor it predicts but never sees, and
+an outside judge that must itself be checked.
+References
+Amodei, D.; Olah, C.; Steinhardt, J.; Christiano, P.; Schul-
+man, J.; and Mané, D. 2016. Concrete Problems in AI Safety.
+arXiv preprint arXiv:1606.06565.
+Anthropic. 2026. New in Claude Managed Agents: Dream-
+ing, Outcomes, and Multiagent Orchestration.
+https://
+claude.com/blog/new-in-claude-managed-agents.
+Product
+announcement, May 19, 2026.
+Austin, J.; Odena, A.; Nye, M.; Bosma, M.; Michalewski, H.;
+Dohan, D.; Jiang, E.; Cai, C.; Terry, M.; Le, Q.; and Sutton,
+C. 2021. Program Synthesis with Large Language Models.
+arXiv preprint arXiv:2108.07732.
+Bai, Y.; Kadavath, S.; Kundu, S.; Askell, A.; Kernion, J.;
+Jones, A.; Chen, A.; Goldie, A.; Mirhoseini, A.; McKinnon,
+C.; et al. 2022. Constitutional AI: Harmlessness from AI
+Feedback. arXiv preprint arXiv:2212.08073.
+Chen, G. H.; Chen, S.; Liu, Z.; Jiang, F.; and Wang, B. 2024a.
+Humans or LLMs as the Judge? A Study on Judgement Bias.
+In Proceedings of the 2024 Conference on Empirical Meth-
+ods in Natural Language Processing (EMNLP).
+Chen, M.; Li, Y.; Yang, Y.; Yu, S.; Lin, B.; and He, X.
+2024b.
+AutoManual: Generating Instruction Manuals by
+LLM Agents via Interactive Environmental Learning.
+In
+Advances in Neural Information Processing Systems, vol-
+ume 37.
+Chen, M.; Tworek, J.; Jun, H.; Yuan, Q.; Pinto, H. P. d. O.;
+Kaplan, J.; Edwards, H.; Burda, Y.; Joseph, N.; Brockman,
+G.; et al. 2021. Evaluating Large Language Models Trained
+on Code. arXiv preprint arXiv:2107.03374.
+Chen, T. Y.; Cheung, S. C.; and Yiu, S. M. 1998. Meta-
+morphic Testing: A New Approach for Generating Next Test
+Cases. Technical Report HKUST-CS98-01, Hong Kong Uni-
+versity of Science and Technology.
+Deng, M.; Ramachandran, A.; Xu, C.; Hu, L.; Yao, Z.; Datta,
+A.; and Zhang, H. 2025. ReFoRCE: A Text-to-SQL Agent
+with Self-Refinement, Consensus Enforcement, and Column
+Exploration. arXiv preprint arXiv:2502.00675.
+Dong, P.; Li, L.; Tang, Z.; Liu, X.; Pan, X.; Wang, Q.; and
+Chu, X. 2024a. Pruner-Zero: Evolving Symbolic Pruning
+Metric from Scratch for Large Language Models. In Pro-
+ceedings of the 41st International Conference on Machine
+Learning (ICML).
+Dong, Y.; Ding, J.; Jiang, X.; Li, G.; Li, Z.; and Jin, Z. 2024b.
+CodeScore: Evaluating Code Generation by Learning Code
+Execution. ACM Transactions on Software Engineering and
+Methodology.
+Dubois, Y.; Li, X.; Taori, R.; Zhang, T.; Gulrajani, I.; Ba,
+J.; Guestrin, C.; Liang, P.; and Hashimoto, T. B. 2023. Al-
+pacaFarm: A Simulation Framework for Methods that Learn
+from Human Feedback.
+Advances in Neural Information
+Processing Systems, 36.
+Elsken, T.; Metzen, J. H.; and Hutter, F. 2019. Neural Ar-
+chitecture Search: A Survey. Journal of Machine Learning
+Research, 20(55): 1–21.
+Fernando, C.; Banarse, D.; Michalewski, H.; Osindero, S.;
+and Rocktäschel, T. 2024. Promptbreeder: Self-Referential
+Self-Improvement via Prompt Evolution.
+In Proceedings
+of the 41st International Conference on Machine Learning
+(ICML).
+Gao, L.; Schulman, J.; and Hilton, J. 2023. Scaling Laws
+for Reward Model Overoptimization.
+In Proceedings of
+the 40th International Conference on Machine Learning
+(ICML), 10835–10866.
+Goodhart, C. A. E. 1984. Problems of Monetary Manage-
+ment: The UK Experience. Monetary Theory and Practice:
+The UK Experience, 91–121.
+Gu, J.; Jiang, X.; Shi, Z.; Tan, H.; Zhai, X.; Xu, C.; Li, W.;
+Shen, Y.; Ma, S.; Liu, H.; Wang, S.; Zhang, K.; Wang, Y.;
+Gao, W.; Ni, L.; and Guo, J. 2024. A Survey on LLM-as-a-
+Judge. arXiv preprint arXiv:2411.15594.
+Hu, S.; Lu, C.; and Clune, J. 2025. Automated Design of
+Agentic Systems. In International Conference on Learning
+Representations (ICLR).
+Khattab, O.; Singhvi, A.; Maheshwari, P.; Zhang, Z.; San-
+thanam, K.; Vardhamanan, S.; Haq, S.; Sharma, A.; Joshi,
+T. T.; Moazam, H.; Miller, H.; Zaharia, M.; and Potts, C.
+2024. DSPy: Compiling Declarative Language Model Calls
+into Self-Improving Pipelines. In International Conference
+on Learning Representations (ICLR).
+
+Lei, F.; Chen, J.; Ye, Y.; Cao, R.; Shin, D.; Su, H.; Suo,
+Z.; Gao, H.; Hu, W.; Yin, P.; Zhong, V.; Xiong, C.; Sun,
+R.; Liu, Q.; Wang, S.; and Yu, T. 2025. Spider 2.0: Evaluat-
+ing Language Models on Real-World Enterprise Text-to-SQL
+Workflows. In International Conference on Learning Repre-
+sentations (ICLR).
+Li, X.; Chen, W.; Liu, Y.; Zheng, S.; Chen, X.; He, Y.; Li,
+Y.; You, B.; Shen, H.; Sun, J.; et al. 2026. SkillsBench:
+Benchmarking how well agent skills work across diverse
+tasks. arXiv preprint arXiv:2602.12670.
+Liu, J.; Xia, C. S.; Wang, Y.; and Zhang, L. 2023. Is Your
+Code Generated by ChatGPT Really Correct? Rigorous Eval-
+uation of Large Language Models for Code Generation. In
+Advances in Neural Information Processing Systems, vol-
+ume 36.
+Liu, P.; Zhang, G.; Wang, B.; Xu, H.; Liang, X.; Jiang, Y.; and
+Li, Z. 2021. Loss Function Discovery for Object Detection
+via Convergence-Simulation Driven Search. In International
+Conference on Learning Representations (ICLR).
+Madaan, A.; Tandon, N.; Gupta, P.; Hallinan, S.; Gao, L.;
+Wiegreffe, S.; Alon, U.; Dziri, N.; Prabhumoye, S.; Yang,
+Y.; et al. 2023. Self-Refine: Iterative Refinement with Self-
+Feedback. Advances in Neural Information Processing Sys-
+tems, 36.
+Ng, A. Y.; Harada, D.; and Russell, S. 1999. Policy Invariance
+Under Reward Transformations: Theory and Application to
+Reward Shaping. In Proceedings of the 16th International
+Conference on Machine Learning (ICML).
+Ni, J.; Liu, Y.; Liu, X.; Sun, Y.; Zhou, M.; Cheng, P.; Wang,
+D.; Jiang, X.; and Jiang, G. 2026. Trace2Skill: Parallel In-
+ductive Skill Distillation for LLM Agents. arXiv preprint
+arXiv:2603.25158.
+Novikov, A.; V˜u, N.; Eisenberger, M.; Dupont, E.; Huang,
+P.-S.; Wagner, A. Z.; Shirobokov, S.; Kozlovskii, B.; Ruiz, F.
+J. R.; Mehrabian, A.; Kumar, M. P.; See, A.; Chaudhuri, S.;
+Holland, G.; Davies, A.; Nowozin, S.; Kohli, P.; and Balog,
+M. 2025. AlphaEvolve: A Coding Agent for Scientific and
+Algorithmic Discovery. arXiv preprint arXiv:2506.13131.
+OpenAI. 2026. Codex: Record & Replay. https://developers.
+openai.com/codex/record-and-replay. Developer documen-
+tation.
+Ouyang, L.; Wu, J.; Jiang, X.; Almeida, D.; Wainwright, C.;
+Mishkin, P.; Zhang, C.; Agarwal, S.; Slama, K.; Ray, A.;
+Schulman, J.; Hilton, J.; Kelton, F.; Miller, L.; Simens, M.;
+Askell, A.; Welinder, P.; Christiano, P.; Leike, J.; and Lowe,
+R. 2022. Training Language Models to Follow Instructions
+with Human Feedback.
+Advances in Neural Information
+Processing Systems, 35: 27730–27744.
+Pan, A.; Bhatia, K.; and Steinhardt, J. 2022. The Effects
+of Reward Misspecification: Mapping and Mitigating Mis-
+aligned Models. In International Conference on Learning
+Representations (ICLR).
+Park, J. S.; O’Brien, J. C.; Cai, C. J.; Morris, M. R.; Liang,
+P.; and Bernstein, M. S. 2023. Generative Agents: Interactive
+Simulacra of Human Behavior. In Proceedings of the 36th
+Annual ACM Symposium on User Interface Software and
+Technology.
+Real, E.; Liang, C.; So, D.; and Le, Q. 2020. AutoML-Zero:
+Evolving Machine Learning Algorithms From Scratch. In
+Proceedings of the 37th International Conference on Ma-
+chine Learning (ICML), 8007–8019.
+Shinn, N.; Cassano, F.; Gopinath, A.; Narasimhan, K.; and
+Yao, S. 2023. Reflexion: Language Agents with Verbal Re-
+inforcement Learning. In Advances in Neural Information
+Processing Systems, volume 36.
+Skalse, J.; Howe, N.; Krasheninnikov, D.; and Krueger, D.
+2022. Defining and Characterizing Reward Gaming. Ad-
+vances in Neural Information Processing Systems, 35: 9460–
+9471.
+Wang, G.; Xie, Y.; Jiang, Y.; Mandlekar, A.; Xiao, C.; Zhu,
+Y.; Fan, L.; and Anandkumar, A. 2024a.
+Voyager: An
+Open-Ended Embodied Agent with Large Language Mod-
+els. Transactions on Machine Learning Research.
+Wang, J.; Ren, Y.; and Zhang, H. 2026. From Procedural
+Skills to Strategy Genes: Towards Experience-Driven Test-
+Time Evolution. arXiv preprint arXiv:2604.15097.
+Wang, L.; Ma, C.; Feng, X.; Zhang, Z.; Yang, H.; Zhang, J.;
+Chen, Z.; Tang, J.; Chen, X.; Lin, Y.; Zhao, W. X.; Wei, Z.;
+and Wen, J. 2024b. A Comprehensive Survey of LLM-Based
+Autonomous Agents. Frontiers of Computer Science, 18(6).
+Wang, Z. Z.; Mao, J.; Fried, D.; and Neubig, G. 2024c. Agent
+Workflow Memory. arXiv preprint arXiv:2409.07429.
+Wu, R.; Wang, X.; Mei, J.; Cai, P.; Fu, D.; Yang, C.; Wen,
+L.; Yang, X.; Shen, Y.; Wang, Y.; et al. 2025. Self-Evolving
+LLM Agents through an Experience-Driven Lifecycle. arXiv
+preprint arXiv:2510.16079.
+Xia, P.; Chen, J.; Wang, H.; Liu, J.; Zeng, K.; Wang, Y.;
+Han, S.; Zhou, Y.; Zhao, X.; Chen, H.; et al. 2026. SkillRL:
+Evolving Agents via Recursive Skill-Augmented Reinforce-
+ment Learning. arXiv preprint arXiv:2602.08234.
+Yang, B.; Xia, Y.; Sun, W.; and Liu, Y. 2025.
+Hallu-
+cination Detection for LLM-based Text-to-SQL Genera-
+tion via Two-Stage Metamorphic Testing.
+arXiv preprint
+arXiv:2512.22250.
+Yang, C.; Wang, X.; Lu, Y.; Liu, H.; Le, Q. V.; Zhou, D.; and
+Chen, X. 2024. Large Language Models as Optimizers. In
+International Conference on Learning Representations.
+Yang, Y.; Li, J.; Pan, Q.; Zhan, B.; Cai, Y.; Du, L.;
+Zhou, J.; Chen, K.; Chen, Q.; Li, X.; et al. 2026.
+Au-
+toSkill: Experience-Driven Lifelong Learning via Skill Self-
+Evolution. arXiv preprint arXiv:2603.01145.
+Yuan, W.; Pang, R. Y.; Cho, K.; Li, X.; Sukhbaatar, S.; Xu,
+J.; and Weston, J. 2024. Self-Rewarding Language Mod-
+els. In Proceedings of the 41st International Conference on
+Machine Learning (ICML).
+Yuksekgonul, M.; Bianchi, F.; Boen, J.; Liu, S.; Huang, Z.;
+Guestrin, C.; and Zou, J. 2024. TextGrad: Automatic “Dif-
+ferentiation” via Text. arXiv preprint arXiv:2406.07496.
+Zhang, J.; Qu, C.; Fang, J.; et al. 2025. A Survey of Self-
+Evolving Agents: On Path to Artificial Super Intelligence.
+arXiv preprint arXiv:2507.21046.
+Zhang, X.; Cui, Y.; Wang, G.; Li, Z.; Qiu, W.; Zhu, B.; and
+He, P. 2026a. Library Drift: Diagnosing and Fixing a Silent
+
+Failure Mode in Self-Evolving LLM Skill Libraries. In ICML
+2026 Workshop on Failure Modes in Agentic AI.
+Zhang, X.; Cui, Y.; Wang, G.; Li, Z.; Qiu, W.; Zhu, B.; and
+He, P. 2026b. Ratchet: A Minimal Hygiene Recipe for Self-
+Evolving LLM Agents. arXiv preprint arXiv:2605.22148.
+Zhang, X.; Wang, G.; Cui, Y.; Qiu, W.; Li, Z.; Zhu, B.; and
+He, P. 2026c. Experience Compression Spectrum: Unifying
+Memory, Skills, and Rules in LLM Agents. arXiv preprint
+arXiv:2604.15877.
+Zhao, A.; Huang, D.; Xu, Q.; Lin, M.; Liu, Y.-J.; and Huang,
+G. 2024. ExpeL: LLM Agents Are Experiential Learners.
+In Proceedings of the AAAI Conference on Artificial Intelli-
+gence.
+Zheng, L.; Chiang, W.-L.; Sheng, Y.; Zhuang, S.; Wu, Z.;
+Zhuang, Y.; Lin, Z.; Li, Z.; Li, D.; Xing, E. P.; Zhang, H.;
+Gonzalez, J. E.; and Stoica, I. 2023. Judging LLM-as-a-Judge
+with MT-Bench and Chatbot Arena. Advances in Neural
+Information Processing Systems, 36.
+Zhuge, M.; Zhao, C.; Ashley, D.; Wang, W.; Khizbullin, D.;
+Xiong, Y.; Liu, Z.; Chang, E.; Krishnamoorthi, R.; Tian,
+Y.; Shi, Y.; Chandra, V.; and Schmidhuber, J. 2024. Agent-
+as-a-Judge: Evaluate Agents with Agents. arXiv preprint
+arXiv:2410.10934.
+
+Appendix A: Task Descriptions
+These cards give enough context to interpret the results; the
+builders that assemble each family’s tasks and splits are in
+the released code.
+MBPP+
+validation task · anchor: hidden unit tests
+Task. A one-paragraph natural-language programming prob-
+lem plus one example call; the solver writes a Python function.
+Anchor. The EvalPlus hidden test suite, which adds many
+more tests per problem than the original MBPP and repairs
+faulty ones, giving reliable pass/fail.
+Typical failures. Crashes, mishandled edge cases, printing in-
+stead of returning, misread specifications, exactly the failure
+classes the op pool checks.
+Spider 2.0-Snow
+validation task · anchor: execution match
+Task. An analyst question over a real hosted Snowflake ware-
+house: production-scale databases with hundreds of tables,
+cryptic columns, sharded table families, and dialect-specific
+SQL. The solver writes one query from the question, a ren-
+dered schema catalog, and optional domain notes.
+Anchor. Execute the candidate and compare the fetched table
+to the stored gold result with the official comparator (value-
+based; column names and order are ignored).
+Typical failures. Unresolvable identifiers, type errors on date-
+like columns, and, hardest, queries that run cleanly but com-
+pute the wrong thing. Our single-call solver passes about a
+third of screened tasks.
+Report generation
+target task · no accurate metric exists
+Task. Write one section of an analyst report (e.g., “value-chain
+map: control points from ASIC to optical engine”) in mark-
+down, given the inputs below.
+Inputs. (i) Section title and purpose. (ii) A style contract fixing
+units, reference dates, and accounting rules (e.g., “all amounts
+USD, calibrated to 2026 Q2, market sizes must not be summed
+across pools”). (iii) Evidence cards. (iv) A metric vocabulary
+registering the section’s key figures (id, name, value, unit).
+Evidence card. An audited unit of evidence: id E0103, one-
+sentence claim, verbatim source quote, source attribution and
+date, stance (supporting / opposing / neutral), and an auditor’s
+credibility verdict.
+Requirements. Ground every claim in the cards (cite
+[E###]); state each key figure’s value with its inline tag
+binding it to the metric vocabulary (rendered downstream as
+audit tooltips); hedge weak or disputed evidence and present
+both sides of conflicts; include required structure such as a
+summary line.
+Why no metric exists. Section quality is holistic; even an
+expert author cannot reduce “a good section” to a checkable
+rule. The RAQS rubric scores lexical and structural proxies of
+the requirements above and is treated as reference signal only.
+Appendix B: Setup Details
+Splits and screening.
+For MBPP+ and Spider 2.0 we
+screen every task with five independent samples of the frozen
+single-call solver, graded by the official anchor. We drop tasks
+the solver always passes (no room to improve) and stratify
+the rest across pass levels for a balanced difficulty mix, then
+split 60/40 into train and test. The dev set is ten items, five
+clear failures and five clean passes (for report generation:
+five golden-quality positives and five class-stratified check-
+able failures), so the metric is scored on both classes. In the
+released code the dev and test splits are named eval_dev
+and eval_locked.
+Anchors.
+MBPP+: hidden unit tests. Spider 2.0: execute
+the candidate on the live warehouse and compare the fetched
+table to the stored gold result with the official comparator,
+which matches values (ignoring column names and order).
+We reproduce the evaluator’s CSV round-trip of the fetched
+frame, without which even gold queries fail on dtype. Report
+generation: the metric loop’s anchor is a frozen demo-delta
+soft label, where a teacher compares the frozen-agent report
+against the golden section under a closed seven-class miss
+taxonomy and passes iff at most one miss class is present.
+Each of the 48 held-out sections contributes two locked
+items, the frozen-agent report (which the strict anchor al-
+most always fails) and the golden section (which passes by
+definition), giving 96 items balanced 50/50, so a degenerate
+metric scores 0.5. The skill and co-loops are evaluated by the
+official rubric evaluator (RAQS, 0–100 normalized), whose
+dimensions cover evidence grounding, metric-tag discipline,
+claim calibration, structure, and style.
+Spider 2.0 prompt grounding.
+The generation prompt
+grounds the solver with a compact typed schema catalog
+(columns as name:TYPE, sharded tables collapsed, sample
+values on date-like columns) and Snowflake-specific rules
+(quoted identifiers, type-respecting casts, value-only grad-
+ing). We report this because it is a large, shared effect we
+control for, not a contribution: grounding raises the frozen
+baseline by half on the screened pool (0.211 to 0.329) but is
+applied identically to every arm, so all reported lifts sit on
+top of it. It also sets up the detectability contrast: grounding
+pushes the solver’s residual failures from compile errors into
+clean-executing wrong values.
+Appendix C: The Metric Language and
+Lifecycle
+Language.
+Recapping the grammar of Eq. 1: a metric is an
+expression over ops (pure functions of (task, output) return-
+ing drawback/clean/abstain), composed by W, V, nega-
+tion, the unweighted K-of-k vote, and a weighted vote against
+a threshold, with abstaining children excluded from a com-
+binator and an all-abstain node abstaining. Negation and the
+weighted vote are offered to the composer on every round
+but appear in none of the selected metrics, so every reported
+expression reads as a plain drawback disjunction or vote.
+Lifecycle.
+Each task starts from a small pool of seed detec-
+tors, the obvious failure checks a practitioner reads straight
+off the task description (does the code crash, does the query
+group correctly, is a key figure missing); drafting them, or
+having an LLM draft them from the task spec, is an after-
+noon’s work, and their exact contents barely matter because
+the lifecycle grows and prunes the pool from there. Synthesis
+authors typed op specs from clustered misses under a closed
+
+per-task taxonomy. The birth gate requires a new op to fire on
+at least half its cluster and stay clean on known-good outputs.
+Ops born from anchored misses enter active; unlabeled-gap
+ops enter shadow and are promoted only on demonstrated an-
+chor agreement. Per-op fitness is the leave-one-out marginal
+of the incumbent expression, and non-positive ops retire after
+a two-round grace.
+Selection and guards.
+The objective multiplies dev agree-
+ment by consensus agreement on unlabeled train outputs
+(exponent 1.0 for MBPP+ and Spider, 0.25 for report gen-
+eration, where op consensus is a weaker regularizer), mi-
+nus a small complexity penalty. Both agreement terms are
+weighted. Dev agreement is the recall-weighted mean of the
+two per-class recalls over the dev items a candidate opines on,
+with the fail class at weight 2 and the clean class at weight
+1. Train consensus is reliability-weighted: each opining op’s
+vote is scaled by 1 + 10 max(0, mo) for that op’s anchored
+leave-one-out marginal mo, so anchor-proven ops lead the
+vote and ops with no anchored evidence contribute at unit
+weight. This keeps a bloc of cheaply synthesized, correlated
+detectors from defining the pseudo-label that the regular-
+izer rewards agreeing with. The complexity penalty charges
+0.001 per op beyond a floor of three and a further 0.002
+per LLM-calling op, which is why selected expressions stay
+small and mostly deterministic. Fail-closed anchoring makes
+candidates without a usable dev opinion unselectable, and
+a validity gate drops all-pass/all-fail/all-abstain candidates.
+The naive ablation disables exactly these two guards; the no-
+lifecycle ablation disables exactly the birth gate, shadow tier,
+and retirement.
+Appendix D: Final-Judge Protocol and
+Rubrics
+Protocol.
+For each of the 48 held-out sections we pair the
+stored round-0 report against the stored peak-round report,
+and separately against the final-round report, for every arm
+and seed. Pre-repair this is 3 arms × 3 seeds × 2 rounds × 48
+sections = 864 pairs; the post-repair rerun adds a fourth seed
+on the two co-loop arms, giving 1,056. Each pair is judged
+twice with positions swapped, and a win counts only when
+both orders agree; otherwise it is a tie.
+Rubrics.
+The generic rubric asks a senior-editor ques-
+tion about holistic reader value with no knowledge of the
+pipeline’s conventions. The task-aware rubric additionally
+states the format contract: evidence citations and inline met-
+ric tags are required output that renders downstream; a tag
+with no value nearby is a defect; fabricated figures are dis-
+qualifying. Both rubrics judge the same stored pairs, so the
+four cells of Table 5 differ only in the repair pass (rows) and
+the rubric (columns).
+Appendix E: What Evolution Actually
+Produced
+Final artifacts from the paper runs, verbatim except where
+marked as condensed, illustrating the central qualitative
+claim: everything the loops evolve is legible. Figure 5 gives
+the final metric on each task, Figure 6 traces one synthesized
+Task
+Loop Synthesized Bank Evicted Rollback
+MBPP+ skill
+140–167
+50
+80–100
+1
+co
+111–154
+50
+60–101
+0
+Spider
+skill
+149–177
+50
+86–114
+1–2
+co
+152–153
+50
+76–86
+1–2
+Report
+skill
+6–66
+6–50
+0–15
+0
+co
+135–156
+50
+85–106
+0
+Table 6: Synthesis is prolific and the bounded bank evicts
+more than half of what it creates. Skill-loop lifecycle over
+100 rounds, bank cap 50, the counterpart to Table 1. Bank: fi-
+nal active skills. Evicted: removed by contribution. Rollback:
+held-out regressions reverted. Three-seed min–max; a bare
+number means all seeds agree. Bold rows are our proposed
+configuration.
+detector through the whole lifecycle, Figure 7 grades one
+attempt with the hidden tests and with the evolved metric
+side by side, and Figure 8 pairs skills the two loops learned
+independently.
+Appendix F: Lifecycle Statistics
+Table 1 in the results gives the metric-loop op lifecycle; Ta-
+ble 6 here gives the skill-loop side, both for the anchored
+arms. The locked metric sets are small, 40 items on MBPP+
+and Spider and 96 on reports, but they are regraded in full ev-
+ery round: the nine anchored metric-loop runs record 52,600
+item-level verdicts against the locked reference and 5,743
+birth-gate decisions. Each run stores every verdict with its
+per-op trace, which is what makes the paired tests recom-
+putable from a finished run without rerunning any loop; the
+released code includes the script that reads those tables and
+computes the reported counts and p-values. For the skill
+loops, synthesis is prolific (roughly 1.5 skills per round), the
+bounded bank forces contribution-based eviction of more
+than half of everything created, and rollback fires rarely; the
+report skill loop is the outlier, its targeted failure capsules
+producing skills so effective that a handful suffice (one seed
+held its plateau with a bank of six).
+Appendix G: Negative and Supporting Results
+Naive co-loops are not a free pass.
+Although naive co-
+loops match the anchored arm on held-out evaluation (their
+measurement anchor is untouched), their metric arms are
+degenerate where inspection matters: on report generation
+the naive metric grades 0.97–1.00 of train as passing (versus
+0.78–0.82 anchored), and on Spider 2.0 the naive objective
+barely moves on two of three seeds.
+Skill-loop robustness to metric quality.
+The weak-metric
+Spider 2.0 seeds reported in the results reach the same peak as
+their two-op sibling because training signal quality degrades
+gracefully: a failed attempt still carries concrete error text
+into skill synthesis even when the pass/fail label is noisy.
+Anchor size.
+Ten dev items is a design choice about what
+sparse anchoring realistically supplies, not a tuned setting, so
+we test how far selection depends on it. The results section
+
+Evolved metrics
+one final expression per task, verbatim
+MBPP+
+Spider 2.0
+Report
+Flag a solution if the judge finds a spec
+mismatch, or it crashes on probe inputs,
+or it prints instead of returning:
+Flag a query if it aggregates without
+grouping, or the judge finds it does not
+answer the question (selected
+independently on two of three seeds):
+Flag a section if a registered key figure never
+appears, or a weak-credibility card is cited
+without hedging (the other two seeds swap
+the first leaf for an uncited-claims detector):
+(any
+spec_mismatch
+crash
+returns_not_print_only)
+(any
+missing_group_by
+spec_sql_mismatch)
+(any
+ledger_metric_uncovered
+low_status_card_overclaimed)
+Figure 5: The final evolved metric on each task, verbatim, with a plain reading above it. Each is a short drawback disjunction
+over typed detectors: nothing here is a learned scalar, and each leaf names the failure class it fires on.
+A synthesized op
+born, gated, promoted, and selected (Spider 2.0)
+Tracing one op through the whole lifecycle, on the metric-loop seed that ends at (any
+syn_forbids_select_star_when_columns spec_sql_mismatch). The loop clustered four unlabeled train outputs that
+returned every column although the question implied specific ones, and authored the typed spec {kind: static, check:
+forbids_select_star, detects: select_star_specific_columns}. Because its birth evidence was an unlabeled
+gap rather than an anchored miss, it entered as a shadow: it ran and recorded verdicts but could not be selected. It was promoted the
+same round only once composing it with the incumbent raised dev agreement from 0.71 to 0.81, and selection then adopted it, replacing
+the grouping check the seed pool had contributed. The two co-loop seeds on this task converge on a different synthesized op
+(syn_top_n_missing_limit) and the third on the seed select_star check, so the leaf is not a fixed artifact of the pool.
+Figure 6: One synthesized detector through the whole lifecycle: born from unlabeled outputs, admitted as a shadow,
+promoted only once it raised anchor agreement, then selected. A Spider 2.0 metric-loop seed; the aggregate counts are
+Table 1.
+reports the numbers; the protocol behind them is an offline
+replay of report-generation selection, drawing 200 stratified
+subsamples per anchor size from the same ten items, preserv-
+ing the fail/clean balance within each draw, and rescoring
+every candidate expression the live run actually considered
+under the reduced anchor. No new generation and no new
+solver calls are involved, so the comparison isolates the an-
+chor’s contribution to selection from run-to-run variance.
+Appendix H: Reproducibility
+The code is released at https://github.com/amazon-science/
+Self-Evolving-Agents-Double-Ratchet: all loops, op packs,
+split builders, screening scripts, and the judge protocols, suf-
+ficient to rerun every experiment end to end and reproduce
+results in line with those reported here. We release code only,
+not run data, results, or logs. All model calls go through the
+Amazon Bedrock API, so wall-clock time is dominated by
+API latency. Each run writes its own round-by-round his-
+tory, op pool, skill bank, and judge outputs as structured
+result files, and every number in this paper is read directly
+from those files. The role-to-model table named in the setup
+covers every LLM role: solver, teacher, composer, skill syn-
+thesizer, judge ops, and final judge. Spider 2.0 requires cre-
+dentialed access to the benchmark’s hosted warehouse; all
+other experiments are self-contained.
+
+Grading one task: hidden tests vs. evolved metric
+MBPP+ task, final-round trace, verbatim
+Task and solver output
+Ground-truth anchor
+Evolved metric
+“Write a function to find the ratio of zeroes in an
+array of integers.”
+def zero_count(nums):
+zeros = sum(1 for x
+in nums if x == 0)
+non_zeros = len(nums) - zeros
+...
+return zeros / non_zeros
+The code runs cleanly and returns a number; it
+computes the ratio to non-zeros where the spec
+wants the ratio to all elements. Only the
+meaning is wrong.
+Hidden unit tests (EvalPlus).
+assert zero_count(...)
+→AssertionError
+Verdict: fail.
+The verdict is reliable but opaque:
+no indication of which requirement
+was misread.
+Evolved composition (any
+spec_mismatch crash
+returns_not_print_only).
+crash: clean
+returns_not_print_only: clean
+spec_mismatch (judge op):
+drawback
+Verdict: fail, agreeing with the anchor,
+and naming the failure class: the
+specification was misread.
+The named drawback is what turns this attempt into a usable failure capsule for skill synthesis; the anchor’s bare verdict could not have
+driven the same repair.
+Figure 7: The same verdict, reached two ways: the hidden tests say fail, and the evolved metric says fail while naming
+why. One MBPP+ attempt whose code runs cleanly and returns a number but computes the wrong quantity. Only the middle
+column is ground truth; the right column is what an inspectable composition adds on top of an equally correct verdict.
+Same lesson, two loops
+functionally matched skills, reference vs. co-evolved, condensed
+Each pair below was synthesized independently, one by the reference loop under ground-truth grading and one under the evolved metric
+(Double Ratchet); neither loop saw the other. Converging on the same task lesson is the qualitative face of the retention result.
+MBPP+
+Spider 2.0
+Report
+(grader imports a literal identifier)
+(empty result diagnosis)
+(the anti-erasure lesson)
+reference function-name-
+from-assert: “the harness imports
+the symbol literally as written in the
+assert; lift the identifier verbatim
+including case, the prose is only a hint.”
+reference sql-empty-result-
+diagnosis: “a 0-row result is almost
+never correct when the gold has rows;
+incrementally relax predicates to locate
+which condition eliminates all rows.”
+reference metric-tag-annotates-
+not-replaces: “the scorer counts a
+figure only when a literal number sits
+adjacent to the brace tag; a tag with no
+rendered numeral reads as an unrendered
+placeholder.”
+co copy_callable_
+identifier_from_assert: “the
+grader imports the name verbatim from
+the assert; reproduce that exact spelling
+letter for letter, including apparent typos.”
+co sql-empty-result-
+sanity-probe: “an empty result
+almost always means one predicate
+matched nothing; validate each CTE’s
+row count in isolation before trusting the
+join.”
+co metric-tag-inline-
+after-number: “the tag annotates the
+value; it never replaces the value, and a
+bare card cite does not satisfy it.”
+Figure 8: Trained on ground truth and trained on the evolved metric, the two loops independently learn the same task
+lesson. One functionally matched skill pair per task, condensed. Neither loop saw the other, so the convergence is the qualitative
+face of the lift-retention result in Table 3.
