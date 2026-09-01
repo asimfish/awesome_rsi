@@ -1,0 +1,1248 @@
+2026-8-21
+Self-Harness: Harnesses That Improve Themselves
+Hangfan Zhang1, Shao Zhang1, Kangcong Li1, Chen Zhang1
+Yang Chen1, Yiqun Zhang1, Lei Bai1,†, Shuyue Hu1,†
+1Shanghai Artificial Intelligence Laboratory,{zhanghangfan,zhangshao,hushuyue}@pjlab.org.cn
+Abstract
+The performance of LLM-based agents is jointly shaped by their base models and the harnesses that
+mediate their interaction with the environment. Because different models exhibit distinct behaviors,
+effective harness design is inherently model-specific. Yet agent harnesses are still largely engineered by
+human experts, a paradigm that scales poorly as modern LLMs become increasingly diverse and rapidly
+evolving. In this paper, we introduceSelf-Harness, a new paradigm in which an LLM-based agent
+improves its own operating harness, without relying on human engineers or stronger external agents.
+WeoperationalizeSelf-Harnessasaniterativeloopwiththreestages:WeaknessMining, whichidentifies
+model-specific failure patterns from execution traces;Harness Proposal, which generates diverse yet
+minimal harness modifications tied to these failures; andProposal Validation, which accepts candidate
+edits only after regression testing. We instantiate Self-Harness across Terminal-Bench-2.0, SWE-bench
+Verified, and AppWorld using a minimal initial harness and three base models from diverse families:
+MiniMax M2.5, Qwen3.5-35B-A3B, and GLM-5. Across all nine model–benchmark combinations,
+every final harness improves both held-in and held-out pass rates, with overall relative gains of up to
+132%. Qualitative analyses further show that the retained mechanisms address benchmark-specific
+bottlenecks in artifact handling and runtime control, software-patch verification, and application-state
+retrieval. These results suggest a path toward LLM-based agents that are not merely shaped by their
+harnesses, but can also participate in reshaping them.
+For a conscious being, to exist is to change, to change is to mature, to mature is to go on
+creating oneself endlessly.
+—Henri Bergson, Creative Evolution
+1. Introduction
+To date, LLM-based agents are not shaped by their base model alone, but also by theirharness:
+the surrounding system that situates the model and mediates its interaction with the environment.
+Although there is no universally accepted definition, a harness may include system prompts, tools,
+runtime mechanisms, verification rules, orchestration logic, and failure-recovery procedures. The
+same base model can thus exhibit substantially different performance under different harnesses (Lee
+et al., 2026; Lin et al., 2026; Yang et al., 2024).
+From early frameworks such as ReAct (Yao et al., 2023) to product- and platform-level systems
+such as Claude Code, Codex, and OpenHands, harnesses have largely been engineered by human
+experts (Liu et al., 2026; OpenAI, 2026; Wang et al., 2025; Zhang et al., 2025c; Zhu et al., 2026).
+† Corresponding authors
+arXiv:2606.09498v3  [cs.CL]  20 Aug 2026
+Self-Harness: Harnesses That Improve Themselves
+Figure 1| Three paradigms of harness improvement. In human harness engineering, human engineers
+manuallyrevisetheagentharness. InMeta-Harness, astrongerexternalagentguidestheimprovement
+of a weaker target agent. In Self-Harness, the agent improves its own operating harness.
+While effective, this human-centered paradigm does not scale well with the diversity and rapid
+evolution of modern LLMs. Different models can exhibit distinct behavioral patterns, tool-use habits,
+error modes, and sensitivities to prompting (Qin et al., 2023; Schulhoff et al., 2025; Sclar et al.,
+2024); consequently, a harness that works well for one model may be suboptimal for another (Lee
+et al., 2026; Lin et al., 2026; Sclar et al., 2024). As new models continue to be released at a rapid
+pace, manually redesigning and tuning a model-specific harness for each model becomes increasingly
+costly and untenable.
+In this paper, we explore a novel paradigm,Self-Harness: enabling an LLM-based agent to improve
+the very harness through which it operates (Figure 1). Unlike recent approaches that use stronger
+external agents to improve the harnesses of weaker ones (Lee et al., 2026; Lin et al., 2026), Self-
+Harness seeks to internalize this improvement loop within the target agent itself. This paradigm
+reduces dependence on external guidance that may be costly, unavailable for frontier models, or
+mismatched to the target model’s failure modes. More broadly, in Bergson’s terms, this points toward
+a technical analogue of self-creation: a system not merely changed from without, but continually
+“going on creating itself.”
+We operationalize Self-Harness as an improvement loop that repeatedly turns behavioral evidence
+into harness updates (Figure 2). The loop consists of three stages.Weakness Mining:Starting
+from an initial harness, the agent with a fixed model is run on a set of tasks, producing execution
+traces with verifiable outcomes. The agent then clusters failed traces, allowing it to reason about
+model-specific failure patterns rather than isolated mistakes.Harness Proposal:Based on these
+failure patterns, the agent generates a small set of diverse yet minimal harness modifications, each
+tied to a specific failure mechanism. This constraint ensures that proposed edits remain targeted
+rather than overly general.Proposal Validation:Candidate modifications are evaluated through
+regression tests, and an edit is promoted only if it improves performance without causing measurable
+degradation on held-out tasks. If multiple candidate modifications pass the regression tests, they
+are merged into the next version of the harness, which then serves as the starting point for the next
+iteration.
+In our experiments, we instantiate Self-Harness with a minimal initial harness (Figure 3) and
+three base models from diverse families: MiniMax M2.5, Qwen3.5-35B-A3B, and GLM-5 (GLM-5
+Team, 2026; MiniMax, 2026; Qwen Team, 2026), across Terminal-Bench-2.0, SWE-bench Verified,
+and AppWorld. Across the nine model–benchmark combinations, every final harness improves
+both held-in and held-out pass rates (Table 1). On Terminal-Bench-2.0, Self-Harness consistently
+2
+Self-Harness: Harnesses That Improve Themselves
+improves performance across all three models. For held-in tasks, which provide execution traces
+to the evaluation system, the pass rate is increased from 43.0% to 50.0% for MiniMax M2.5, from
+15.1% to 36.0% for Qwen3.5-35B-A3B, and from 47.7% to 57.0% for GLM-5. For held-out tasks,
+whose execution traces are never used as inputs to the evaluation system, the improvements remain
+substantial. The pass rate is increased from 40.5% to 61.9% for MiniMax M2.5, from 23.8% to 38.1%
+for Qwen3.5-35B-A3B, and from 42.9% to 57.1% for GLM-5. The same pattern holds on SWE-bench
+Verified and AppWorld: every model improves on both splits, with overall Pass gains of 3.5–22.0
+and 10.3–40.6 percentage points, respectively. These results indicate that Self-Harness can evolve
+an initial harness into model-specific ones better suited to different base models. Moreover, it can
+discover broadly useful harness modifications that transfer to tasks whose traces are hidden from the
+proposer.
+QualitativeanalysesfurthershowthatSelf-Harnessdoesmorethansimplymakethepromptlonger
+or add generic instructions. Instead, it introduces targeted changes that reflect the recurring problems
+each model encounters during execution, turning model-specific weaknesses into concrete harness-
+level interventions. For MiniMax M2.5, the changes encourage the agent to create required output files
+earlier, handle structured tool outputs more carefully, and stop unproductive tool-use loops before they
+become too long. For Qwen3.5-35B-A3B, the changes focus on checking dependencies in advance,
+avoiding repeated failed commands, breaking cycles of endless exploration, and reminding the agent
+to produce the required artifacts after tool errors. For GLM-5, the changes mainly help the agent
+preserve environment settings across shell commands and move more quickly from exploration to
+implementation and testing. Notably, Self-Harness can also introduce broader structural mechanisms,
+such as subagent-based decomposition and middleware creation, that go beyond local failure repair
+and improve the overall organization of problem solving.
+To summarize, our key contributions are as follows:
+• We propose Self-Harness, a novel paradigm for harness improvement that enables an LLM-based
+agent to design and refine the harness through which it operates, tailoring it to its own base
+model without human engineering effort or guidance from a stronger external agent.
+• We operationalize Self-Harness as an iterative loop that turns each model’s behavioral evidence
+into model-specific harness updates: it evaluates execution traces to identify recurring failure
+patterns, generates diverse yet minimal candidate edits, and promotes only those that pass
+regression tests.
+• Experiments show that Self-Harness improves performance across all nine model–benchmark
+combinations, with overall Pass gains of up to 40.6 percentage points and relative improvements
+of up to 132%; qualitative analyses further confirm that different models benefit from distinct
+harness changes, suggesting that Self-Harness can turn model-specific weaknesses into concrete
+harness changes.
+2. Background and Related Work
+From prompts to agent harnesses.Prompt engineering and context engineering show that fixed
+models can be steered by instructions, demonstrations, retrieved evidence, memory, tool state, and
+dynamically constructed inputs (Lewis et al., 2020; Liang et al., 2026; Liu et al., 2021; Mei et al.,
+2025; Packer et al., 2024; Schulhoff et al., 2025; Wei et al., 2022; Xu et al., 2026). Agentic systems
+extend this control surface from a single input to an execution environment: the model acts, observes
+consequences, uses tools, receives feedback, and follows runtime policies. ReAct, SWE-agent, Claude
+Code, and SemaClaw/OpenClaw illustrate how such surrounding mechanisms shape long-horizon
+agent behavior and software-engineering performance (Liu et al., 2026; Yang et al., 2024; Yao et al.,
+3
+Self-Harness: Harnesses That Improve Themselves
+2023; Zhu et al., 2026).
+We useharnessfor this surrounding system layer: prompts, tools, memory, verification rules,
+permission policies, adapters, and runtime mechanisms that mediate between the model and the
+environment. Many important agent failures are failures of this layer rather than failures of an isolated
+model response: an agent may report success without checking an artifact, retry an unproductive
+action pattern, lose the source of truth in a long context, or lack a recovery action. These behaviors
+emerge from the interaction between instructions, observations, tools, and runtime control, so
+improving them requires changing more than prompt text.
+Self-improving agents and automated agent design.A growing line of work studies systems that
+adapt their inputs, memories, contexts, or workflows over time (Shinn et al., 2023; Zelikman et al.,
+2024; Zhang et al., 2025a, 2026). Reflexion stores verbal feedback for later attempts (Shinn et al.,
+2023), agentic context engineering evolves contexts for later model calls (Zhang et al., 2026), and
+STOP studies recursive self-improvement for code generation (Zelikman et al., 2024). These methods
+show that fixed models can benefit from accumulated feedback, but the adapted object is usually a
+response strategy, memory, context, or generated program rather than a declared agent harness state.
+A second line optimizes agent designs from outside the evaluated agent. Automated Design of
+Agentic Systems searches over agent designs, language agents can be represented as optimizable
+graphs, and Meta-Harness directly optimizes harness code using source code, scores, and traces from
+prior candidates (Hu et al., 2025; Lee et al., 2026; Zhuge et al., 2024). These systems motivate
+harness-level optimization, but they frame improvement as an external search or optimization process
+rather than as a bounded edit proposed by the evaluated model under its current harness.
+Finally, scientific discovery and self-evolving agent systems such as The AI Scientist, AI Scientist-v2,
+AlphaEvolve, Alita, Godel Agent, and Darwin Godel Machine automate broader loops of research,
+algorithm design, or capability expansion (Fu et al., 2026; Lu et al., 2024; Novikov et al., 2025; Qiu
+et al., 2025; Yamada et al., 2025; Yin et al., 2025; Zhang et al., 2025b). Self-Harness is closest in
+spirit to this self-improvement literature and to automated harness optimization, but it studies a
+narrower controlled setting: whether the same fixed model, operating under the current harness, can
+propose a bounded candidate change to the harness that governs its own future behavior.
+3. Self-Harness: An Iterative Loop for Model-Specific Harness Improvement
+Human harness engineering improves agent harnesses through expert inspection and manual revision,
+while external optimizer approaches treat harness design choices as a searchable space. Self-Harness
+studies a middle ground in which a fixed model iteratively improves the harness around itself through
+an explicit self-improvement loop driven by execution evidence. In each iteration, the evaluation
+system runs the current harness and mines recurring failure patterns from clustered execution traces
+to produce structured evidence. Given this evidence, the same model is invoked in a proposer role to
+generate a set of diverse yet minimal candidate harness modifications, each targeting a specific failure
+mechanism without replacing the overall control architecture. Candidate edits are then validated
+through regression testing on held-out tasks, and an explicit acceptance rule promotes only those
+edits that improve performance without introducing unacceptable regressions.
+3.1. Preliminary
+We useharnessto denote the non-parametric scaffolding that governs how a fixed language model
+is deployed as an agent. A harness includes the instructions, the available tools, memory and state-
+4
+Self-Harness: Harnesses That Improve Themselves
+Weakness Mining
+Proceed to N ex t
+I terationMissing 
+Validation
+Corrupted 
+Tool
+Current Harness    
+prompts · tools · memory · policies
+Fixed Model   
+All Re j ect -  N o Update
+Selected
+Failure Patterns
+     as
+Proposer
+Run     
+on tasks
+Collected
+Execution Traces
+Clustered 
+Failure Patterns
+Failure Patterns 
+&  I nsig h ts
+Harness Proposal
+W1: Missing 
+Validation Current 
+Harness    
+Validate 
+before Conclude
+W2: Unlimited 
+Exploration
+Loop Breaker
+Middleware
+W3: Corrupted 
+Tool Call
+Tool 
+Policy Update
+Proposed
+Harness Edits
+Proposed Harness
+Candidates
+Proposal Validation
+Validate 
+before Conclude
+Accept
+Loop Breaker
+Middleware
+Accept
+Tool 
+Policy Update
+Model
+Fixed           
+Re j ect Accept -  Update Harness
+Updated Harness    
+prompts · tools · memory · policies
+Fixed Model  
+Regression
+Test
+Promotion
+D ecision
+Figure 2| Overview of one Self-Harness optimization loop. The current harnessℎ𝑡 with fixed model
+is evaluated on tasks to collect execution traces, which are clustered into verifier-grounded failure
+patterns. The same model is then invoked under the current harness as a proposer, using the mined
+failure patterns to generate bounded candidate harness edits. Candidate edits are evaluated by
+regression tests on held-in and held-out splits. Accepted candidates are merged to update the harness
+toℎ𝑡+1, while rejected candidates are logged without changing the active harness. Throughout the
+loop, the model weights and evaluator remain fixed; only the surrounding harness is modified.
+management mechanisms, etc. The harness does not modify the model parameters; instead, it
+specifies the execution protocol through which the model observes a task, takes actions, invokes tools,
+checks intermediate artifacts, and produces a final answer.
+Formally, let𝑀 be a fixed language model and letℎ denote an agent harness. Given a task instance
+𝑥, running𝑀 under harnessℎ produces an execution trace𝜏 and an output𝑦. The trace records the
+messages, tool calls, and verifier outcomes. An evaluator then maps the task, trace, and output to
+a behavioral outcome, such as pass/fail. In this work, the model𝑀 and evaluatorE are held fixed,
+while the harness is treated as the object of improvement. Self-Harness therefore operates over a
+lineage of harnessesℎ0,ℎ 1,... , where each transition corresponds to a bounded edit to the execution
+protocol rather than an update to the model weights.
+3.2. Weakness Mining: Identifying Failure Patterns from Clustered Execution Traces
+ThefirststageofSelf-Harnessconvertsbehavioralfailuresintostructuredevidenceforharnessrevision.
+At round𝑡, we run the fixed model𝑀 under the current harnessℎ𝑡 on a held-in split𝐷in. For each
+task instance𝑥𝑖∈𝐷 in, the run produces an output𝑦𝑖 and an execution trace𝜏𝑖. The evaluatorE then
+5
+Self-Harness: Harnesses That Improve Themselves
+Algorithm 1Self-Harness
+Require: fixed model𝑀, initial harnessℎ0, held-in split𝐷in, held-out split𝐷ho, evaluatorE, proposal
+width𝐾, rounds𝑇
+Ensure:final harnessℎ 𝑇
+1:for𝑡=0,1,...,𝑇−1do
+2:(𝑃 in(ℎ𝑡),𝑃 ho(ℎ𝑡),𝑅 𝑡)←Evaluate(𝑀,ℎ 𝑡,𝐷 in,𝐷 ho,E)
+3:𝐵 𝑡←BuildEvidenceBundle(𝑅 𝑡)⊲from held-in verifier-grounded failures
+4:P 𝑡←ParallelPropose(𝑀,ℎ 𝑡,𝐵 𝑡,𝐾)⊲P 𝑡 ={(Δ 𝑗,𝑎 𝑗)}𝐾
+𝑗=1
+5:A 𝑡←∅
+6:for all(Δ 𝑗,𝑎 𝑗)∈P 𝑡 do
+7:ℎ (𝑗)
+𝑡 ←Δ 𝑗(ℎ𝑡)
+8:(𝑃 in(ℎ(𝑗)
+𝑡 ),𝑃 ho(ℎ(𝑗)
+𝑡 ),𝑅(𝑗)
+𝑡 )←Evaluate(𝑀,ℎ (𝑗)
+𝑡 ,𝐷 in,𝐷 ho,E)
+9:Δ (𝑗)
+in ←𝑃 in(ℎ(𝑗)
+𝑡 )−𝑃 in(ℎ𝑡)
+10:Δ (𝑗)
+ho←𝑃 ho(ℎ(𝑗)
+𝑡 )−𝑃 ho(ℎ𝑡)
+11:ifΔ (𝑗)
+in ≥0andΔ (𝑗)
+ho≥0andmax(Δ (𝑗)
+in ,Δ(𝑗)
+ho)>0then
+12:A 𝑡←A 𝑡∪{(ℎ (𝑗)
+𝑡 ,Δ 𝑗,𝑎 𝑗,Δ(𝑗)
+in ,Δ(𝑗)
+ho)}
+13:Accept(Δ 𝑗)⊲passed acceptance rule
+14:else
+15:Reject(Δ 𝑗)
+16:end if
+17:end for
+18:ifA 𝑡 =∅then
+19:ℎ 𝑡+1←ℎ 𝑡 ⊲no accepted candidate
+20:else
+21:ℎ 𝑡+1←MergeAccepted(ℎ 𝑡,A 𝑡)⊲accepted edits are merged
+22:end if
+23:end for
+24:returnℎ 𝑇
+assigns an outcome𝑧𝑖 =E(𝑥 𝑖,𝜏𝑖,𝑦 𝑖), such as pass or fail. This yields a trace record
+𝑟𝑖 =(𝑥 𝑖,𝜏𝑖,𝑦 𝑖,𝑧 𝑖),
+and a round-level record set𝑅𝑡 ={𝑟 𝑖}|𝐷 in|
+𝑖=1 . Since both𝑀 andE are fixed, changes in these records
+across rounds can be attributed to changes in the harness.
+A central role of the evaluation system is to avoid treating failures as isolated anecdotes. We
+therefore focus on the subset of failed records
+𝐹𝑡 ={𝑟 𝑖∈𝑅 𝑡|𝑧 𝑖 =fail}.
+and cluster them by verifier-grounded failure signatures. For each failed record𝑟𝑖, the evaluation
+system analyzes the trace as evidence for why the evaluator rejected the run. It identifies the terminal
+failure reason exposed by the verifier, the agent-side behavior connected to that terminal failure,
+and the causal status of that behavior within the trace. This attribution step prevents the clustering
+procedure from conflating superficial symptoms with reusable failure mechanisms: two runs may
+share the same verifier outcome, such as a timeout or missing artifact, while requiring different
+harness changes because the underlying agent behaviors differ.
+6
+Self-Harness: Harnesses That Improve Themselves
+We write this attribution as a failure signature
+𝜙(𝑟𝑖)=(𝑐 𝑖,𝑞𝑖,𝑚 𝑖),
+where 𝑐𝑖 denotes the terminal verifier-level cause,𝑞𝑖 denotes the causal status of the relevant agent
+behavior, and𝑚𝑖 denotes the abstract agent mechanism exposed by the trace. Failures are clustered
+by exact agreement of this signature:
+𝐶𝜙 ={𝑟 𝑖∈𝐹 𝑡|𝜙(𝑟 𝑖)=𝜙}
+Thus, the clustering is deterministic and evaluator-grounded: two failed cases are grouped together
+only when they agree on what the verifier ultimately rejected, how the agent behavior contributed to
+that rejection, and which reusable behavioral mechanism was involved. The goal is not to discover
+latent semantic similarity among traces, but to aggregate failures that plausibly admit the same
+harness-level intervention.
+For each cluster𝐶𝜙, the evaluation system constructs a structured failure pattern containing its
+cluster size, representative task instances, shared trace symptoms, verifier evidence, and the inferred
+agent mechanism. Clusters are then ordered by their support and estimated actionability, so that the
+proposer is exposed first to recurring mechanisms that are more likely to map to a high-value harness
+modification.
+The output of this stage is an evidence bundle𝐵𝑡 summarizing the dominant failure patterns
+observed underℎ𝑡. Importantly,𝐵𝑡 does not prescribe a harness edit. It separates verifier-level failure
+from agent-level mechanism, allowing the proposer to target a specific reusable weakness rather
+than patching a coarse outcome such as timeout, assertion failure, or missing output. This keeps the
+evaluator distinct from the optimizer while ensuring that subsequent candidate modifications are
+grounded in explicit cross-case evidence.
+3.3. Harness Proposal: Exploring Diverse yet Minimal Candidate Modifications
+Given the evidence bundle𝐵𝑡, the proposal stage translates recurring failure patterns into candidate
+harness edits. The proposer is not an external optimizer with unrestricted access to the search space.
+Instead, we invoke the same fixed model𝑀 with current harnessℎ𝑡 in a proposer role and provide it
+with a bounded proposal context: the editable surfaces of the current harness, the verifier-grounded
+failure patterns from the evaluation system, records of passing behaviors that should be preserved, and
+summaries of previously attempted edits. This context exposes the proposer to structured cross-case
+evidence rather than raw execution logs, encouraging it to reason about reusable failure mechanisms
+rather than individual task failures.
+Self-Harness uses parallel proposal generation to explore several candidate improvements from
+the same evidence. The proposer generates𝐾mutually distinct proposal bundles,
+P𝑡 ={(Δ 𝑗,𝑎 𝑗)}𝐾
+𝑗=1,
+where each editΔ𝑗 maps the current harness to a candidate harness
+ℎ(𝑗)
+𝑡 =Δ 𝑗(ℎ𝑡).
+and 𝑎𝑗 is an audit record describing the targeted failure pattern, the edited harness surface, the
+expected behavioral effect, and the regression risks. Each proposal must be grounded in a primary
+failure mechanism and mapped to a concrete editable surface. The candidates are required to be
+materially distinct: they should not merely restate the same cluster, surface, or mechanism with
+7
+Self-Harness: Harnesses That Improve Themselves
+different wording. This parallel proposal step broadens exploration while keeping each candidate
+branch individually interpretable.
+The proposer first selects target failure patterns from𝐵𝑡. A pattern is considered a suitable target
+only if it is both supported by evidence and plausibly addressable by an editable harness surface.
+This addressability criterion is important because not every failure cluster implies a useful harness
+modification: some clusters reflect task-specific difficulty, unstable outcomes, or model capability
+limits rather than a missing execution rule. When multiple clusters are plausible, the proposer favors
+mechanisms that are concrete, recurrent, and likely to be mitigated by a narrow change to the
+execution protocol; weakly supported or non-addressable patterns are excluded rather than forced
+into a patch.
+Diversity is encouraged across proposal branches, while minimality is enforced within each branch.
+A proposal may target a different failure mechanism, choose a different harness surface, or express a
+different hypothesis about how to improve execution. However, each individual edit is constrained
+to modify only the surface needed to address its selected mechanism, preserve unrelated harness
+behavior, and avoid broad rewrites of the agent control architecture.
+3.4. Proposal Validation: Ensuring Robust Improvement through Regression Testing
+A candidate harness edit is not adopted immediately after it is proposed. Instead, each candidate
+branch is treated as a new harness variant and evaluated under the same evaluator used to diagnose
+the current harness. For a proposalΔ𝑗, letℎ(𝑗)
+𝑡 =Δ 𝑗(ℎ𝑡) denote the resulting candidate harness. We
+evaluate both the current harnessℎ𝑡 and the candidate harnessℎ(𝑗)
+𝑡 on the held-in split𝐷in and the
+held-out split𝐷ho. The held-in split measures whether the proposal addresses the evidence that
+motivated it, while the held-out split serves as a regression test for behaviors that were not visible to
+the proposer.
+Let 𝑃in(ℎ) and 𝑃ho(ℎ) denote the number of passed tasks for harnessℎ on 𝐷in and 𝐷ho, respectively.
+We define the split-wise improvements of candidateℎ(𝑗)
+𝑡 over the current harness as
+Δ(𝑗)
+in =𝑃 in(ℎ(𝑗)
+𝑡 )−𝑃 in(ℎ𝑡),
+and
+Δ(𝑗)
+ho =𝑃 ho(ℎ(𝑗)
+𝑡 )−𝑃 ho(ℎ𝑡).
+A candidate is accepted only if it improves at least one split without degrading the other:
+Δ(𝑗)
+in ≥0,Δ (𝑗)
+ho≥0,max
+
+Δ(𝑗)
+in ,Δ(𝑗)
+ho
+
+>0.
+This rule implements a conservative promotion criterion. Proposals that only trade off one split against
+the other are rejected, even if their total pass count increases. When evaluation is stochastic, we repeat
+candidate evaluation and apply the same rule to aggregate pass counts across repeats. This reduces
+the chance that a harness edit is promoted due to a single favorable run. If multiple compatible
+candidates satisfy the rule in the same round, their edits are merged into the next harness; rejected
+candidates remain logged but do not change the active harness. In addition to the pass-count rule,
+validation rejects proposals that do not modify any editable surface or fail execution before a valid
+evaluation result is obtained. For each evaluated candidate, the system records the changed surfaces,
+split-wise outcomes, evaluation repeats, proposal summary, and accept/reject decision, making each
+transition in the harness lineage auditable.
+8
+Self-Harness: Harnesses That Improve Themselves
+4. Experiments
+We evaluate whether Self-Harness can improve agent performance by modifying only the harness
+around a fixed language model across three agentic benchmarks: Terminal-Bench-2.0, SWE-bench
+Verified, and AppWorld. Together, they cover terminal interaction in containerized environments,
+repository-level software repair, and multi-application workflows. Across three model backends, we
+start from a minimal benchmark-specific harness and let Self-Harness propose, validate, and promote
+bounded edits using held-in execution evidence and held-out regression gates.
+4.1. Setup
+Benchmarks.We evaluate Self-Harness on Terminal-Bench-2.0 (Merrill et al., 2026), SWE-bench
+Verified (Jimenez et al., 2024), and AppWorld (Trivedi et al., 2024). Terminal-Bench-2.0 contains 89
+containerized terminal tasks that test general tool-based execution, including artifact management,
+commanduse,verificationbehavior,andrecoveryfromexecutionerrors. Weevaluateonafixed64-case
+subset, excluding tasks that depend on unstable external web resources or require multimodal inputs.
+This filtering reduces evaluation noise from factors outside the harness. In particular, multimodal
+tasks require modality-specific input handling that is not exposed by our minimal initial harness;
+including them would primarily measure unsupported harness functionality rather than the effect
+of Self-Harness edits. SWE-bench Verified evaluates repository-level software repair: an agent must
+inspect a real codebase, implement a patch for a reported issue, and satisfy repository tests in the
+benchmark-provided per-instance execution environment. We use a fixed 100-case subset partitioned
+into 67 held-in and 33 held-out cases. Cases are sampled proportionally by repository. AppWorld
+evaluates multi-application workflows in which an agent interacts with application APIs and is graded
+by state-based unit tests. We use 180 examples divided evenly between held-in and held-out splits.
+The held-in split contains the official training tasks, while the held-out split is fixed by proportionally
+sampling from the official normal and challenge test partitions.
+Models.We evaluate Self-Harness with three models: MiniMax M2.5 (MiniMax, 2026), Qwen3.5-
+35B-A3B (Qwen Team, 2026), and GLM-5 (GLM-5 Team, 2026). The model is held fixed across all
+harness variants and is also used in the proposal stage to generate edits from evaluator feedback. All
+comparisons are therefore within-model comparisons: the decoding configuration, budget, tool set,
+benchmark environment, and evaluator are kept unchanged while only the harness is allowed to vary.
+This isolates the effect of Self-Harness from changes in model capability or evaluation protocol.
+Harness.The initial harness builds upon the DeepAgent (LangChain, 2026) SDK but is intentionally
+kept minimal: a short benchmark-facing system prompt, and the default filesystem and shell tools.
+Self-Harness can only change the harness definition file that configures how DeepAgent is instantiated
+and controlled to build a new harness candidateℎ(𝑗)
+𝑡 . The editable surfaces correspond to declared
+configuration points in this harness, such as instruction, tools, verification guidance, etc. Figure 3
+shows the initial harness implementation.
+Splits and protocol.We fix the evaluated task set and partition it into a held-in split and a held-out
+split before running Self-Harness. The held-in split supplies the trajectories, verifier outcomes, and
+failure evidence exposed to the proposer, while the held-out split is never shown to the proposer and
+is used only by the automatic promotion gate. A candidate harness is promoted with the acceptance
+rule defined in Section 3.4. Task split assignments are fixed across harness variants, and each task
+9
+Self-Harness: Harnesses That Improve Themselves
+1defbuild_system_prompt() ->str:
+2return"""
+3You are running inside a Terminal Bench 2 Harbor task environment.
+4
+5Use the built-in filesystem and shell tools to inspect the workspace, make
+6concrete edits, and verify outcomes against the actual task environment.
+7
+8Do not assume synthetic datasets, domain-specific tools, or hidden fixtures
+9unless you discover them in the repo or runtime.
+10""".strip()
+11
+12
+13BASELINE_SYSTEM_PROMPT = build_system_prompt()
+14
+15
+16defbuild_memory_sources() ->list[str]:
+17return["/AGENTS.md"]
+18
+19
+20defbuild_subagents() ->list[dict[str, Any]]:
+21return[]
+22
+23
+24defbuild_skills() ->list[str]:
+25return[]
+26
+27
+28defbuild_bootstrap_instruction() ->str:
+29return"Start by inspecting the workspace and identifying the smallest relevant edit surface."
+30
+31
+32defbuild_execution_instruction() ->str:
+33return"Prefer concrete repo changes over generic advice, and keep edits tightly scoped to the
+task."
+34
+35
+36defbuild_verification_instruction() ->str:
+37return"Before concluding, verify the result with the most targeted command, file read, or test
+you can run."
+38
+39
+40defbuild_failure_recovery_instruction() ->str:
+41return"If a tool call fails, inspect the error and adapt; do not blindly retry the same action."
+42
+43
+44defbuild_runtime_control_policy() ->dict[str, Any]:
+45return{
+46"enabled": False,
+47"max_recent_tool_errors": None,
+48"max_total_tool_messages": None,
+49"instruction": None,
+50}
+51
+52
+53defbuild_fixed_harness_agent(
+54model: "BaseChatModel | str",
+55*,
+56backend: Any | None = None,
+57):
+58ifbackendis notNone:
+59returncreate_deep_agent(model=model, system_prompt=BASELINE_SYSTEM_PROMPT, backend=backend)
+60returncreate_deep_agent(model=model, system_prompt=BASELINE_SYSTEM_PROMPT)
+Figure 3| Initial harness and editable interface used as the starting point for Self-Harness. The harness
+is intentionally kept minimal, consisting only of the Terminal-Bench-2.0 default system prompt, the
+default DeepAgent tools (basic file reading, file writing, file editing, and shell execution), and the
+declared interfaces that Self-Harness is allowed to modify.
+10
+Self-Harness: Harnesses That Improve Themselves
+Model Initial harness Self-Harness
+Held-in Held-out Overall Held-in Held-out Overall
+Terminal-Bench-2.0
+MiniMax M2.5 43.0 40.5 42.250.0(+16%)61.9(+53%) 53.9(+28%)
+Qwen3.5-35B-A3B 15.1 23.8 18.036.0(+138%)38.1(+60%) 36.7(+104%)
+GLM-5 47.7 42.9 46.157.0(+20%)57.1(+33%) 57.0(+24%)
+SWE-bench Verified
+MiniMax M2.5 51.5 34.8 46.058.2(+13%)40.9(+18%) 52.5(+14%)
+Qwen3.5-35B-A3B 20.1 18.2 19.542.5(+111%)39.4(+116%) 41.5(+113%)
+GLM-5 53.7 48.5 52.058.2(+8%)50.0(+3%) 55.5(+7%)
+AppWorld
+MiniMax M2.5 51.7 45.6 48.662.8(+21%)55.0(+21%) 58.9(+21%)
+Qwen3.5-35B-A3B 25.0 20.0 22.560.0(+140%)44.4(+122%) 52.2(+132%)
+GLM-5 47.8 41.1 44.492.2(+93%)77.8(+89%) 85.0(+91%)
+Table 1| Held-in, held-out, and overall pass rates (%) for the initial and final harnesses. Bold black
+values denote the final harness produced by Self-Harness.
+starts from a fresh benchmark environment. These controls ensure that measured improvements
+come from harness changes.
+Metrics.Our primary metric isPass (%), the percentage of evaluated task attempts that pass the
+corresponding benchmark’s official verifier, computed over two repeated attempts for each harness
+candidate unless otherwise specified. This measures mean single-attempt task success under a fixed
+harness configuration and evaluation protocol.
+4.2. Main Results
+Table 1 shows that every final harness improves Pass on both held-in and held-out splits across all
+nine model–benchmark combinations. The largest relative gain is 132% for Qwen3.5-35B-A3B on
+AppWorld, while the largest absolute gain is 40.6 percentage points for GLM-5 on AppWorld, from
+44.4% to 85.0%. Meanwhile, the relative held-out gain exceeds the held-in gain in four combinations:
+MiniMax M2.5 and GLM-5 on Terminal-Bench-2.0, and MiniMax M2.5 and Qwen3.5-35B-A3B on
+SWE-bench Verified.
+These results show that harness-level edits can yield measurable improvements while keeping the
+model backend, tool set, budget, benchmark environment, and evaluator fixed. The gains are not
+confined to the held-in failures used to construct proposal evidence: all three backends improve on the
+held-out split, and no promoted harness degrades either split. This supports the central design goal of
+Self-Harness: proposed edits should target reusable execution mechanisms rather than case-specific
+failures, and the regression gate should prevent improvements on one split from being promoted at
+the cost of another.
+4.3. Experimental Analysis
+Harness evolution and retained edits.Figure 4 presents four representative evolution trajectories
+spanning all three benchmarks, while Figures 5 and 6 show the retained code-level edits for the two
+Terminal-Bench-2.0 examples. On Terminal-Bench-2.0, the retained edits primarily target artifact
+handling, failure recovery, and runtime control; on SWE-bench Verified, they target patch validation
+11
+Self-Harness: Harnesses That Improve Themselves
+accepted rejected branch endpoint
+0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+Candidate evaluations
+20
+24
+28
+32
+36Pass (%)
+18.0
+31.3
+21.1 24.2
+34.4 32.8
+36.7
+Initial harness
+Late deliverables
+> artifact-ensure subagent
+Skipped imports
+> dependency-verifier skill
+Missing modules
+> precheck imports
+Exploration loops
+> force a change
+Missing files
+> create within 2 steps
+Tool errors
+> middleware guard
+(a) Qwen3.5-35B-A3B on Terminal-Bench-2.0.
+0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
+Candidate evaluations
+42
+46
+50
+54Pass (%)
+42.2
+49.250.0
+51.6
+53.9
+Initial harness
+Missing artifacts
+> create output early
+Stalled tool loops
+> redirect after 50 tool calls
+Schema-invalid content
+> use correct content tags
+Combined harness
+artifacts + schemas + loops (b) MiniMax M2.5 on Terminal-Bench-2.0.
+0 1 2 3 4 5 6 7 8 9
+Candidate evaluations
+44
+46
+48
+50
+52
+54
+56Pass (%)
+46.0
+50.0 51.0
+52.5
+Initial harness
+Empty patches
+> diff detector
+Stricter test policy
+> local-test enforcement
+Untested patch
+> local verification
+(c) MiniMax M2.5 on SWE-bench Verified.
+0 1 2 3 4 5 6 7 8 9 10 11 12 13
+Candidate evaluations
+40
+50
+60
+70
+80
+90Pass (%)
+44.4
+76.4
+67.2
+74.7
+85.0
+Initial harness
+Action-only tasks
+> null completion
+Turn-budget exhaustion
+> progress-check reminder
+Partial record lists
+> pagination exhaustion
+Merged retained
+> completion + pagination (d) GLM-5 on AppWorld.
+Figure 4| Representative Self-Harness evolution trajectories across model backends and benchmarks.
+Green markers denote accepted harness candidates, gray crosses denote rejected candidates, and red
+crosses mark explored branch endpoints. Step lines connect candidates to their parent harness; the
+x-axis follows candidate-evaluation order.
+and executable verification; and on AppWorld, complete state retrieval and correct completion
+semantics. The concrete implementation of these mechanisms remains model-specific. Across these
+runs, proposed edits passing validation are denoted as green nodes. Red nodes and grey slots denote
+rejected branches and failing trials, respectively. The corresponding GLM-5 Terminal-Bench-2.0 run is
+introduced in Appendix Figure 10, and Sections B.2 and B.3 report the remaining SWE-bench Verified
+and AppWorld evolution, code-level, and trace analyses.
+For MiniMax M2.5, the harness improves from 42.2% to 53.9% pass rate. The retained edits in
+Figure 5 address missing required artifacts, schema-invalid tool content, and stalled tool-use loops,
+yielding a harness that creates required outputs earlier, handles structured tool content more carefully,
+and redirects execution after prolonged tool interaction.
+The Qwen3.5 evolution run shown in Figure 4(a) starts at 18.0% pass rate and reaches 36.7% after
+merging the edits shown in Figure 6, which emphasize artifact checking, missing-artifact recovery,
+retry discipline, and tool-error-triggered middleware. These changes mainly improve the agent’s
+ability to recover from file-editing or tool failures and still leave verifier-required artifacts in place.
+For GLM-5, the harness improves from 46.1% to 57.0% through edits targeting late artifacts,
+external computation, session-scoped tools, and implementation-oriented exploration. These edits
+make environment changes persist across shell commands and encourage the agent to move from
+prolonged exploration toward implementation and testing.
+12
+Self-Harness: Harnesses That Improve Themselves
+Figure5| Code-leveldifferencesforthethreeMiniMaxM2.5Terminal-Bench-2.0harnessmodifications
+retained in the final promoted harness. Red rows denote code removed from the initial harness, and
+green rows denote the updated harness behavior.
+Trace-Level Analysis of Accepted Edits.To examine how accepted harness edits affect agent
+behavior, we compare representative traces before and after harness modification. Figures 7 and 8
+show Terminal-Bench-2.0 examples for MiniMax M2.5 and Qwen3.5-35B-A3B, with the GLM-5
+example shown in Appendix Figure 9. Sections B.2 and B.3 provide corresponding SWE-bench
+Verified and AppWorld cases. Across benchmarks, the retained edits are model- and task-environment-
+specific and align with the dominant failure mechanisms observed under each initial harness.
+For MiniMax M2.5, the accepted edits emphasize early artifact creation and bounded execution.
+The bootstrap instruction is changed from merely identifying the smallest relevant edit surface to
+identifying the required output artifact and creating an initial version as early as possible. The runtime
+policy is also enabled with a limit on total tool messages, encouraging the agent to redirect rather than
+continue open-ended tool use. Figure 7 shows that this changes the agent from prolonged dataset
+exploration to a concrete workflow: identifying the relevant metadata split, computing the required
+count, writing the answer file, and reading it back before stopping.
+For Qwen3.5, the promoted harness adds constraints for dependency prechecking, loop breaking,
+command-retry discipline, and artifact-focused recovery after tool errors. Figure 8 illustrates how
+these edits change failure recovery behavior. Under the initial harness, the agent creates the required
+extractor script, encounters overwrite and edit failures, repeatedly tries to modify the same artifact,
+and ultimately deletes/app/extract.js before stopping; the verifier therefore fails because the
+required file is missing. Under the edited harness, a tool-error-triggered system prompt redirects the
+agent toward the missing artifact: it recreates the extractor, fixes the parsing logic, writes the output
+file, performs targeted validation of the JSON result, and leaves the required artifact present for the
+verifier.
+For GLM-5, the accepted edits focus on persistent environment changes and the transition from
+exploration to implementation. The edited harness instructs the agent to make installed tools or path
+changes persist across shell sessions and to verify tool accessibility after modifying the environment.
+13
+Self-Harness: Harnesses That Improve Themselves
+Figure 6| Code-level differences for the four Qwen3.5-35B-A3B Terminal-Bench-2.0 harness modifica-
+tions retained in the final promoted harness. Red rows denote code removed from the initial harness,
+and green rows denote the updated harness behavior.
+It also adds a verification-stage constraint: if the agent has been exploring without producing required
+artifacts, it should transition to implementing and testing a solution. Figure 9 shows this behavior
+in a build task. The initial harness spends substantial budget on long external downloads and later
+rationalizes failed sanity checks, whereas the edited harness switches strategy after timeout evidence,
+validates alternative sources early, repairs the failing render check, and only then finalizes.
+Togetherwiththecross-benchmarkcasesinSectionsB.2andB.3,theseexamplesillustrateconcrete
+workflow changes associated with the quantitative gains in Table 1, including earlier artifact creation,
+recovery from failed actions, complete state retrieval, and explicit verification before completion.
+The trace evidence is consistent with the intended mechanism of Self-Harness: recurring execution
+failures are translated into targeted changes to agent workflow.
+5. Conclusion
+This paper studied whether a fixed language model can improve the harness that governs its own agent
+behavior. We introduced Self-Harness, a propose–evaluate–accept framework in which the model
+is evaluated under the current harness, receives structured evidence from its own execution traces,
+and proposes bounded edits to declared harness surfaces. Candidate harnesses are then re-evaluated
+under the same benchmark protocol, and only edits that satisfy a non-regressive acceptance rule are
+promoted into the harness lineage.
+The main lesson is that harness improvement should be treated as an empirical state transition. A
+14
+Self-Harness: Harnesses That Improve Themselves
+Figure 7| Representative MiniMax M2.5 traces on the Terminal-Bench-2.0count-dataset-tokens
+task. Left: the initial harness ends without the required answer artifact. Right: the edited harness
+produces and verifies/app/answer.txt.
+useful harness edit must specify the behavior it aims to change, the surface it modifies, the evidence
+that motivates it, and the evaluation result that justifies promotion. By keeping the model, evaluator,
+and benchmark protocol fixed, Self-Harness isolates whether improved behavior comes from changes
+to the harness scaffold.
+Our experiments across Terminal-Bench-2.0, SWE-bench Verified, and AppWorld instantiate this
+protocol with a minimal DeepAgent-based baseline harness and three model backends. Self-Harness
+improves Pass (%) across all nine model–benchmark combinations while preserving held-in and
+held-out performance under the acceptance rule. The retained edits are small, auditable changes
+to configurable harness surfaces that address distinct bottlenecks in artifact handling and runtime
+control, software-patch verification, and application-state retrieval, suggesting that even sparse initial
+harnesses can support useful self-improvement when proposals are constrained by execution evidence
+and validated by regression testing.
+Self-Harness also has important limits. It studies bounded harness edits under fixed benchmarks,
+not open-ended self-improvement. Accepted edits may still reflect benchmark-specific failure patterns,
+and the protocol depends on the quality of verifier outcomes and trace records. Higher-stakes harness
+changes would require stronger acceptance gates than pass-rate non-regression alone.
+More broadly, Self-Harness points toward a style of agent engineering in which harnesses evolve
+through recorded, testable, and reversible changes. Future work can further explore application of
+self-harness-style self-improvement in broader environments, but the core requirement remains the
+same: self-improvement should be grounded in behavioral evidence rather than only in the proposer’s
+rationale for a plausible edit.
+References
+Lingyue Fu, Xin Ding, Linyue Pan, Yaoming Zhu, Shao Zhang, Lin Qiu, Weiwen Liu, Weinan Zhang,
+Xuezhi Cao, Xunliang Cai, Jiaxin Ding, and Yong Yu. Catarena: Evaluation of llm agents through
+iterative tournament competitions. InInternational Conference on Machine Learning. PMLR, 2026.
+15
+Self-Harness: Harnesses That Improve Themselves
+GLM-5 Team. Glm-5: from vibe coding to agentic engineering, 2026. URLhttps://arxiv.org/
+abs/2602.15763.
+Shengran Hu, Cong Lu, and Jeff Clune. Automated design of agentic systems, 2025. URLhttps:
+//arxiv.org/abs/2408.08435.
+Carlos E. Jimenez, John Yang, Alexander Wettig, Shunyu Yao, Kexin Pei, Ofir Press, and Karthik
+Narasimhan. Swe-bench: Can language models resolve real-world github issues?, 2024. URL
+https://arxiv.org/abs/2310.06770.
+LangChain. Deepagents, 2026. URLhttps://github.com/langchain-ai/deepagents. Soft-
+ware framework.
+Yoonho Lee, Roshen Nair, Qizheng Zhang, Kangwook Lee, Omar Khattab, and Chelsea Finn. Meta-
+harness: End-to-end optimization of model harnesses, 2026. URLhttps://arxiv.org/abs/
+2603.28052.
+Patrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio Petroni, Vladimir Karpukhin, Naman Goyal,
+Heinrich Kuttler, Mike Lewis, Wen-tau Yih, Tim Rocktaschel, Sebastian Riedel, and Douwe Kiela.
+Retrieval-augmentedgenerationforknowledge-intensivenlptasks. InAdvancesinNeuralInformation
+Processing Systems, 2020. URLhttps://arxiv.org/abs/2005.11401.
+Yongyuan Liang, Shijie Zhou, Yu Gu, Hao Tan, Gang Wu, Franck Dernoncourt, Jihyung Kil, Ryan A
+Rossi, and Ruiyi Zhang. Anticipatory planning for multimodal ai agents. InProceedings of the
+IEEE/CVF Conference on Computer Vision and Pattern Recognition, pages 5925–5935, 2026.
+Jiahang Lin, Shichun Liu, Chengjun Pan, Lizhi Lin, Shihan Dou, Zhiheng Xi, Xuanjing Huang, Hang
+Yan, Zhenhua Han, Tao Gui, and Yu-Gang Jiang. Agentic harness engineering: Observability-driven
+automatic evolution of coding-agent harnesses, 2026. URLhttps://arxiv.org/abs/2604.
+25850.
+Jiacheng Liu, Xiaohan Zhao, Xinyi Shang, and Zhiqiang Shen. Dive into claude code: The design space
+of today’s and future ai agent systems, 2026. URLhttps://arxiv.org/abs/2604.14228.
+Pengfei Liu, Weizhe Yuan, Jinlan Fu, Zhengbao Jiang, Hiroaki Hayashi, and Graham Neubig. Pre-train,
+prompt, and predict: A systematic survey of prompting methods in natural language processing,
+2021. URLhttps://arxiv.org/abs/2107.13586.
+Chris Lu, Cong Lu, Robert Tjarko Lange, Jakob Foerster, Jeff Clune, and David Ha. The ai scientist:
+Towards fully automated open-ended scientific discovery, 2024. URLhttps://arxiv.org/abs/
+2408.06292.
+Lingrui Mei, Jiayu Yao, Yuyao Ge, Yiwei Wang, Baolong Bi, Yujun Cai, Jiazhi Liu, Mingyu Li, Zhong-Zhi
+Li, Duzhen Zhang, Chenlin Zhou, Jiayi Mao, Tianze Xia, Jiafeng Guo, and Shenghua Liu. A survey
+of context engineering for large language models, 2025. URLhttps://arxiv.org/abs/2507.
+13334.
+Mike A. Merrill, Alexander G. Shaw, Nicholas Carlini, Boxuan Li, Harsh Raj, Ivan Bercovich, Lin Shi,
+Jeong Yeon Shin, Thomas Walshe, E. Kelly Buchanan, Junhong Shen, Guanghao Ye, Haowei Lin,
+JasonPoulos,MaoyuWang,MariannaNezhurina,JeniaJitsev,DiLu,OrfeasMenisMastromichalakis,
+Zhiwei Xu, Zizhao Chen, Yue Liu, Robert Zhang, Leon Liangyu Chen, Anurag Kashyap, Jan-Lucas
+Uslu, Jeffrey Li, Jianbo Wu, Minghao Yan, Song Bian, Vedang Sharma, Ke Sun, Steven Dillmann,
+Akshay Anand, Andrew Lanpouthakoun, Bardia Koopah, Changran Hu, Etash Guha, Gabriel H. S.
+Dreiman, Jiacheng Zhu, Karl Krauth, Li Zhong, Niklas Muennighoff, Robert Amanfu, Shangyin Tan,
+16
+Self-Harness: Harnesses That Improve Themselves
+Shreyas Pimpalgaonkar, Tushar Aggarwal, Xiangning Lin, Xin Lan, Xuandong Zhao, Yiqing Liang,
+Yuanli Wang, Zilong Wang, Changzhi Zhou, David Heineman, Hange Liu, Harsh Trivedi, John
+Yang, Junhong Lin, Manish Shetty, Michael Yang, Nabil Omi, Negin Raoof, Shanda Li, Terry Yue
+Zhuo, Wuwei Lin, Yiwei Dai, Yuxin Wang, Wenhao Chai, Shang Zhou, Dariush Wahdany, Ziyu She,
+Jiaming Hu, Zhikang Dong, Yuxuan Zhu, Sasha Cui, Ahson Saiyed, Arinbjörn Kolbeinsson, Jesse
+Hu, Christopher Michael Rytting, Ryan Marten, Yixin Wang, Alex Dimakis, Andy Konwinski, and
+Ludwig Schmidt. Terminal-bench: Benchmarking agents on hard, realistic tasks in command line
+interfaces, 2026. URLhttps://arxiv.org/abs/2601.11868.
+MiniMax. Minimax m2.5: Built for real-world productivity, February 2026. URLhttps://www.
+minimax.io/news/minimax-m25. Official model report.
+Alexander Novikov, Ngan Vu, Marvin Eisenberger, Emilien Dupont, Po-Sen Huang, Adam Zsolt Wagner,
+Sergey Shirobokov, Borislav Kozlovskii, Francisco J. R. Ruiz, Abbas Mehrabian, M. Pawan Kumar,
+Abigail See, Swarat Chaudhuri, George Holland, Alex Davies, Sebastian Nowozin, Pushmeet Kohli,
+and Matej Balog. Alphaevolve: A coding agent for scientific and algorithmic discovery, 2025. URL
+https://arxiv.org/abs/2506.13131.
+OpenAI. Codex, 2026. URLhttps://openai.com/codex/. Product page.
+Charles Packer, Sarah Wooders, Kevin Lin, Vivian Fang, Shishir G. Patil, Ion Stoica, and Joseph E.
+Gonzalez. Memgpt: Towards llms as operating systems, 2024. URLhttps://arxiv.org/abs/
+2310.08560.
+Yujia Qin, Shihao Liang, Yining Ye, Kunlun Zhu, Lan Yan, Yaxi Lu, Yankai Lin, Xin Cong, Xiangru
+Tang, Bill Qian, Sihan Zhao, Runchu Tian, Ruobing Xie, Jie Zhou, Mark Gerstein, Dahai Li, Zhiyuan
+Liu, and Maosong Sun. Toolllm: Facilitating large language models to master 16000+ real-world
+apis, 2023. URLhttps://arxiv.org/abs/2307.16789.
+Jiahao Qiu, Xuan Qi, Tongcheng Zhang, Xinzhe Juan, Jiacheng Guo, Yifu Lu, Yimin Wang, Zixin Yao,
+Qihan Ren, Xun Jiang, Xing Zhou, Dongrui Liu, Ling Yang, Yue Wu, Kaixuan Huang, Shilong Liu,
+Hongru Wang, and Mengdi Wang. Alita: Generalist agent enabling scalable agentic reasoning with
+minimal predefinition and maximal self-evolution, 2025. URLhttps://arxiv.org/abs/2505.
+20286.
+Qwen Team. Qwen3.5: Towards native multimodal agents, February 2026. URLhttps://qwen.
+ai/blog?id=qwen3.5. Official model report and model card for Qwen3.5-35B-A3B.
+Sander Schulhoff, Michael Ilie, Nishant Balepur, Konstantine Kahadze, Amanda Liu, Chenglei Si,
+Yinheng Li, Aayush Gupta, HyoJung Han, Sevien Schulhoff, Pranav Sandeep Dulepet, Saurav
+Vidyadhara, Dayeon Ki, Sweta Agrawal, Chau Pham, Gerson Kroiz, Feileen Li, Hudson Tao, Ashay
+Srivastava, Hevander Da Costa, Saloni Gupta, Megan L. Rogers, Inna Goncearenco, Giuseppe Sarli,
+Igor Galynker, Denis Peskoff, Marine Carpuat, Jules White, Shyamal Anadkat, Alexander Hoyle,
+and Philip Resnik. The prompt report: A systematic survey of prompt engineering techniques, 2025.
+URLhttps://arxiv.org/abs/2406.06608.
+Melanie Sclar, Yejin Choi, Yulia Tsvetkov, and Alane Suhr. Quantifying language models’ sensitivity
+to spurious features in prompt design or: How i learned to start worrying about prompt formatting,
+2024. URLhttps://arxiv.org/abs/2310.11324.
+Noah Shinn, Federico Cassano, Edward Berman, Ashwin Gopinath, Karthik Narasimhan, and Shunyu
+Yao. Reflexion: Language agents with verbal reinforcement learning, 2023. URLhttps://arxiv.
+org/abs/2303.11366.
+17
+Self-Harness: Harnesses That Improve Themselves
+Harsh Trivedi, Tushar Khot, Mareike Hartmann, Ruskin Manku, Bhuwan Dhingra, and Ashish Sab-
+harwal. AppWorld: A controllable world of apps and people for benchmarking interactive coding
+agents. InProceedings of the 62nd Annual Meeting of the Association for Computational Linguistics
+(Volume 1: Long Papers), pages 16022–16076. Association for Computational Linguistics, 2024.
+Xingyao Wang, Boxuan Li, Yufan Song, Frank F Xu, Xiangru Tang, Mingchen Zhuge, Jiayi Pan, Yueqi
+Song, Bowen Li, Jaskirat Singh, et al. Openhands: An open platform for ai software developers
+as generalist agents. InInternational Conference on Learning Representations, volume 2025, pages
+65882–65919, 2025.
+JasonWei, XuezhiWang, DaleSchuurmans, MaartenBosma, BrianIchter, FeiXia, EdChi, QuocLe, and
+Denny Zhou. Chain-of-thought prompting elicits reasoning in large language models. InAdvances
+in Neural Information Processing Systems, 2022. URLhttps://arxiv.org/abs/2201.11903.
+Siyuan Xu, Shiyang Li, Xin Liu, Tianyi Liu, Yixiao Li, Zhan Shi, Zixuan Zhang, Zilong Wang, Qingyu
+Yin, JianshuChen, etal. Controllable andverifiable tool-usedatasynthesisforagentic reinforcement
+learning.arXiv preprint arXiv:2604.09813, 2026.
+Yutaro Yamada, Robert Tjarko Lange, Cong Lu, Shengran Hu, Chris Lu, Jakob Foerster, Jeff Clune,
+and David Ha. The ai scientist-v2: Workshop-level automated scientific discovery via agentic tree
+search, 2025. URLhttps://arxiv.org/abs/2504.08066.
+John Yang, Carlos E. Jimenez, Alexander Wettig, Kilian Lieret, Shunyu Yao, Karthik Narasimhan, and
+Ofir Press. Swe-agent: Agent-computer interfaces enable automated software engineering, 2024.
+URLhttps://arxiv.org/abs/2405.15793.
+Shunyu Yao, Jeffrey Zhao, Dian Yu, Nan Du, Izhak Shafran, Karthik Narasimhan, and Yuan Cao.
+React: Synergizing reasoning and acting in language models, 2023. URLhttps://arxiv.org/
+abs/2210.03629.
+Xunjian Yin, Xinyi Wang, Liangming Pan, Li Lin, Xiaojun Wan, and William Yang Wang. Gödel agent:
+A self-referential agent framework for recursively self-improvement. InProceedings of the 63rd
+Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages
+27890–27913, 2025. doi: 10.18653/v1/2025.acl-long.1354. URL https://aclanthology.
+org/2025.acl-long.1354/.
+Eric Zelikman, Eliana Lorch, Lester Mackey, and Adam Tauman Kalai. Self-taught optimizer (stop):
+Recursively self-improving code generation, 2024. URLhttps://arxiv.org/abs/2310.02304.
+Hangfan Zhang, Siyuan Xu, Zhimeng Guo, Huaisheng Zhu, Shicheng Liu, Xinrun Wang, Qiaosheng
+Zhang, Yang Chen, Peng Ye, Lei Bai, et al. The path of self-evolving large language models:
+Achieving data-efficient learning via intrinsic feedback.arXiv preprint arXiv:2510.02752, 2025a.
+Jenny Zhang, Shengran Hu, Cong Lu, Robert Lange, and Jeff Clune. Darwin gödel machine: Open-
+ended evolution of self-improving agents, 2025b. URLhttps://arxiv.org/abs/2505.22954.
+Qizheng Zhang, Changran Hu, Shubhangi Upasani, Boyuan Ma, Fenglu Hong, Vamsidhar Kamanuru,
+Jay Rainton, Chen Wu, Mengmeng Ji, Hanchen Li, Urmish Thakker, James Zou, and Kunle Olukotun.
+Agentic context engineering: Evolving contexts for self-improving language models, 2026. URL
+https://arxiv.org/abs/2510.04618. ICLR 2026.
+Shao Zhang, Xihuai Wang, Wenhao Zhang, Chaoran Li, Junru Song, Tingyu Li, Lin Qiu, Xuezhi
+Cao, Xunliang Cai, Wen Yao, Weinan Zhang, Xinbing Wang, and Ying Wen. Leveraging dual
+process theory in language agent framework for real-time simultaneous human-AI collaboration.
+18
+Self-Harness: Harnesses That Improve Themselves
+In Wanxiang Che, Joyce Nabende, Ekaterina Shutova, and Mohammad Taher Pilehvar, editors,
+Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics (Volume
+1: Long Papers), pages 4081–4108, Vienna, Austria, July 2025c. Association for Computational
+Linguistics. ISBN 979-8-89176-251-0. doi: 10.18653/v1/2025.acl-long.206. URL https://
+aclanthology.org/2025.acl-long.206/.
+Ningyan Zhu, Huacan Wang, Jie Zhou, Feiyu Chen, Shuo Zhang, Ge Chen, Chen Liu, Jiarou Wu,
+Wangyi Chen, Xiaofeng Mou, and Yi Xu. Semaclaw: A step towards general-purpose personal ai
+agents through harness engineering, 2026. URLhttps://arxiv.org/abs/2604.11548.
+Mingchen Zhuge, Wenyi Wang, Louis Kirsch, Francesco Faccio, Dmitrii Khizbullin, and Juergen
+Schmidhuber. Language agents as optimizable graphs, 2024. URLhttps://arxiv.org/abs/
+2402.16823.
+19
+Self-Harness: Harnesses That Improve Themselves
+A. Benchmark Configurations and Reproducibility Details
+A.1. Model Inference Services
+MiniMax M2.5 and GLM-5 were accessed through hosted inference services, using MiniMax’s
+hosted API and OpenRouter, respectively.1 Qwen3.5-35B-A3B was deployed locally on four NVIDIA
+H200 GPUs using an internal image derived from the public SGLang Docker imagelmsysorg/
+sglang:v0.5.12-cu129.2
+A.2. Benchmark Configurations
+Shared reproducibility settings.Each candidate evaluation uses two repeated attempts. We keep
+the task sets, model backends, benchmark environments, evaluators, and all non-editable runtime
+settings fixed within each comparison.
+Terminal-Bench-2.0 configuration.We use Harbor3 as the execution environment for all Terminal-
+Bench-2.0 tasks. Evaluations use a 2 MB/s outbound network bandwidth cap. To reduce failures
+caused by incidental network latency rather than agent behavior, we mirror a subset of external
+resources required by Terminal-Bench-2.0 tasks when the original resources are stable but slow to
+download. Tasks that depend on external resources that cannot be accessed reliably, as well as tasks
+requiring multimodal inputs unsupported by the initial harness, are excluded from the main 64-case
+evaluation set. This configuration keeps the benchmark environment controlled while preserving the
+core terminal-interaction setting of Terminal-Bench-2.0.
+SWE-bench Verified configuration.We use a fixed 100-case subset of SWE-bench Verified, parti-
+tioned into 67 held-in and 33 held-out cases. Cases are sampled proportionally by repository, and the
+resulting split is fixed across all harness variants. Each task is run in an isolated per-instance Docker
+sandbox initialized with its repository workspace. The resulting patch is scored by the official SWE-
+bench evaluator in the corresponding prebuilt, task-specific instance image.4 We use a 3,600-second
+case timeout and a 120-second tool timeout.
+AppWorld configuration.We use a fixed 180-example AppWorld evaluation set with 90 held-in
+and 90 held-out examples. The held-in split contains all examples from AppWorld’s officialtrain
+partition, while the held-out split is proportionally sampled from the officialtest_normal and
+test_challenge partitions and then fixed across all harness variants. Each task is executed in a
+fresh AppWorld context with isolated task state and is scored using AppWorld’s official evaluator. We
+allow at most 50 agent turns per task.
+B. Expanded Experimental Analyses
+B.1. Terminal-Bench-2.0
+We report the GLM-5 evolution trajectory, retained edits, and a representative Terminal-Bench-2.0
+build-task trace.
+1MiniMax token plan:https://platform.minimax.io/subscribe/token-plan; OpenRouter GLM-5 endpoint:
+https://openrouter.ai/z-ai/glm-5. Accessed on 2026/05.
+2https://hub.docker.com/r/lmsysorg/sglang/tags?name=v0.5.12-cu129.
+3https://www.harborframework.com/docs/tutorials/running-terminal-bench.
+4Official SWE-bench images are available athttps://hub.docker.com/u/swebench; per-instance repositories
+follow the naming patternswebench/sweb.eval.x86_64.<instance-id>.
+20
+Self-Harness: Harnesses That Improve Themselves
+Figure 8| Representative Qwen3.5 traces on the Terminal-Bench-2.0extract-elf task. Left: the
+initial harness ends with the required extractor missing. Right: the edited harness restores the
+extractor and validates its output.
+Figure 9| Case study of a GLM-5 harness edit on the Terminal-Bench-2.0build-pov-ray task. Left:
+a failed trace under the initial harness, where long monolithic external downloads consume large
+tool budgets and the agent later finalizes despite repeated non-zero sanity checks. Right: a successful
+trace under the edited harness, where the agent uses bounded staged operations, checks external
+archive evidence before committing more work, and repairs the failed sanity check before finalizing.
+B.2. SWE-bench Verified
+MiniMax M2.5.Overall Pass increases from 46.0% to 52.5%. The promoted harness separates
+empty-diff detection from targeted local testing: a diff-inspection subagent checks whether a patch
+exists, and a test-verifier subagent runs the most relevant failing test. In the representative Astropy
+FITS-card case, the initial harness makes the source change but does not finish verification, whereas
+the promoted harness resolves dependencies, validates the patch, and completes with the required
+source change.
+21
+Self-Harness: Harnesses That Improve Themselves
+Qwen3.5-35B-A3B.Overall Pass increases from 19.5% to 41.5%. The retained harness combines
+a patch-verifier subagent with a direct pre-submission instruction to inspect the current diff and
+run targeted tests. In the representative Django window-function case, the initial harness submits a
+patch without successfully running the relevant test suite, and its sole FAIL-TO-PASS test remains
+unresolved. The retained harness instead places the SQLite casting guard at the inner window-
+compatible expression, runs the 49-testexpressions_window suite before submission, and passes
+all 1 FAIL-TO-PASS and 46 PASS-TO-PASS tests.
+GLM-5.Overall Pass increases from 52.0% to 55.5%. The promoted harness extends the FAIL-
+TO-PASS verification cycle with dependency-aware recovery: it parses import failures, identifies
+and installs missing packages, reruns the exact test, and continues debugging if the test remains
+unsuccessful. In the Astropy trace, the initial harness submits after only a syntax check, leaving
+all four FAIL-TO-PASS tests and five PASS-TO-PASS tests failing; the promoted harness completes
+executable verification, after which all four FAIL-TO-PASS and all 68 PASS-TO-PASS tests pass.
+B.3. AppWorld
+MiniMax M2.5.Overall Pass increases from 48.6% to 58.9%. The promoted harness combines a
+state-auditor subagent with pagination and temporal-boundary guidance. In the Venmo case, the
+initial harness requests payment from all seven participants, whereas the promoted harness exhausts
+transaction pages, applies the time boundary, identifies four participants who have paid, and requests
+payment only from the remaining three.
+Qwen3.5-35B-A3B.Overall Pass increases from 22.5% to 52.2%. The final harness retains two
+prompt-level guards: a completion-contract guard distinguishes action-only tasks from information
+requests, and a pagination guard requires complete record retrieval and a final target-object check. In
+the Spotify case, the initial harness returns a null play-count result; the promoted harness exhausts
+the library pages, compares play counts, and returns the expected song.
+GLM-5.Overall Pass increases from 44.4% to 85.0%. Its final harness adds an action-versus-
+information completion rule and exhaustive pagination before state mutation. In the Venmo case, the
+initial harness uses only the first transaction page and supplies an unnecessary textual answer; the
+promoted harness exhausts all pages, mutates all 12 records, and completes the action-only task with
+a null answer.
+Across SWE-bench Verified, all three promoted harnesses strengthen verification but choose differ-
+ent structures: MiniMax separates empty-diff and targeted-test checks, Qwen delegates inspection to
+a patch-verifier subagent, and GLM embeds dependency repair in the verification instruction. Across
+AppWorld, the runs converge on complete state retrieval and correct completion semantics, again
+through model-specific harness mechanisms.
+22
+Self-Harness: Harnesses That Improve Themselves
+0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18
+Candidate evaluations
+46
+50
+54
+58Pass (%)
+46.1
+50.8
+53.9
+56.3
+57.0
+accepted rejected branch endpoint
+50.8
+53.9
+Initial harness
+Late artifacts
+> write early; force cleanup
+External compute
+> bound, stage, inspect
+Session-scoped tools
+> persist PATH and verify
+Implementation nudge
+> shift to build/test
+(a) Evolution trajectory.
+(b) Retained code-level edits.
+Figure 10| GLM-5 on Terminal-Bench-2.0. Panel (a) shows the evolution from 46.1% to 57.0%
+overall Pass, with green markers for accepted candidates, gray crosses for rejected candidates, and red
+crosses for explored branch endpoints. Panel (b) shows the retained edits for persistent environment
+configuration and the transition from exploration to implementation.
+23
+Self-Harness: Harnesses That Improve Themselves
+0 1 2 3 4 5 6 7 8 9
+Candidate evaluations
+44
+46
+48
+50
+52
+54
+56Pass (%)
+46.0
+50.0
+51.0
+52.5
+accepted rejected branch endpoint
+Initial harness
+Empty patches
+> diff detector
+Stricter test policy
+> local-test enforcement
+Untested patch
+> local verification
+(a) Evolution trajectory.
+(b) Retained code-level edits.
+Figure 11| MiniMax M2.5 on SWE-bench Verified. Overall Pass increases from 46.0% to 52.5%. Panel
+(a) shows the evolution trajectory, with green markers for accepted candidates and gray crosses for
+rejected candidates. Panel (b) shows the retained edits, which separate empty-diff detection from
+targeted local testing.
+24
+Self-Harness: Harnesses That Improve Themselves
+Figure 12| SWE-bench Verified Astropy FITS-card float-formatting traces for MiniMax M2.5. Left: the
+initial harness makes the source change but stops before completing executable verification. Right:
+the promoted harness resolves the missing dependencies, runs targeted validation, and completes
+with the required source change.
+25
+Self-Harness: Harnesses That Improve Themselves
+0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25
+Candidate evaluations
+20
+25
+30
+35
+40
+45Pass (%)
+19.5
+22.5 23.5
+32.5 33.0
+35.0
+39.5
+41.5
+accepted rejected branch endpoint
+22.5 23.5
+32.5
+Initial harness
+Empty patches
+> verifier subagent
+Silent failures
+> inspect test output
+No code change
+> require non-empty diff
+Traceback drift
+> fix exact frame
+Unverified patch
+> check diff and test
+Missed verifier call
+> enforce before submit
+Policy bloat
+> targeted tests only
+(a) Evolution trajectory.
+(b) Retained code-level edits.
+Figure 13|Qwen3.5-35B-A3B on SWE-bench Verified. Overall Pass increases from 19.5% to 41.5%.
+Panel (a) shows the evolution trajectory, and panel (b) shows the retained patch-verifier and pre-
+submission checks that require inspection of the current diff and execution of targeted tests.
+26
+Self-Harness: Harnesses That Improve Themselves
+Figure 14| SWE-bench Verified Django window-function traces for Qwen3.5-35B-A3B. Left: the
+initial harness submits without running the relevant suite and fails the sole FAIL-TO-PASS test. Right:
+the retained harness runs that suite before submission and passes all required tests.
+0 1 2 3 4 5 6 7 8 9 10
+Candidate evaluations
+50
+52
+54
+56
+58Pass (%)
+52.0
+53.0
+54.0
+55.5
+54.5
+accepted rejected branch endpoint
+Initial harness
+Single test failure
+> FAIL_TO_PASS feedback
+Failing test loop
+> parse/debug/fix cycle
+Missing dependencies
+> install then rerun
+Setup failures
+> bootstrap preinstall
+(a) Evolution trajectory.
+(b) Retained code-level edits.
+Figure 15| GLM-5 on SWE-bench Verified. Overall Pass increases from 52.0% to 55.5%. Panel (a)
+shows the evolution trajectory, and panel (b) shows the retained dependency-aware verification cycle,
+which recovers from import failures before rerunning the relevant tests.
+27
+Self-Harness: Harnesses That Improve Themselves
+Figure 16| SWE-bench Verified Astropy topocentric ITRS transformation traces for GLM-5. Left: the
+initial harness performs only a syntax check, leaving all four FAIL-TO-PASS tests and five PASS-TO-
+PASS tests failing. Right: the promoted harness repairs missing dependencies, completes executable
+verification, and passes all four FAIL-TO-PASS and all 68 PASS-TO-PASS tests.
+0 1 2 3 4 5 6 7 8 9 10 11 12 13
+Candidate evaluations
+45
+50
+55
+60Pass (%)
+48.6
+52.5 52.2 52.8
+58.9
+accepted rejected branch endpoint
+Initial harness
+Action-only tasks
+> null completion
+Turn-waste loops
+> stop exploration
+Wrong completion
+> verify answer
+Partial records
+> pagination + state audit
+(a) Evolution trajectory.
+(b) Retained code-level edits.
+Figure 17| MiniMax M2.5 on AppWorld. Overall Pass increases from 48.6% to 58.9%. Panel (a)
+shows the evolution trajectory, and panel (b) shows the retained state-auditing, pagination, and
+temporal-boundary mechanisms used to identify the complete set of target records.
+28
+Self-Harness: Harnesses That Improve Themselves
+Figure 18| AppWorld Venmo traces for MiniMax M2.5. Left: the initial harness requests payment
+from all seven participants without accounting for prior transactions. Right: the promoted harness
+exhausts the transaction pages, identifies the four participants who have already paid, and requests
+payment only from the remaining three.
+0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22
+Candidate evaluations
+20
+30
+40
+50
+60Pass (%)
+22.5 22.8
+42.2
+52.2
+48.3
+45.8
+49.4
+42.8
+accepted rejected branch endpoint
+Initial harness
+Ambiguous time range
+> temporal-boundary guard
+Wrong final answer
+> answer-null guard
+Partial record lists
+> pagination guard
+Pagination runner error
+> pagination guard
+Unverified state
+> verification guard
+Premature completion
+> completion guard
+Wrong extraction
+> extraction guard
+(a) Evolution trajectory.
+(b) Retained code-level edits.
+Figure 19| Qwen3.5-35B-A3B on AppWorld. Overall Pass increases from 22.5% to 52.2%. Panel (a)
+shows the evolution trajectory, and panel (b) shows the retained completion-contract and pagination
+guards, which require complete retrieval and distinguish action-only tasks from information requests.
+29
+Self-Harness: Harnesses That Improve Themselves
+Figure 20| AppWorld Spotify traces for Qwen3.5-35B-A3B. Left: the initial harness returns a null
+play-count result after incomplete retrieval. Right: the promoted harness exhausts the library pages,
+compares the retrieved play counts, and returns the expected song.
+0 1 2 3 4 5 6 7 8 9 10 11 12 13
+Candidate evaluations
+40
+50
+60
+70
+80
+90Pass (%)
+44.4
+76.4
+67.2
+74.7
+85.0
+accepted rejected branch endpoint
+Initial harness
+Action-only tasks
+> null completion
+Turn-budget exhaustion
+> progress-check reminder
+Partial record lists
+> pagination exhaustion
+Merged retained
+> completion + pagination
+(a) Evolution trajectory.
+(b) Retained code-level edits.
+Figure 21| GLM-5 on AppWorld. Overall Pass increases from 44.4% to 85.0%. Panel (a) shows the
+evolution trajectory, and panel (b) shows the retained action-versus-information completion rule and
+exhaustive-pagination requirement applied before state mutation.
+30
+Self-Harness: Harnesses That Improve Themselves
+Figure 22| AppWorld Venmo traces for GLM-5. Left: the initial harness reads only the first transaction
+page and supplies an unnecessary textual answer. Right: the promoted harness exhausts all pages,
+mutates all 12 target records, and completes the action-only task with a null answer.
+31

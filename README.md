@@ -1,16 +1,16 @@
 # Awesome Recursive Self-Improvement (RSI) Resources
 
 [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
-![papers](https://img.shields.io/badge/papers-26-blue)
-![reports](https://img.shields.io/badge/reports-11-red)
-![zh-PDF](https://img.shields.io/badge/zh--PDF-14-green)
-![slides](https://img.shields.io/badge/slides-23p-orange)
+![papers](https://img.shields.io/badge/papers-31-blue)
+![reports](https://img.shields.io/badge/reports-18-red)
+![zh-PDF](https://img.shields.io/badge/zh--PDF-19-green)
+![slides](https://img.shields.io/badge/slides-26p-orange)
 
 围绕 **Recursive Self-Improvement（递归自改进）** 的论文与资源列表 + 系统性调研仓库（2026-08-31 完成）。与一般 awesome 列表不同，本仓库同时提供：
 
-- **11 份中文精读报告**（`reports/`，逐篇拆方法、数字、局限与谱系定位）
-- **26 篇论文英文原版 PDF + 14 篇保版式中文翻译 PDF**（`papers/`，由 [super_translate](https://github.com/asimfish/super_translate) 生成）
-- **23 页汇总报告**（`awesome_rsi_slides.html` 方向键翻页 / `awesome_rsi_slides.pdf`）
+- **18 份中文精读报告**（`reports/`，逐篇拆方法、数字、局限与谱系定位）
+- **31 篇论文英文原版 PDF + 19 篇保版式中文翻译 PDF**（`papers/`，由 [super_translate](https://github.com/asimfish/super_translate) 生成）
+- **26 页汇总报告**（`awesome_rsi_slides.html` 方向键翻页 / `awesome_rsi_slides.pdf`）
 
 一句话结论：**执行已经自动化，品味正在被编译，锚是最后的手工业**——所有能跑的自进化系统都保留一个不参与进化的 ground-truth 锚；谁能工业化地生产不可 game 的锚，谁就握住了 RSI 的节流阀。
 
@@ -21,12 +21,13 @@
 | [1. Start Here](#1-start-here)                          |                                                              |
 | ------------------------------------------------------- | ------------------------------------------------------------ |
 | [2. Core Readings](#2-core-readings)                    | [3. Papers](#3-papers)                                        |
-| [3.1 Framework Side](#31-framework-side)                | [3.2 Evaluator Side](#32-evaluator-side)                      |
-| [3.3 Model Side](#33-model-side)                        | [3.4 Knowledge Side](#34-knowledge-side)                      |
-| [3.5 Online Side](#35-online-side)                      | [3.6 Harness & Self-Evolving Agent Lineage](#36-harness--self-evolving-agent-lineage) |
-| [4. Frontier Tracking (2026 H2)](#4-frontier-tracking-2026-h2) | [5. Ten Insights](#5-ten-insights)                     |
-| [6. Reading Routes](#6-reading-routes)                  | [7. Repository Layout](#7-repository-layout)                  |
-| [8. Translation Pipeline](#8-translation-pipeline)      | [9. Disclaimer & Credits](#9-disclaimer--credits)             |
+| [3.0 Surveys](#30-surveys)                              | [3.1 Framework Side](#31-framework-side)                      |
+| [3.2 Evaluator Side](#32-evaluator-side)                | [3.3 Model Side](#33-model-side)                              |
+| [3.4 Knowledge Side](#34-knowledge-side)                | [3.5 Online Side](#35-online-side)                            |
+| [3.6 Harness & Self-Evolving Agent Lineage](#36-harness--self-evolving-agent-lineage) | [4. Frontier Tracking (2026 H2)](#4-frontier-tracking-2026-h2) |
+| [5. Ten Insights](#5-ten-insights)                      | [6. Reading Routes](#6-reading-routes)                        |
+| [7. Repository Layout](#7-repository-layout)            | [8. Translation Pipeline](#8-translation-pipeline)            |
+| [9. Disclaimer & Credits](#9-disclaimer--credits)       |                                                              |
 
 ## 1. Start Here
 
@@ -34,7 +35,7 @@
 |---|---|
 | 15 分钟 | 打开 [`awesome_rsi_slides.html`](awesome_rsi_slides.html)（浏览器方向键翻页，P 键打印）或 [`awesome_rsi_slides.pdf`](awesome_rsi_slides.pdf) |
 | 2 小时 | [汇总报告](reports/10_synthesis_insights.md) → [总纲解读](reports/01_lilian_weng_harness_engineering.md) → [Who Grades the Grader 解读](reports/05_who_grades_the_grader.md)（全谱系最重要的否定性结论） |
-| 系统研读 | `reports/` 按 01→02→07→03→04→05→06→08→11→09→10 顺序，配 `papers/zh/` 中文 PDF 对照原文 |
+| 系统研读 | `reports/` 按 01→02→07→03→04→05→06→08→11→09→10 顺序（谱系扩编 12→13→14→15→16→17→18 按需精读），配 `papers/zh/` 中文 PDF 对照原文 |
 
 ## 2. Core Readings
 
@@ -46,10 +47,21 @@ _Lilian Weng_
 _Anthropic_
 3. **RSI 六篇论文导读帖**（本调研 3.1-3.3 节六篇论文的最初信息源）. 小红书, 2026\. [post](https://www.xiaohongshu.com/explore/6a93e8a3000000001f000d72)
 4. **Continual Harness 中文解读.** 微信公众号「X0后的回忆」, 2026\. [article](https://mp.weixin.qq.com/s/xMuLJvX3kwRUUw5WQ7R3ww)
+5. **Harness 自进化全景：三种范式与六个系统的实现思路**（Self-Harness / Meta-Harness / AutoSaddler / EnvHarness / Prime Agent / MetaCaster 六系统导读）. 微信公众号, 2026\. [article](https://mp.weixin.qq.com/s/Lm_hmnkeeWlN6zVGlBBphw)
+6. **Agentic RL 系列（上）：环境、轨迹、Reward 与训练闭环.** 微信公众号, 2026\. [article](https://mp.weixin.qq.com/s/Ly2BvP3y2bFB9czGqRguWQ)
+7. **Agentic RL 系列（中）：SkillRL，如何把一次失败变成可复用的 Skill.** 微信公众号, 2026\. [article](https://mp.weixin.qq.com/s/wqMM1D4NZQmRtWOcebuhTA)
+8. **Agentic RL 系列（下）：Evolving-RL，用 Reward 训练 Agent 总结经验.** 微信公众号, 2026\. [article](https://mp.weixin.qq.com/s/bu3-RyqaYPdA1mH79oF39g)
 
 ## 3. Papers
 
 > 分类沿用本调研的五侧地图：**框架侧**（改 harness 源码）、**评估侧**（评估器共进化）、**模型侧**（critic 与权重）、**知识侧**（经验编译为技能）、**在线侧**（免重置在线适应）。每条提供 arXiv 链接、仓库内英文/中文 PDF 与精读报告的相对链接。
+
+### 3.0 Surveys
+
+1. **A Survey of Self-Evolving Agents: What, When, How, and Where to Evolve on the Path to Artificial Super Intelligence.** TMLR, 2026\. [paper](https://arxiv.org/abs/2507.21046), [PDF-en](papers/en/2507.21046_SelfEvolvingAgentsSurvey.pdf), [PDF-zh](papers/zh/2507.21046_SelfEvolvingAgentsSurvey_zh.pdf), [解读](reports/12_self_evolving_agents_survey.md)
+_Huan-ang Gao, Jiayi Geng, Wenyue Hua, Mengkang Hu, Xinzhe Juan, Hongzhang Liu, Shilong Liu, Jiahao Qiu, et al._
+
+另见 4 节趋势中以共进化为中心轴的综述 [Co-Evolution in Agentic Systems](https://arxiv.org/abs/2608.10299)。
 
 ### 3.1 Framework Side
 
@@ -94,7 +106,7 @@ _Seth Karten, Joel Zhang, Tersoo Upaa Jr, Ruirong Feng, Wenzhe Li, Chengshuai Sh
 
 ### 3.6 Harness & Self-Evolving Agent Lineage
 
-> Weng 博文谱系与本调研扩展收录的自进化 agent 前置/平行工作，按时间排序。
+> Weng 博文谱系与本调研扩展收录的自进化 agent 前置/平行工作，按时间排序。其中 Self-Harness / Meta-Harness / AutoSaddler / EnvHarness / Prime Agent / MetaCaster 六个系统的中文导读见 [Harness 自进化全景](https://mp.weixin.qq.com/s/Lm_hmnkeeWlN6zVGlBBphw)。
 
 1. **Self-Taught Optimizer (STOP): Recursively Self-Improving Code Generation.** COLM, 2024\. [paper](https://arxiv.org/abs/2310.02304), [PDF-en](papers/en/2310.02304_STOP.pdf), [PDF-zh](papers/zh/2310.02304_STOP_zh.pdf)
 _Eric Zelikman, Eliana Lorch, Lester Mackey, Adam Tauman Kalai_
@@ -116,7 +128,7 @@ _Dhruv Trehan, Paras Chopra_
 _Haoran Ye, Xuning He, Vincent Arak, Haonan Dong, Guojie Song_
 10. **HyperAgents.** arXiv, 2026\. [paper](https://arxiv.org/abs/2603.19461), [PDF-en](papers/en/2603.19461_Hyperagents.pdf)
 _Jenny Zhang, Bingchen Zhao, Wannan Yang, Jakob Foerster, Jeff Clune, Minqi Jiang, Sam Devlin, Tatiana Shavrina_
-11. **Meta-Harness: End-to-End Optimization of Model Harnesses.** arXiv, 2026\. [paper](https://arxiv.org/abs/2603.28052), [PDF-en](papers/en/2603.28052_MetaHarness.pdf), [PDF-zh](papers/zh/2603.28052_MetaHarness_zh.pdf)
+11. **Meta-Harness: End-to-End Optimization of Model Harnesses.** arXiv, 2026\. [paper](https://arxiv.org/abs/2603.28052), [code](https://github.com/stanford-iris-lab/meta-harness-tbench2-artifact), [PDF-en](papers/en/2603.28052_MetaHarness.pdf), [PDF-zh](papers/zh/2603.28052_MetaHarness_zh.pdf), [解读](reports/13_meta_harness.md)
 _Yoonho Lee, Roshen Nair, Qizheng Zhang, Kangwook Lee, et al._
 12. **Agentic Harness Engineering: Observability-Driven Automatic Evolution of Coding-Agent Harnesses (AHE).** arXiv, 2026\. [paper](https://arxiv.org/abs/2604.25850), [code](https://github.com/china-qijizhifeng/agentic-harness-engineering), [PDF-en](papers/en/2604.25850_AHE.pdf), [PDF-zh](papers/zh/2604.25850_AHE_zh.pdf)
 _Jiahang Lin, Shichun Liu, Chengjun Pan, Lizhi Lin, Shihan Dou, et al._
@@ -128,10 +140,18 @@ _Rui Meng, Bhavana Dalvi Mishra, Jiefeng Chen, Chun-Liang Li, et al. (Google Clo
 _Prannay Hebbar, Yogendra Manawat, Samuel Verboomen, et al. (Hexo Labs)_
 16. **Harness Updating Is Not Harness Benefit: Disentangling Evolution Capabilities in Self-Evolving LLM Agents.** arXiv, 2026\. [paper](https://arxiv.org/abs/2605.30621), [PDF-en](papers/en/2605.30621_HarnessUpdatingNotBenefit.pdf)
 _Minhua Lin, Juncheng Wu, Zijun Wang, Zhan Shi, Yisi Sang, et al._
-17. **Self-Harness: Harnesses That Improve Themselves.** arXiv, 2026\. [paper](https://arxiv.org/abs/2606.09498), [PDF-en](papers/en/2606.09498_SelfHarness.pdf), [PDF-zh](papers/zh/2606.09498_SelfHarness_zh.pdf)
+17. **Self-Harness: Harnesses That Improve Themselves.** arXiv, 2026\. [paper](https://arxiv.org/abs/2606.09498), [PDF-en](papers/en/2606.09498_SelfHarness.pdf), [PDF-zh](papers/zh/2606.09498_SelfHarness_zh.pdf), [解读](reports/14_self_harness.md)
 _Hangfan Zhang, Shao Zhang, Kangcong Li, Chen Zhang, Yang Chen, Yiqun Zhang, Lei Bai, Shuyue Hu_
 18. **Autodata: An Agentic Data Scientist to Create High Quality Synthetic Data.** arXiv, 2026\. [paper](https://arxiv.org/abs/2606.25996), [PDF-en](papers/en/2606.25996_Autodata.pdf)
 _Ilia Kulikov, Chenxi Whitehouse, Tianhao Wu, Yixin Nie, et al. (FAIR at Meta)_
+19. **EnvHarness: Awakening Static Worlds for Agent Learning.** arXiv, 2026\. [paper](https://arxiv.org/abs/2608.19880), [PDF-en](papers/en/2608.19880_EnvHarness.pdf), [PDF-zh](papers/zh/2608.19880_EnvHarness_zh.pdf), [解读](reports/15_envharness.md)
+_Chengsong Huang, Zifeng Wang, Rujun Han, Jun Yan, Yanfei Chen, et al. (Google Cloud AI Research)_
+20. **AutoSaddler: Automatic Harness Optimization with Durable Updates from Agent Execution Traces.** arXiv, 2026\. [paper](https://arxiv.org/abs/2608.23041), [PDF-en](papers/en/2608.23041_AutoSaddler.pdf), [PDF-zh](papers/zh/2608.23041_AutoSaddler_zh.pdf), [解读](reports/16_autosaddler.md)
+_Sungho Park, Wonjoong Kim, Rongyuan Tan, Jue Zhang, Wook-Shin Han, et al. (POSTECH, KAIST, SUSTech, Microsoft)_
+21. **MetaCaster: Meta-Harness-Optimized Agent for End-to-End Few-Shot Learning of Lightweight Time Series Forecasters.** arXiv, 2026\. [paper](https://arxiv.org/abs/2608.23473), [code](https://github.com/D2I-Group/metacaster), [PDF-en](papers/en/2608.23473_MetaCaster.pdf), [PDF-zh](papers/zh/2608.23473_MetaCaster_zh.pdf), [解读](reports/17_metacaster.md)
+_ChengAo Shen, Wenchao Yu, Fangyu Wu, Dongjin Song, Hanghang Tong, et al. (UH, NEC Labs)_
+22. **Prime Agent: A Self-Improving RLM Harness.** arXiv, 2026\. [paper](https://arxiv.org/abs/2608.23552), [code](https://github.com/PrimeIntellect-ai/prime-agent), [PDF-en](papers/en/2608.23552_PrimeAgent.pdf), [PDF-zh](papers/zh/2608.23552_PrimeAgent_zh.pdf), [解读](reports/18_prime_agent.md)
+_Seth Karten, Alex L. Zhang, Kevin Thomas, Sebastian Müller, et al. (Princeton, Prime Intellect, MIT)_
 
 ## 4. Frontier Tracking (2026 H2)
 
@@ -187,7 +207,7 @@ _Ilia Kulikov, Chenxi Whitehouse, Tianhao Wu, Yixin Nie, et al. (FAIR at Meta)_
 
 按目的选路线（materials 均在本仓库内）：
 
-- **想快速建立全景**：slides 23 页（15 分钟）→ [报告 10](reports/10_synthesis_insights.md)（叙事弧线 + 两轴地图 + 十条 insight）
+- **想快速建立全景**：slides 26 页（15 分钟）→ [报告 10](reports/10_synthesis_insights.md)（叙事弧线 + 两轴地图 + 十条 insight）
 - **想理解 harness 工程**：[报告 01](reports/01_lilian_weng_harness_engineering.md)（Weng 总纲）→ [报告 07](reports/07_darwin_godel_machine.md)（DGM 基线）→ [报告 11](reports/11_continual_harness.md)（免重置 + 共学习）
 - **想理解评估器战争**：[报告 03](reports/03_evolm.md)（reward overoptimization 悖论）→ [报告 04](reports/04_red_queen_godel_machine.md)（epoch 冻结）→ [报告 05](reports/05_who_grades_the_grader.md)（观测等价 + 锚定纪律）→ [报告 06](reports/06_echo.md)（权重层双路 GRPO）
 - **想看生产落地**：[报告 02](reports/02_anthropic_when_ai_builds_itself.md)（Anthropic 内部证据）→ [报告 08](reports/08_moss.md)（MOSS 门控回滚）→ 4 节的 SESG / OLE / HarnessFix
@@ -197,9 +217,9 @@ _Ilia Kulikov, Chenxi Whitehouse, Tianhao Wu, Yixin Nie, et al. (FAIR at Meta)_
 ```
 awesome_rsi/
 ├── README.md                        # 本文件
-├── awesome_rsi_slides.html          # 23 页汇总 HTML PPT（方向键翻页，P 键打印）
-├── awesome_rsi_slides.pdf           # 同内容 23 页 PDF 版（1280x720 逐页）
-├── reports/                         # 11 份精读报告（Markdown，中文）
+├── awesome_rsi_slides.html          # 26 页汇总 HTML PPT（方向键翻页，P 键打印）
+├── awesome_rsi_slides.pdf           # 同内容 26 页 PDF 版（1280x720 逐页）
+├── reports/                         # 18 份精读报告（Markdown，中文）
 │   ├── 01_lilian_weng_harness_engineering.md   # 总纲：harness 工程 → RSI
 │   ├── 02_anthropic_when_ai_builds_itself.md   # 工业证据：>80% 代码由 Claude 写
 │   ├── 03_evolm.md                             # 评估侧：rubric 共进化
@@ -210,10 +230,17 @@ awesome_rsi/
 │   ├── 08_moss.md                              # 框架侧：生产部署 + 门控回滚
 │   ├── 09_wikiskill.md                         # 知识侧：经验→wiki→技能
 │   ├── 10_synthesis_insights.md                # 汇总：两轴地图 + 十条 insight
-│   └── 11_continual_harness.md                 # 在线侧：免重置精炼 + 模型-harness 共学习
+│   ├── 11_continual_harness.md                 # 在线侧：免重置精炼 + 模型-harness 共学习
+│   ├── 12_self_evolving_agents_survey.md       # 综述：What/When/How/Where 四维坐标
+│   ├── 13_meta_harness.md                      # 谱系：harness 端到端优化（Stanford）
+│   ├── 14_self_harness.md                      # 谱系：harness 自我改进（上海 AI Lab）
+│   ├── 15_envharness.md                        # 谱系：环境侧进化（Google Cloud AI）
+│   ├── 16_autosaddler.md                       # 谱系：轨迹归因 + 持久化更新（Microsoft 等）
+│   ├── 17_metacaster.md                        # 谱系：meta-harness 垂直落地（时序预测）
+│   └── 18_prime_agent.md                       # 谱系：自改进 RLM harness（Prime Intellect）
 ├── papers/
-│   ├── en/                          # 26 篇英文原版 PDF（arXiv）
-│   └── zh/                          # 14 篇中文翻译 PDF（super_translate，保版式）
+│   ├── en/                          # 31 篇英文原版 PDF（arXiv）
+│   └── zh/                          # 19 篇中文翻译 PDF（super_translate，保版式）
 └── assets/
     ├── fulltext/                    # 核心论文提取全文（报告撰写底稿）
     └── trends_research_raw.md       # 2026H2 趋势扫描原始笔记

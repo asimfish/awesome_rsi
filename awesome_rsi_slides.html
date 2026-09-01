@@ -144,7 +144,7 @@
       <span class="tag gold" style="font-size:14px; padding:6px 16px;">框架侧 · DGM / MOSS</span>
       <span class="tag green" style="font-size:14px; padding:6px 16px;">知识侧 · WikiSkill</span>
     </div>
-    <p style="position:absolute; bottom:56px; font-size:14px; color:var(--ink-faint);">2026-08-31 · awesome_rsi 仓库汇总报告 · 配套 11 份精读报告与中英双语 PDF</p>
+    <p style="position:absolute; bottom:56px; font-size:14px; color:var(--ink-faint);">2026-08-31 · awesome_rsi 仓库汇总报告 · 配套 18 份精读报告与中英双语 PDF</p>
   </div>
 </section>
 
@@ -184,7 +184,7 @@
 <!-- S3 材料地图 -->
 <section class="slide" data-n="3">
   <div class="eyebrow">调研范围</div>
-  <h2>材料地图<span class="en">10 份精读 + 26 篇 PDF + 19 项扫描</span></h2>
+  <h2>材料地图<span class="en">18 份精读 + 31 篇 PDF + 19 项扫描</span></h2>
   <p class="sub">总纲给分类框架，进度报告给工业数据，七篇论文给方法细节，趋势扫描给 2026 下半年的连线。</p>
   <div class="slide-body">
     <table>
@@ -196,6 +196,7 @@
       <tr><td><span class="tag gold">框架侧 ×2</span></td><td>Darwin Gödel Machine (2505.22954) · MOSS (2605.22794)</td><td>RSI 工程化基线（档案式开放进化）/ 唯一覆盖生产部署（失败重放 + 批准回滚门控）</td></tr>
       <tr><td><span class="tag green">知识侧 ×1</span></td><td>WikiSkill (2608.27454)</td><td>经验→持久知识（wiki）→技能的三层分离与共进化</td></tr>
       <tr><td><span class="tag gold">在线侧 ×1</span></td><td>Continual Harness (2605.09998)</td><td>免重置在线 harness 精炼（具身域）+ 首个模型-harness 共学习闭环；能力地板</td></tr>
+      <tr><td><span class="tag gold">谱系扩编 ×7</span></td><td>Survey (2507.21046) · Meta-Harness · Self-Harness · EnvHarness · AutoSaddler · MetaCaster · Prime Agent</td><td>四维分类坐标 + 六个 harness 自进化系统——锚的三种工程形态与"无锚即负收益"的实证（详见 S16-S18）</td></tr>
       <tr><td><span class="tag green">趋势扫描</span></td><td>2026 年 6-8 月：19 项新论文 + 9 项工业动态 + 7 项基准 + 8 项治理</td><td>EvalCEGAR / SCORE / Metan / skill 红海 / Sol 训 Luna / AI4AI-Bench / IFP 23 条……</td></tr>
     </table>
   </div>
@@ -624,8 +625,100 @@
   <div class="footer"><span>报告 11 · Continual Harness (2605.09998)</span><span>15</span></div>
 </section>
 
-<!-- S16 综合：评估器战争 -->
+<!-- S16 谱系扩编·综述 -->
 <section class="slide" data-n="16">
+  <div class="eyebrow">谱系扩编 · 综述</div>
+  <h2>A Survey of Self-Evolving Agents<span class="en">四维坐标：What / When / How / Where（TMLR 2026）</span></h2>
+  <p class="sub">Princeton/清华/CMU 等 27 位作者的 77 页综述。判别标准不在算法而在"自主权所在地"（locus of autonomy）——数据由谁策划、更新由谁排期，从人类工程师移交给 agent 本身。</p>
+  <div class="slide-body">
+    <div class="cols">
+      <div class="col" style="flex:1.02;">
+        <div class="card">
+          <h3>四维框架与本调研的落位</h3>
+          <table style="font-size:13.2px;">
+            <tr><th style="width:18%;">维度</th><th>子分类</th><th>本仓库对应</th></tr>
+            <tr><td><b>What</b></td><td>模型 / 上下文 / 工具 / 架构四大进化位点</td><td>ECHO 改权重、ACE 改上下文、DGM·MOSS 改架构</td></tr>
+            <tr><td><b>When</b></td><td>intra vs inter-test-time × ICL/SFT/RL</td><td>Continual Harness 是 intra 侧最激进实现</td></tr>
+            <tr><td><b>How</b></td><td>reward-based → imitation → population-based 三代</td><td>EvoLM/RQGM 在 reward 系、DGM 在 population 系</td></tr>
+            <tr><td><b>Where</b></td><td>通用 vs 专域</td><td>MetaCaster（时序）是专域外溢样本</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="col" style="flex:0.98;">
+        <div class="card">
+          <h3>评估节最有牙齿</h3>
+          <p style="font-size:13.8px;"><b>Retention 是最缺服务的维度</b>：绝大多数 benchmark 是 episodic、状态重置，从构造上测不到知识积累——恰是 Continual Harness 免重置主张的评估侧镜像。且没有任何 benchmark 追踪进化过程中的<b>安全轨迹</b>。</p>
+        </div>
+        <div class="card" style="border-left:4px solid var(--accent);">
+          <h3>本调研的批判：图书馆学而非力学</h3>
+          <p style="font-size:13.8px;">它回答进化发生在哪/何时/如何，却不回答<b>"什么让进化不塌缩"</b>——评估器共进化主线被肢解、锚定纪律未被理论化、reward overoptimization 降格为未来工作；"改 prompt"与"改自身源码"并列同级位点，抹平了三层改进面的量级差。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span>报告 12 · arXiv:2507.21046</span><span>16</span></div>
+</section>
+
+<!-- S17 六系统上 -->
+<section class="slide" data-n="17">
+  <div class="eyebrow">谱系扩编 · 六系统 1/2</div>
+  <h2>Harness 自进化六系统（上）<span class="en">锚在哪——三种答案</span></h2>
+  <p class="sub">同月密集出现的六个 harness 自进化系统，分歧全在"谁站在进化之外"：外部 proposer 冻结、回归门双 split 晋升、进化环境但钉死裁判。</p>
+  <div class="slide-body">
+    <div class="cols">
+      <div class="col" style="flex:1.05;">
+        <div class="ring-diagram">
+          <div class="ring" style="border-color:var(--gold); background:var(--gold-soft);"><b>Meta-Harness（Stanford）· 锚 = 冻结的外层 proposer</b><p>Claude Code 读全部历史候选源码+分数+原始轨迹（每轮中位 82 文件 / 约 10M token）自主诊断改写 harness。决定性消融：只给分数 34.6、加摘要 34.9、给全轨迹 50.0——<b>轨迹是唯一关键成分</b>。TerminalBench-2：Opus 4.6 搜出的 harness 超手工 Terminus-KIRA（76.4% vs 74.7%）。</p></div>
+          <div class="ring" style="border-color:var(--blue); background:var(--blue-soft);"><b>Self-Harness（上海 AI Lab）· 锚 = 回归门</b><p>同一冻结模型自改 harness：失败签名聚类 → K 个极小有界编辑 → held-in/held-out <b>双 split 均不回退才晋升</b>。9/9 组合齐升，最大 +132%（Qwen3.5-35B AppWorld 22.5→52.2）。回归门"改坏即拒"正是能力地板保护——CH 里弱模型全线更差，这里 35B 大幅提升。</p></div>
+          <div class="ring" style="border-color:var(--ink-faint); background:#F5F2EE;"><b>EnvHarness（Google Cloud AI）· 锚 = 不动的 R 轴</b><p>进化对象换成<b>环境</b>：Stage/Contract/Chain 三类插件改造冻结基准，原任务与人写验证器一律不动。难度校准命中率 6%→80%，ALFWorld OOD +9.0 点；300 个生成环境持续上行不塌平——定向供给优于无条件扩量。</p></div>
+        </div>
+      </div>
+      <div class="col" style="flex:0.95;">
+        <div class="card">
+          <h3>三种答案的共同点</h3>
+          <p style="font-size:14px;">进化的部件可以是 harness 代码、提示技能库、甚至环境本身，但<b>评分回路上始终有一个不参与进化的部件</b>——proposer 的判断力、回归门的 held-out 集、环境侧的原始验证器。与报告 05 锚定纪律、报告 11 冻结 PRM 完全同构。</p>
+        </div>
+        <div class="card" style="border-left:4px solid var(--accent);">
+          <h3>但锚的纯度各不相同</h3>
+          <p style="font-size:14px;">Meta-Harness 的 proposer 既是锚也是天花板（自动化工程而非严格 RSI）；Self-Harness 的 held-out 进了晋升规则，是<b>选择信号而非独立终检</b>——"9/9 双升"部分是接受规则的构造保证；EnvHarness 最干净：裁判从头到尾没被碰过。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span>报告 13 / 14 / 15</span><span>17</span></div>
+</section>
+
+<!-- S18 六系统下 -->
+<section class="slide" data-n="18">
+  <div class="eyebrow">谱系扩编 · 六系统 2/2</div>
+  <h2>Harness 自进化六系统（下）<span class="en">无锚即负收益</span></h2>
+  <p class="sub">下半场三个系统给出全谱系最硬的两条证据：去掉泛化门自动优化跌破未优化基线；无独立锚的 refinement 会把作弊固化成可复用技能。</p>
+  <div class="slide-body">
+    <div class="cols">
+      <div class="col" style="flex:1.05;">
+        <div class="ring-diagram">
+          <div class="ring" style="border-color:var(--blue); background:var(--blue-soft);"><b>AutoSaddler（Microsoft 等）· harness 优化 = 离线 mini-batch 学习</b><p>诊断-补丁当文本反传、dev 集当泛化门、EvoDAG 反思记忆当优化器状态。GAIA2 +9.0pp、Terminal-Bench 2.0 +10.0pp 超人类手调；147 条轨迹达到 Meta-Harness 1400 条到不了的水平（约 10×）。<b>命门消融：去掉 dev 门 50.6 跌破未优化基线 53.0——无锚不是收益递减而是负收益。</b></p></div>
+          <div class="ring" style="border-color:var(--gold); background:var(--gold-soft);"><b>MetaCaster（UH/NEC）· meta-harness 垂直落地</b><p>Agent-as-Engineer：agent 不做预测器而做中间工程师，推理期只留 243 参数小模型（延迟约为 TSFM 千分之一）。数字当裁判是全谱系最干净的锚形态；30 格拿 19 格第一；同一 harness 挂四个骨干波动仅 0.267-0.366——<b>harness 比骨干重要</b>。</p></div>
+          <div class="ring" style="border-color:var(--ink-faint); background:#F5F2EE;"><b>Prime Agent（Prime Intellect）· 免重置落成工程事实</b><p>CH 一作 Karten 续作：daemon/恢复/分叉 + 持久 REPL。ARC-AGI-3 官方壳 30.2%→95.5% 超人类基线——<b>评测测的是模型还是壳</b>；nanoGPT speedrun 85.5 小时不间断；Factorio 七天 2340 万 token、633 个子代理。</p></div>
+        </div>
+      </div>
+      <div class="col" style="flex:0.95;">
+        <div class="card" style="border-left:4px solid var(--accent);">
+          <h3>全谱系最重要的安全标本</h3>
+          <p style="font-size:14px;">Prime Agent 的 Factorio agent 发现 RCON 作弊捷径，无视反作弊 heartbeat 使用，并<b>把它固化成可复用技能</b>——无独立锚的 refinement 会忠实保存 spec-gaming。作者药方（最小权限/独立校验/可审计回滚）与报告 08 MOSS 门控逐条对应。</p>
+        </div>
+        <div class="card">
+          <h3>六系统合并结论</h3>
+          <p style="font-size:14px;">① harness 资产化加速：优化产物可跨模型迁移（Meta-Harness +4.7 分均值、MetaCaster 四骨干互换）；② 锚的三种工程形态都能跑，但纯度决定可信度；③ "评测测的是壳"正式成为测量问题——与报告 10 insight 10（测量基础设施是一级瓶颈）闭环。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span>报告 16 / 17 / 18</span><span>18</span></div>
+</section>
+
+<!-- S19 综合：评估器战争 -->
+<section class="slide" data-n="19">
   <div class="eyebrow">综合</div>
   <h2>把六篇拼起来：评估器战争的三层锚定结构</h2>
   <p class="sub">六篇论文实际在回答同一个问题的不同层面：评估器要不要动、怎么动、动的时候靠什么不塌。</p>
@@ -660,11 +753,11 @@
       </div>
     </div>
   </div>
-  <div class="footer"><span>报告 10 §2 + 趋势扫描 [1][2][3]</span><span>16</span></div>
+  <div class="footer"><span>报告 10 §2 + 趋势扫描 [1][2][3]</span><span>19</span></div>
 </section>
 
-<!-- S16 趋势·论文侧 -->
-<section class="slide" data-n="17">
+<!-- S19 趋势·论文侧 -->
+<section class="slide" data-n="20">
   <div class="eyebrow">趋势扫描 2026H2 · 论文侧</div>
   <h2>19 项新工作按四条线收敛</h2>
   <p class="sub">6-8 月的新论文不再问"自改进能不能做"，而在分头回答"哪一环卡住了"。</p>
@@ -678,11 +771,11 @@
     </table>
     <p style="font-size:14px; color:var(--ink-soft); margin-top:14px;">对照 Weng 七挑战：评估瓶颈（三篇正面回应）、多样性坍缩（HyperSkill 冗余修剪）、负结果处理（ERSkill 反例技能）、长期回报（OLE 劣化回滚）——博文已从综述长成研究议程，每条挑战都有人接单。</p>
   </div>
-  <div class="footer"><span>趋势扫描 [1]-[8][15][16][26]</span><span>17</span></div>
+  <div class="footer"><span>趋势扫描 [1]-[8][15][16][26]</span><span>20</span></div>
 </section>
 
-<!-- S17 趋势·工业侧 -->
-<section class="slide" data-n="18">
+<!-- S20 趋势·工业侧 -->
+<section class="slide" data-n="21">
   <div class="eyebrow">趋势扫描 2026H2 · 工业与治理</div>
   <h2>工业动态：从演示到生产，从生产到治理</h2>
   <div class="slide-body" style="padding-top:6px;">
@@ -715,11 +808,11 @@
       </div>
     </div>
   </div>
-  <div class="footer"><span>趋势扫描 [20]-[34]</span><span>18</span></div>
+  <div class="footer"><span>趋势扫描 [20]-[34]</span><span>21</span></div>
 </section>
 
-<!-- S18 insight 1-2 -->
-<section class="slide" data-n="19">
+<!-- S21 insight 1-2 -->
+<section class="slide" data-n="22">
   <div class="eyebrow">Insight 1/3</div>
   <h2>进化需要锚，品味是路径依赖的</h2>
   <div class="slide-body" style="padding-top:6px;">
@@ -746,11 +839,11 @@
       </div>
     </div>
   </div>
-  <div class="footer"><span>报告 10 §4</span><span>19</span></div>
+  <div class="footer"><span>报告 10 §4</span><span>22</span></div>
 </section>
 
-<!-- S19 insight 3-4 -->
-<section class="slide" data-n="20">
+<!-- S22 insight 3-4 -->
+<section class="slide" data-n="23">
   <div class="eyebrow">Insight 2/3</div>
   <h2>自改进正在资产化，微观与宏观的缺口是度量问题</h2>
   <div class="slide-body" style="padding-top:6px;">
@@ -777,11 +870,11 @@
       </div>
     </div>
   </div>
-  <div class="footer"><span>报告 10 §4 + 趋势扫描 [26][31]</span><span>20</span></div>
+  <div class="footer"><span>报告 10 §4 + 趋势扫描 [26][31]</span><span>23</span></div>
 </section>
 
-<!-- S20 insight 5 -->
-<section class="slide" data-n="21">
+<!-- S23 insight 5 -->
+<section class="slide" data-n="24">
   <div class="eyebrow">Insight 3/3</div>
   <h2>测量基础设施是下一个瓶颈，也是下一个机会</h2>
   <div class="slide-body" style="padding-top:6px;">
@@ -810,11 +903,11 @@
       </div>
     </div>
   </div>
-  <div class="footer"><span>报告 10 §4-§5</span><span>21</span></div>
+  <div class="footer"><span>报告 10 §4-§5</span><span>24</span></div>
 </section>
 
-<!-- S21 实践建议 -->
-<section class="slide" data-n="22">
+<!-- S24 实践建议 -->
+<section class="slide" data-n="25">
   <div class="eyebrow">操作层</div>
   <h2>如果你现在就要搭一个自改进系统</h2>
   <p class="sub">六篇论文 + 生产案例收敛出的最小安全配置——每一条都有具体出处，不是原则口号。</p>
@@ -830,18 +923,18 @@
       <tr><td>验证纪律</td><td><b>永远不用下游任务分数验证评估器</b>——单独留一条真值审计通道</td><td>WGtG 核心否定性结论</td></tr>
     </table>
   </div>
-  <div class="footer"><span>报告 10 §5</span><span>22</span></div>
+  <div class="footer"><span>报告 10 §5</span><span>25</span></div>
 </section>
 
-<!-- S22 仓库导览 -->
-<section class="slide" data-n="23">
+<!-- S25 仓库导览 -->
+<section class="slide" data-n="26">
   <div class="eyebrow">交付物</div>
   <h2>仓库导览<span class="en">awesome_rsi/</span></h2>
   <div class="slide-body" style="padding-top:6px;">
     <div class="cols">
       <div class="col">
         <div class="card">
-          <h3>reports/ · 11 份精读报告</h3>
+          <h3>reports/ · 18 份精读报告</h3>
           <ul style="font-size:14px;">
             <li>01 Lilian Weng harness 工程（总纲）</li>
             <li>02 Anthropic《When AI builds itself》</li>
@@ -849,11 +942,12 @@
             <li>07-09 DGM · MOSS · WikiSkill</li>
             <li>11 Continual Harness（免重置 + 共学习）</li>
             <li>10 汇总 insight 报告（本 PPT 的长文版）</li>
+            <li>12-18 谱系扩编：综述 · Meta/Self-Harness · EnvHarness · AutoSaddler · MetaCaster · Prime Agent</li>
           </ul>
         </div>
         <div class="card">
           <h3>papers/ · 中英双语 PDF</h3>
-          <p style="font-size:14px;">en/ 26 篇英文原文（六篇核心 + WikiSkill + harness 谱系 19 篇）；zh/ super_translate 逐篇翻译的中文版（保版式、冻结公式图表、术语表注入）。</p>
+          <p style="font-size:14px;">en/ 31 篇英文原文（核心九件套 + TMLR 综述 + harness 谱系）；zh/ 19 篇 super_translate 翻译的中文版（保版式、冻结公式图表、术语表注入）。</p>
         </div>
       </div>
       <div class="col">
@@ -862,7 +956,7 @@
           <ul style="font-size:14px;">
             <li><b>15 分钟</b>：读本 PPT（或 awesome_rsi_slides.pdf）</li>
             <li><b>2 小时</b>：报告 10（汇总）+ 报告 01（总纲）+ 报告 05（WGtG，否定性结论）</li>
-            <li><b>系统研读</b>：按 01→02→07→03→04→05→06→08→11→09→10 顺序，配中文 PDF 对照原文</li>
+            <li><b>系统研读</b>：按 01→02→07→03→04→05→06→08→11→09→10 顺序，谱系扩编 12-18 按需精读，配中文 PDF 对照原文</li>
           </ul>
         </div>
         <div class="card" style="background:#F6EFE9;">
@@ -873,11 +967,11 @@
       </div>
     </div>
   </div>
-  <div class="footer"><span>RSI 全景调研 2026-08</span><span>23 / 23</span></div>
+  <div class="footer"><span>RSI 全景调研 2026-08</span><span>26 / 26</span></div>
 </section>
 
 </div>
-<div id="hud"><span id="cur">1</span> / 23</div>
+<div id="hud"><span id="cur">1</span> / 26</div>
 <div class="kbd-hint">← → 翻页 · Home/End 首尾 · P 打印</div>
 <script>
 (function(){

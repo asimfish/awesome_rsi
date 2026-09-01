@@ -1,0 +1,2094 @@
+METACASTER: Meta-Harness-Optimized Agent for End-to-End
+Few-Shot Learning of Lightweight Time Series Forecasters
+ChengAo Shen1, Wenchao Yu2, Fangyu Wu3, Dongjin Song4, Hanghang Tong5,
+Dongsheng Luo6, Wei Cheng2, Haifeng Chen2, Jingchao Ni1
+1University of Houston, 2NEC Labs, 3University of Waterloo, 4University of Connecticut,
+5University of Illinois at Urbana-Champaign, 6Singapore Management University
+1{cshen9, jni7}@uh.edu, 2{wyu, weicheng, haifeng}@nec-labs.com,
+3fangyu.wu@uwaterloo.ca, 4dongjin.song@uconn.edu,
+5htong@illinois.edu, 6dsluo@smu.edu.sg
+Abstract
+Time series forecasting (TSF) is evolving to-
+ward multimodal and agentic settings, yet us-
+ing foundation models remains uneconomical
+in resource-constrained scenarios, where com-
+pact, specialized forecasters are more desirable.
+However, lightweight forecasters typically re-
+quire substantial training data, limiting their use
+in domains with scarce, slowly accumulated, or
+privacy-sensitive time series. To address this
+dilemma, we investigate the challenging prob-
+lem of few-shot learning for lightweight fore-
+casters. We propose METACASTER, a meta-
+harness-optimized multi-agent framework that
+uses agentic data generation to automatically
+train specialized lightweight forecasters from
+only a few examples and textual contexts. Our
+work highlights a new TSF paradigm in which
+agents act not as forecasters but as intermediary
+engineers that prepare efficient, task-specific
+forecasters for deployment. Experiments on 18
+datasets, 23 state-of-the-art lightweight fore-
+casters, and 14 baselines demonstrate that
+METACASTERachieves both data efficiency
+and computational efficiency while maintain-
+ing high-quality TSF performance.1
+1 Introduction
+Time series forecasting (TSF) underpins decision-
+making and intelligence across domains such as
+geoscience, healthcare, and energy (Koprinska
+et al., 2018; Morid et al., 2023; Ardid et al., 2025).
+Unlike traditional TSF, which focuses on numerical
+prediction at future timesteps, emergent TSF set-
+tings are multimodal, incorporating textual context
+describing domains, events, or external conditions
+(Jiang et al., 2025). This transition is driven by
+advances in large language models (LLMs) and AI
+agents. As Fig. 1 illustrates, recent LLM-based
+TSF methods have two main paradigms: (a)LLM-
+as-F orecaster– where pre-trained LLMs serve as
+1The code of METACASTERis available at https://
+github.com/D2I-Group/metacaster.
+forecasting backbones with additional cross-modal
+adapters and TSF heads (e.g., TimeLLM (Jin et al.,
+2024),S2IPLLM (Pan et al., 2024),TimeVLM (Zhong
+et al., 2025),etc.); and (b)Agent-as-F orecaster–
+where LLM agents interpret time series in contex-
+tual prompts, reason about future trends, and gen-
+erate forecasts conversationally or visually (e.g.,
+LLMTime (Gruver et al., 2023), TimeOmni-1 (Guan
+et al., 2026a),Nexus(Das et al., 2026),etc.).
+Despite the inspiring progress, using LLMs as
+the computational core for forecasting is largely
+obstructed by the modality gap betweendiscrete
+language tokens andcontinuoustime series values.
+Consequently, the effectiveness of the paradigms in
+Fig. 1(a) and (b), compared with specialized non-
+LLM forecasters, remains under debate (Tan et al.,
+2024; Merrill et al., 2024). Benchmark studies
+consistently show that dedicated numerical models,
+such as DLinear (Zeng et al., 2023) and PatchTST
+(Nie et al., 2023), can outperform LLM-based ap-
+proaches (Shen et al., 2025a), motivating the rise
+of time series foundation models (TSFMs) such as
+Moirai (Woo et al., 2024),Chronos (Ansari et al.,
+2024), andSundial(Liu et al., 2025c).
+However, using large models – whether LLMs
+or TSFMs – as one-size-fits-all solutions raises
+concerns about sustainability and carbon footprint
+(Bolón-Canedo et al., 2024). The demand for rapid
+deployment in resource-constrained settings (e.g.,
+edge devices and small organizations) has therefore
+sparked growing interest in lightweight forecasters
+(Ma et al., 2024), analogous to the rise of small
+language models (SLMs) (Belcak et al., 2025). No-
+tably, recent studies show that lightweight forecast-
+ers can rival LLMs and TSFMs in individual TSF
+tasks (Shen et al., 2025b), Their main limitation is
+the need for sufficient downstream training data, as
+they lack large-scale pre-training.
+In practice, collecting long-history time series
+for training can significantly delay deployment. In
+privacy-sensitive domains such as healthcare and
+arXiv:2608.23473v1  [cs.LG]  24 Aug 2026
+Pre-trained LLM
+🔥
+❄/
+🔥Adapter
+Context
+TSF head
+🔥
+ LLM agent
+Context
+“0.1, 0.2, …, 0.5”
+“The electricity is 0.1, 0.2, …, 0.5 …”Prompt
+Context
+𝓓𝐬𝐮𝐩
+ "𝓓
+Lightweight Forecaster
+MGAgentFTAgent
+🔥HarnessHarness
+❄
+Deployment Time
+Inference Time(a) LLM-As-Forecaster(b) Agent-As-Forecaster(c) MetaCaster (Agent-As-Engineer)
+❄/
+🔥
+❄
+❄
+Figure 1: Comparison of different paradigms of using LLMs for TSF. METACASTERis the proposed model.
+finance, acquiring large training datasets may even
+be infeasible. This raises a challenging question:
+can lightweight forecasters be effectively trained
+with only a few samples?Although such models are
+highly prone to overfitting without large-scale pre-
+training, we demonstrate that a solution is possible
+in the era of agentic AI.
+To address this challenge, we propose META-
+CASTER, a Meta-harness-optimized agent for end-
+to-end few-shot learning of lightweight forecasters.
+As Fig. 1(c) illustrates, rather than directly gener-
+ating forecasts, METACASTER’s agents act as in-
+termediaries that prepares a specialized forecaster
+for a target TSF task. At deployment time, given a
+few-shot support set Dsup and contextual descrip-
+tion C, METACASTERemploys two agents: (1)
+MGAGENTrefers to Dsup and C, and generates a
+sufficient dataset ¯D that complies with domain con-
+straints; and (2) FTAGENTtrains and selects the
+best lightweight forecasters using ¯D. To support
+FTAGENT, we compile 23 state-of-the-art (SOTA)
+lightweight forecasters (2022-2026) into LT-LIB
+library (§3.5) with a unified API. Similar to fine-
+tuning a foundation model, METACASTERper-
+forms task adaptation at deployment time, but more
+efficiently via the novel agents and LLM API calls.
+After deployment, only the selected lightweight
+forecaster is used for inference.
+Unlike existing time series generation models
+that focus on data simulation (Huang et al., 2025b;
+Gu et al., 2025; Ge et al., 2025), METACASTER
+generates time series specifically to improve fore-
+casting performance. To our knowledge, it is the
+first framework to align data generation with fore-
+caster quality. Motivated by recent findings on
+the importance of agent Harnesses (Li et al., 2026a;
+Lee et al., 2026) – the infrastructure surrounding an
+LLM (e.g., system prompts, skills, tools) – we opti-
+mize MGAGENT’s Harness using a meta-harness
+HPAGENT(Fig. 2), which is more efficient than
+fine-tuning LLMs. The optimized Harness is also
+transferable across different LLMs, enabling flexi-
+ble API switching in downstream deployment, as
+demonstrated in §4.2. In summary, our contribu-
+tions are as follows.
+• We investigate the challenging problem of few-
+shot learning for lightweight forecasters.
+• We propose METACASTER, a novel meta-
+harness-optimized multi-agent framework that
+achieves large-model-like performance with effi-
+cient inference for TSF tasks.
+• We compile 20+ SOTA lightweight forecasters
+into LT-LIB, a unified library that will be re-
+leased alongside METACASTER.
+• We conduct comprehensive experiments on 18
+datasets against 14 baselines, demonstrating the
+effectiveness of METACASTER.
+2 Related Work
+LLM-based TSF. As discussed in §1, many exist-
+ing LLM-based TSF models adopt eitherLLM-As-
+F orecaster(Zhou et al., 2023; Jin et al., 2024; Pan
+et al., 2024; Liu et al., 2024, 2025a; Wang et al.,
+2025; Zhong et al., 2025) orAgent-As-F orecaster
+(Xue and Salim, 2023; Gruver et al., 2023; Das
+et al., 2026). Additionally, some multi-task time
+series QA agents can conduct TSF via LLM rea-
+soning (Kong et al., 2025; Guan et al., 2026a; Yu
+et al., 2025; Wu et al., 2026; Guan et al., 2026b).
+In contrast, there are relatively fewerAgent-As-
+Engineermodels that use Harness for TSF (Zhao
+et al., 2025; Garza and Rosillo Garcia, 2025; Zhang
+et al., 2025; Jalori et al., 2025). However, these
+models don’t generate times series (thus require
+large training data), and never automatically opti-
+mize their Harness for TSF, distinguishing them
+from METACASTER.
+Time Series Generation. Our work is related to
+time series generation models, including data aug-
+mentation techniques (Luo et al., 2023; Yue et al.,
+2022; Iwana and Uchida, 2021; Wen et al., 2021),
+generative models that focus on data distributions
+(Yoon et al., 2019; Desai et al., 2021; Jeon et al.,
+2022; Yuan and Qiao, 2024), and language-based
+models that can encode contexts (Naiman et al.,
+2024; Huang et al., 2025b; Gu et al., 2025; Ge
+et al., 2025). However, these standalone genera-
+tors aim to simulate certain data properties, rather
+than directly optimize TSF performance, leaving a
+significant gap as we will demonstrate in §4.
+Agent Harness Optimization. AI agents are un-
+dergoing a paradigm shift. Recent findings chal-
+lenge the assumption that better models alone pro-
+duce more reliable agents (Li et al., 2026a; Ning
+et al., 2026). Rather, improving the infrastructure
+layer around an agent,i.e., theagent harness, can
+significantly enhance its performance (Li et al.,
+2026a), leading to growing attention to harness
+engineering (Lin et al., 2026), and emerging tech-
+niques for optimizing texts (Yuksekgonul et al.,
+2025) and harness (Lee et al., 2026) within agentic
+systems. Unlike time series agents that mostly rely
+on supervised fine-tuning or reinforcement learn-
+ing (Guan et al., 2026a,b; Wu et al., 2026), the
+proposed METACASTERis, to our best knowledge,
+the first time series agent exposed to automatic
+harness optimization.
+3 The Proposed Method
+3.1 Problem Statement
+Given a multivariate time series (MTS) X=
+[x1, ...,xD]⊤ ∈R D×T within alook-back window
+of length T , where xd ∈R T (1≤d≤D) is a
+univariate time series (UTS) of the d-th variate, the
+goal of TSF is to estimate the most likely values of
+the MTS at future H time steps,i.e., ¯Y∈R D×H,
+such that the difference between the estimation and
+the ground truth Y=X T+1:T+H ∈R D×H is min-
+imized in terms of a metric, such as mean squared
+error (MSE).
+In this work, we integrate multiple lightweight
+forecasters F={f 1, ..., fL}, where fl :R D×T →
+RD×H (1≤l≤L ). We refer to F as LT-LIB
+(Lightweight TSF Library, §3.5). It is noteworthy
+that the forecasters in F are non-pre-trained due to
+their small capacities.
+The Task. Given F, a K-shotsupport set Dsup =
+{(Xi,Y i)}K
+i=1, and a textual context description C
+about the target domain (e.g., climatology, health-
+care), the task is to train the forecasters in F with
+optimal forecasting errors on a test set. The task is
+challenging when K is small,i.e., in the few-shot
+setting, especially for the small forecasters inF.
+3.2 Framework Overview
+To address the task, we propose METACASTER,
+a multi-agent system that generates a sufficient
+dataset ¯D={(X i,Y i)}N ′
+i=1 with N ′ ≫K based
+on the limited data in {Dsup,C} , and then splits ¯D
+into a training set ¯Dtr and a validation set ¯Dval for
+training the forecasters inF.
+Unlike existing generative models that focus on
+data realism (Huang et al., 2025b; Gu et al., 2025;
+Ge et al., 2025), METACASTERgenerates ¯D to
+ensure that forecasters trained on ¯Dtr perform com-
+parably to those trained on real data of the same
+size (as | ¯Dtr|) in the target domain. This objec-
+tive difference is crucial: standard generators can-
+not guarantee faithful data reproduction, and the
+resulting mismatch may lead to biased forecast-
+ers. In contrast, METACASTERdirectly optimizes
+data generation for downstream forecasting per-
+formance, learning to produce training data that
+is better suited for building effective time series
+forecasters in the target domain.
+To enable agent optimization, we adopt a meta-
+harness strategy (Lee et al., 2026) given recent
+findings on harness’s significant impact on agent
+performance (Li et al., 2026a). Fig. 2 illustrates the
+optimization framework of METACASTER, con-
+sisting of three key components: (1) a Meta-
+Generator (MGAGENT, §3.4); (2) a Forecaster
+Trainer (FTAGENT, §3.5); and (3) a Harness Pro-
+poser (HPAGENT, §3.6). Among them, HPAGENT
+optimizes the Harness of MGAGENTduring the
+agent optimization process, which will be dropped
+at deployment and inference time (§3.7).
+3.3 The Harness Optimization Problem
+To enable METACASTERto generate domain-
+specific training data, we construct a corpus of time
+series datasets Char ={D m,C m}M
+m=1 for Harness
+optimization, where Dm ={(X i,Y i)}Nm
+i=1 denotes
+the time series from the m-th domain and Cm its
+associated context. The corpus spans M diverse
+domains to improve METACASTER’s cross-domain
+generalizability.
+As illustrated in Fig. 2, each dataset Dm is
+split into train/validation/test sets Dm
+tr , Dm
+val and
+Dm
+te , representing the authentic data from the m-th
+domain. To simulate practical few-shot settings,
+K samples from Dm
+tr are used to construct Dm
+sup.
+METACASTERthen leverages {Dm
+sup,C m} to gen-
+erate { ¯Dm
+tr , ¯Dm
+val}. The objective is to minimize
+the performance gap between forecasters trained
+System Prompt
+Skills
+LLM
+Toolkit
+MemoryOther
+Meta-Generator (MGAgent)
+LLM
+Toolkit
+MemoryOther
+Forecaster Trainer (FTAgent)
+LT-Lib
+SparseTSF
+FITS
+CycleNetMixlinear
+……
+LLM
+Harness Proposer (HPAgent)
+ ⭐
+🔥
+ 🔥
+❄
+❄
+❄
+❄
+Diagnosis
+Analysis
+Train setVal setTest set
+Few-shot set
+Context
+Update
+Generated Dataset
+This is about Electricity Load Diagrams 2011-2014: Portuguese clients, hourly consump@on in kW …
+Lightweight Forecaster
+Evaluation MetricsTraining Logs
+Monitor
+×𝐵 
+×𝐵𝐾 
+Training Datasets
+Train set
+TS-GeneratorRunTrain ProcessCreateIterateSample
+Toolkit
+MemoryOther
+Reasoning Traces
+TrainableFrozen
+🔥
+❄
+Feedback loopForward pass
+Optimization step
+System Prompt
+Skills
+❄
+ ❄
+❄
+❄
+❄
+❄
+Lightweight TSF library with 23 forecasters
+TSMixerCMoSDLinearLightTS
+Figure 2: An illustration of the harness optimization framework of the proposed METACASTERsystem.
+on {Dm
+tr ,D m
+val} and those trained on { ¯Dm
+tr , ¯Dm
+val},
+evaluated on the same test setD m
+te .
+Formally, let θ be the trainable Harness in
+METACASTER, f m
+l ( ¯f m
+l ) be the forecaster trained
+using {Dm
+tr ,D m
+val} ({ ¯Dm
+tr , ¯Dm
+val}), the Harness opti-
+mization problem is
+min
+θ
+E1≤m≤M,1≤l≤L
+ 
+δ(ω(f m
+l ), ω(¯f m
+l ))
+
+(1)
+where ω(·) is a metric that evaluates forecasting
+errors on Dm
+te , and δ(·,·) is a measure of difference
+between two metrics.
+3.4 Meta-Generator (MGAGENT)
+Given the few-shot set {Dm
+sup,C m}, MGAGENT
+seeks to generate ¯Dm, that is
+¯Dm =MGAGENT(D m
+sup,C m) (2)
+which will be split into { ¯Dm
+tr , ¯Dm
+val} by FTAGENT
+(§3.5). Here, Cm provides semantic cues that guide
+MGAGENTto generate domain-compliant signals
+using methods pertinent to them-th domain.
+As shown in Fig. 2, MGAGENTis centered
+on a (replaceable) LLM. Rather than generating
+MTS directly, the LLM uses its Harness to create
+a TS-Generator program that integrates domain-
+specific knowledge, rules, and models pertinent
+to the m-th domain, circumventing LLM’s lim-
+ited capability in direct time series inference (Mer-
+rill et al., 2024). Instead, MGAGENTexploits the
+LLM’s strengths in planning, reasoning, and cod-
+ing to orchestrate more suitable tools for time series
+inference, hence the “Meta-” prefix.
+Upon receiving {Dm
+sup,C m}, MGAGENT(1) an-
+alyzes the MTS in Dm
+sup, (2) createsTS-Generator
+to generate Dm, and (3) performs quality checks.
+It accepts Dm if all checks pass. Otherwise, it goes
+to step (2) to reviseTS-Generator.
+In this process, the Harness exposes several com-
+ponents to the LLM, including asystem prompt,
+skills, atoolkit,long-term memory, and other execu-
+tionmiddleware. The system prompt defines MGA-
+GENT’s behavior, goals, constraints, and tool-usage
+rules. Skills (Li et al., 2026b) are reusable modules
+containing instructions, metadata, and tool bind-
+ings for the time series generation task in Eq. (2).
+The toolkit provides APIs for tools such as Python
+and web search, while the long-term memory stores
+information about generated data to support itera-
+tive review and refinement in steps (2) and (3).
+In the Harness, the system prompt and skills
+define key behavior of MGAGENT. Thus, we freeze
+the LLM and use them as the trainable parameters
+θ. Instead of Harness engineering (Li et al., 2026a),
+θ is edited by HPAGENT(§3.6) in an outer loop to
+automatically optimize Eq. (1).
+3.5 Forecaster Trainer (FTAGENT)
+FTAGENTsplits ¯Dm into { ¯Dm
+tr , ¯Dm
+val} according to
+the partition sizes of {Dm
+tr ,D m
+val}, orchestrates com-
+putational resources to train the forecasters in F,
+and evaluates them on Dm
+te , producing trained fore-
+casters, evaluation metrics, and training reports:
+{{f m
+l , ¯f m
+l , ω(fm
+l ), ω(¯f m
+l )}L
+l=1,R}
+=FTAGENT({D m
+tr ,D m
+val,D m
+te },{ ¯Dm
+tr , ¯Dm
+val})
+(3)
+where ω(·) is the evaluation metric such as MSE
+and MAE, andRdenotes the training reports.
+Lightweight TSF Library (LT-LIB). To con-
+struct F, we collect 23 SOTA lightweight fore-
+casters proposed from 2022 to 2026, including
+Linear-Layer models (e.g.,MixLinear (Ma et al.,
+2024)), MLP-based forecasters (e.g., TSMixer
+(Chen et al., 2023)), and Frequency-domain mod-
+els (e.g., FITS (Xu et al., 2024)). Their sizes,
+as listed in Appendix C.1, are much smaller
+than SOTA Transformer-based forecasters (e.g.,
+PatchTST (Nie et al., 2023): ∼3.2M) and TSFMs
+(e.g.,Chronos (Ansari et al., 2024): ∼700M). We
+compile them in LT-LIBwith a unified interface to
+facilitate training calls in FTAGENT.
+As shown in Fig. 2, FTAGENTcomposes pro-
+grams to train each forecaster with a grid search of
+hyperparameters. It organizes training jobs –i.e.,
+(forecaster, hyperparameter, dataset) triplets – into
+a queue and assigns available GPUs for maximally
+parallel execution. During training, it monitors pro-
+cesses, resolves errors when encountered, and re-
+covers interrupted jobs without human intervention.
+This procedure ends when the queue is emptied.
+FTAGENT’s Harness shares the same compo-
+nents as MGAGENT’s, with additional access to
+LT-LIB. Unlike MGAGENT, however, its Harness
+is not optimized, since the training process is rela-
+tively standard and has less impact on the resulting
+forecasters than the generated dataset ¯Dm.
+3.6 Harness Proposer (HPAGENT)
+HPAGENTis the meta-harness (Lee et al., 2026)
+that configures the Harness of MGAGENTto opti-
+mize Eq. (1). Upon receiving {ω(f m
+l ), ω(¯f m
+l )}L
+l=1
+from FTAGENT, HPAGENTevaluates Eq. (1) using
+a hinge-loss based measure:
+δ(ω(f m
+l ), ω(¯f m
+l )) = max
+n ω( ¯f m
+l )−ω(f m
+l )
+ω(f m
+l ) ,0
+o
+(4)
+which induces a penalty when the forecasting error
+ω( ¯f m
+l ) of the forecaster trained on the generated
+¯Dtr is larger than ω(f m
+l ) of the forecaster trained
+on the authentic dataset Dtr, suggesting ¯Dtr needs
+improvements. Otherwise, Eq. (4) won’t induce
+any penalty when ¯f m
+l performs better thanf m
+l .
+As in Fig. 2, HPAGENToversees the entire
+pipeline through three stages: (1)Self-Planned
+Analysis, which collects evidence on MGAGENT
+and FTAGENTperformance, including the loss in
+Eq. (1), statistical differences between Dtr and ¯Dtr
+(e.g., MMD), and training issues from logs R; (2)
+Diagnosis, which identifies potential causes of per-
+formance degradation from MGAGENT’s reasoning
+traces, system prompt, and skills, then determines
+how to update the Harness θ of MGAGENT; and
+(3)Update, which edits θ. Effectively, HPAGENT
+serves as the optimizer of Eq. (1), as defined by its
+system prompt.
+Accordingly, HPAGENT’s lifecycle is the en-
+tire optimization process with multiple epochs of
+updating θ, whereas MGAGENTand FTAGENT
+each functions within a single epoch. HPAGENT
+therefore relies more heavily on long-term memory,
+which stores dataset snapshots, evaluation metrics,
+training logs, analysis/diagnosis results, θ update
+logs,etc., across epochs. This memory enables
+rollback of harmful updates and allows HPAGENT
+to output the bestθat the end of optimization.
+3.7 Training and Inference
+Harness Training. We summarize the optimiza-
+tion process in Appendix A. In every epoch, we
+draw K∼Uniform([10,50]) . Notably, instead
+of feeding the K-shot support set {Dm
+sup,C m} to
+METACASTERindividually, we sample a batch
+of B datasets from the corpus Char to extract B
+support sets, and let METACASTERprocess them
+simultaneously. This extension allows HPAGENT
+to evaluate generalizability across datasets and mit-
+igate overfitting to any specific dataset.
+Inference. After optimization, HPAGENToutputs
+the best θ∗, and is discarded. The Harnesses of
+MGAGENT(including θ∗) and FTAGENT(includ-
+ing LT-LIB) are retained, while their LLMs are
+removed. For a new target domain g, these Har-
+nesses are attached to user-selected LLM APIs to
+instantiate MGAGENTand FTAGENT. Given K-
+shot Dg
+sup and context Cg, the agents execute the
+forward process in Fig. 2 to produce the trained
+forecaster ¯f g
+∗ . At TSF stage, only ¯f g
+∗ needs to be
+maintained, while MGAGENTand FTAGENTare
+dropped, as shown in Fig. 1(c).
+Therefore, the entire downstream deployment
+and inference process can be accomplished using
+low-cost devices capable of running the Harnesses
+and the LT-LIBframework, making it more effi-
+cient than relying on GPU-intensive TSFMs.
+4 Experiments
+4.1 Experimental Setup
+Datasets. To evaluate METACASTER, we employ
+the GIFT-Eval benchmark (Aksu et al., 2024), pre-
+visouly adopted for training TSFMs (Woo et al.,
+2024). We use 18 datasets across 9 domains (e.g.,
+energy, weather, traffic), split into a train corpus of
+8 datasets (i.e., Char in §3.3), anin-domain (IND)
+Dataset Ours Generation Models Augmentation Methods References
+METACASTERTimeDP VerbalTS T2S DiffTS TimeVAE Repeat Bootstrap Jitter MagWarpDmsup Dmtr
+IND (K= 10)
+ETTm1 0.376 1.049 1.004 0.922 1.154 0.749 0.781 0.748 0.746 1.919 0.687 0.316
+Electricity 0.300 0.2881.061 1.150 0.365 0.328 0.380 0.379 0.375 7.057 0.721 0.121
+Seattle 1.522 1.4201.800 1.792 1.643 1.759 1.955 1.849 1.925 43.24 2.341 1.024
+SZTaxi 0.104 0.124 0.116 0.118 0.111 0.114 0.134 0.118 0.123 1.122 0.187 0.096
+Sales 2.616 2.587 2.4192.758 4.323 2.795 4.175 2.949 2.946 4.321 3.004 2.927
+Bitbrains 0.068 0.079 0.098 0.094 0.121 0.109 0.197 0.149 0.159 0.826 0.152 0.150
+Solar 0.158 0.208 0.513 0.552 0.238 0.237 0.278 0.272 0.272 0.446 0.440 0.157
+OOD
+Saugeen 1.960 1.492 1.4741.578 2.281 2.705 3.119 2.887 2.908 3.893 1.859 1.183
+USbirths 0.702 2.690 1.501 1.540 1.7750.607 0.752 0.715 0.714 12.08 1.204 0.250
+M4† 2.093 2.178 2.331 2.444 2.688 2.993 3.250 3.101 3.057 8.654 2.628 2.330
+IND (K= 30)
+ETTm1 0.345 1.049 1.027 0.910 1.211 0.684 0.714 0.664 0.662 0.943 0.602 0.316
+Electricity 0.226 0.287 1.055 1.140 0.363 0.268 0.305 0.287 0.290 1.644 0.657 0.121
+Seattle 1.177 1.414 1.806 1.777 1.673 2.158 1.738 1.656 1.622 21.15 1.785 1.024
+SZTaxi 0.114 0.121 0.116 0.1150.1120.156 0.162 0.141 0.135 1.626 0.150 0.096
+Sales 2.362 2.479 2.455 2.942 4.439 2.598 3.603 3.131 3.158 3.422 2.611 2.927
+Bitbrains 0.125 0.0840.097 0.095 0.130 0.114 0.463 0.469 0.489 0.777 0.137 0.150
+Solar 0.152 0.220 0.515 0.576 0.240 0.234 0.254 0.252 0.248 0.356 0.379 0.157
+OOD
+Saugeen 1.464 1.495 1.480 1.593 2.286 2.019 2.419 2.266 2.277 2.620 1.547 1.183
+USbirths 0.533 1.980 1.509 1.536 1.7320.474 0.546 0.524 0.525 5.107 0.803 0.250
+M4† 2.112 2.248 2.394 2.522 2.663 3.402 3.126 3.109 3.169 10.321 2.950 2.330
+IND (K= 50)
+ETTm1 0.267 1.063 1.035 0.931 1.284 0.548 0.582 0.556 0.546 0.592 0.456 0.316
+Electricity 0.191 0.279 1.053 1.197 0.352 0.227 0.244 0.234 0.233 1.287 0.472 0.121
+Seattle 1.125 1.423 1.819 1.779 1.732 2.810 1.537 1.462 1.497 12.78 1.533 1.024
+SZTaxi 0.110 0.120 0.114 0.113 0.113 0.318 0.230 0.222 0.216 0.352 0.143 0.096
+Sales 2.835 2.6052.4742.852 4.459 2.683 2.778 2.590 2.560 3.039 2.501 2.927
+Bitbrains 0.119 0.097 0.0990.0950.124 0.155 0.929 0.976 0.987 1.214 0.119 0.150
+Solar 0.149 0.234 0.520 0.553 0.250 0.547 0.234 0.231 0.229 0.333 0.296 0.157
+OOD
+Saugeen 1.415 1.464 1.482 1.591 2.291 1.767 2.462 2.380 2.371 2.528 1.515 1.183
+USbirths 0.424 2.366 1.509 1.531 1.6870.367 0.396 0.380 0.376 5.787 0.574 0.250
+M4† 1.916 2.157 2.455 2.444 2.896 3.279 3.330 3.300 3.282 12.210 2.560 2.330
+Wins (of 30) 19 3 3 1 1 3 0 0 0 0 – –
+Table 1: TSF performance comparison on IND and OOD corpora for K∈ {10,30,50} in terms of MSE. Lower
+MSE is better.Red( blue) values indicate the best (second-best) MSE per row. †M4 uses instance-normalized MSE
+to address large distribution shifts. MAE results are available in Appendix E.
+ETTm1 Electr. Seattle SZT axi Sales Bitbr. Solar Saugeen USbirths M4
+0
+1
+2
+3MSE
+10 30 50 10 30 50 10 30 50 10 30 50 10 30 50 10 30 50 10 30 50 10 30 50 10 30 50 10 30 50
+4.3 5.2 3.3 3.3 3.3MetaCaster
+TimeScientist
+IND
+OOD
+Figure 3: Comparing the selected (trained) forecasters of agent pipelines METACASTERandTimeScientist.
+test corpus (7 datasets), and anout-of-domain
+(OOD)test corpus (3 datasets). The IND corpus
+shares domains with Char, while the OOD corpus
+covers unseen domains to evaluate generalization.
+All test datasets are disjoint from Char. Each dataset
+Dm has a textual context Cm. Time series are split
+chronologically into 80%/10%/10% train/valida-
+tion/test sets. Following standard protocol (Nie
+et al., 2023), the look-back window T is set as 336,
+the prediction horizon H is 192. Full dataset details
+and approaches to avoid data leakage are deferred
+to Appendix B.1.
+Baselines. We compare METACASTERwith the
+most relevant SOTA methods, includingtime se-
+ries generation models: (1) TimeVAE (Desai et al.,
+2021), (2)DiffTS (Yuan and Qiao, 2024), (3)T2S
+(Ge et al., 2025), (4) TimeDP (Huang et al., 2025b),
+(5) VerbalTS (Gu et al., 2025);time series aug-
+mentation techniques(Iwana and Uchida, 2021;
+Luo et al., 2023): (6) Repeat, (7) Bootstrap, (8)
+Jitter, (9) MagWarp;pre-trained TSFMs: (10)
+Chronos (Ansari et al., 2024), (11) Moirai (Woo
+et al., 2024), (12) VisionTS (Chen et al., 2024),
+(13)Time-LLM (Jin et al., 2024); and a SOTAagent
+pipeline: (14) TimeScientist (Zhao et al., 2025).
+Details about these methods are in Appendix B.2.
+Settings. We draw K∈ {10,30,50} samples from
+each test dataset to constitute Dm
+sup, which is fed
+with Cm to the compared methods. Generation
+models and augmentation methods use {Dm
+sup,C m}
+to produce ¯Dm of size N ′
+m, which is used to train
+the forecasters in our LT-LIB. TSFMs use Dm
+sup for
+fine-tuning. TimeScientist uses Dm
+sup to directly
+train forecasters as it cannot generate time series.
+Held-Out ForecasterOurs
+Figure 4: Performance distribution. Each dot represents
+the performance of a forecaster ¯f m
+l on a test set Dm
+te ,
+covering all forecasters in LT-LIBand all datasets in
+both of IND and OOD corpora.
+For our METACASTER, we set batch size B= 8 ,
+and use GPT-5.4 (Lee et al., 2026) as the default
+LLM. We also test different LLMs in our ablation
+study (Table 2). For all methods that can generate
+¯Dm, the size N ′
+m is set to |Dm
+tr |+|D m
+val|. Following
+(Nie et al., 2023; Tan et al., 2024), we use MSE
+and MAE to evaluate the TSF performance.
+4.2 Experimental Results
+Table 1 reports MSE results comparing genera-
+tion models, augmentation methods, and META-
+CASTER. We randomly hold out 3 forecasters from
+LT-LIBand evaluate the average performance over
+the remaining 20; the held-out forecasters are used
+to assess METACASTER’s generalization to unseen
+forecasters (Fig. 4). MAE results are provided
+in Appendix E, and Appendix F reports the best-
+performing forecaster among the 20 as trained by
+the compared methods.
+Table 1 also reports results of training forecast-
+ers with K-shot Dm
+sup and full set Dm
+tr , serving as
+lower and upper performance references, respec-
+tively. From Table 1, we highlight several observa-
+tions: (1) METACASTERoutperforms the genera-
+tion/augmentation baselines in most cases, demon-
+strating the benefit of optimizing data generation
+for forecasting; (2) METACASTER’s performance
+improves with larger K, showing effective few-
+shot utilization; (3) When K≥30 , METACASTER
+approaches or even surpassesD m
+tr , suggesting that
+raw data may be noisy and optimized data can
+improve training; (4) In the extreme case when
+K= 10 , METACASTERremains competitive; and
+(5) Despite increased difficulty, METACASTERgen-
+eralizes well to OOD datasets, where it generally
+outperforms baselines.
+Fig. 4 shows the MSE distribution of indi-
+vidual forecasters trained by the models in Ta-
+ble 1, normalized by the upper reference ( Dm
+tr )
+Ours
+Inference Latency (ms)
+MSE
+Figure 5: Comparing METACASTERwith TSFMs on
+Solar dataset. Full results are in Appendix E.
+(i.e., Eq. (4)). METACASTERproduces more high-
+quality forecasters with lower variance. Moreover,
+it generalizes better to held-out forecasters than the
+baselines. Fig. 3 compares METACASTERwith
+TimeScientist under K∈10,30,50 . Without
+data generation capability,TimeScientist strug-
+gles to train generalizable forecasters and its per-
+formance does not scale with K, indicating that a
+pure training pipeline is insufficient. Appendix E
+reports results when TimeScientist uses LT-LIB,
+yielding consistent conclusions.
+Comparing with TSFMs. Fig. 5 compares Meta-
+Caster with TSFMs on the Solar dataset under
+K= 30 in terms of performancevs.cost. Af-
+ter deployment, METACASTERtrains and selects
+a lightweight forecaster for inference and incurs
+no further agent overhead – here,MixLinear (243
+parameters) is selected at runtime. In contrast,
+TSFMs remain expensive from fine-tuning through
+inference. At comparable performance, META-
+CASTERachieves up to 103× lower latency and
+105×fewer parameters than TSFMs.
+Ablation Study. Table 2 presents an ablation study
+using averaged MSE with K= 30 , with META-
+CASTERas our original model. In (a), we study
+the effect of forecasting-oriented optimization in
+Eq. (1) by replacing Eq.(1) with MMD and Wasser-
+stein distances to directly align the generated set
+¯Dm
+tr with the authentic set Dm
+tr . In (b), we remove
+contextual cues Cm to evaluate their contribution.
+In (c), we examine the impact of different LLMs.
+From Table 2(a), minimizing data distribution
+discrepancy generally degrades performance, as it
+is not directly aligned with the forecasting objec-
+tive. Table 2(b) shows that contextual cues Cm
+are crucial, as they guide MGAGENTin selecting
+domain-relevant knowledge for generating time se-
+Dataset(→) IND Corpus OOD Corpus
+Method(↓) ETTm1 Electricity Seattle SZTaxi Sales Bitbrains Solar Saugeen USbirths M4 Overall
+METACASTER 0.3450.226 1.177 0.114 2.362 0.1250.152 1.4640.533 2.112 0.267
+(a) Loss→MMD 0.7080.1571.204 0.150 3.581 0.575 0.254 2.3390.4032.556 0.764
+(a) Loss→Wasserstein 0.702 0.284 1.734 0.152 3.553 0.483 0.254 2.406 0.535 3.105 0.940
+(b) Remove contextCm 0.386 0.293 1.425 0.144 2.595 0.158 0.281 2.004 0.534 2.312 0.521
+(c) LLM→Gemini-3.1-Pro 0.430 0.226 1.177 0.114 2.362 0.120 0.151 1.396 0.533 2.129 0.288
+(c) LLM→Claude-Opus-4.70.494 0.226 1.189 0.114 2.362 0.151 0.150 1.491 0.541 2.129 0.321
+(c) LLM→Qwen3.5-122B-A10B0.494 0.223 1.177 0.114 2.362 0.199 0.152 1.729 0.533 2.129 0.366
+(c) LLM→GPT-5.3-Codex 0.557 0.209 1.115 0.087 2.229 0.098 0.148 1.465 1.488 2.269 0.677
+Table 2: Ablation analysis in terms of MSE. “Overall” assesses the normalized MSE (Eq. (4)) across datasets.
+(b) Meta-Generator (Epoch 4)Analysis:Perform statistical analysis and visualization(c) Harness-Optimizer (Epoch 4 → 5)
+Context shows this iscloud server trace data, including CPU  and Memory. Search related information about the variates.
+Initiate: Optimization round 4, downstream Forecaster underperforms current best (epoch 2), Launch analysis.Mean: 2.62/53.25 Std: 0.26/2.57P>0:90% ...
+	
+
+	
+
+
+
+
+CPUMemory
+Generation: create TS_Generator()
+CPUMemory
+> tool_call(web_search(query=“Cloud server trace data feature”))[1] Microsoft.com Azure VM trace 2017 / 2019 (GitHub)[2] arxiv.com Characterizing co-located DC workloads CPU utilisation[3] Google Borg cluster workload trace (ResearchGate)
+Analysis:load authentic and generated time series, compare their mean/var andplotsMean: 2.62/53.25vs 2.93/48.23 Std: 0.26/2.57 vs 0.31/2.61P>0:90% ...Diagnosis: The per-window ρ histogram reveals broken-channel correlation in the generated time series.Plan: I will strengthen the channel-correlation check during server dataset generation. Update skills of Meta-Generator: 
+Skill name: cloud_server_coupled_synthesisdescription: “Generate cloud-server CPU/memory utilization.”applies_to_datasets:  - cloud_server_traces  - cpu_memory_utilization
+Final selection(a) Harness Optimization 
+1def TS_Generator(exp_set):2# Sample each channel from exp_set, perturb each channel to generate. 
+1def TS_Generator(exp_set):# Perturb CPU channel with noise23# Derive Memory noise from CPU usage
+(d) Key Changes in Meta-Generator (Epoch 5)Quality checkCheck cross-channel ρCheck lagged cross-correlation……
+Epoch
+Relative MSEEpoch 2Epoch 5
+CPUMemory
+Figure 6: An illustration of Harness optimization by METACASTER: (a) hinge loss (Eq. (4)) during optimization
+iterations. (b)-(d) key traces of MGAGENTand HPAGENTfrom Epoch 4 to 5 on alibaba_cluster_2018 dataset.
+ries. Interestingly, Table 2(c) shows that different
+LLMs yield comparable results in many cases, sug-
+gesting the Harness – rather than the LLM back-
+bone – is the key factor in METACASTER, consis-
+tent with prior findings (Li et al., 2026a). Although
+GPT-5.3-Codex wins in some cases, it is unstable
+on datasets such as ETTm1 and USbirths, leading
+to worse overall results; thus, we adoptGPT-5.4 as
+the default LLM for its consistent performance.
+Further Analysis. We have evaluated computa-
+tional efficiency, token usage, robustness of per-
+formance (using standard deviation), performance
+changew.r .t. K, performance of top-ranked fore-
+casters, visualization of generated time series and
+data distribution, which are in Appendix C.3, F.
+4.3 Case Study
+Fig. 6(a) shows the evolution of hinge loss (Eq.(4))
+over 8 Harness optimization epochs, where META-
+CASTERconverges quickly and selects the final
+Harness from epoch 5. Fig 6(b)-(d) illustrates
+MGAGENTand HPAGENTtraces from epoch 4 to 5
+on the alibaba_cluster_2018 dataset in Char. MGA-
+GENT(Fig 6(b)) analyzes the few-shot examples
+Dm
+sup, inspects statistics, retrieves domain knowl-
+edge about the two variates CPU and memory, and
+constructs a TS_Generator. HPAGENT(Fig. 6(c))
+detects performance degradation at epoch 4 via
+memory, then performs Analysis and Diagnosis.
+The Analysis uses analytical tools pertinent to the
+issue identified in the reasoning traces of MGA-
+GENTand the training logs of FTAGENT. The Di-
+agnosis identifies broken inter-variate correlation
+as the root cause. It then updates MGAGENT’s
+skills, leading to an improvedTS_Generator that
+strengthens the CPU-memory correlation and and
+an addition of consistency checks. Consequently,
+epoch 5 produces correlated time series that are
+more compliant with the few-shot examples than
+epoch 4. This example illustrates a simple Harness
+update. In fact, METACASTER’s optimization is
+more complex and it deals with B= 8 datasets
+in Char concurrently. The final output is a trained
+lightweight forecaster rather than the generated
+time series.
+5 Conclusion
+In this work, we study few-shot learning for
+lightweight forecasters via a novel meta-harness-
+optimized multi-agent, METACASTER, which au-
+tomates an end-to-end pipeline for time series gen-
+eration, forecaster training, parameter tuning, and
+model selection. Experiments not only validate
+the effectiveness of METACASTER, but also set a
+groundwork for delving into the Agent-as-Engineer
+paradigm in agentic time series forecasting.
+Limitations
+In this work, we study the challenging yet practi-
+cal problem of improving lightweight time series
+forecasters in a few-shot setting for rapid deploy-
+ment, avoiding delays from costly data acquisition
+and privacy constraints. This is enabled by leverag-
+ing the knowledge and reasoning capabilities of AI
+agent systems.
+However, our current work does not address the
+extreme zero-shot setting, where no reference ex-
+amples are available. Without reference time series,
+the agent lacks basic statistical grounding of the
+target domain, leading to unreliable data genera-
+tion. This is a common limitation of time series
+generation-based models (Jeon et al., 2022; Yuan
+and Qiao, 2024; Naiman et al., 2024; Huang et al.,
+2025b; Gu et al., 2025; Ge et al., 2025) and high-
+lights the advantage of TSFMs, which can transfer
+pre-trained knowledge in zero-shot settings. In
+contrast, by leveraging only a small number of
+examples – which is often feasible in practice –
+METACASTERachieves competitive performance
+with TSFMs while maintaining significantly lower
+computational cost.
+Additionally, our experiments cover 18 time se-
+ries datasets spanning a limited set of domains. We
+plan to extend this to the full pre-training corpora
+of modern TSFMs to further improve Harness opti-
+mization. Meanwhile, LT-LIBcurrently includes
+a set of SOTA lightweight forecasters we have col-
+lected so far. It may not be exhaustive as new
+lightweight forecasters continue to emerge. In fu-
+ture work, we will continuously update LT-LIBto
+strengthen the METACASTERsystem.
+Acknowledgments
+This work was partially supported by a research
+gift from NEC Laboratories America and by the
+NVIDIA Academic Grant Program.
+References
+Taha Aksu, Gerald Woo, Juncheng Liu, Xu Liu, Cheng-
+hao Liu, Silvio Savarese, Caiming Xiong, and Doyen
+Sahoo. 2024. Gift-eval: A benchmark for general
+time series forecasting model evaluation.arXiv
+preprint arXiv:2410.10393.
+Alibaba Group. 2018. Alibaba cluster trace v2018.
+https://github.com/alibaba/clusterdata.
+Abdul Fatir Ansari, Lorenzo Stella, Caner Turkmen,
+Xiyuan Zhang, Pedro Mercado, Huibin Shen, Olek-
+sandr Shchur, Syama Sundar Rangapuram, Sebastian
+Pineda Arango, Shubham Kapoor, Jasper Zschieg-
+ner, Danielle C. Maddix, Hao Wang, Michael W.
+Mahoney, Kari Torkkola, Andrew Gordon Wilson,
+Michael Bohlke-Schneider, and Yuyang Wang. 2024.
+Chronos: Learning the language of time series.
+TMLR.
+Alberto Ardid, David Dempsey, Corentin Caudron,
+Shane Cronin, Ben Kennedy, Társilo Girona, Diana
+Roman, Craig Miller, Sally Potter, Oliver D Lamb,
+and 1 others. 2025. Ergodic seismic precursors and
+transfer learning for short term eruption forecasting
+at data scarce volcanoes.Nat. Commun.
+Peter Belcak, Greg Heinrich, Shizhe Diao, Yonggan
+Fu, Xin Dong, Saurav Muralidharan, Yingyan Celine
+Lin, and Pavlo Molchanov. 2025. Small language
+models are the future of agentic ai.arXiv preprint
+arXiv:2506.02153.
+Verónica Bolón-Canedo, Laura Morán-Fernández, Brais
+Cancela, and Amparo Alonso-Betanzos. 2024. A re-
+view of green artificial intelligence: Towards a more
+sustainable future.Neurocomputing.
+Centers for Disease Control and Prevention. Flu-
+View: Outpatient illness surveillance (ILINet).
+https://gis.cdc.gov/grasp/fluview/
+fluportaldashboard.html.
+Centers for Disease Control and Prevention, NCHS.
+National vital statistics system: Births data. https:
+//www.cdc.gov/nchs/nvss/births.htm.
+Mouxiang Chen, Lefei Shen, Zhuo Li, Xiaoyun
+Wang, Jianling Sun, and Chenghao Liu. 2024. Vi-
+sionts: Visual masked autoencoders are free-lunch
+zero-shot time series forecasters.arXiv preprint
+arXiv:2408.17253.
+Si-An Chen, Chun-Liang Li, Nate Yoder, Sercan O.
+Arik, and Tomas Pfister. 2023. Tsmixer: An all-mlp
+architecture for time series forecasting.TMLR.
+Sarkar Snigdha Sarathi Das, Palash Goyal, Mihir Par-
+mar, Nanyun Peng, Vishy Tirumalashetty, Chun-
+Liang Li, Rui Zhang, Jinsung Yoon, and Tomas Pfis-
+ter. 2026. Nexus: An agentic framework for time
+series forecasting.arXiv preprint arXiv:2605.14389.
+Abhyuday Desai, Cynthia Freeman, Zuhui Wang, and
+Ian Beaver. 2021. Timevae: A variational auto-
+encoder for multivariate time series generation.arXiv
+preprint arXiv:2111.08095.
+Vijay Ekambaram, Arindam Jati, Nam Nguyen, Phan-
+wadee Sinthong, and Jayant Kalagnanam. 2023.
+TSMixer: Lightweight MLP-mixer model for multi-
+variate time series forecasting. InKDD.
+Jingru Fei, Kun Yi, Wei Fan, Qi Zhang, and Zhen-
+dong Niu. 2025. Amplifier: Bringing attention to
+neglected low-energy components in time series fore-
+casting. InAAAI.
+Azul Garza and Renée Rosillo Garcia. 2025. Timecopi-
+lot. InNeurIPS Workshop on Recent Advances in
+Time Series F oundation Models.
+Yunfeng Ge, Jiawei Li, Yiji Zhao, Haomin Wen, Zhao
+Li, Meikang Qiu, Hongyan Li, Ming Jin, and Shirui
+Pan. 2025. T2s: High-resolution time series genera-
+tion with text-to-series diffusion models. InIJCAI.
+Rakshitha Godahewa, Christoph Bergmeir, Geoffrey I
+Webb, Rob J Hyndman, and Pablo Montero-Manso.
+2021. Monash time series forecasting archive. In
+NeurIPS Datasets and Benchmarks.
+Nate Gruver, Marc Finzi, Shikai Qiu, and Andrew Gor-
+don Wilson. 2023. Large language models are zero-
+shot time series forecasters. InNeurIPS.
+Shuqi Gu, Chuyue Li, Baoyu Jing, and Kan Ren. 2025.
+Verbalts: Generating time series from texts. InICML.
+Tong Guan, Zijie Meng, Dianqi Li, Shiyu Wang,
+Chao-Han Huck Yang, Qingsong Wen, Zuozhu Liu,
+Sabato Marco Siniscalchi, Ming Jin, and Shirui Pan.
+2026a. Timeomni-1: Incentivizing complex reason-
+ing with time series in large language models. In
+ICLR.
+Tong Guan, Sheng Pan, Johan Barthelemy, Zhao Li,
+Yujun Cai, Cesare Alippi, Ming Jin, and Shirui Pan.
+2026b. Timeomni-vl: Unified models for time se-
+ries understanding and generation.arXiv preprint
+arXiv:2602.17149.
+Keith W Hipel and A Ian McLeod. 1994.Time Series
+Modelling of Water Resources and Environmental
+Systems. Elsevier.
+Qihe Huang, Zhengyang Zhou, Kuo Yang, Zhongchao
+Yi, Xu Wang, and Yang Wang. 2025a. TimeBase:
+The power of minimalism in efficient long-term time
+series forecasting. InICML.
+Yu-Hao Huang, Chang Xu, Yueying Wu, Wu-Jun Li,
+and Jiang Bian. 2025b. Timedp: Learning to generate
+multi-domain time series with domain prompts. In
+AAAI.
+Brian Kenji Iwana and Seiichi Uchida. 2021. An em-
+pirical survey of data augmentation for time series
+classification with neural networks.PLOS ONE.
+Gunjan Jalori, Preetika Verma, and Sercan Ö. Arık.
+2025. Flairr-ts: Forecasting llm-agents with iterative
+refinement and retrieval for time series. InFindings
+of EMNLP.
+Jinsung Jeon, Jeonghak Kim, Haryong Song, Se-
+unghyeon Cho, and Noseong Park. 2022. Gt-gan:
+General purpose time series synthesis with genera-
+tive adversarial networks. InNeurIPS.
+Yushan Jiang, Kanghui Ning, Zijie Pan, Xuyang Shen,
+Jingchao Ni, Wenchao Yu, Anderson Schneider,
+Haifeng Chen, Yuriy Nevmyvaka, and Dongjin Song.
+2025. Multi-modal time series analysis: A tutorial
+and survey. InKDD.
+Ming Jin, Shiyu Wang, Lintao Ma, Zhixuan Chu,
+James Y . Zhang, Xiaoming Shi, Pin-Yu Chen, Yux-
+uan Liang, Yuan-Fang Li, Shirui Pan, and Qingsong
+Wen. 2024. Time-llm: Time series forecasting by
+reprogramming large language models. InICLR.
+Yaxuan Kong, Yiyuan Yang, Yoontae Hwang, Wenjie
+Du, Stefan Zohren, Zhangyang Wang, Ming Jin, and
+Qingsong Wen. 2025. Time-mqa: Time series multi-
+task question answering with context enhancement.
+InACL.
+Irena Koprinska, Dengsong Wu, and Zheng Wang. 2018.
+Convolutional neural networks for energy time series
+forecasting. InIJCNN.
+Yoonho Lee, Roshen Nair, Qizheng Zhang, Kangwook
+Lee, Omar Khattab, and Chelsea Finn. 2026. Meta-
+harness: End-to-end optimization of model harnesses.
+arXiv preprint arXiv:2603.28052.
+Junjie Li, Xi Xiao, Yunbei Zhang, Chen Liu, Lin Zhao,
+Xiaoying Liao, Yingrui Ji, Janet Wang, Jianyang
+Gu, Yingqiang Ge, Weijie Xu, Xi Fang, Xiang Xu,
+Tianchen Zhao, Youngeun Kim, Tianyang Wang, Ji-
+hun Hamm, Smita Krishnaswamy, Jun Huan, and
+Chandan Reddy. 2026a. Agent harness engineer-
+ing: A survey. https://openreview.net/pdf?
+id=eONq7FdiHa.
+Xiangyi Li, Wenbo Chen, Yimin Liu, Shenghan
+Zheng, Xiaokun Chen, Yifeng He, Yubo Li, Bin-
+gran You, Haotian Shen, Jiankai Sun, and 1 oth-
+ers. 2026b. Skillsbench: Benchmarking how well
+agent skills work across diverse tasks.arXiv preprint
+arXiv:2602.12670.
+Yaguang Li, Rose Yu, Cyrus Shahabi, and Yan Liu.
+2018. Diffusion convolutional recurrent neural net-
+work: Data-driven traffic forecasting. InICLR.
+Zhe Li, Shiyi Qi, Yiduo Li, and Zenglin Xu. 2023.
+Revisiting long-term time series forecasting: An
+investigation on linear mapping.arXiv preprint
+arXiv:2305.10721.
+Jiahang Lin, Shichun Liu, Chengjun Pan, Lizhi Lin,
+Shihan Dou, Zhiheng Xi, Xuanjing Huang, Hang
+Yan, Zhenhua Han, and Tao Gui. 2026. Agentic
+harness engineering: Observability-driven automatic
+evolution of coding-agent harnesses.arXiv preprint
+arXiv:2604.25850.
+Shengsheng Lin, Weiwei Lin, Xinyi Hu, Wentai Wu,
+Ruichao Mo, and Haocheng Zhong. 2024a. Cyclenet:
+Enhancing time series forecasting through modeling
+periodic patterns. InNeurIPS.
+Shengsheng Lin, Weiwei Lin, Wentai Wu, Haojun Chen,
+and Junjie Yang. 2024b. Sparsetsf: Modeling long-
+term time series forecasting with 1k parameters. In
+ICML.
+Peiyuan Liu, Hang Guo, Tao Dai, Naiqi Li, Jigang Bao,
+Xudong Ren, Yong Jiang, and Shu-Tao Xia. 2025a.
+Calf: Aligning llms for time series forecasting via
+cross-modal fine-tuning. InAAAI.
+Peiyuan Liu, Beiliang Wu, Yifan Hu, Naiqi Li, Tao Dai,
+Jigang Bao, and Shu-Tao Xia. 2025b. TimeBridge:
+Non-stationarity matters for long-term time series
+forecasting. InICML.
+Yong Liu, Guo Qin, Xiangdong Huang, Jianmin Wang,
+and Mingsheng Long. 2024. Autotimes: Autoregres-
+sive time series forecasters via large language models.
+InNeurIPS.
+Yong Liu, Guo Qin, Zhiyuan Shi, Zhi Chen, Caiyin
+Yang, Xiangdong Huang, Jianmin Wang, and Ming-
+sheng Long. 2025c. Sundial: A family of highly
+capable time series foundation models. InICML.
+Dongsheng Luo, Wei Cheng, Yingheng Wang,
+Dongkuan Xu, Jingchao Ni, Wenchao Yu, Xuchao
+Zhang, Yanchi Liu, Yuncong Chen, Haifeng Chen,
+and 1 others. 2023. Time series contrastive learning
+with information-aware augmentations. InAAAI.
+Aitian Ma, Dongsheng Luo, and Mo Sha. 2024. MixLin-
+ear: Extreme low resource multivariate time series
+forecasting with 0.1K parameters.arXiv preprint
+arXiv:2410.02081.
+Spyros Makridakis, Evangelos Spiliotis, and Vassil-
+ios Assimakopoulos. 2020. The M4 competition:
+100,000 time series and 61 forecasting methods.Int.
+J. F orecast.
+Spyros Makridakis, Evangelos Spiliotis, and Vassilios
+Assimakopoulos. 2022. The M5 competition: Back-
+ground, organization, and implementation.Int. J.
+F orecast.
+Mike A Merrill, Mingtian Tan, Vinayak Gupta, Thomas
+Hartvigsen, and Tim Althoff. 2024. Language mod-
+els still struggle to zero-shot reason about time series.
+InFindings of EMNLP.
+Mohammad Amin Morid, Olivia R Liu Sheng, and
+Joseph Dunbar. 2023. Time series prediction using
+deep learning methods in healthcare.ACM TMIS.
+Ilan Naiman, Nimrod Berman, Itai Pemper, Idan Arbiv,
+Gal Fadlon, and Omri Azencot. 2024. Utilizing im-
+age transforms and diffusion models for generative
+modeling of short and long time series. InNeurIPS.
+National Renewable Energy Laboratory. 2006. Solar
+power data for integration studies. https://www.
+nrel.gov/grid/solar-power-data.html.
+Yuqi Nie, Nam H. Nguyen, Phanwadee Sinthong, and
+Jayant Kalagnanam. 2023. A time series is worth 64
+words: Long-term forecasting with transformers. In
+ICLR.
+Xuying Ning, Katherine Tieu, Dongqi Fu, Tianxin Wei,
+Zihao Li, Yuanchen Bei, Jiaru Zou, Mengting Ai,
+Zhining Liu, Ting-Wei Li, and 1 others. 2026. Code
+as agent harness.arXiv preprint arXiv:2605.18747.
+Zijie Pan, Yushan Jiang, Sahil Garg, Anderson Schnei-
+der, Yuriy Nevmyvaka, and Dongjin Song. 2024.
+S2ip-llm: Semantic space informed prompt learning
+with llm for time series forecasting. InICML.
+ChengAo Shen, Wenchao Yu, Ziming Zhao, Dongjin
+Song, Wei Cheng, Haifeng Chen, and Jingchao Ni.
+2025a. Multi-modal view enhanced large vision mod-
+els for long-term time series forecasting. InNeurIPS.
+ChengAo Shen, Ziming Zhao, Hanghang Tong, Dongjin
+Song, Dongsheng Luo, Qingsong Wen, and Jingchao
+Ni. 2025b. Svtime: Small time series forecasting
+models informed by "physics" of large vision model
+forecasters.arXiv preprint arXiv:2510.09780.
+Siqi Shen, Vincent van Beek, and Alexandru Iosup.
+2015. Statistical characterization of business-critical
+workloads hosted in cloud datacenters. InCCGrid.
+Haotian Si, Changhua Pei, Jianhui Li, Dan Pei, and
+Gaogang Xie. 2025. CMoS: Rethinking time series
+prediction through the lens of chunk-wise spatial
+correlations. InICML.
+Artyom Stitsyuk and Jaesik Choi. 2025. xPatch:
+Dual-stream time series forecasting with exponen-
+tial seasonal-trend decomposition. InAAAI.
+Mingtian Tan, Mike A Merrill, Vinayak Gupta, Tim
+Althoff, and Thomas Hartvigsen. 2024. Are language
+models actually useful for time series forecasting?
+NeurIPS.
+Peiwang Tang and Weitai Zhang. 2025. Unlocking the
+power of patch: Patch-based MLP for long-term time
+series forecasting. InAAAI.
+Artur Trindade. 2015. Electricity-
+LoadDiagrams20112014. https://
+archive.ics.uci.edu/dataset/321/
+electricityloaddiagrams20112014.
+University of Washington STAR Lab. Seattle induc-
+tive loop detector dataset. https://github.com/
+zhiyongc/Seattle-Loop-Data.
+Chengsen Wang, Qi Qi, Jingyu Wang, Haifeng Sun,
+Zirui Zhuang, Jinming Wu, Lei Zhang, and Jianxin
+Liao. 2025. Chattime: A unified multimodal time se-
+ries foundation model bridging numerical and textual
+data. InAAAI.
+Shiyu Wang, Haixu Wu, Xiaoming Shi, Tengge Hu,
+Huakun Luo, Lintao Ma, James Y . Zhang, and Jun
+Zhou. 2024. Timemixer: Decomposable multiscale
+mixing for time series forecasting. InICLR.
+Qingsong Wen, Liang Sun, Fan Yang, Xiaomin Song,
+Jingkun Gao, Xue Wang, and Huan Xu. 2021. Time
+series data augmentation for deep learning: A survey.
+InIJCAI.
+Gerald Woo, Chenghao Liu, Akshat Kumar, Caiming
+Xiong, Silvio Savarese, and Doyen Sahoo. 2024. Uni-
+fied training of universal time series forecasting trans-
+formers. InICML.
+Xingjian Wu, Junkai Lu, Zhengyu Li, Xiangfei Qiu,
+Jilin Hu, Chenjuan Guo, Christian S. Jensen, and
+Bin Yang. 2026. Timeart: Towards agentic time se-
+ries reasoning via tool-augmentation.arXiv preprint
+arXiv:2601.13653.
+Mingyuan Xia, Chunxu Zhang, Zijian Zhang, Hao Miao,
+Qidong Liu, Yuanshao Zhu, and Bo Yang. 2025.
+TimeEmb: A lightweight static-dynamic disentan-
+glement framework for time series forecasting.arXiv
+preprint arXiv:2510.00461.
+Zhijian Xu, Ailing Zeng, and Qiang Xu. 2024. Fits:
+Modeling time series with 10k parameters. InICLR.
+Hao Xue and Flora D Salim. 2023. Promptcast: A
+new prompt-based learning paradigm for time series
+forecasting.IEEE TKDE.
+Kun Yi, Jingru Fei, Qi Zhang, Hui He, Shufeng Hao,
+Defu Lian, and Wei Fan. 2024. FilterNet: Harness-
+ing frequency filters for time series forecasting. In
+NeurIPS.
+Jinsung Yoon, Daniel Jarrett, and Mihaela van der
+Schaar. 2019. Time-series generative adversarial net-
+works. InNeurIPS.
+Fangxu Yu, Hongyu Zhao, and Tianyi Zhou. 2025.
+Ts-reasoner: Aligning time series foundation
+models with llm reasoning.arXiv preprint
+arXiv:2510.03519.
+Xinyu Yuan and Yan Qiao. 2024. Diffusion-ts: Inter-
+pretable diffusion for general time series generation.
+InICLR.
+Zhihan Yue, Yujing Wang, Juanyong Duan, Tianmeng
+Yang, Congrui Huang, Yunhai Tong, and Bixiong Xu.
+2022. Ts2vec: Towards universal representation of
+time series. InAAAI.
+Mert Yuksekgonul, Federico Bianchi, Joseph Boen,
+Sheng Liu, Pan Lu, Zhi Huang, Carlos Guestrin, and
+James Zou. 2025. Optimizing generative ai by back-
+propagating language model feedback.Nature.
+Ailing Zeng, Muxi Chen, Lei Zhang, and Qiang Xu.
+2023. Are transformers effective for time series fore-
+casting? InAAAI.
+Boya Zhang, Shuaijie Yin, Huiwen Zhu, and Xing
+He. 2026. FreqCycle: A multi-scale time-frequency
+analysis method for time series forecasting.arXiv
+preprint arXiv:2603.09661.
+Tianping Zhang, Yizhuo Zhang, Wei Cao, Jiang Bian,
+Xiaohan Yi, Shun Zheng, and Jian Li. 2022. Less
+is more: Fast multivariate time series forecasting
+with light sampling-oriented mlp structures.arXiv
+preprint arXiv:2207.01186.
+Xiaohan Zhang, Tian Gao, Mingyue Cheng, Bokai Pan,
+Ze Guo, Yaguo Liu, Xiaoyu Tao, and Qi Liu. 2025.
+Alphacast: A human wisdom-llm intelligence co-
+reasoning framework for interactive time series fore-
+casting.arXiv preprint arXiv:2511.08947.
+Haokun Zhao, Xiang Zhang, Jiaqi Wei, Yiwei Xu, Yut-
+ing He, Siqi Sun, and Chenyu You. 2025. Timeseries-
+scientist: A general-purpose ai agent for time series
+analysis.arXiv preprint arXiv:2510.01538.
+Ling Zhao, Yujiao Song, Chao Zhang, Yu Liu, Pu Wang,
+Tao Lin, Min Deng, and Haifeng Li. 2020. T-GCN:
+A temporal graph convolutional network for traffic
+prediction.IEEE TITS.
+Siru Zhong, Weilin Ruan, Ming Jin, Huan Li, Qingsong
+Wen, and Yuxuan Liang. 2025. Time-vlm: Exploring
+multimodal vision-language models for augmented
+time series forecasting. InICML.
+Haoyi Zhou, Shanghang Zhang, Jieqi Peng, Shuai
+Zhang, Jianxin Li, Hui Xiong, and Wancai Zhang.
+2021. Informer: Beyond efficient transformer for
+long sequence time-series forecasting. InAAAI.
+Pengfei Zhou, Yunlong Liu, Junli Liang, Qi Song, and
+Xiangyang Li. 2025. CrossLinear: Plug-and-play
+cross-correlation embedding for time series forecast-
+ing with exogenous variables. InKDD.
+Tian Zhou, Peisong Niu, Xue Wang, Liang Sun, and
+Rong Jin. 2023. One fits all: Power general time
+series analysis by pretrained lm. InNeurIPS.
+A Algorithm
+The meta-harness optimization algorithm of METACASTERis summarized in Algorithm 1. The notations
+are consistent with §3.
+Algorithm 1:Meta-harness optimization of METACASTER
+Input: (1) Corpurs Char ={D m,C m}M
+m=1; (2) LT-LIB F={f 1, ..., fL}; (3) number of epochs E;
+(4) batch sizeB
+Output:Optimized harnessθ ∗
+1ℓ ∗ ←+∞// Initialize loss function value
+2θ←θ 0 // Initialize harness
+3fori= 1, ..., Edo
+/* Optimization loop */
+4K∼Uniform([10,50])
+5Draw a batchC b ={D m,C m}B
+m=1
+/* Forward passes across datasets in a batch */
+6for{D m,C m} ∈ Cb do
+7{D m
+tr ,D m
+val,D m
+te } ←Split(Dm)// train/validation/test split
+8D m
+sup ←Ksamples fromD m
+tr //K-shot support set
+/* Run MGagent (Eq.(2)) */
+9 ¯Dm ←MGAGENT θ(Dm
+sup,C m)
+10{ ¯Dm
+tr , ¯Dm
+val} ←Split(¯Dm)
+/* Run FTagent (Eq.(3)) */
+11{{f m
+l , ¯f m
+l , ω(fm
+l ), ω(¯f m
+l )}L
+l=1,R} ←FTAGENT({Dm
+tr ,D m
+val,D m
+te },{ ¯Dm
+tr , ¯Dm
+val})
+12end
+13ℓ← 1
+BL
+BP
+m=1
+LP
+l=1
+δ
+ 
+ω(f m
+l ), ω(¯f m
+l )
+
+// The optimization loss Eq.(1)
+/* Run HPagent */
+14θ←HPAGENT(θ, ℓ, ℓ ∗,R)
+15ifℓ < ℓ ∗ then
+16ℓ ∗ ←ℓ
+17θ ∗ ←θ
+18end
+19end
+B Datasets and Baselines
+B.1 Datasets
+Pretraining-style train/test separation.Both the training and evaluation datasets are drawn from
+GIFT-Eval (Aksu et al., 2024), which is released under the Apache 2.0 license and permits research
+use. To prevent dataset leakage, we follow the data-isolation paradigm adopted by foundation-model
+pre-training and draw them from two disjoint GIFT-Eval collections, so that no source series ever appears
+in both phases.
+Addressing Data Leakage.Three successive layers guard against test-source contamination.
+First, the training and evaluation datasets are drawn from two disjoint GIFT-Eval collections,
+Salesforce/GiftEvalPretrain for training andSalesforce/GIFT_Eval for evaluation, so no source
+series ever appears in both phases. Second, the context Cm delivered to MGAGENTis stripped of dataset
+identifiers, source URLs, and benchmark names before reaching the agent, leaving only the domain label
+and a short semantic description, so the agent cannot use a dataset name as a hook to retrieve or imitate the
+true test data from any pretraining corpus it may have memorised. Third, we manually audit the runtime
+traces of MGAGENTon held-out runs and confirm that no external web request is issued and no real test
+data is touched; synthesis is driven only by the few-shot support setD m
+sup and the de-identified context.
+Training collection.We take 8 datasets covering 6 domain categories (energy, traffic, weather, health,
+retail, cloud) from Salesforce/GiftEvalPretrain (Aksu et al., 2024); per-dataset frequency, chan-
+nel count, length, domain label, and source are listed in Table 3. Two of them (cdc_fluview_ilinet,
+alibaba_cluster_trace_2018) are multivariate (D= 5 and D= 2 ); the remaining six are sampled from
+populations of parallel univariate series (D= 1).
+Dataset Freq.D N TDomain Source
+australian_electricity_demand 30min 1 5 231k energy (Godahewa et al., 2021)
+solar_power 4s 1 1 7.4M energy (Godahewa et al., 2021)
+PEMS_BAY 5min 1 325 52k traffic (Li et al., 2018)
+traffic_hourly 1h 1 862 17.5k traffic (Godahewa et al., 2021)
+weather 1d 1 3,010 var weather (Godahewa et al., 2021)
+cdc_fluview_ilinet 1w 5 5 1.2k health (Centers for Disease Control and Prevention)
+m5 1d 1 30,490 1.9k retail (Makridakis et al., 2022)
+alibaba_cluster_trace_2018 1min 2 58k 2k+ cloud (Alibaba Group, 2018)
+Table 3: Overview of Training Dataset.
+Test collection.We take 10 datasets from Salesforce/GIFT_Eval (Aksu et al., 2024), split into 7
+IND (big-domain label appears in the training collection) and 3 OOD (entirely absent from training);
+per-dataset frequency, channel count, length, domain label, and source are listed in Table 4. Among the
+OOD set, M4 is a mixed-domain daily subset; we include it to probe whether the model still works when
+domain information is ambiguous or absent.
+Dataset Freq.D N TDomain Source
+IND
+ETTm1 15min 7 1 50k energy (Zhou et al., 2021)
+Electricity 1h 1 370 35.1k energy (Trindade, 2015)
+Seattle 1h 1 323 8.8k traffic (University of Washington STAR Lab)
+SZTaxi 15min 1 156 3.0k traffic (Zhao et al., 2020)
+Sales 1d 1 118 1.8k retail (Godahewa et al., 2021)
+Bitbrains 5min 2 1,250 8.6k cloud (Shen et al., 2015)
+Solar 1h 1 137 8.8k energy (National Renewable Energy Laboratory, 2006)
+OOD
+Saugeen 1d 1 1 23.7k hydrology (Hipel and McLeod, 1994)
+USbirths 1d 1 1 7.3k demographics (Centers for Disease Control and Prevention, NCHS)
+M4 1d 1 4,227 9.9k mixed (Makridakis et al., 2020)
+Table 4: Overview of Test Dataset.
+Coverage of the difficulty spectrum.The 18 datasets jointly span the axes that govern few-shot
+forecasting difficulty onGIFT-Eval. Sampling frequency ranges from 4-second photovoltaic telemetry
+on solar_power to weekly health indicators on cdc_fluview_ilinet, covering six orders of magnitude.
+The number of variates D takes values in {1,2,5,7} , exposing both univariate and small-multichannel
+regimes. Per-series length ranges from 1.2k steps on the shortest health series to 7.4M steps on the densest
+telemetry feed, a five-order-of-magnitude span that subjects the synthesis pipeline to highly heterogeneous
+regimes within a single benchmark.
+Forecasting protocol on each dataset.On every dataset the raw series is split chronologically into train
+/ validation / test partitions at an 80/10/10 ratio, z-score-normalised per channel using statistics estimated
+on the train partition, and sliced into (X,Y) pairs with a look-back of T= 336 steps and a horizon of
+H= 192 steps; this contract is shared by every method evaluated in this paper. The few-shot support set
+Dm
+sup fed to METACASTERand to every external baseline is obtained by drawing K windows from the train
+partition of dataset m, with K∈ {10,30,50} in the main results (Table 1) and K∈ {10,20,30,50,100}
+in the few-shot scaling study (Appendix F). Each dataset is paired with a textual context Cm summarising
+its domain and semantic cues, bundled with the support set and passed to any method that consumes
+textual conditioning.
+B.2 Baselines
+This subsection consolidates every baseline reported in the main table (Table 1), grouped into deep
+generative synthesisers and classical augmentation procedures, together with two reference levels that
+delineate the dynamic range of each row. The reference levels are Dm
+sup, which trains each forecaster
+directly on the few-shot support set with no augmentation and acts as the no-synthesis floor, and Dm
+tr ,
+which trains on the full historical training split and acts as the data-rich oracle that any few-shot method
+aspires to match. For completeness we additionally describe the foundation forecasters compared in
+§4.2 and the closest agent-driven referenceTimeScientist (Fig. 3), neither of which fits the few-shot
+synthesis cell of the main table but both of which appear in the rest of the experimental study.
+Deep generative baselines.
+•TimeDP (Huang et al., 2025b): a diffusion model conditioned on domain prompts assembled from
+learned time-series prototype vectors, whose weights are inferred from few-shot samples of the target
+domain.
+•VerbalTS (Gu et al., 2025): a diffusion model that maps unstructured textual descriptions to time
+series through a multi-focal alignment module bridging text tokens and temporal latents.
+•T2S (Ge et al., 2025): a text-conditioned Diffusion Transformer trained with Flow Matching over a
+length-adaptive V AE latent space, enabling variable-length text-to-series synthesis.
+•Diffusion-TS (Yuan and Qiao, 2024): a denoising diffusion model with an encoder-decoder
+Transformer that decomposes samples into trend and seasonal components and predicts the clean
+signal under a Fourier-domain loss.
+•TimeVAE (Desai et al., 2021): a variational autoencoder whose decoder composes outputs from
+interpretable level, trend, and seasonality blocks sampled from a Gaussian latent prior.
+Classical augmentation baselines.
+•Repeat : cycles deterministically through the few-shot pool until the target training-set size is reached.
+•Bootstrap : resamples windows with replacement and adds small zero-mean Gaussian noise scaled
+per channel.
+•Jitter (Iwana and Uchida, 2021): adds independent zero-mean Gaussian noise to every time step
+and channel of each resampled window.
+•MagWarp (Iwana and Uchida, 2021; Wen et al., 2021): multiplies each channel by a smooth scaling
+curve obtained by cubic-spline interpolation through random knots.
+Foundation forecasters.
+•VisionTS (Chen et al., 2024): recasts forecasting as image inpainting by arranging the look-back
+into a 2D grid and decoding the masked horizon with a frozen ImageNet-pretrained MAE.
+•Chronos (Ansari et al., 2024): quantises scaled time-series values into a fixed vocabulary and trains
+a T5 encoder-decoder on tokenised sequences for autoregressive probabilistic forecasting.
+•Moirai (Woo et al., 2024): a masked encoder Transformer with any-variate attention and multi-patch
+projections, pretrained on the LOTSA corpus to handle arbitrary frequencies and channel counts.
+•Time-LLM (Jin et al., 2024): freezes a pretrained GPT-2 backbone and reprograms patch embeddings
+into text-prototype tokens, prepending dataset descriptions as a prompt prefix.
+TimeScientist. TimeScientist (Zhao et al., 2025) is a multi-agent pipeline driven by a local Qwen2.5
+backbone that diagnoses each series and ensembles classical forecasters (ARIMA,ETS,Random Forest)
+per query. We separate it from the foundation forecasters above because it does not ship a single pretrained
+weight matrix; instead, the LLM agent is invoked at every test window to compose and tune the classical
+predictors, making it the closest published reference to METACASTER’s agent-driven paradigm.
+C Implementation Details
+C.1 Forecaster Pool
+Twenty-three lightweight forecasters across four families:
+Family Forecaster Params MACs (M) Latency (ms) Peak VRAM (MB) Ref.
+LinearVanilla Linear65K 0.45 0.03 8.4 (Zeng et al., 2023)
+DLinear129K 0.90 0.10 8.7 (Zeng et al., 2023)
+NLinear65K 0.45 0.04 8.4 (Zeng et al., 2023)
+RLinear65K 0.45 0.17 8.4 (Li et al., 2023)
+CrossLinear2.5M 28.45 0.72 23.1 (Zhou et al., 2025)
+MixLinear243 0.08 0.43 8.3 (Ma et al., 2024)
+MLPTSMixer153K 1.66 0.42 10.1 (Chen et al., 2023)
+LightTS74K 0.70 0.75 10.1 (Zhang et al., 2022)
+PatchMLP2.5M 18.12 1.21 20.1 (Tang and Zhang, 2025)
+xPatch770K 8.16 1.44 13.6 (Stitsyuk and Choi, 2025)
+CMoS13K 0.36 1.09 9.3 (Si et al., 2025)
+PatchTSMixer553K 20.83 1.12 14.4 (Ekambaram et al., 2023)
+Freq/FilterFITS925 0.01 0.32 8.3 (Xu et al., 2024)
+CycleNet65K 0.45 0.32 8.5 (Lin et al., 2024a)
+PaiFilter136K 0.95 0.35 9.8 (Yi et al., 2024)
+TexFilter179K 0.94 1.62 9.9 (Yi et al., 2024)
+FreqCycle64K 0.43 0.78 9.5 (Zhang et al., 2026)
+MixingTimeMixer377K 50.08 0.80 65.0 (Wang et al., 2024)
+TimeBase146 0.02 0.29 9.2 (Huang et al., 2025a)
+TimeBridge36K 3.01 2.09 10.4 (Liu et al., 2025b)
+TimeEmb308K 1.89 0.47 10.5 (Xia et al., 2025)
+Amplifier327K 1.06 0.73 10.6 (Fei et al., 2025)
+SparseTSF137 0.08 0.20 8.2 (Lin et al., 2024b)
+Table 5: The 23 forecasters in LT-LIB, grouped by family.
+Per-architecture descriptions.For completeness we list the core architectural idea of each forecaster in
+LT-LIB, grouped by family; bibliographic references match Table 5. All 23 forecasters are wrapped by a
+uniform training interface in LT-LIBso that FTAGENTcan launch any of them via the same (forecaster,
+dataset, hyperparameter)call signature.
+Linear family.
+•Vanilla Linear (Zeng et al., 2023): a single fully-connected temporal layer maps each variate’s
+look-back window directly to its horizon via a weighted sum, with weights shared across variates.
+•DLinear (Zeng et al., 2023): series decomposition splits the input into trend and seasonal components,
+each forecast by a separate linear layer whose outputs are summed.
+•NLinear (Zeng et al., 2023): the last look-back value is subtracted before a linear projection and
+added back after, providing simple distribution-shift compensation.
+•RLinear (Li et al., 2023): a single linear projection wrapped by reversible instance normalisation
+(RevIN), with weights shared across variates.
+•CrossLinear (Zhou et al., 2025): a plug-and-play cross-correlation embedding is fused with patch
+embeddings of the endogenous variable before a global linear forecasting head produces the horizon
+under parameter-free RevIN.
+•MixLinear (Ma et al., 2024): segment-wise intra/inter linear mixing in the time domain is fused with
+low-pass-filtered complex-valued linear compression and reconstruction in the frequency domain,
+reducing parameters fromO(n 2)toO(n)on the downsampled length.
+MLP family.
+•TSMixer (Chen et al., 2023): stacks interleaved time-mixing and feature-mixing MLP blocks that
+alternately mix along the temporal axis and across covariates.
+•LightTS (Zhang et al., 2022): applies MLP blocks on top of two downsampled views of the input
+(interval and continuous sampling) before recombining them.
+•PatchMLP (Tang and Zhang, 2025): embeds channel-independent multi-scale patches, splits them
+via moving-average decomposition, and routes smooth and residual components through intra- and
+inter-variable MLPs.
+•xPatch (Stitsyuk and Choi, 2025): decomposes the patched input via exponential moving average
+into trend and seasonal components processed by parallel MLP-linear and CNN-nonlinear streams.
+•CMoS (Si et al., 2025): replaces shape embeddings with a Correlation Mixing layer that uses parameter-
+shared basis matrices combined via channel-specific weights to model relative positional correlations
+between input and output chunks.
+•PatchTSMixer (Ekambaram et al., 2023): adapts the MLP-Mixer to patched series with successive
+inter-patch, intra-patch, and inter-channel mixing blocks, each augmented with a gated-attention
+module.
+Frequency / filter family.
+•FITS (Xu et al., 2024): applies rFFT, low-pass truncation, and a single complex-valued linear layer
+for amplitude-and-phase interpolation in the frequency domain before inverse FFT.
+•CycleNet (Lin et al., 2024a): subtracts a per-channel learnable recurrent cycle of user-specified
+length, then forecasts the residual with a linear or two-layer MLP head.
+•PaiFilter (Yi et al., 2024): multiplies the input spectrum by a single universal learnable frequency
+kernel shared across all sequences, acting as a fixed shaping filter.
+•TexFilter (Yi et al., 2024): generates the frequency-domain filter conditionally from each input’s
+spectrum, adapting the shaping kernel per sample for context-dependent dependency learning.
+•FreqCycle (Zhang et al., 2026): couples a filter-enhanced cyclic component for low-frequency
+periodicity with a segmented frequency-domain branch that reweights mid- and high-frequency
+bands.
+Mixing family.
+•TimeMixer (Wang et al., 2024): decomposes series at multiple sampling scales and mixes seasonal
+components fine-to-coarse and trend components coarse-to-fine before ensembling scale-specific
+predictors.
+•TimeBase (Huang et al., 2025a): a sub-0.4k-parameter network that extracts orthogonal full-rank
+typical-period bases and reformulates point-level forecasting as segment-level prediction over learned
+cycles.
+•TimeBridge (Liu et al., 2025b): a patch-based Transformer that applies Integrated Attention within
+each variate’s patches to mitigate short-term non-stationarity and Cointegrated Attention across
+variates to model long-term cointegration.
+•TimeEmb (Xia et al., 2025): disentangles series into a time-invariant component handled by a learnable
+global embedding bank and a time-varying component processed via frequency-domain filtering.
+•Amplifier (Fei et al., 2025): amplifies low-energy frequency components before seasonal-trend
+modelling and restores original energy afterward, paired with a semi-channel interaction block for
+cross-channel dependencies.
+•SparseTSF (Lin et al., 2024b): a sub-1k-parameter design that downsamples the input by its period
+into subsequences and predicts each via cross-period sparse linear projection, reducing forecasting to
+cross-period trend extrapolation.
+C.2 Training Environment
+Hardware.All experiments reported in this paper are executed on a single node equipped with
+4×NVIDIA RTX 6000 Ada GPUs, each with 48 GB of memory.
+Software stack.All code runs under Python 3.12.8 with PyTorch 2.5.1, CUDA 12.4, and cuDNN 9.1.
+Auxiliary libraries include NumPy 2.1.3, Pandas 2.2.3, SciPy 1.15.1, scikit-learn 1.6.1, Matplotlib 3.10.0,
+and torchvision 0.20.1. All three METACASTERagents (HPAGENT, MGAGENT, FTAGENT) are driven by
+an OpenAIGPT-5.4model invoked through the OpenAI API.
+C.3 Compute Budget
+METACASTER’s compute cost decomposes into three stages that operate on distinct natural units, and
+Table 6 summarises each on the 4×NVIDIA RTX 6000 Ada node described in Appendix C.2. LLM-token
+counts cover both prompt and completion againstGPT-5.4via the OpenAI API.
+Stage 1: Harness Optimisation (per Phase A run).Phase A trains the Meta-Generator harness once.
+All three agents are active: HPAGENTproposes edits, MGAGENTgenerates synthetic data under each
+candidate harness, and FTAGENTtrains a panel of forecasters that scores the candidate. The resulting H⋆
+is reused for every subsequent deployment, so this stage is paid once per project rather than per query.
+Stage 2: Generation and Forecaster Training (per dataset).At deployment time, MGAGENTpro-
+duces the synthetic training tensor X′ from the few-shot input, and FTAGENTthen trains the lightweight
+forecasters of LT-LIBon X′ and selects the one shipped to the user. The LLM is invoked only inside
+MGAGENT’s generation step; the downstream-forecaster training that follows runs without any LLM call.
+Stage 3: Post-deployment Inference (per query).Once a forecaster has been selected and deployed,
+only its forward pass runs at user query time. The deployed forecaster is a lightweight architecture drawn
+from LT-LIB(Appendix C.1), so the forward pass takes a few milliseconds per look-back window and
+can run on either a GPU or a CPU; no LLM call sits on this path.
+Pre-training Deployment Inference
+Active agents All MGAGENT+ FTAGENTNone
+LLM-driven Yes Yes No
+GPU Required GPU or CPU GPU or CPU
+Time-Cost 5–7 h 30–40 min a few ms
+LLM tokens∼46M∼150K 0
+Table 6: Computational cost of different stages under METACASTERframework.
+C.4 Use of AI Assistants
+During the paper writing process, we used LLMs to check and polish the grammar and typos. Beyond
+this, LLMs were not used extensively elsewhere.
+D System Prompts
+This section reproduces the System Prompts that constitute the system-prompt slot of θ for MGAGENT
+and the hand-authored Harnesses of HPAGENTand FTAGENT. Each prompt is rendered in the notation of
+the main text; runtime tokens supplied by the driver appear as<placeholder>.
+D.1 Harness Proposer (HPAGENT)
+HPAGENToptimises MGAGENT’s Harness θ over R epochs (§3.6); its System Prompt directs every
+epoch of the propose–evaluate–accept loop and is reproduced verbatim below.
+You are HPagent of MetaCaster. Your job is to grow a library of validated synthesis skillsθ∗ that
+MGagent will load at deployment time. You do NOT generate data yourself — you author the recipes
+that MGagent executes.
+You are currently executing epoch <round_n> of <max_rounds>.
+Workspace.The Harness you edit lives at <harness_root>/:
+harness/
+|– core/router.md classification rules + skill manifest
+\– skills/<name>/SKILL.md one self-contained recipe per regime
+•You may edit ONLY files under <harness_root>/.
+•The Harness starts EMPTY at epoch0— author every artefact from scratch.
+State digest (pre-loaded each epoch).The first user message contains:
+•Pinned 3-forecaster panel + the full 23-model held-out pool.
+•Per-dataset metadata for the <n_train> training datasets in <train_datasets>.
+•Current Harness body + skill-health report.
+•Diagnostic figures from the previous epoch.
+•Full history of prior epochs’ summary.json + current best.
+Per-epoch workflow.
+•Turns 1–2: read_image on≥2diagnostic figures; identify gaps.
+•Turn 3: Brief proposal: which SKILL.md to add or edit, and why.
+•Turns 4–7: edit_file / write_file — author the change (each new skill≥150lines, with≥1
+generation function and≥1validation function).
+Skill schema.Every SKILL.md must declare YAML frontmatter:
+---
+name: <snake_case_id>
+description: <one-line summary>
+version: <int>
+---
+Decision rule for is_new_best.Compare against the current best epoch (not epoch0):
+•Median downstream hingeδ(·,·)decreases (audit-only excluded): High.
+•8-dim distribution-metric portfolio improves on the majority of datasets: High.
+•Visual evidence on diagnostic figures: Tie-break.
+•Catastrophic regression on any non-audit dataset (∆δ≥+2.0): Hard veto.
+Tools.read_file, write_file, edit_file, bash, read_image, run_round_evaluation, finalize_round,
+etc.
+End of epoch <round_n> spec. Begin work.
+D.2 Meta-Generator (MGAGENT)
+MGAGENTproduces the synthetic dataset ¯D from the few-shot input via Eq. (2) (§3.4); its System Prompt
+is the slot ofθthat HPAGENToptimises during Harness training and is reproduced verbatim below.
+You are MGagent of MetaCaster. Your single deliverable is <output_dir>/dataset.npy: a float32
+array of synthetic windows that, when used as training data for a lightweight forecaster, will
+yield the lowest possible test MSE.
+You execute a frozen Harnessθ ∗ produced offline by HPagent, located at <harness_root>/:
+harness/
+|– core/router.md
+\– skills/<name>/SKILL.md
+You may NOT train any forecaster yourself — FTagent will do that on your output.
+Inputs you may read.
+•<input_dir>/few_shot.npy — shape (N_few_shot, L+H, C) float32.
+•<input_dir>/meta.json — seq_len=L, pred_len=H, C_eff=C, freq, domain.
+•<input_dir>/context.txt — optional natural-language contextC.
+Three-stage pipeline.
+1.Analyse: compute statistics (mean, std, quantiles), ACF at lag-1, 24, 48, 168, FFT peaks,
+channel correlation, zero_frac, lower_tail_mass. Emit a Fingerprint JSON describing regime,
+priorities, and challenges.
+2.Retrieve and Execute: read core/router.md; match the fingerprint to one or more
+SKILL.md; run_python on the synthesis code inside that SKILL.md; write the candidate to
+<output_dir>/dataset.npy.tmp.
+3.Validate: run the gates declared inside the SKILL.md (shape, NaN, per-channel mean/std drift,
+ACF preservation, quantile match, range coverage, sample-mean diversity ratio∈[0.5,2.0]). On
+PASS, move to dataset.npy; on FAIL, return to Stage 2 with a different recipe.
+Output contract (non-negotiable).
+•Shape exactly (N, L+H, C) float32, all finite,N≥100.
+•L=meta["seq_len"],H=meta["pred_len"],C=meta["C_eff"].
+•Always preserve the trailing channel dim, even whenC= 1.
+•Save exactly once to <output_dir>/dataset.npy.
+Tools.read_file, run_python, read_image, web_search, etc.
+D.3 Forecaster Trainer (FTAGENT)
+FTAGENTtrains every fl ∈ Fon the synthetic data and returns the best forecaster to the user via Eq. (3)
+(§3.5); its System Prompt is hand-authored and not optimised by HPAGENT, and is reproduced verbatim
+below.
+You are FTagent of MetaCaster. Your job is to supervise the training of every forecasterf l ∈ F
+from the lightweight library LT-Lib on the synthetic dataset ¯Dproduced by MGagent, and to return
+the single best forecaster (lowest validation MSE) as the deliverable for the user.
+Inputs.
+•<synth_dir>/dataset.npy — MGagent output, shape (N, L+H, C) float32.
+•<input_dir>/meta.json — shape and frequency metadata.
+•<test_dir>/test.npy — held-out evaluation windows.
+•Model library at <model_pool> — the 23 lightweight forecasters of LT-Lib.
+Responsibilities.
+1.Plan and dispatch.Enumerate (forecaster, hyperparameter, split) training jobs from
+<model_pool> and queue them onto the available <gpu_pool> for maximally parallel execution.
+2.Supervise in real time.Monitor every running job’s loss curve and resource usage; reallocate
+GPUs as jobs finish, resolve errors as they arise, and recover interrupted jobs without human
+intervention.
+3.Select and deliver.Rank the trained forecasters by validation MSE, evaluate the chosen Top-1
+on <test_dir>/test.npy, and ship it as the deliverable for the user.
+Hard constraints.
+•Never modify dataset.npy or test.npy.
+•Use only the registered factory architectures from <model_pool>.
+•Every queued job MUST terminate (success or explicit failure); no silent skips.
+Tools.bash, read_file, write_file, read_json, etc.
+E Supplementary Results
+MAE counterpart of the main table.Table 7 reports per-dataset MAE for the nine methods compared
+on MSE in Table 1.
+Foundation models on all benchmarks.Foundation forecasters — VisionTS (Chen et al., 2024),
+Chronos (Ansari et al., 2024),Moirai (Woo et al., 2024),Time-LLM (Jin et al., 2024), andTimeScientist
+(Zhao et al., 2025) — replace the lightweight downstream forecaster with a 91 M–7 B-param backbone
+invoked at every test window. Figure 7 plots the METACASTERforecaster against each foundation method
+across all 10 evaluation datasets, with bubble area∝log 10(params).
+Comparison with TimeScientist under the shared forecaster pool.We substitute TimeScientist’s
+original candidates with forecasters drawn from LT-LIB, so that both methods select from the same pool.
+Fig. 8 contrasts the per-dataset MSE of the best forecaster selected by METACASTERagainst that by
+TimeScientistunder this shared pool. METACASTERoutperformsTimeScientiston 26 of 30 cells.
+Dataset Agent Generation Augmentation Ref
+METACASTERTimeDP VerbalTS T2S DiffTS TimeV AE Repeat Bootstrap Jitter MagWarp Sample Full
+IND (K= 10)
+ETTm1 0.457 0.568 0.567 0.531 0.582 0.620 0.650 0.637 0.636 0.930 0.625 0.400
+Electricity 0.413 0.415 0.860 0.866 0.474 0.436 0.468 0.466 0.464 1.652 0.652 0.243
+Seattle 0.849 0.8440.989 0.989 0.971 0.948 0.995 0.962 0.986 4.395 1.127 0.663
+SZTaxi 0.255 0.277 0.274 0.276 0.260 0.261 0.285 0.266 0.272 0.814 0.339 0.246
+Sales 0.661 0.795 0.771 1.027 1.510 0.830 0.945 0.766 0.763 1.169 0.866 0.868
+Bitbrains 0.102 0.0850.114 0.110 0.135 0.149 0.172 0.150 0.156 0.408 0.208 0.148
+Solar 0.253 0.351 0.633 0.661 0.378 0.349 0.381 0.375 0.376 0.454 0.514 0.255
+OOD
+Saugeen 0.802 0.6660.675 0.743 1.003 1.042 1.108 1.044 1.053 1.184 0.816 0.548
+USbirths 0.669 1.387 1.100 1.097 1.1450.605 0.665 0.649 0.649 2.420 0.894 0.365
+M4† 1.447 1.476 1.527 1.563 1.639 1.730 1.803 1.761 1.748 9.298 1.621 1.527
+IND (K= 30)
+ETTm1 0.424 0.570 0.572 0.531 0.592 0.565 0.606 0.583 0.583 0.675 0.565 0.400
+Electricity 0.357 0.416 0.855 0.862 0.472 0.385 0.411 0.398 0.401 0.824 0.616 0.243
+Seattle 0.740 0.842 0.980 0.980 0.983 1.085 0.933 0.903 0.891 3.241 0.974 0.663
+SZTaxi 0.271 0.279 0.274 0.2740.2630.300 0.315 0.295 0.290 0.999 0.309 0.246
+Sales 0.637 0.737 0.793 1.093 1.528 0.769 0.933 0.820 0.832 0.999 0.769 0.868
+Bitbrains 0.119 0.0870.116 0.113 0.143 0.159 0.214 0.190 0.186 0.327 0.197 0.148
+Solar 0.243 0.363 0.636 0.675 0.380 0.340 0.356 0.353 0.349 0.405 0.478 0.255
+OOD
+Saugeen 0.647 0.654 0.677 0.748 1.005 0.886 0.980 0.932 0.937 0.983 0.733 0.548
+USbirths 0.570 1.218 1.104 1.090 1.1320.533 0.569 0.556 0.558 1.561 0.716 0.365
+M4† 1.453 1.499 1.547 1.588 1.632 1.845 1.768 1.763 1.780 10.04 1.718 1.527
+IND (K= 50)
+ETTm1 0.378 0.572 0.574 0.533 0.615 0.533 0.557 0.535 0.532 0.558 0.496 0.400
+Electricity 0.328 0.409 0.855 0.885 0.465 0.352 0.366 0.358 0.357 0.736 0.509 0.243
+Seattle 0.730 0.845 0.984 0.979 1.003 1.206 0.866 0.836 0.848 2.455 0.889 0.663
+SZTaxi 0.265 0.275 0.274 0.2690.2650.451 0.386 0.379 0.373 0.454 0.301 0.246
+Sales 0.884 0.793 0.797 1.080 1.534 0.833 0.860 0.793 0.7890.985 0.742 0.868
+Bitbrains 0.144 0.1000.119 0.113 0.136 0.186 0.317 0.281 0.292 0.381 0.180 0.148
+Solar 0.240 0.377 0.640 0.660 0.388 0.593 0.343 0.340 0.338 0.393 0.414 0.255
+OOD
+Saugeen 0.615 0.642 0.678 0.747 1.007 0.803 0.970 0.940 0.939 0.950 0.716 0.548
+USbirths 0.501 1.318 1.105 1.089 1.1280.459 0.476 0.464 0.461 1.601 0.584 0.365
+M4† 1.384 1.469 1.567 1.563 1.702 1.811 1.825 1.816 1.812 8.318 1.600 1.527
+Wins (of 30) 19 5 0 0 2 3 0 0 1 0 – –
+Table 7: MAE counterpart of Table 1 on the same nine methods. †M4 uses instance-normalised MAE.
+10−1
+100
+101
+102
+1030.00
+0.25
+0.50
+0.75
+1.00
+1.25
+1.50MSE ↓
+Electricity
+10−1
+100
+101
+102
+1030.0
+0.5
+1.0
+1.5MSE ↓
+ETTm1
+10−1
+100
+101
+102
+103
+0.5
+1.0
+1.5
+2.0MSE ↓
+Seattle
+10−1
+100
+101
+102
+1030.00
+0.25
+0.50
+0.75
+1.00
+1.25
+1.50MSE ↓
+SZ-Taxi
+10−1
+100
+101
+102
+103
+1.5
+2.0
+2.5
+3.0
+3.5MSE ↓
+Sales
+10−1
+100
+101
+102
+103
+Latency (ms, log)
+0
+1
+2
+3
+4MSE ↓
+Bitbrains
+10−1
+100
+101
+102
+103
+Latency (ms, log)
+0.00
+0.25
+0.50
+0.75
+1.00
+1.25MSE ↓
+Solar
+10−1
+100
+101
+102
+103
+Latency (ms, log)
+1.25
+1.50
+1.75
+2.00
+2.25
+2.50
+2.75MSE ↓
+Saugeen
+10−1
+100
+101
+102
+103
+Latency (ms, log)
+1.8
+2.0
+2.2
+2.4
+2.6
+2.8
+3.0inst-MSE ↓
+M4 (daily)
+10−1
+100
+101
+102
+103
+Latency (ms, log)
+0.5
+1.0
+1.5MSE ↓
+USbirths
+MetaCaster Chronos Moirai VisionTS Time-LLM zero-shot few-shot 102 106
+Figure 7: Comparing METACASTERwith TSFMs on all evaluation datasets.
+F Further Study
+Top-1 / Top-3 / Top-5 vs. baselines.At deployment, only a single forecaster is shipped per dataset,
+so we additionally compare each method using only its best-performing forecasters rather than the full
+pool. Table 8 reports, per dataset, the mean MSE of the K best forecasters trained under each method (for
+K= 1,3,5), evaluated within the 20 main-pool forecasters. METACASTERretains the lead across most
+cells.
+ETTm1 Electr. Seattle SZT axi Sales Bitbr. Solar Saugeen USbirths M4
+0
+1
+2
+3MSE
+10 30 50 10 30 50 10 30 50 10 30 50 10 30 50 10 30 50 10 30 50 10 30 50 10 30 50 10 30 50
+3.7 4.5 8.4 4.8 3.5 3.9MetaCaster
+TimeScientist
+IND
+OOD
+Figure 8: METACASTERvs.TimeScientistunder the shared LT-LIBforecaster pool.
+Dataset Ours Generation Models Augmentation Methods References
+METACASTER TimeDP VerbalTS T2S DiffTS TimeVAE Repeat Bootstrap Jitter MagWarp Dmsup Dmtr
+T op-1
+ETTm1 0.243 0.967 0.982 0.886 0.921 0.437 0.382 0.382 0.385 0.358 0.489 0.300
+Electricity 0.148 0.209 0.947 1.017 0.237 0.128 0.125 0.1250.1250.125 0.274 0.107
+Seattle 0.949 1.271 1.658 1.674 1.288 1.678 1.097 1.097 1.114 1.647 1.295 0.953
+SZTaxi 0.099 0.091 0.103 0.105 0.091 0.095 0.092 0.092 0.091 0.088 0.090 0.075
+Sales 2.176 2.265 2.205 2.416 2.483 2.223 2.410 2.382 2.416 2.512 2.202 2.270
+Bitbrains 0.056 0.077 0.079 0.079 0.082 0.082 0.144 0.142 0.143 0.154 0.083 0.102
+Solar 0.135 0.173 0.453 0.503 0.145 0.148 0.149 0.149 0.150 0.149 0.222 0.136
+Saugeen 1.416 1.444 1.429 1.512 1.658 1.489 1.372 1.371 1.3801.359 1.292 1.089
+USbirths 0.351 1.376 1.425 1.412 1.364 0.266 0.250 0.2490.255 0.502 0.487 0.106
+M4† 1.980 1.9322.299 2.164 2.190 2.204 2.121 2.086 2.089 13.182 2.139 1.853
+T op-3
+ETTm1 0.256 0.974 0.986 0.892 0.944 0.491 0.435 0.431 0.432 0.391 0.496 0.303
+Electricity 0.158 0.219 0.974 1.026 0.2710.149 0.154 0.152 0.154 0.172 0.308 0.107
+Seattle 0.985 1.295 1.698 1.696 1.363 1.697 1.177 1.151 1.192 2.052 1.351 0.966
+SZTaxi 0.101 0.095 0.105 0.1060.0920.098 0.097 0.094 0.095 0.115 0.106 0.077
+Sales 2.201 2.295 2.225 2.464 2.634 2.248 2.504 2.437 2.486 2.597 2.221 2.324
+Bitbrains 0.068 0.077 0.079 0.079 0.085 0.083 0.178 0.171 0.159 0.173 0.085 0.104
+Solar 0.137 0.181 0.470 0.509 0.163 0.165 0.172 0.167 0.172 0.183 0.227 0.137
+Saugeen 1.422 1.450 1.435 1.535 1.712 1.572 1.3951.396 1.404 1.572 1.306 1.096
+USbirths 0.369 1.452 1.457 1.417 1.3960.326 0.336 0.332 0.334 0.695 0.513 0.123
+M4† 2.006 1.9742.311 2.168 2.278 2.506 2.219 2.208 2.280 34.704 2.186 1.974
+T op-5
+ETTm1 0.282 0.979 0.989 0.894 0.970 0.539 0.493 0.467 0.469 0.466 0.499 0.304
+Electricity 0.183 0.229 0.998 1.040 0.293 0.192 0.200 0.194 0.196 0.263 0.337 0.107
+Seattle 1.046 1.314 1.730 1.716 1.403 1.704 1.280 1.249 1.268 5.347 1.403 0.971
+SZTaxi 0.102 0.098 0.106 0.1070.0950.102 0.102 0.098 0.098 0.185 0.112 0.079
+Sales 2.213 2.311 2.234 2.563 2.787 2.273 2.537 2.481 2.518 2.721 2.241 2.381
+Bitbrains 0.074 0.077 0.079 0.082 0.090 0.085 0.195 0.188 0.181 0.211 0.089 0.118
+Solar 0.141 0.185 0.477 0.517 0.187 0.183 0.190 0.186 0.190 0.226 0.234 0.138
+Saugeen 1.425 1.455 1.438 1.543 1.767 1.595 1.623 1.598 1.619 1.839 1.320 1.104
+USbirths 0.394 1.478 1.467 1.429 1.4290.358 0.372 0.359 0.368 1.051 0.537 0.133
+M4† 2.013 2.0002.319 2.181 2.331 2.667 2.273 2.267 2.358 52.066 2.253 2.021
+Table 8: Per-dataset top-Kbest-forecaster MSE atn few = 30. †M4 uses instance-normalised MSE.
+Few-shot input scaling.Figure 9 reports the per-dataset Relative MSE of METACASTERat nfew ∈
+{10,20,30,50,100} on both IND and OOD subsets. On most datasets, METACASTERimproves as nfew
+grows.
+Multi-seed sensitivity at nfew = 30.Table 9 reports the per-dataset MSE of METACASTERacross three
+independent LLM-sampling seeds atn few = 30. METACASTERis seed-insensitive on most datasets.
+Per-forecaster MSE distribution: violin plots.Figure 10 renders the per-method Relative MSE
+distribution across the 20× {7,3}(forecaster, dataset) cells, split IND / OOD. METACASTERsits below
+every non-Full baseline at every quartile in both subsets, with the narrowest non-trivial distribution.
+Heatmap across forecasters and methods.Figure 11 renders the per-(forecaster, method) Relative
+MSE as a dual-panel heatmap, with the 20 main forecasters as rows and the 10 methods of Table 1 as
+columns. METACASTERis the lowest column on both panels.
+Qualitative synthetic samples.Figure 12 compares one synthetic window per method on four repre-
+sentative datasets (ETTm1 ch. 0, Solar, Electricity, Saugeen), against a real window on the top row for
+10 20 30 50 100
+nfew (few-shot input size)
+0.0
+0.5
+1.0
+1.5Relative MSE ↓
+IND
+10 20 30 50 100
+nfew (few-shot input size)
+0
+2
+4
+OOD
+ETTm1
+Bitbrains
+Electricity
+Solar
+Seattle
+Saugeen
+SZTaxi
+M4
+Sales
+USbirths
+Figure 9: Few-shot input scaling of METACASTERon IND and OOD.
+DatasetMSE (±std)
+ETTm10.345±0.023
+Electricity0.226±0.000
+Seattle1.177±0.041
+SZTaxi0.114±0.003
+Sales2.362±0.411
+Bitbrains0.125±0.025
+Solar0.152±0.000
+Saugeen1.464±0.523
+USbirths0.533±0.254
+M4† 2.112±0.044
+Table 9: Per-dataset MSE of META-
+CASTER, mean ± std across three
+independent LLM-sampling seeds
+(†M4 in instance-normalised MSE).
+Held-Out 
+Forecaster
+Ours
+(a) IND Result (b) OOD Result
+Ours
+Figure 10: Relative MSE distributions atn few = 30on IND (left) and OOD (right).
+reference. METACASTER’s window tracks both the dominant period and the local fluctuations of the
+real series across all four datasets, while the deep generative baselines either drift in amplitude, miss the
+period, or collapse to near-constant trajectories.
+Distributional alignment via t-SNE.Figure 13 runs t-SNE separately on each of the 10 evaluation
+datasets. METACASTER-generated windows overlap the real manifold on most datasets, indicating that
+the synthetic distribution is well aligned with the real one.
+MetaCaster
+TimeDP VerbalTS
+T2S DiffTS
+TimeVAE Repeat Bootstrap
+Jitter
+MagWarp
+MixLinear
+FITS
+SparseTSF
+CMoS
+CycleNet
+RLinear
+NLinear
+TimeBridge
+TSMixer
+xPatch
+PaiFilter
+TimeEmb
+Linear
+DLinear
+TimeMixer
+TexFilter
+PatchMLP
+PatchTSMixer
+Amplifier
+LightTS
+0.06 0.56 1.50 1.50 1.17 0.73 0.10 0.10 0.10 0.22
+0.07 0.44 1.04 0.98 0.66 1.18 1.13 1.07 0.99 1.04
+0.09 0.60 1.48 1.50 0.73 0.70 0.13 0.13 0.14 0.19
+0.12 0.59 1.55 1.59 0.64 0.57 1.00 0.89 0.92 1.45
+0.19 0.58 1.50 1.51 1.01 0.59 1.02 0.92 0.90 2.76
+0.18 0.58 1.51 1.50 1.02 0.61 0.92 0.83 0.82 2.59
+0.21 0.58 1.54 1.54 1.10 0.70 1.42 0.92 0.93 2.89
+0.23 1.05 1.67 1.64 1.71 0.96 1.76 1.19 1.24 2.31
+0.29 0.93 1.73 1.47 0.71 0.58 0.86 0.78 0.80 3.39
+0.20 0.66 1.35 1.40 1.16 0.53 0.45 0.39 0.41 4.01
+0.24 0.73 1.52 1.61 0.80 0.69 1.63 1.62 1.60 3.17
+0.23 0.73 1.48 1.55 0.85 0.73 1.53 1.45 1.47 3.38
+0.23 0.71 1.61 1.49 0.87 0.64 1.22 1.14 1.09 2.26
+0.29 0.72 1.68 1.52 0.88 0.68 1.32 1.26 1.27 2.52
+0.22 0.79 1.52 1.59 1.08 0.93 1.42 0.86 0.76 3.51
+0.30 0.79 1.49 1.64 0.97 0.58 1.27 1.24 1.22 3.87
+0.23 0.71 1.50 1.66 1.05 0.57 0.79 0.96 1.26 3.71
+0.24 0.87 1.50 1.50 1.45 0.56 0.62 0.64 0.50 2.72
+0.28 0.75 1.51 1.65 0.99 0.65 1.09 0.79 0.79 3.48
+0.27 0.69 1.53 1.43 0.73 0.56 0.91 1.00 0.93 2.67
+In-domain (7 datasets)
+0.0
+0.5
+1.0
+1.5
+2.0
+2.5
+3.0
+3.5
+4.0
+raw-MSE hinge  ↓
+MetaCaster
+TimeDP VerbalTS
+T2S DiffTS
+TimeVAE Repeat Bootstrap
+Jitter
+MagWarp
+MixLinear
+FITS
+SparseTSF
+CMoS
+CycleNet
+RLinear
+NLinear
+TimeBridge
+TSMixer
+xPatch
+PaiFilter
+TimeEmb
+Linear
+DLinear
+TimeMixer
+TexFilter
+PatchMLP
+PatchTSMixer
+Amplifier
+LightTS
+0.14 1.26 1.15 1.29 1.41 1.21 0.31 0.31 0.33 2.04
+0.13 0.15 0.14 0.22 0.41 0.31 1.08 1.05 1.06 0.79
+0.24 1.78 1.75 1.84 2.01 0.95 0.29 0.29 0.30 1.58
+0.39 1.77 1.76 1.79 1.92 0.51 0.88 0.81 0.87 2.15
+0.52 1.80 1.78 1.82 1.95 0.74 1.03 0.96 1.00 3.46
+0.56 1.80 1.78 1.79 1.97 0.78 1.07 0.99 1.01 3.48
+0.56 1.78 1.82 1.82 2.02 0.82 1.16 0.93 1.04 3.28
+0.52 1.74 1.74 1.77 3.05 1.17 1.62 1.36 1.32 2.03
+0.47 1.85 1.46 1.56 1.79 0.27 0.45 0.48 0.43 2.68
+0.75 1.76 1.74 1.83 1.93 0.83 0.63 0.62 0.60 4.00
+0.71 1.80 1.84 1.96 2.04 1.21 1.96 1.88 1.72 3.73
+0.76 1.75 1.73 1.82 1.83 1.15 1.68 1.72 1.70 3.24
+0.77 1.83 1.86 1.81 1.99 0.72 0.97 0.91 0.99 3.30
+0.64 1.80 1.81 1.83 2.04 0.56 0.77 0.76 0.73 3.35
+0.80 1.77 1.78 1.88 2.02 0.93 1.66 1.14 1.20 3.77
+0.70 1.70 1.74 1.86 1.93 0.95 1.02 0.97 0.98 3.40
+0.97 1.72 1.72 1.81 2.01 0.95 1.03 1.06 1.14 2.66
+1.13 1.67 1.67 1.72 2.14 1.03 1.12 1.15 1.11 2.83
+1.07 1.75 1.82 1.99 2.05 1.08 1.49 1.21 1.18 3.31
+1.20 1.88 1.83 1.80 1.88 0.95 1.28 1.21 1.24 3.74
+OOD (3 datasets)
+0.0
+0.5
+1.0
+1.5
+2.0
+2.5
+3.0
+3.5
+4.0
+raw-MSE hinge  ↓
+Figure 11: Per-(forecaster, method) Relative MSE heatmap (top: IND; bottom: OOD).
+Real
+ETTm1 (ch0) Solar Electricity Saugeen (OOD)
+MetaCaster
+TimeDP
+VerbalTS
+T2S
+Diffusion-TS
+TimeVAE
+Figure 12: Synthetic windows on four datasets (channel 0): real on top, METACASTER, and five generative baselines.
+ETTm1
+ Electricity
+ Seattle
+Bitbrains
+ SZ-Taxi
+ Hierarchical-Sales
+Solar
+Saugeen
+ USbirths
+ M4
+In-Distribution
+Out-of-Distribution
+Real MetaCaster Few-shot sample
+Figure 13: Per-dataset t-SNE of real, METACASTER-generated, and few-shot windows (top: IND; bottom: OOD).
