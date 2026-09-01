@@ -1,15 +1,15 @@
 # Awesome Recursive Self-Improvement (RSI) Resources
 
 [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
-![papers](https://img.shields.io/badge/papers-31-blue)
-![reports](https://img.shields.io/badge/reports-18-red)
+![papers](https://img.shields.io/badge/papers-32%2B3_classics-blue)
+![reports](https://img.shields.io/badge/reports-20-red)
 ![zh-PDF](https://img.shields.io/badge/zh--PDF-19-green)
 ![slides](https://img.shields.io/badge/slides-26p-orange)
 
 围绕 **Recursive Self-Improvement（递归自改进）** 的论文与资源列表 + 系统性调研仓库（2026-08-31 完成）。与一般 awesome 列表不同，本仓库同时提供：
 
-- **18 份中文精读报告**（`reports/`，逐篇拆方法、数字、局限与谱系定位）
-- **31 篇论文英文原版 PDF + 19 篇保版式中文翻译 PDF**（`papers/`，由 [super_translate](https://github.com/asimfish/super_translate) 生成）
+- **20 份中文精读报告**（`reports/`，逐篇拆方法、数字、局限与谱系定位，含 00 起源前史）
+- **32 篇论文英文原版 PDF + 3 篇起源经典（1965-2003）+ 保版式中文翻译 PDF**（`papers/`，由 [super_translate](https://github.com/asimfish/super_translate) 生成）
 - **26 页汇总报告**（`awesome_rsi_slides.html` 方向键翻页 / `awesome_rsi_slides.pdf`）
 
 一句话结论：**执行已经自动化，品味正在被编译，锚是最后的手工业**——所有能跑的自进化系统都保留一个不参与进化的 ground-truth 锚；谁能工业化地生产不可 game 的锚，谁就握住了 RSI 的节流阀。
@@ -20,7 +20,8 @@
 
 | [1. Start Here](#1-start-here)                          |                                                              |
 | ------------------------------------------------------- | ------------------------------------------------------------ |
-| [2. Core Readings](#2-core-readings)                    | [3. Papers](#3-papers)                                        |
+| [2. Core Readings](#2-core-readings)                    | [2.5 Origins (1965-2014)](#25-origins-1965-2014)              |
+| [3. Papers](#3-papers)                                  |                                                              |
 | [3.0 Surveys](#30-surveys)                              | [3.1 Framework Side](#31-framework-side)                      |
 | [3.2 Evaluator Side](#32-evaluator-side)                | [3.3 Model Side](#33-model-side)                              |
 | [3.4 Knowledge Side](#34-knowledge-side)                | [3.5 Online Side](#35-online-side)                            |
@@ -35,7 +36,7 @@
 |---|---|
 | 15 分钟 | 打开 [`awesome_rsi_slides.html`](awesome_rsi_slides.html)（浏览器方向键翻页，P 键打印）或 [`awesome_rsi_slides.pdf`](awesome_rsi_slides.pdf) |
 | 2 小时 | [汇总报告](reports/10_synthesis_insights.md) → [总纲解读](reports/01_lilian_weng_harness_engineering.md) → [Who Grades the Grader 解读](reports/05_who_grades_the_grader.md)（全谱系最重要的否定性结论） |
-| 系统研读 | `reports/` 按 01→02→07→03→04→05→06→08→11→09→10 顺序（谱系扩编 12→13→14→15→16→17→18 按需精读），配 `papers/zh/` 中文 PDF 对照原文 |
+| 系统研读 | `reports/` 按 00→01→02→07→03→04→05→06→08→11→09→10 顺序（谱系扩编 12-18 与 iCoder 19 按需精读），配 `papers/zh/` 中文 PDF 对照原文 |
 
 ## 2. Core Readings
 
@@ -51,6 +52,20 @@ _Anthropic_
 6. **Agentic RL 系列（上）：环境、轨迹、Reward 与训练闭环.** 微信公众号, 2026\. [article](https://mp.weixin.qq.com/s/Ly2BvP3y2bFB9czGqRguWQ)
 7. **Agentic RL 系列（中）：SkillRL，如何把一次失败变成可复用的 Skill.** 微信公众号, 2026\. [article](https://mp.weixin.qq.com/s/wqMM1D4NZQmRtWOcebuhTA)
 8. **Agentic RL 系列（下）：Evolving-RL，用 Reward 训练 Agent 总结经验.** 微信公众号, 2026\. [article](https://mp.weixin.qq.com/s/bu3-RyqaYPdA1mH79oF39g)
+9. **AI到底能不能自己造AI？别吵了，有人做出来了**（iCoder 中文解读）. 微信公众号, 2026\. [article](https://mp.weixin.qq.com/s/28q7O59IzEXl_tiWulYbDA)
+
+## 2.5 Origins (1965-2014)
+
+RSI 概念的思想起源四篇（逐篇拆解见[解读报告 00](reports/00_origins_1965_2014.md)）：Good 给正反馈直觉，Yudkowsky 给能力构造与持续条件，Schmidhuber 给自指完备的形式化极限，Bostrom 给进入强 RSI 的动力学判据（crossover）。
+
+1. ⭐ **Speculations Concerning the First Ultraintelligent Machine.** Advances in Computers Vol. 6, 1965\. [paper](http://incompleteideas.net/papers/Good65ultraintelligent.pdf), [PDF](papers/classics/1965_Good_UltraintelligentMachine.pdf)（扫描影印版，无文本层）, [解读](reports/00_origins_1965_2014.md)
+_Irving John Good_ — 提出 intelligence explosion："设计机器本身也是一种智力活动，超智能机器可以设计出更好的机器"，智能提升提高产生进一步提升的能力，形成正反馈。
+2. ⭐ **General Intelligence and Seed AI 2.3.** Singularity Institute, 2000-2001\. [web archive](https://web.archive.org/web/20120805130100/singularity.org/files/GISAI.html), [PDF](papers/classics/2001_Yudkowsky_GISAI.pdf), [PDF-zh](papers/classics/2001_Yudkowsky_GISAI_zh.pdf), [解读](reports/00_origins_1965_2014.md)
+_Eliezer Yudkowsky_ — 描述具备 self-understanding / self-modification / recursive self-improvement 的 Seed AI；指出让固定优化器跑得更快不能维持递归改进，每一级提升必须让系统看到或实现新的改进机会。
+3. ⭐ **Gödel Machines: Self-Referential Universal Problem Solvers Making Provably Optimal Self-Improvements.** arXiv, 2003\. [paper](https://arxiv.org/abs/cs/0309048), [PDF](papers/classics/2003_Schmidhuber_GoedelMachines.pdf), [PDF-zh](papers/classics/2003_Schmidhuber_GoedelMachines_zh.pdf), [解读](reports/00_origins_1965_2014.md)
+_Juergen Schmidhuber_ — 寻找 improvement 的机制本身也在可修改集合里；proof searcher 找到"自改写收益可证明更高"的证明才执行改写。
+4. ⭐ **Superintelligence: Paths, Dangers, Strategies.** Oxford University Press, 2014\. [book](https://global.oup.com/academic/product/superintelligence-9780199678112), [解读](reports/00_origins_1965_2014.md)
+_Nick Bostrom_ — 把 RSI 放入 optimization power / recalcitrance 动力学；crossover point：系统自身贡献开始主导后续改进即进入 strong RSI。判据："When the AI improves itself, it improves the thing that does the improving"——一次改进是否同时提升发现、验证、实现下一次改进的能力。
 
 ## 3. Papers
 
@@ -144,6 +159,8 @@ _Minhua Lin, Juncheng Wu, Zijun Wang, Zhan Shi, Yisi Sang, et al._
 _Hangfan Zhang, Shao Zhang, Kangcong Li, Chen Zhang, Yang Chen, Yiqun Zhang, Lei Bai, Shuyue Hu_
 18. **Autodata: An Agentic Data Scientist to Create High Quality Synthetic Data.** arXiv, 2026\. [paper](https://arxiv.org/abs/2606.25996), [PDF-en](papers/en/2606.25996_Autodata.pdf)
 _Ilia Kulikov, Chenxi Whitehouse, Tianhao Wu, Yixin Nie, et al. (FAIR at Meta)_
+23. ⭐ **iCoder: Recursive AI-Led Development of Frontier Industrial Coding Model.** Tech Report, 2026\. [report](https://huggingface.co/i-Coder/iCoder-27B/blob/main/Coder_Tech_Report.pdf), [code](https://github.com/bingreeky/iCoder), [model](https://huggingface.co/i-Coder/iCoder-27B), [PDF-en](papers/en/iCoder27B_TechReport.pdf), [PDF-zh](papers/zh/iCoder27B_TechReport_zh.pdf), [解读](reports/19_icoder.md)
+_Cheng Yang, Jiayang Lyu, Shangyuan Liu, Guibin Zhang, et al. (SJTU, NUS, DP Technology)_ — AI 主导交付 release-ready 27B 工业编码模型（RTLLM 68.0 超 GPT-5.5/Opus 4.8），人类介入压缩为"高密度 prior、低频门控"五层接口。**本仓库计划以其代码库为后续开发基础。**
 19. **EnvHarness: Awakening Static Worlds for Agent Learning.** arXiv, 2026\. [paper](https://arxiv.org/abs/2608.19880), [PDF-en](papers/en/2608.19880_EnvHarness.pdf), [PDF-zh](papers/zh/2608.19880_EnvHarness_zh.pdf), [解读](reports/15_envharness.md)
 _Chengsong Huang, Zifeng Wang, Rujun Han, Jun Yan, Yanfei Chen, et al. (Google Cloud AI Research)_
 20. **AutoSaddler: Automatic Harness Optimization with Durable Updates from Agent Execution Traces.** arXiv, 2026\. [paper](https://arxiv.org/abs/2608.23041), [PDF-en](papers/en/2608.23041_AutoSaddler.pdf), [PDF-zh](papers/zh/2608.23041_AutoSaddler_zh.pdf), [解读](reports/16_autosaddler.md)
@@ -219,7 +236,8 @@ awesome_rsi/
 ├── README.md                        # 本文件
 ├── awesome_rsi_slides.html          # 26 页汇总 HTML PPT（方向键翻页，P 键打印）
 ├── awesome_rsi_slides.pdf           # 同内容 26 页 PDF 版（1280x720 逐页）
-├── reports/                         # 18 份精读报告（Markdown，中文）
+├── reports/                         # 20 份精读报告（Markdown，中文）
+│   ├── 00_origins_1965_2014.md                 # 前史：Good → Yudkowsky → Schmidhuber → Bostrom
 │   ├── 01_lilian_weng_harness_engineering.md   # 总纲：harness 工程 → RSI
 │   ├── 02_anthropic_when_ai_builds_itself.md   # 工业证据：>80% 代码由 Claude 写
 │   ├── 03_evolm.md                             # 评估侧：rubric 共进化
@@ -237,10 +255,12 @@ awesome_rsi/
 │   ├── 15_envharness.md                        # 谱系：环境侧进化（Google Cloud AI）
 │   ├── 16_autosaddler.md                       # 谱系：轨迹归因 + 持久化更新（Microsoft 等）
 │   ├── 17_metacaster.md                        # 谱系：meta-harness 垂直落地（时序预测）
-│   └── 18_prime_agent.md                       # 谱系：自改进 RLM harness（Prime Intellect）
+│   ├── 18_prime_agent.md                       # 谱系：自改进 RLM harness（Prime Intellect）
+│   └── 19_icoder.md                            # 工业实证：AI 主导开发 27B 前沿模型（后续开发基座）
 ├── papers/
-│   ├── en/                          # 31 篇英文原版 PDF（arXiv）
-│   └── zh/                          # 19 篇中文翻译 PDF（super_translate，保版式）
+│   ├── classics/                    # 起源经典（1965 Good / 2001 GISAI / 2003 Gödel Machine，含中译）
+│   ├── en/                          # 32 篇英文原版 PDF（arXiv + iCoder 技术报告）
+│   └── zh/                          # 20 篇中文翻译 PDF（super_translate，保版式）
 └── assets/
     ├── fulltext/                    # 核心论文提取全文（报告撰写底稿）
     └── trends_research_raw.md       # 2026H2 趋势扫描原始笔记

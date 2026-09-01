@@ -144,7 +144,7 @@
       <span class="tag gold" style="font-size:14px; padding:6px 16px;">框架侧 · DGM / MOSS</span>
       <span class="tag green" style="font-size:14px; padding:6px 16px;">知识侧 · WikiSkill</span>
     </div>
-    <p style="position:absolute; bottom:56px; font-size:14px; color:var(--ink-faint);">2026-08-31 · awesome_rsi 仓库汇总报告 · 配套 18 份精读报告与中英双语 PDF</p>
+    <p style="position:absolute; bottom:56px; font-size:14px; color:var(--ink-faint);">2026-08-31 · awesome_rsi 仓库汇总报告 · 配套 20 份精读报告与中英双语 PDF</p>
   </div>
 </section>
 
@@ -184,11 +184,12 @@
 <!-- S3 材料地图 -->
 <section class="slide" data-n="3">
   <div class="eyebrow">调研范围</div>
-  <h2>材料地图<span class="en">18 份精读 + 31 篇 PDF + 19 项扫描</span></h2>
+  <h2>材料地图<span class="en">20 份精读 + 35 篇 PDF + 19 项扫描</span></h2>
   <p class="sub">总纲给分类框架，进度报告给工业数据，七篇论文给方法细节，趋势扫描给 2026 下半年的连线。</p>
   <div class="slide-body">
     <table>
       <tr><th style="width:16%;">层</th><th style="width:34%;">材料</th><th>在调研中的角色</th></tr>
+      <tr><td><span class="tag gold">前史 ×4</span></td><td>Good 1965 · GISAI 2001 · Gödel Machine 2003 · Superintelligence 2014</td><td>RSI 定义链：正反馈直觉 → 三能力与持续条件 → 自指形式化极限 → crossover 动力学判据（详见 S4）</td></tr>
       <tr><td><span class="tag blue">总纲</span></td><td>Lilian Weng《Harness Engineering for Self-Improvement》(2026-07)</td><td>把 2023-2026 三条线（auto-research / 自改进 agent / 进化式程序搜索）统一到"harness 工程 → RSI"框架；其余材料都能在此找到坐标</td></tr>
       <tr><td><span class="tag blue">进度报告</span></td><td>Anthropic Institute《When AI builds itself》(2026)</td><td>唯一的一手工业证据源：内部数据首次披露 + 三情景推演 + 可验证暂停提议</td></tr>
       <tr><td><span class="tag red">评估侧 ×3</span></td><td>EvoLM (2605.03871) · Red Queen GM (2606.26294) · Who Grades the Grader (2607.12790)</td><td>rubric 共进化 / 受控效用进化 / 锚定纪律——评估器怎么动、动多快、靠什么不塌</td></tr>
@@ -197,14 +198,52 @@
       <tr><td><span class="tag green">知识侧 ×1</span></td><td>WikiSkill (2608.27454)</td><td>经验→持久知识（wiki）→技能的三层分离与共进化</td></tr>
       <tr><td><span class="tag gold">在线侧 ×1</span></td><td>Continual Harness (2605.09998)</td><td>免重置在线 harness 精炼（具身域）+ 首个模型-harness 共学习闭环；能力地板</td></tr>
       <tr><td><span class="tag gold">谱系扩编 ×7</span></td><td>Survey (2507.21046) · Meta-Harness · Self-Harness · EnvHarness · AutoSaddler · MetaCaster · Prime Agent</td><td>四维分类坐标 + 六个 harness 自进化系统——锚的三种工程形态与"无锚即负收益"的实证（详见 S16-S18）</td></tr>
+      <tr><td><span class="tag red">工业实证 ×1</span></td><td>iCoder-27B 技术报告（SJTU/NUS/DP Tech）</td><td>AI 主导交付 release-ready 前沿模型：五层 prior 门控 + 失败驱动配方（详见 S20，本仓库后续开发基座）</td></tr>
       <tr><td><span class="tag green">趋势扫描</span></td><td>2026 年 6-8 月：19 项新论文 + 9 项工业动态 + 7 项基准 + 8 项治理</td><td>EvalCEGAR / SCORE / Metan / skill 红海 / Sol 训 Luna / AI4AI-Bench / IFP 23 条……</td></tr>
     </table>
   </div>
   <div class="footer"><span>RSI 全景调研 2026-08</span><span>03</span></div>
 </section>
 
-<!-- S4 Weng harness -->
+
+<!-- S4 起源 -->
 <section class="slide" data-n="4">
+  <div class="eyebrow">前史 · 1965-2014</div>
+  <h2>RSI 起源：从 Good 到 Bostrom<span class="en">papers/classics/ · 报告 00</span></h2>
+  <p class="sub">四篇文献给出完整定义链：正反馈直觉 → 能力构造与持续条件 → 自指完备的形式化极限 → 进入强 RSI 的动力学判据。2025-2026 的全部工程实践都在这四个坐标轴内运动。</p>
+  <div class="slide-body">
+    <div class="cols">
+      <div class="col" style="flex:1.05;">
+        <div class="ring-diagram">
+          <div class="ring" style="border-color:var(--ink-faint); background:#F5F2EE;"><b>Good 1965 · intelligence explosion</b><p>"设计机器本身也是一种智力活动"——超智能机器可以设计更好的机器，智能提升提高产生进一步提升的能力，正反馈成立。附警告：超智能机器是人类需要做出的最后一项发明。</p></div>
+          <div class="ring" style="border-color:var(--blue); background:var(--blue-soft);"><b>Yudkowsky 2001 · Seed AI 三能力 + 持续条件</b><p>self-understanding / self-modification / recursive self-improvement。否定性判据：让固定优化器跑得更快只有一次性收益，<b>每一级提升必须开出新的改进机会</b>，闭环才能持续。</p></div>
+          <div class="ring" style="border-color:var(--gold); background:var(--gold-soft);"><b>Schmidhuber 2003 · Gödel Machine</b><p>寻找 improvement 的机制本身也在可修改集合里（含 proof searcher 自己）；找到"自改写收益可证明更高"的形式证明才执行。逻辑自洽、工程不可行——划定了完全自指的极点。</p></div>
+          <div class="ring" style="border-color:var(--accent); background:#FBEDE8;"><b>Bostrom 2014 · crossover 判据</b><p>增长率 = optimization power / recalcitrance。crossover point：系统自身贡献开始主导后续改进。真 RSI 不是反复改进自身，而是<b>一次改进提升发现/验证/实现下一次改进的能力</b>。</p></div>
+        </div>
+      </div>
+      <div class="col" style="flex:0.95;">
+        <div class="card">
+          <h3>2026 年的回声</h3>
+          <table style="font-size:13px;">
+            <tr><th>1965-2014</th><th>本调研对应</th></tr>
+            <tr><td>Good 正反馈</td><td>Anthropic >80% 代码由 Claude 写（报告 02），宏观爆炸仍未观测（insight 8）</td></tr>
+            <tr><td>GISAI"每级开新机会"</td><td>Metan 实测 meta 深度上限约 2.5——机会枯竭的量化形态</td></tr>
+            <tr><td>Gödel Machine 证明门</td><td>DGM 松弛为"经验验证更优"，代价是评估器成新单点故障（报告 05）</td></tr>
+            <tr><td>Bostrom crossover</td><td>iCoder 把人类接口压缩成五层门控（报告 19），但仍未越线</td></tr>
+          </table>
+        </div>
+        <div class="card" style="border-left:4px solid var(--accent);">
+          <h3>一句话判据</h3>
+          <p style="font-size:14.5px;">"When the AI improves itself, it improves <b>the thing that does the improving</b>." —— 检验 RSI 的不是改进次数，而是"改进能力"本身是否进入优化闭环。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span>报告 00 · Good 1965 / GISAI 2001 / Gödel Machine 2003 / Superintelligence 2014</span><span>04</span></div>
+</section>
+
+<!-- S5 Weng harness -->
+<section class="slide" data-n="5">
   <div class="eyebrow">总纲 · Lilian Weng</div>
   <h2>RSI 的现实路径：改 harness，不是改权重</h2>
   <p class="sub">harness = 围绕模型的系统层：编排执行、决定模型如何思考规划、调用工具、管理上下文、存储工件、评估结果。</p>
@@ -239,11 +278,11 @@
       </div>
     </div>
   </div>
-  <div class="footer"><span>报告 01 · Lilian Weng harness 工程</span><span>04</span></div>
+  <div class="footer"><span>报告 01 · Lilian Weng harness 工程</span><span>05</span></div>
 </section>
 
-<!-- S5 Anthropic 内部证据 -->
-<section class="slide" data-n="5">
+<!-- S6 Anthropic 内部证据 -->
+<section class="slide" data-n="6">
   <div class="eyebrow">进度报告 · Anthropic</div>
   <h2>内部证据：四组首次披露的数字</h2>
   <p class="sub">按"初级执行 → 资深设计 → 首席判断"的工作阶梯递进——前两级已被 Claude 大面积接管。</p>
@@ -272,11 +311,11 @@
       </div>
     </div>
   </div>
-  <div class="footer"><span>报告 02 · Anthropic《When AI builds itself》</span><span>05</span></div>
+  <div class="footer"><span>报告 02 · Anthropic《When AI builds itself》</span><span>06</span></div>
 </section>
 
-<!-- S6 外部校准 -->
-<section class="slide" data-n="6">
+<!-- S7 外部校准 -->
+<section class="slide" data-n="7">
   <div class="eyebrow">进度报告 · 外部对照</div>
   <h2>校准：微观产出 ≠ 宏观节奏</h2>
   <p class="sub">Anthropic 的内部数字必须与三方证据并读——张力本身就是 2026 年度量之争的核心。</p>
@@ -296,11 +335,11 @@
       </div>
     </div>
   </div>
-  <div class="footer"><span>报告 02 §4 + 趋势扫描 [26][31][32]</span><span>06</span></div>
+  <div class="footer"><span>报告 02 §4 + 趋势扫描 [26][31][32]</span><span>07</span></div>
 </section>
 
-<!-- S7 六篇坐标 -->
-<section class="slide" data-n="7">
+<!-- S8 六篇坐标 -->
+<section class="slide" data-n="8">
   <div class="eyebrow">六篇论文</div>
   <h2>坐标系：评估侧 3 · 模型侧 1 · 框架侧 2 · 知识侧 1 · 在线侧 1</h2>
   <p class="sub">2025 年 RSI 完成从理论到工程的跨越（DGM 把 SWE-bench 从 20% 推到 50%），2026 年的新进展集中在评估侧。</p>
@@ -317,11 +356,11 @@
       <tr><td><b>Continual Harness</b><br>2605.09998</td><td><span class="tag gold">在线</span></td><td>免重置：单场 episode 内边玩边精炼提示/子代理/技能/记忆，再共学权重</td><td>Pro 上 100%/$130 vs 基线 98%/$215；Flash-Lite 反而更差（能力地板）</td></tr>
     </table>
   </div>
-  <div class="footer"><span>报告 03-09 · 小红书原帖分类 + 本调研重组</span><span>07</span></div>
+  <div class="footer"><span>报告 03-09 · 小红书原帖分类 + 本调研重组</span><span>08</span></div>
 </section>
 
-<!-- S8 DGM -->
-<section class="slide" data-n="8">
+<!-- S9 DGM -->
+<section class="slide" data-n="9">
   <div class="eyebrow">框架侧 · 起点</div>
   <h2>Darwin Gödel Machine<span class="en">RSI 工程化的基线（2025-05）</span></h2>
   <p class="sub">把哥德尔机"证明有益才修改"的不可行前提，替换成"经验验证 + 档案保留"——自改进从理论构想变成可跑的工程。</p>
@@ -353,11 +392,11 @@
       </div>
     </div>
   </div>
-  <div class="footer"><span>报告 07 · Darwin Gödel Machine</span><span>08</span></div>
+  <div class="footer"><span>报告 07 · Darwin Gödel Machine</span><span>09</span></div>
 </section>
 
-<!-- S9 EvoLM -->
-<section class="slide" data-n="9">
+<!-- S10 EvoLM -->
+<section class="slide" data-n="10">
   <div class="eyebrow">评估侧 1/3</div>
   <h2>EvoLM<span class="en">rubric 共进化 · "什么是好 rubric"变成可优化目标</span></h2>
   <p class="sub">同一个 Qwen3-8B 交替扮演出题人与答题人：rubric 的奖励 = 让冻结的 1.7B 小 judge 更能分出好坏；偏好对由"现在的回答 vs 早期 checkpoint 的回答"自动构造，零人工标注。</p>
@@ -397,11 +436,11 @@
       </div>
     </div>
   </div>
-  <div class="footer"><span>报告 03 · EvoLM (2605.03871)</span><span>09</span></div>
+  <div class="footer"><span>报告 03 · EvoLM (2605.03871)</span><span>10</span></div>
 </section>
 
-<!-- S10 RQGM -->
-<section class="slide" data-n="10">
+<!-- S11 RQGM -->
+<section class="slide" data-n="11">
   <div class="eyebrow">评估侧 2/3</div>
   <h2>Red Queen Gödel Machine<span class="en">评估器进 harness 搜索循环 · 受控效用进化</span></h2>
   <p class="sub">物种适应的是同样在进化的环境——但评估器的进化自由度被三条机制约束，保证"尺子在动，但每一段测量仍然有效"。</p>
@@ -437,11 +476,11 @@
       </div>
     </div>
   </div>
-  <div class="footer"><span>报告 04 · RQGM (2606.26294) · preliminary preprint</span><span>10</span></div>
+  <div class="footer"><span>报告 04 · RQGM (2606.26294) · preliminary preprint</span><span>11</span></div>
 </section>
 
-<!-- S11 WGtG -->
-<section class="slide" data-n="11">
+<!-- S12 WGtG -->
+<section class="slide" data-n="12">
   <div class="eyebrow">评估侧 3/3 · 否定性结论</div>
   <h2>Who Grades the Grader?<span class="en">锚定纪律承重 · 任务分数无法验证评估器</span></h2>
   <p class="sub">AWS + 汇丰的机制研究：评分函数 = 带类型缺陷检测器的表达式树，全系统唯一监督信号是十条带黄金参考的锚定样本。</p>
@@ -475,11 +514,11 @@
       </div>
     </div>
   </div>
-  <div class="footer"><span>报告 05 · WGtG (2607.12790)</span><span>11</span></div>
+  <div class="footer"><span>报告 05 · WGtG (2607.12790)</span><span>12</span></div>
 </section>
 
-<!-- S12 ECHO -->
-<section class="slide" data-n="12">
+<!-- S13 ECHO -->
+<section class="slide" data-n="13">
   <div class="eyebrow">模型侧</div>
   <h2>ECHO<span class="en">critic 陈旧性 · 评估器共进化的权重层实现</span></h2>
   <p class="sub">on-policy RL 中 policy 的错误模式随训练漂移，冻结的 critic 会从"有用"变成"有害"——critic 的奖励不是听起来有道理，而是诊断带来的实际分数提升。</p>
@@ -512,11 +551,11 @@
       </div>
     </div>
   </div>
-  <div class="footer"><span>报告 06 · ECHO (2601.06794)</span><span>12</span></div>
+  <div class="footer"><span>报告 06 · ECHO (2601.06794)</span><span>13</span></div>
 </section>
 
-<!-- S13 MOSS -->
-<section class="slide" data-n="13">
+<!-- S14 MOSS -->
+<section class="slide" data-n="14">
   <div class="eyebrow">框架侧 · 生产部署</div>
   <h2>MOSS<span class="en">唯一覆盖生产部署的自改写方案</span></h2>
   <p class="sub">立场：skill / prompt / memory / workflow 这些文本可变层是源码层的严格子集——路由逻辑、hook 顺序、状态不变量只能在代码层触及。</p>
@@ -550,11 +589,11 @@
       </div>
     </div>
   </div>
-  <div class="footer"><span>报告 08 · MOSS (2605.22794) + 趋势扫描 [9][10][14][17]</span><span>13</span></div>
+  <div class="footer"><span>报告 08 · MOSS (2605.22794) + 趋势扫描 [9][10][14][17]</span><span>14</span></div>
 </section>
 
-<!-- S14 WikiSkill -->
-<section class="slide" data-n="14">
+<!-- S15 WikiSkill -->
+<section class="slide" data-n="15">
   <div class="eyebrow">知识侧</div>
   <h2>WikiSkill<span class="en">经验编译为持久知识 · 技能与 wiki 共进化</span></h2>
   <p class="sub">此前的技能发现工作把"指导技能开发的洞见"散落在优化历史里用完即弃；WikiSkill 把它们持续固化进一个持久 wiki，后续技能更新在其上构建。</p>
@@ -587,12 +626,12 @@
       </div>
     </div>
   </div>
-  <div class="footer"><span>报告 09 · WikiSkill (2608.27454) + 趋势扫描 [4]-[8]</span><span>14</span></div>
+  <div class="footer"><span>报告 09 · WikiSkill (2608.27454) + 趋势扫描 [4]-[8]</span><span>15</span></div>
 </section>
 
 
-<!-- S15 Continual Harness -->
-<section class="slide" data-n="15">
+<!-- S16 Continual Harness -->
+<section class="slide" data-n="16">
   <div class="eyebrow">在线侧 · 免重置</div>
   <h2>Continual Harness<span class="en">在故障现场修，不回起点重来（2026-05）</span></h2>
   <p class="sub">普林斯顿 + ARISE + DeepMind：同一张四角色闭环图画三遍，只换 Refiner——人（GPP）→ 程序（CH 本体）→ 程序 + RL trainer（共学习）。全图没有 reset 箭头，这个缺席是刻意主张。</p>
@@ -622,11 +661,11 @@
       </div>
     </div>
   </div>
-  <div class="footer"><span>报告 11 · Continual Harness (2605.09998)</span><span>15</span></div>
+  <div class="footer"><span>报告 11 · Continual Harness (2605.09998)</span><span>16</span></div>
 </section>
 
-<!-- S16 谱系扩编·综述 -->
-<section class="slide" data-n="16">
+<!-- S17 谱系扩编·综述 -->
+<section class="slide" data-n="17">
   <div class="eyebrow">谱系扩编 · 综述</div>
   <h2>A Survey of Self-Evolving Agents<span class="en">四维坐标：What / When / How / Where（TMLR 2026）</span></h2>
   <p class="sub">Princeton/清华/CMU 等 27 位作者的 77 页综述。判别标准不在算法而在"自主权所在地"（locus of autonomy）——数据由谁策划、更新由谁排期，从人类工程师移交给 agent 本身。</p>
@@ -656,11 +695,11 @@
       </div>
     </div>
   </div>
-  <div class="footer"><span>报告 12 · arXiv:2507.21046</span><span>16</span></div>
+  <div class="footer"><span>报告 12 · arXiv:2507.21046</span><span>17</span></div>
 </section>
 
-<!-- S17 六系统上 -->
-<section class="slide" data-n="17">
+<!-- S18 六系统上 -->
+<section class="slide" data-n="18">
   <div class="eyebrow">谱系扩编 · 六系统 1/2</div>
   <h2>Harness 自进化六系统（上）<span class="en">锚在哪——三种答案</span></h2>
   <p class="sub">同月密集出现的六个 harness 自进化系统，分歧全在"谁站在进化之外"：外部 proposer 冻结、回归门双 split 晋升、进化环境但钉死裁判。</p>
@@ -685,11 +724,11 @@
       </div>
     </div>
   </div>
-  <div class="footer"><span>报告 13 / 14 / 15</span><span>17</span></div>
+  <div class="footer"><span>报告 13 / 14 / 15</span><span>18</span></div>
 </section>
 
-<!-- S18 六系统下 -->
-<section class="slide" data-n="18">
+<!-- S19 六系统下 -->
+<section class="slide" data-n="19">
   <div class="eyebrow">谱系扩编 · 六系统 2/2</div>
   <h2>Harness 自进化六系统（下）<span class="en">无锚即负收益</span></h2>
   <p class="sub">下半场三个系统给出全谱系最硬的两条证据：去掉泛化门自动优化跌破未优化基线；无独立锚的 refinement 会把作弊固化成可复用技能。</p>
@@ -714,11 +753,46 @@
       </div>
     </div>
   </div>
-  <div class="footer"><span>报告 16 / 17 / 18</span><span>18</span></div>
+  <div class="footer"><span>报告 16 / 17 / 18</span><span>19</span></div>
 </section>
 
-<!-- S19 综合：评估器战争 -->
-<section class="slide" data-n="19">
+
+<!-- S20 iCoder -->
+<section class="slide" data-n="20">
+  <div class="eyebrow">工业实证 · AI 造 AI</div>
+  <h2>iCoder：AI 主导开发 27B 前沿模型<span class="en">高密度 prior · 低频门控（SJTU/NUS/DP Tech）</span></h2>
+  <p class="sub">问题不是"agent 能不能优化"，而是<b>多少人类介入就够</b>。专家经验一次性编码为 Research Skills，四阶段全部具体决策交给 Codex GPT-5.6-Sol——最终配方是 agent 在失败中修订出来的。<b>本仓库计划以其代码库为后续开发基础。</b></p>
+  <div class="slide-body">
+    <div class="cols">
+      <div class="col" style="flex:1.05;">
+        <div class="ring-diagram">
+          <div class="ring" style="border-color:var(--gold); background:var(--gold-soft);"><b>五层 prior 接口：人类到底还握着什么</b><p>交付物定义、权限门（新身份须人批）、正确性判据（verifier 不许 agent 削弱或替换）、证据纪律（结论必须引注册证据）四样写死，其余全部让渡。invariants 明确列为"不许靠试错学"。</p></div>
+          <div class="ring" style="border-color:var(--blue); background:var(--blue-soft);"><b>四阶段·失败驱动配方</b><p>任务池 → SFT 冷启动 → OPSD（一次目标塌缩迫使 agent 围绕 verifier-anchored credit 重设计学习规则）→ RLVR（reward exploits / false verdicts / 长度退化相继改写 reward 资格、优化器、轨迹预算）。阶段可回退。</p></div>
+          <div class="ring" style="border-color:var(--ink-faint); background:#F5F2EE;"><b>作为开发基座的三件可复用资产</b><p>① Research Skills 表示（版本化 SOP+代码，可换域）；② 治理四件套（任务队列/实验日志/决策记录/审批门，与 MOSS 门控同构更轻）；③ Data→SFT→OPSD→RLVR 可回退状态机。</p></div>
+        </div>
+      </div>
+      <div class="col" style="flex:0.95;">
+        <div class="card">
+          <h3>关键数字（27B 尺寸）</h3>
+          <ul>
+            <li>RTLLM <b>68.0 全场第一</b>：超 GPT-5.5（66.0）/ Opus 4.8（64.7）/ 1.6T 参数 DeepSeek-V4-Pro（67.5）</li>
+            <li>vs 同尺寸 Qwen3.6-27B：RTLLM <b>+18.4</b>、VerilogEval +16.2、KernelBench L2 correctness <b>2.64×</b></li>
+            <li>KernelBench L1 61：近两倍于 DSv4-Pro（32）；CVDP 第二超 GPT-5.5 达 16 分</li>
+            <li>token 效率：51% / 33% 的输出 token 逼近 HY3 / DSv4-Pro（差 1.1 / 4.5 分）</li>
+          </ul>
+        </div>
+        <div class="card" style="border-left:4px solid var(--accent);">
+          <h3>与调研的两条硬连线</h3>
+          <p style="font-size:14px;">① 对报告 02 的递进：Anthropic 说 >80% 代码 AI 写但方向权在人，iCoder 第一次给出"人类还握什么"的工程清单；② 对报告 05 的回避式确认：评估器共进化的全部难题被"锚锁死不进化"绕开——工业域可执行性红利，换域即失效。按 Bostrom crossover（报告 00）仍未越线。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span>报告 19 · iCoder Tech Report（HF: i-Coder/iCoder-27B · GitHub: bingreeky/iCoder）</span><span>20</span></div>
+</section>
+
+<!-- S21 综合：评估器战争 -->
+<section class="slide" data-n="21">
   <div class="eyebrow">综合</div>
   <h2>把六篇拼起来：评估器战争的三层锚定结构</h2>
   <p class="sub">六篇论文实际在回答同一个问题的不同层面：评估器要不要动、怎么动、动的时候靠什么不塌。</p>
@@ -753,11 +827,11 @@
       </div>
     </div>
   </div>
-  <div class="footer"><span>报告 10 §2 + 趋势扫描 [1][2][3]</span><span>19</span></div>
+  <div class="footer"><span>报告 10 §2 + 趋势扫描 [1][2][3]</span><span>21</span></div>
 </section>
 
-<!-- S19 趋势·论文侧 -->
-<section class="slide" data-n="20">
+<!-- S21 趋势·论文侧 -->
+<section class="slide" data-n="22">
   <div class="eyebrow">趋势扫描 2026H2 · 论文侧</div>
   <h2>19 项新工作按四条线收敛</h2>
   <p class="sub">6-8 月的新论文不再问"自改进能不能做"，而在分头回答"哪一环卡住了"。</p>
@@ -771,11 +845,11 @@
     </table>
     <p style="font-size:14px; color:var(--ink-soft); margin-top:14px;">对照 Weng 七挑战：评估瓶颈（三篇正面回应）、多样性坍缩（HyperSkill 冗余修剪）、负结果处理（ERSkill 反例技能）、长期回报（OLE 劣化回滚）——博文已从综述长成研究议程，每条挑战都有人接单。</p>
   </div>
-  <div class="footer"><span>趋势扫描 [1]-[8][15][16][26]</span><span>20</span></div>
+  <div class="footer"><span>趋势扫描 [1]-[8][15][16][26]</span><span>22</span></div>
 </section>
 
-<!-- S20 趋势·工业侧 -->
-<section class="slide" data-n="21">
+<!-- S22 趋势·工业侧 -->
+<section class="slide" data-n="23">
   <div class="eyebrow">趋势扫描 2026H2 · 工业与治理</div>
   <h2>工业动态：从演示到生产，从生产到治理</h2>
   <div class="slide-body" style="padding-top:6px;">
@@ -808,11 +882,11 @@
       </div>
     </div>
   </div>
-  <div class="footer"><span>趋势扫描 [20]-[34]</span><span>21</span></div>
+  <div class="footer"><span>趋势扫描 [20]-[34]</span><span>23</span></div>
 </section>
 
-<!-- S21 insight 1-2 -->
-<section class="slide" data-n="22">
+<!-- S23 insight 1-2 -->
+<section class="slide" data-n="24">
   <div class="eyebrow">Insight 1/3</div>
   <h2>进化需要锚，品味是路径依赖的</h2>
   <div class="slide-body" style="padding-top:6px;">
@@ -839,11 +913,11 @@
       </div>
     </div>
   </div>
-  <div class="footer"><span>报告 10 §4</span><span>22</span></div>
+  <div class="footer"><span>报告 10 §4</span><span>24</span></div>
 </section>
 
-<!-- S22 insight 3-4 -->
-<section class="slide" data-n="23">
+<!-- S24 insight 3-4 -->
+<section class="slide" data-n="25">
   <div class="eyebrow">Insight 2/3</div>
   <h2>自改进正在资产化，微观与宏观的缺口是度量问题</h2>
   <div class="slide-body" style="padding-top:6px;">
@@ -870,11 +944,11 @@
       </div>
     </div>
   </div>
-  <div class="footer"><span>报告 10 §4 + 趋势扫描 [26][31]</span><span>23</span></div>
+  <div class="footer"><span>报告 10 §4 + 趋势扫描 [26][31]</span><span>25</span></div>
 </section>
 
-<!-- S23 insight 5 -->
-<section class="slide" data-n="24">
+<!-- S25 insight 5 -->
+<section class="slide" data-n="26">
   <div class="eyebrow">Insight 3/3</div>
   <h2>测量基础设施是下一个瓶颈，也是下一个机会</h2>
   <div class="slide-body" style="padding-top:6px;">
@@ -903,11 +977,11 @@
       </div>
     </div>
   </div>
-  <div class="footer"><span>报告 10 §4-§5</span><span>24</span></div>
+  <div class="footer"><span>报告 10 §4-§5</span><span>26</span></div>
 </section>
 
-<!-- S24 实践建议 -->
-<section class="slide" data-n="25">
+<!-- S26 实践建议 -->
+<section class="slide" data-n="27">
   <div class="eyebrow">操作层</div>
   <h2>如果你现在就要搭一个自改进系统</h2>
   <p class="sub">六篇论文 + 生产案例收敛出的最小安全配置——每一条都有具体出处，不是原则口号。</p>
@@ -923,19 +997,20 @@
       <tr><td>验证纪律</td><td><b>永远不用下游任务分数验证评估器</b>——单独留一条真值审计通道</td><td>WGtG 核心否定性结论</td></tr>
     </table>
   </div>
-  <div class="footer"><span>报告 10 §5</span><span>25</span></div>
+  <div class="footer"><span>报告 10 §5</span><span>27</span></div>
 </section>
 
-<!-- S25 仓库导览 -->
-<section class="slide" data-n="26">
+<!-- S27 仓库导览 -->
+<section class="slide" data-n="28">
   <div class="eyebrow">交付物</div>
   <h2>仓库导览<span class="en">awesome_rsi/</span></h2>
   <div class="slide-body" style="padding-top:6px;">
     <div class="cols">
       <div class="col">
         <div class="card">
-          <h3>reports/ · 18 份精读报告</h3>
+          <h3>reports/ · 20 份精读报告</h3>
           <ul style="font-size:14px;">
+            <li>00 起源前史：Good → Bostrom（1965-2014）</li>
             <li>01 Lilian Weng harness 工程（总纲）</li>
             <li>02 Anthropic《When AI builds itself》</li>
             <li>03-06 EvoLM · RQGM · WGtG · ECHO</li>
@@ -943,11 +1018,12 @@
             <li>11 Continual Harness（免重置 + 共学习）</li>
             <li>10 汇总 insight 报告（本 PPT 的长文版）</li>
             <li>12-18 谱系扩编：综述 · Meta/Self-Harness · EnvHarness · AutoSaddler · MetaCaster · Prime Agent</li>
+            <li>19 iCoder：AI 主导开发 27B 前沿模型（开发基座）</li>
           </ul>
         </div>
         <div class="card">
           <h3>papers/ · 中英双语 PDF</h3>
-          <p style="font-size:14px;">en/ 31 篇英文原文（核心九件套 + TMLR 综述 + harness 谱系）；zh/ 19 篇 super_translate 翻译的中文版（保版式、冻结公式图表、术语表注入）。</p>
+          <p style="font-size:14px;">en/ 32 篇英文原文 + classics/ 起源经典 3 篇；zh/ super_translate 翻译的中文版（保版式、冻结公式图表、术语表注入），覆盖核心材料与经典。</p>
         </div>
       </div>
       <div class="col">
@@ -956,7 +1032,7 @@
           <ul style="font-size:14px;">
             <li><b>15 分钟</b>：读本 PPT（或 awesome_rsi_slides.pdf）</li>
             <li><b>2 小时</b>：报告 10（汇总）+ 报告 01（总纲）+ 报告 05（WGtG，否定性结论）</li>
-            <li><b>系统研读</b>：按 01→02→07→03→04→05→06→08→11→09→10 顺序，谱系扩编 12-18 按需精读，配中文 PDF 对照原文</li>
+            <li><b>系统研读</b>：按 00→01→02→07→03→04→05→06→08→11→09→10 顺序，谱系扩编 12-19 按需精读，配中文 PDF 对照原文</li>
           </ul>
         </div>
         <div class="card" style="background:#F6EFE9;">
@@ -967,11 +1043,11 @@
       </div>
     </div>
   </div>
-  <div class="footer"><span>RSI 全景调研 2026-08</span><span>26 / 26</span></div>
+  <div class="footer"><span>RSI 全景调研 2026-08</span><span>28 / 28</span></div>
 </section>
 
 </div>
-<div id="hud"><span id="cur">1</span> / 26</div>
+<div id="hud"><span id="cur">1</span> / 28</div>
 <div class="kbd-hint">← → 翻页 · Home/End 首尾 · P 打印</div>
 <script>
 (function(){
