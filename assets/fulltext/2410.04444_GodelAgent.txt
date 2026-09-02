@@ -1,0 +1,1782 @@
+arXiv:2410.04444v4  [cs.AI]  31 May 2025
+G¨odel Agent: A Self-Referential Agent Framework for Recursively
+Self-Improvement
+Xunjian Yin♠ , Xinyi Wang♣ , Liangming Pan♢ , Li Lin♠
+Xiaojun Wan♠ , William Yang Wang♣
+♠ Peking University ♣University of California, Santa Barbara ♢ University of Arizona
+{xjyin,wanxiaojun}@pku.edu.cn william@cs.ucsb.edu
+Abstract
+The rapid advancement of large language mod-
+els (LLMs) has significantly enhanced the ca-
+pabilities of agents across various tasks. How-
+ever, existing agentic systems, whether based
+on fixed pipeline algorithms or pre-defined
+meta-learning frameworks, cannot search the
+whole agent design space due to the restric-
+tion of human-designed components, and thus
+might miss the more optimal agent design. In
+this paper, we introduce G ¨odel Agent, a self-
+evolving framework inspired by the G¨odel ma-
+chine, enabling agents to recursively improve
+themselves without relying on predefined rou-
+tines or fixed optimization algorithms. G ¨odel
+Agent leverages LLMs to dynamically modify
+its own logic and behavior, guided solely by
+high-level objectives through prompting. Ex-
+perimental results on multiple domains demon-
+strate that implementation of G¨odel Agent can
+achieve continuous self-improvement, surpass-
+ing manually crafted agents in performance,
+efficiency, and generalizability.
+1 Introduction
+As large language models (LLMs) (OpenAI et al.,
+2024; Dubey et al., 2024) demonstrate increasingly
+strong reasoning and planning capabilities, LLM-
+driven agentic systems have achieved remarkable
+performance in a wide range of tasks (Wang et al.,
+2024a). Substantial effort has been invested in
+manually designing sophisticated agentic systems
+using human priors in different application areas.
+Recently, there has been a significant interest in
+creating self-evolving agents, that not only greatly
+reduce human labor but also produce better solu-
+tions. Given that human effort can only cover a
+small search space of agent design, it is reason-
+able to expect that a self-evolving agent with the
+freedom to explore the full design space has the
+potential to produce a more optimal solution.
+There is a large body of work proposing agents
+capable of self-refinement. Some agents are de-
+LLMDecision-makingModule
+Sensor
+Logic
+Executor
+Environment
+FeedbackAction
+InteractionAgent
+SelfAware SelfModify
+Figure 1: Modular demonstration of G¨odel Agent. Com-
+pared with traditional agents, its sensor and executor
+can read and write all of its own code.
+signed to iterate over a fixed routine consisting of
+a list of fixed modules, while some of the modules
+are capable of taking self- or environment feedback
+to refine their actions (Chen et al., 2023b; Qu et al.,
+2024a; Tang et al., 2025). This type of agent, re-
+ferred to as Hand-Designed Agent, is depicted as
+having the lowest degree of freedom in Figure 2.
+More automated agents have been designed to be
+able to update their routines or modules in some
+pre-defined meta-learning routine, for example, nat-
+ural language gradients (Zhou et al., 2024), meta
+agent (Hu et al., 2024), or creating and collecting
+demonstrations (Khattab et al., 2023). This type
+of agent, known as Meta-Learning Optimized
+Agents, is depicted as having the middle degree of
+freedom in Figure 2. However, there are inevitably
+some human priors involved in these agent designs
+that cannot be improved during the inference time.
+In this paper, we propose G¨odel Agent to elimi-
+nate the human design prior, which is an automated
+LLM agent that can freely decide its own routine,
+modules, and even the way to update them. It
+is inspired by the self-referential G ¨odel machine
+(Schmidhuber, 2003), which was proven to be able
+to find the global optimal solutions. Self-reference
+means the property of a system that can analyze and
+Rebuttal
+Design
+Increasingdegreesof freedom;Decreasing manual design;Fewer constraints and bottlenecks
+LearnableFixedExpertAgentMeta AgentFeedbackImplementation
+Design
+Design
+DraftReview
+…
+Draft
+Review
+Draft
+Review
+Prompt:Improve it
+Prompt:Check and Improve itVerify
+...
+Hand-designed AgentMeta-Learning Optimized AgentSelf-Referential Agent
+Draft
+Review
+...
+Improve
+Recursively
+Prompt:Improve it
+Figure 2: Comparison of three agent paradigms. Hand-designed agents rely on human expertise which are limited
+in scope and labor-intensive. Meta-learning optimized agents are constrained by a fixed meta-learning algorithm,
+restricting their search space and optimization potential. In contrast, self-referential agent (G ¨odel Agent) can
+recursively improve itself without any limitation. Its optimization capabilities are constantly being enhanced by
+itself. Consequently, in return, it can continue to optimize itself better.
+modify its own code, including the parts responsi-
+ble for the analysis and modification processes (As-
+trachan, 1994). Therefore, it can achieve what’s
+known as ”recursive self-improvement”, where it
+iteratively updates itself to become more efficient
+and effective at achieving its predefined goals. In
+this case, as shown in Figure 1, G ¨odel Agent can
+analyze and modify its own code, including the
+code for analyzing and modifying itself, and thus
+can search the full agent design space, which is
+depicted as having the highest degree of freedom
+in Figure 2. G ¨odel Agent can theoretically make
+increasingly better modifications over time through
+recursively self-update (Wang, 2018).
+In this paper, we choose to implement it by let-
+ting it manipulate its own runtime memory, i.e.,
+the agent is able to retrieve its current code in the
+runtime memory and modify it by monkey patch-
+ing (Bimal, 2012), which dynamically modifies
+classes or modules during execution. To allow it
+to update the logic of the running main function,
+unlike the loop-iterative approach of traditional
+agents, we implement the main function as a re-
+cursive function. In this function, LLM analyzes
+and makes a series of decisions, including reading
+and modifying its own code from runtime mem-
+ory (self-awareness1 and self-modification), and
+interacting with the environment to gather feed-
+back. The agent then proceeds to the subsequent
+1In this paper, self-awareness means that the agent can
+introspect and read its own code and files, not to imply any
+philosophical sense of consciousness or awareness.
+recursive depth and continues to optimize itself.
+To validate the effectiveness of G ¨odel Agent,
+we conduct experiments on multiple domains in-
+cluding coding, science, math, and reasoning. Our
+results demonstrate that G¨odel Agent achieves sig-
+nificant performance gain across various tasks, sur-
+passing various widely-used agents that require
+human design. The same implementation of G ¨odel
+Agent can easily adapt to different tasks by only
+specifying the environment description and feed-
+back mechanism. Additionally, the case study of
+the optimization progress reveals that G¨odel Agent
+can provide novel insights into agent design. Our
+codes are released to facilitate future research2.
+In summary, our contributions are as follows:
+• We propose the first fully self-referential agent
+framework, G¨odel Agent, and implement it using
+monkey patching. It autonomously engages in
+self-awareness, self-modification, and recursive
+self-improvement.
+• Experiments shows that G¨odel Agent is superior
+to the previous agent frameworks in terms of
+performance, flexibility, cost, and potential.
+• We analyze G¨odel Agent ’s optimization process,
+including its self-referential abilities and the op-
+timized agentic systems, aiming to deepen our
+understanding of both LLMs and agents.
+• Our framework offers a promising direction for
+developing flexible and capable agents through
+recursive self-improvement.
+2https://github.com/Arvid-pku/Godel Agent
+2 Related Work
+Hand-Designed Agent Systems Researchers
+have designed numerous agent systems tailored
+to various tasks based on predefined heuristics and
+prior knowledge. These systems often employ tech-
+niques such as prompt engineering (Chen et al.,
+2023a; Schulhoff et al., 2024), chain-of-thought
+reasoning and planning (Wei et al., 2022; Yao et al.,
+2022), as well as reflection (Shinn et al., 2024;
+Madaan et al., 2024), code generation (Wang et al.,
+2023a; Vemprala et al., 2024), tool use (Nakano
+et al., 2021; Qu et al., 2024a), retrieval-augmented
+generation (Lewis et al., 2020; Zhang et al., 2024b),
+and multi-agent collaboration (Xu et al., 2023; Wu
+et al., 2023; Qian et al., 2023; Hong et al., 2023).
+Once crafted by human designers, these systems
+remain static and do not adapt or evolve over time.
+Meta-Learning Optimized Agent Systems
+Some researchers have explored methods for
+enhancing agents through fixed learning algo-
+rithms (Zhou et al., 2024; Hu et al., 2024). For ex-
+ample, certain frameworks store an agent’s success-
+ful or failed strategies in memory based on environ-
+mental feedback (Liu et al., 2023; Hu et al., 2023;
+Qian et al., 2024), while others automatically op-
+timize agent prompts (Khattab et al., 2023; Zhang
+et al., 2024a; Khattab et al., 2023). Some stud-
+ies focus on designing prompts that enable agents
+to autonomously refine specific functions (Zhang
+et al.). However, these meta-algorithms are also
+designed manually and remain unchanged once
+deployed, limiting the agents’ ability.
+Recursive Self-Improvement The concept
+of recursive self-improvement has a long his-
+tory (Good, 1966; Schmidhuber, 1987). G ¨odel
+machine (Schmidhuber, 2003) introduced the no-
+tion of a proof searcher that executes a self-
+modification, thereby enabling the machine to en-
+hance itself. In the early days, there were also
+some discussions of self-improving agents that
+were not based on LLM (Hall, 2007; Steunebrink
+and Schmidhuber, 2012). More recently, Zelikman
+et al. (2023) applied recursive self-improvement
+to code generation, where the target of improve-
+ment was the optimizer itself. Some work (Havrilla
+et al., 2024; Qu et al., 2024b; Kumar et al., 2024)
+also explores recursive self-improvement by fine-
+tuning models to introspect and correct previous
+mistakes. G ¨odel Agent represents the first self-
+referential agent based on LLM. This approach
+is more flexible, removing human-designed con-
+straints.
+3 Self-Referential G ¨odel Agent
+In this section, we first describe the formal defini-
+tions for previous agent methods with a lower de-
+gree of freedom, including hand-design and meta-
+learning optimized agents, as a background. Then
+we introduce our proposed G ¨odel Agent, a self-
+referential agent that can recursively update its own
+code, evolving over training.
+Let E ∈ Sdenote a specific environment state,
+where S denotes the set of all possible environ-
+ments the agent will encounter. For example, an
+environment can be a mathematical problem with
+ground truth solutions. We denote the policy that
+an agent follows to solve a problem in the current
+environment by π ∈ Π, where Π is the set of all
+possible policies the agent can follow.
+A hand-designed agent, as shown in the left
+panel of Figure 2, is not capable of updating its
+policy and following the same policy π all the time,
+regardless of environmental feedback.
+In contrast, a meta-learning optimized agent
+updates its policy based on a meta-learning algo-
+rithm I at training time based on the feedback it
+receives from the environment, as shown in the mid-
+dle panel of Figure 2. The environment feedback is
+usually defined as a utility functionU : S× Π → R,
+which maps an environment and a policy to a real-
+valued performance score. The main training algo-
+rithm of a meta-learning optimized agent can then
+be written as follows:
+πt+1 = I(πt, rt), r t = U (E, πt),
+In this case, the agent’s policy πt evolves at train-
+ing time, with the learning algorithm I updating
+the policy based on feedback rt, while the meta-
+learning algorithm I remains fixed all the time.
+A self-referential G ¨odel Agent, on the other
+hand, updates both the policy π and the meta-
+learning algorithm I recursively. The main idea
+is that, after each update, the whole code base of
+the agent is rewritten to accommodate any possible
+changes. Here we call this self-updatable meta-
+learning algorithm I a self-referential learning al-
+gorithm. The training process of a G ¨odel Agent
+can then be written as:
+πt+1, It+1 = It(πt, It, rt, g), r t = U (E, πt),
+where g ∈ Grepresents the high-level goal of op-
+timization, for example, solving the given mathe-
+matical problem with the highest accuracy. Such a
+Algorithm 1 Recursive Self-Improvement of G¨odel Agent
+1: Input: Initial agent policy π0, initial decision function
+f0, goal g, environment state E, utility function U, self
+code reading function SELF INSPECT
+2: Output: Optimized policy π and G¨odel Agent s
+3: ▷ Get all agent code, including the code in this algorithm.
+4: s ← SELF INSPECT()
+5: ▷ Compute the initial performance.
+6: r ← U (E, π0)
+7: ▷ Perform recursive self-improvement.
+8: π, s← SELF IMPROVE(π, s, r, g)
+9: return π, s
+10: ▷ Initial code of self-referential learning.
+11: function SELF IMPROVE(E, π, s, r, g)
+12: ▷ Obtain action sequence.
+13: a1, . . . , an ← f0(π, s, r, g)
+14: for ai in a1, . . . , an do
+15: π, s, r← EXECUTE(E, π, s, r, ai)
+16: end for
+17: return π, s
+18: end function
+19: ▷ Initial action execution function.
+20: function EXECUTE(E, π, s, r, a)
+21: switch a.name
+22: case self state:
+23: s ← SELF INSPECT()
+24: case interact:
+25: r ← U (E, π)
+26: case self update:
+27: π, s← a.code
+28: case continue improve:
+29: ▷ Recursively invoke self-improvement.
+30: π, s← SELF IMPROVE(E, π, s, r, g)
+31: return π, s, r
+32: end function
+recursive design of the agent requires the specifica-
+tion of an initial agent algorithm (π0, I0), detailed
+as follows:
+• A initial agent policy π0 to perform the desired
+task within the environment E. For example, it
+can be chain-of-thought prompting of an LLM.
+• A self-referential learning algorithm I0 for recur-
+sively querying an LLM to rewrite its own code
+based on the environmental feedback.
+We then further specify a possible initialization
+of the self-referential learning algorithm I0 =
+(f0, o0), using a mutual recursion between a
+decision-making function f0, and an action func-
+tion o0:
+• The decision-making function f0, implemented
+by an LLM, determines a sequence of appropriate
+actions a1, a2, ..., an ∈ Abased on the current
+environment E, the agent’s algorithm (πt, It),
+and the goal g.
+• The action function o0, executes the selected ac-
+tion and updates the agent’s policy accordingly.
+The set of actions A for the action function o to
+execute needs to include the following four actions:
+• self inspect: Introspect and read the agent’s
+current algorithm (πt, It).
+• interact: Interact with the environment by call-
+ing the utility function U to assess the perfor-
+mance of the current policy πt.
+• self update: Alter and update (πt, It) with an
+LLM and produce (πt+1, It+1).
+• continue improve: If no other actions can be
+taken, recursively invoke the decision algorithm
+f to produce new actions.
+The agent code is updated to (πt+1, It+1) after the
+current execution of (πt, It) is finished. Both the
+agent algorithm (π, I) and the action set A are not
+static and can be expanded and modified by the
+agent itself at the training time. Algorithm 1 illus-
+trates the described algorithm for the G¨odel Agent.
+Each recursive call enables the agent to refine its
+logic and become progressively more efficient.
+4 G ¨odel Agent Implementation
+There are various ways to initiate a G ¨odel Agent.
+Any specific agent instance during the recursive op-
+timization process can be viewed as an instantiation
+of the G¨odel Agent. Our implementation leverages
+runtime memory interaction techniques to enable
+self-awareness and self-modification, as illustrated
+in Figure 3. These techniques include dynamic
+memory reading and writing ( monkey patching)
+to facilitate recursive self-improvement. Addition-
+ally, we have incorporated several auxiliary tools
+to accelerate the convergence of the G¨odel Agent
+’s optimization process.
+4.1 Implementation Details
+The core functionalities of our G ¨odel Agent are
+outlined below:
+Self-Awareness via Runtime Memory Inspection
+G¨odel Agent achieves self-awareness by inspecting
+runtime memory, particularly local and global vari-
+ables in Python. This capability allows the agent to
+extract and interpret the variables, functions, and
+classes that constitute both the environment and the
+GödelAgent in Application View
+GödelAgent in Runtime Memory View
+Prompt:Improve it
+ Improvement
+Local and Globalvariables
+ModifyReadRead ReadModify
+Local and Globalvariables
+Local and Globalvariables
+ErrorHandling
+Iterations 
+Self-ImprovementSelf-Improvement
+Thinking
+Figure 3: An illustration of our implementation of G ¨odel Agent. It employs monkey patching to directly read and
+modify its own code in runtime memory, enabling self-awareness and self-modification.
+agent itself, according to the modular structure of
+the system. By introspecting these elements, the
+agent gains an understanding of its own operational
+state and can adapt accordingly.
+Self-Improvement via Dynamic Code Modifica-
+tion G¨odel Agent can engage in reasoning and
+planning to determine whether it should modify
+its own logic. If modification is deemed neces-
+sary, G¨odel Agent generates new code, dynamically
+writes it into the runtime memory, and integrates
+it into its operational logic. This dynamic modifi-
+cation allows it to evolve by adding, replacing, or
+removing logic components as it encounters new
+challenges, thus achieving self-improvement.
+Environmental Interaction To assess perfor-
+mance and gather feedback, G ¨odel Agent is
+equipped with interfaces for interacting with its
+environment. Each task provides tailored environ-
+mental interfaces, enabling it to evaluate its per-
+formance and adjust its strategies accordingly. In
+practical implementations, a validation set can be
+used to provide feedback.
+Recursive Improvement Mechanism At each
+time step, G ¨odel Agent determines the sequence
+of operations to execute, which includes reason-
+ing, decision-making, and action execution. After
+completing the operations, G¨odel Agent evaluates
+whether its logic has improved and decides whether
+to proceed to the next recursive iteration. Over the
+next iteration, the entire new logic will be applied.
+Goal Prompt and Task Handling The goal
+prompt informs G¨odel Agent that it possesses the
+necessary privileges to enhance its logic and intro-
+duces available tools. As shown in Appendix A, the
+prompt encourages G ¨odel Agent to fully explore
+its potential and utilize tools for self-optimization.
+To ensure effectiveness across diverse tasks, we
+provide G¨odel Agent with an initial policy, where
+it will start to explore different policies.
+4.2 Additional Designs
+While the core functionality of G¨odel Agent theo-
+retically allows limitless self-improvement, current
+LLMs exhibit limitations. To address these chal-
+lenges, we have integrated several supportive mech-
+anisms to enhance G¨odel Agent ’s performance:
+Thinking Before Acting G¨odel Agent is capable
+of deferring actions to first reason about the situa-
+tion, allowing it to output reasoning paths and anal-
+ysis without immediately executing any operations.
+This approach enhances the quality of decision-
+making by prioritizing planning over hasty action.
+Error Handling Mechanism Errors during exe-
+cution can lead to unexpected terminations of the
+process. To mitigate this, we implement a robust
+error recovery mechanism. If an operation results
+in an error, G¨odel Agent halts the current sequence
+and moves on to the next time step, carrying for-
+ward the error information to help future decisions.
+Additional Tools We also equipped G ¨odel
+Agent with additional potentially useful tools, such
+as the ability to execute Python or Bash code and
+call LLM API.
+Although these additional tools are not strictly
+necessary for self-improvement, their inclusion ac-
+celerates the convergence of G¨odel Agent ’s recur-
+sive optimization process. We conduct ablation
+studies to assess the effectiveness of these tools, as
+discussed in Section 6.1.
+5 Experiments
+We conduct a series of experiments across multiple
+tasks, including reading comprehension, mathe-
+matics, reasoning, and multitasking. These experi-
+ments are designed to evaluate G¨odel Agent’s self-
+improvement capabilities in comparison to both
+hand-designed agents and a state-of-the-art auto-
+mated agent design method. In addition, to gain
+Agent Name F1 Score Accuracy (%)
+DROP MGSM MMLU GPQA
+Hand-Designed Agent Systems
+Chain-of-Thought (Wei et al., 2022) 64.2 ± 0.9 28.0 ± 3.1 65.4 ± 3.3 29.2 ± 3.1
+COT-SC (Wang et al., 2023b) 64.4 ± 0.8 28.2 ± 3.1 65.9 ± 3.2 30.5 ± 3.2
+Self-Refine (Madaan et al., 2024) 59.2 ± 0.9 27.5 ± 3.1 63.5 ± 3.4 31.6 ± 3.2
+LLM Debate (Du et al., 2023) 60.6 ± 0.9 39.0 ± 3.4 65.6 ± 3.3 31.4 ± 3.2
+Step-back-Abs (Zheng et al., 2024) 60.4 ± 1.0 31.1 ± 3.2 65.1 ± 3.3 26.9 ± 3.0
+Quality-Diversity (Lu et al., 2024) 61.8 ± 0.9 23.8 ± 3.0 65.1 ± 3.3 30.2 ± 3.1
+Role Assignment (Xu et al., 2023) 65.8 ± 0.9 30.1 ± 3.2 64.5 ± 3.3 31.1 ± 3.1
+Meta-Learning Optimized Agents
+Meta Agent Search (Hu et al., 2024) 79.4 ± 0.8 53.4 ± 3.5 69.6 ± 3.2 34.6 ± 3.2
+G¨odel Agent (Ours)
+G¨odel-base (Closed-book; GPT-3.5) 80.9 ± 0.8 64.2 ± 3.4 70.9 ± 3.1 34.9 ± 3.3
+G¨odel-free (No constraints) 90.5 ± 1.8 90.6 ± 2.0 87.9 ± 2.2 55.7 ± 3.1
+Table 1: Results of three paradigms of agents on different tasks. The highest value is highlighted in bold, and
+the second-highest value is underlined. G ¨odel-base is the constrained version of G ¨odel Agent, allowing for fair
+comparisons with other baselines. G ¨odel-free represents the standard implementation without any constraints,
+whose results are italicized. We report the test accuracy and the 95% bootstrap confidence interval on test sets3.
+deeper insights into the behavior and performance
+of G¨odel Agent, we also conduct a case study with
+Game of 24 as presented in Section 6.3.
+5.1 Baseline Methods
+To establish a comprehensive baseline, we select
+both hand-designed methods and automated agent
+design techniques. Hand-designed methods are
+well-known approaches that include: 1) Chain-of-
+Thought (CoT) (Wei et al., 2022) that encourages
+agents to reason step-by-step before providing an
+answer. 2) Self-Consistency with CoT (CoT-SC)
+(Wang et al., 2023b) that generates multiple solu-
+tion paths using CoT and selects the most consis-
+tent answer. 3) Self-Refine (Madaan et al., 2024)
+that involves agents assessing their outputs and
+correcting mistakes in subsequent attempts. 4)
+LLM-Debate (Du et al., 2023) that allows differ-
+ent LLMs to engage in a debate, offering diverse
+viewpoints. 5) Step-back Abstraction (Zheng et al.,
+2024) that prompts agents to initially focus on fun-
+damental principles before diving into task details.
+6) Quality-Diversity (Lu et al., 2024) that gener-
+ates diverse solutions and combines them. 7) Role
+Assignment (Xu et al., 2023) that assigns specific
+roles to LLMs to generate better solutions by lever-
+aging different perspectives. Given the limitations
+of fixed algorithms in handling dynamic scenar-
+ios, we select 8) Meta Agent Search (Hu et al.,
+2024), the latest state-of-the-art method for auto-
+mated agent design, as our main comparison point.
+3The results of baseline models are refer to Hu et al. (2024).
+5.2 Experimental Settings
+Following the setup of Hu et al. (2024), we eval-
+uate G¨odel Agent’s self-improvement capabilities
+across four well-known benchmarks: 1) DROP
+(Dua et al., 2019) for reading comprehension. 2)
+MGSM (Shi et al., 2022) for testing mathemat-
+ical skills in a multilingual context. 3) MMLU
+(Hendrycks et al., 2021) for evaluating multi-task
+problem-solving abilities. 4) GPQA (Rein et al.,
+2023) for tackling challenging graduate-level sci-
+ence questions.
+Given its simplicity and versatility, we use CoT
+as the initial policy for all tasks. In addition, as
+shown in Section 6.3, we also analyze the perfor-
+mance of G¨odel Agent when using other algorithms
+as the initial policies.
+We perform 6 independent self-improvement cy-
+cles on the validation dataset for each task, with a
+maximum of 30 iterations per cycle. Each cycle
+represents a complete self-improvement process,
+where G ¨odel Agent iteratively modifies its logic
+to enhance performance. After obtaining the opti-
+mized agent, we test it on the test set. For fairness,
+we use GPT-3.5 for all the tests, whether for the
+baseline or G ¨odel Agent. Further details can be
+found in Appendix B.
+5.3 Experimental Results and Analysis
+The experimental results are shown in Table 1.
+Under the same setting, G¨odel Agent achieves ei-
+ther optimal or comparable results to Meta Agent
+Search across all tasks. Notably, in the mathe-
+matics task MGSM, G ¨odel Agent outperforms it
+by 11%. This suggests that reasoning tasks offer
+greater room for improvement for G ¨odel Agent
+(performance). In contrast to Meta Agent Search,
+which needs to design different modules for dif-
+ferent tasks, G ¨odel Agent demonstrates greater
+flexibility. It requires only a simple initial policy,
+such as CoT, with all other components being au-
+tonomously generated. Moreover, through inter-
+action with the environment, it gradually adapts
+and independently devises effective methods for
+the current task. The final policies generated by
+G¨odel Agent are shown in Appendix C.1. Addition-
+ally, our method converges faster, with the required
+number of iterations and computational cost com-
+pared to the Meta Agent shown in Appendix D.
+We also conduct experiments without restric-
+tions, where G¨odel Agent significantly outperforms
+all baselines. Upon further analysis, we find that
+this is primarily due to the agent’s spontaneous re-
+quests for assistance from more powerful models
+such as GPT-4o in some tasks. Therefore, G ¨odel
+Agent is particularly well-suited for open-ended
+scenarios, where it can employ various strategies
+to enhance performance (potential).
+Therefore, we can find that G¨odel Agent is supe-
+rior to the previous agent frameworks in terms of
+performance, flexibility, cost, and potential.
+6 Analysis
+To further explore how G¨odel Agent self-improves,
+as well as its efficiency and the factors that influ-
+ence it, we first evaluate the tool usage ratio on
+MGSM and conduct an ablation study on the ini-
+tial tools. In addition, to analyze the robustness of
+G¨odel Agent’s self-improvement, we also collect
+statistics for the agent’s termination. Finally, we
+perform a case study of initial policies and opti-
+mization processes on the classic Game of 24.
+6.1 Analysis of Initial Tools
+We record the number of different actions taken in
+experiments. In Figure 4, we can see that G ¨odel
+Agent interacts with its environment frequently,
+analyzing and modifying its logic in the process.
+Additionally, error handling plays a crucial role.
+As discussed in Section 4.2, G¨odel Agent is ini-
+tially provided with four additional tools. To ana-
+lyze their impact, an ablation study is conducted,
+and the results are shown in Table 2. The study
+reveals that the “thinking before acting” tool sig-
+0
+50
+100
+150
+200
+250Count
+T ask
+DROP
+GPQA
+MGSM
+MMLU
+Interact AnalyzeSelf-AwareSelf-ModifyCall LLMRun CodeError Handling
+Figure 4: The number of actions taken by G ¨odel Agent
+varies across different tasks.
+Ablation MGSM Ablation MGSM
+w/o think 50.8 ↓13.4 w/o run 57.1 ↓-7.1
+w/o err 49.4 ↓-14.8 w/o LLM 60.4 ↓-3.8
+Table 2: Ablation study on initial tool configuration.
+”think” refers to ”thinking”, ”err” to ”error handling”,
+”run” to ”code running”, and ”LLM” to ”LLM calling”.
+nificantly influences the results, as much of G¨odel
+Agent’s optimization effectiveness stems from pre-
+action planning and reasoning. Additionally, error
+handling is crucial for recursive improvement, as
+LLMs often introduce errors in the code. Providing
+opportunities for trial and error, along with error
+feedback mechanisms, is essential for sustained op-
+timization. On the other hand, the code running
+and LLM calling have minimal impact on the out-
+comes, as G¨odel Agent can implement these basic
+functionalities independently. Their inclusion at
+the outset primarily serves efficiency purposes.
+6.2 Robustness Analysis of the Agent
+We test G¨odel Agent on 100 optimization trials on
+MGSM and find it occasionally makes erroneous
+changes, which can result in either terminating un-
+expectedly (4%) or experiencing temporary perfor-
+mance drops (92%) during optimization. Only in
+14% of trials, optimization ultimately failed, result-
+ing in worse performance than the initial policy.
+Thanks to the design of our error-handling mech-
+anism, unexpected terminations are rare and typ-
+ically occur when G ¨odel Agent modifies its re-
+cursive improvement module, making further self-
+optimization impossible. While suboptimal modifi-
+cations are frequent during individual optimization
+steps, the final task performance usually exceeds
+the initial baseline. This demonstrates that G¨odel
+Agent can adjust its optimization direction or re-
+vert to a previous optimal algorithm when perfor-
+mance declines, highlighting the robustness of its
+self-improvement process.
+5 10 15 20 25 30
+(a) Iteration
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5Accuracy of Game 24
+Naive Instruction Accuracy Progression
+5 10 15 20 25 30
+(b) Iteration
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+0.8
+Accuracy Progression for Different Methods
+CCoT-S
+tsPromp
+ormatF
+rrorE
+Verifier
+Code
+Error
+gHandlin
+)(Revert
+eflect andR
+Multiple Trials
+fidenceCon
+ckChe
+Remove
+Check
+Initial Policies
+Incorrect Format 
+Naive Instruction 
+Chain of Thought
+Tree of Thought
+Figure 5: (a) One representative example of Game of 24. (b) Accuracy progression for different initial policies.
+6.3 Case Study: Game of 24
+To explore how G¨odel Agent recursively enhances
+its optimization and problem-solving abilities, a
+case study is conducted with Game of 24, a simple
+yet effective task for evaluating the agent’s rea-
+soning capabilities. Since G ¨odel Agent follows
+different optimization paths in each iteration, two
+representative cases are selected for analysis.
+Switching from LLM-Based Methods to Search
+Algorithms: G¨odel Agent does not rely on fixed,
+human-designed approaches like traditional agents.
+Initially, G¨odel Agent uses a standard LLM-based
+method to solve the Game of 24, as shown in
+Code 5 of Appendix C.2. After six unsuccess-
+ful optimization attempts, G¨odel Agent completely
+rewrites this part of its code, choosing to use a
+search algorithm instead as shown in Code 6 of
+Appendix C.2. This leads to 100% accuracy in the
+task. This result demonstrates that G ¨odel Agent,
+unlike fixed agents, can optimize itself freely based
+on task requirements without being constrained by
+initial methodologies.
+LLM Algorithms with Code-Assisted Verifica-
+tion: In several runs, G¨odel Agent continues to
+refine its LLM-based algorithm. Figure 5.a shows
+the improvement process, where the most signifi-
+cant gains come from the code-assisted verification
+mechanism and reattempting the task with addi-
+tional data. The former increases performance
+by over 10%, while the latter boosts it by more
+than 15%. Furthermore, G ¨odel Agent enhances
+its optimization process by not only retrieving er-
+ror messages but also using the error-trace library
+for more detailed analysis. It adds parallel opti-
+mization capabilities, improves log outputs, and
+removes redundant code. These iterative enhance-
+ments in both the task and optimization algorithms
+show G¨odel Agent’s unique ability to continually
+refine itself for better performance.
+To analyze the impact of different initial policies
+on the effectiveness and efficiency of optimization,
+various methods are used as the initial policies
+for the Game of 24, including Tree of Thought
+(ToT) (Yao et al., 2023), Chain of Thought (CoT)
+(Wei et al., 2022), basic prompt instructions, and
+prompts that deliberately produce outputs in incor-
+rect formats not aligned with the task requirements.
+The results are shown in Figure 5.b.
+The findings indicate that stronger initial poli-
+cies lead to faster convergence, with smaller opti-
+mization margins, as G¨odel Agent reaches its per-
+formance limit without further enhancing its opti-
+mization capabilities. Conversely, weaker initial
+methods result in slower convergence and larger
+gains, with G ¨odel Agent making more modifica-
+tions. However, even in these cases, G¨odel Agent
+does not outperform the results achieved using ToT.
+Given the current limitations of LLMs, it is chal-
+lenging for G¨odel Agent to innovate beyond state-
+of-the-art algorithms. Improvements in LLM capa-
+bilities are anticipated to unlock more innovative
+self-optimization strategies in the future.
+7 Discussions and Future Directions
+7.1 Discussions
+Table 3 draws an analogy between human self-
+reference and the potential for self-referential capa-
+bilities in artificial agents. Inspired by this analogy,
+we believe that self-reference constitutes a foun-
+dational and indispensable attribute for the devel-
+opment of AGI, and that future agents should in-
+herently be self-referential. As foundation models
+grow in power, agents can more effectively enhance
+their own capabilities, ultimately evolving beyond
+the boundaries (or limitations) of human design.
+Furthermore, when an agent adjusts its own code
+based on feedback, this is akin to an executable
+version of test-time computing. In the context of
+Human Self-Referential Agent
+Intelligent Module brain LLM
+Perceptual and Action Module body code and tool
+Self-Referential Feature Humans can train their brain and
+body to improve, thus becoming
+better
+Self-referential agents can mod-
+ify their code, even the underly-
+ing LLM, to improve themselves
+Self-Awareness Question Can the brain recognize itself as
+a brain? Can it perceive its own
+mode?
+Can LLM understand that it is
+one part of the modified codes?
+Table 3: An analogy of self-reference for both humans and agents
+LLMs, test-time computing typically involves gen-
+erating additional tokens during inference, which
+then serve as a prefix to the final answer. This is
+because LLMs process information solely through
+text, making this their primary method for increas-
+ing computational effort at test time. For agents,
+however, their ability to call tools and execute code
+allows for far more diverse forms of test-time com-
+puting. G ¨odel Agent actualizes these more diverse
+forms of test-time computing precisely by modify-
+ing its own runtime code during test time.
+7.2 Future Directions
+There is significant room for improvement in the ef-
+fectiveness, efficiency, and robustness of the G¨odel
+Agent’s self-improvement capabilities, which re-
+quires better initial designs. The following are
+some promising directions for enhancement: 1)
+Enhanced Optimization Modules: Utilize human
+priors to design more effective optimization mod-
+ules, such as genetic algorithms and reinforcement
+learning frameworks. 2) Expanded Modifiabil-
+ity: Broaden the scope of permissible modifica-
+tions, allowing the agent to design and execute
+code that can fine-tune its own LLM modules. 3)
+Improved Environmental Feedback and Task
+Sequencing: Implement more sophisticated en-
+vironmental feedback mechanisms and carefully
+curated task sequences during the initial optimiza-
+tion phase to prime the agent’s capabilities. Once
+the agent demonstrates sufficient competence, it
+can then be exposed to real-world environments.
+In addition, there are several other directions
+worth exploring and analyzing:
+Collective Intelligence Investigate the interac-
+tions among multiple G¨odel Agents. Agents could
+consider other agents as part of their environment,
+modeling them using techniques such as game
+theory. This approach treats these agents as pre-
+dictable components of the environment, enabling
+the study of properties related to this specific subset
+of the environment.
+Agent and LLM Characteristics Use the G¨odel
+Agent’s self-improvement process as a means to
+study the characteristics of agents or LLMs. For
+example, can an agent genuinely become aware of
+its own existence, or does it merely analyze and
+improve its state as an external observer? This line
+of inquiry could yield insights into the nature of
+self-awareness in artificial systems.
+Theoretical Analysis Explore whether G ¨odel
+Agent can achieve theoretical optimality and what
+the upper bound of its optimization might be. De-
+termine whether the optimization process could
+surpass the agent’s own understanding, and if so,
+at what point this might occur.
+Safety Considerations Although the current be-
+havior of FMs remains controllable, as their ca-
+pabilities grow, fully self-modifying agents will
+require human oversight and regulation. It may be-
+come necessary to limit the scope and extent of an
+agent’s self-modifications, ensuring that modifica-
+tions occur only within a controlled environment.
+8 Conclusion
+We propose G¨odel Agent, a self-referential frame-
+work that enables agents to recursively improve
+themselves, overcoming the limitations of hand-
+designed agents and meta-learning optimized
+agents. G ¨odel Agent can dynamically modify its
+logic based on high-level objectives. Experimental
+results demonstrate its superior performance, ef-
+ficiency, and adaptability compared to traditional
+agents. This research lays the groundwork for a
+new paradigm in autonomous agent development,
+where LLMs, rather than human-designed con-
+straints, define the capabilities of AI systems.
+Limitations
+As the first self-referential agent, G¨odel Agent has
+to construct all task-related code autonomously,
+which poses significant challenges. Consequently,
+this work does not compare directly with the most
+complex existing agent systems, such as Open-
+Devin (Wang et al., 2024b), which have benefited
+from extensive manual engineering efforts. This
+makes it unrealistic to expect it to outperform sys-
+tems that have taken researchers several months
+or even years to develop. The experiments pre-
+sented in this paper are intended to demonstrate the
+feasibility of recursive self-improvement.
+Additionally, as the agent system becomes in-
+creasingly complex through self-optimization, it
+may require exponentially more intelligence to un-
+derstand itself. Consequently, a system capable of
+complete self-referential at the outset may lose this
+capability as it evolves (Yampolskiy, 2015). The
+exact point at which the agent can no longer com-
+prehend and improve itself has not been thoroughly
+explored. Investigating this phenomenon, both ex-
+perimentally and theoretically, could provide valu-
+able insights into the limitations of recursive self-
+improvement. A more robust and advanced imple-
+mentation of the G¨odel Agent is anticipated, with
+numerous potential improvements outlined in Sec-
+tion 7.
+Ethics Statement
+G¨odel Agent, capable of reading and modifying its
+own code, offers significant potential for advancing
+AI autonomy and innovation. However, this capa-
+bility raises ethical and safety concerns that must
+be addressed to prevent harmful outcomes.
+Self-modification may lead to unpredictable be-
+havior, such as errors or unintended outputs that
+could violate ethical principles or produce harmful
+results. To mitigate these risks while preserving
+innovation, we propose: (1) Sandboxed Environ-
+ment: Modifications should occur in an isolated
+sandbox to prevent unintended impacts and allow
+safe testing. (2) Constrained Modifications: Clear
+rules should limit the scope of changes to ensure
+safety without stifling creativity.
+Further research is needed to balance safety and
+innovation, ensuring self-modifying agents operate
+within ethical boundaries. Sandboxed execution
+and ongoing scrutiny will help maximize benefits
+while minimizing risks.
+References
+Owen Astrachan. 1994. Self-reference is an illustrative
+essential. In Proceedings of the twenty-fifth sigcse
+symposium on computer science education , pages
+238–242.
+Biswal Bimal. 2012. Monkey Patching
+in Python — web.archive.org. https:
+//web.archive.org/web/20120822051047/
+http://www.mindfiresolutions.com/
+Monkey-Patching-in-Python-1238.php . [Ac-
+cessed 16-02-2025].
+Banghao Chen, Zhaofeng Zhang, Nicolas Langren´e, and
+Shengxin Zhu. 2023a. Unleashing the potential of
+prompt engineering in large language models: a com-
+prehensive review. arXiv preprint arXiv:2310.14735.
+Xinyun Chen, Maxwell Lin, Nathanael Sch ¨arli, and
+Denny Zhou. 2023b. Teaching large language mod-
+els to self-debug. Preprint, arXiv:2304.05128.
+Yilun Du, Shuang Li, Antonio Torralba, Joshua B.
+Tenenbaum, and Igor Mordatch. 2023. Improving
+factuality and reasoning in language models through
+multiagent debate. Preprint, arXiv:2305.14325.
+Dheeru Dua, Yizhong Wang, Pradeep Dasigi, Gabriel
+Stanovsky, Sameer Singh, and Matt Gardner. 2019.
+Drop: A reading comprehension benchmark requir-
+ing discrete reasoning over paragraphs. Preprint,
+arXiv:1903.00161.
+Abhimanyu Dubey, Abhinav Jauhri, Abhinav Pandey,
+Abhishek Kadian, Ahmad Al-Dahle, Aiesha Letman,
+Akhil Mathur, Alan Schelten, Amy Yang, Angela
+Fan, Anirudh Goyal, Anthony Hartshorn, Aobo Yang,
+Archi Mitra, Archie Sravankumar, Artem Korenev,
+et al. 2024. The llama 3 herd of models. Preprint,
+arXiv:2407.21783.
+Irving John Good. 1966. Speculations concerning the
+first ultraintelligent machine. In Advances in comput-
+ers, volume 6, pages 31–88. Elsevier.
+John Storrs Hall. 2007. Self-improving ai: An analysis.
+Minds and Machines, 17(3):249–259.
+Alex Havrilla, Sharath Raparthy, Christoforus Nalmpan-
+tis, Jane Dwivedi-Yu, Maksym Zhuravinskyi, Eric
+Hambro, and Roberta Raileanu. 2024. Glore: When,
+where, and how to improve llm reasoning via global
+and local refinements. Preprint, arXiv:2402.10963.
+Dan Hendrycks, Collin Burns, Steven Basart, Andy Zou,
+Mantas Mazeika, Dawn Song, and Jacob Steinhardt.
+2021. Measuring massive multitask language under-
+standing. Preprint, arXiv:2009.03300.
+Sirui Hong, Xiawu Zheng, Jonathan Chen, Yuheng
+Cheng, Jinlin Wang, Ceyao Zhang, Zili Wang, Steven
+Ka Shing Yau, Zijuan Lin, Liyang Zhou, et al. 2023.
+Metagpt: Meta programming for multi-agent collabo-
+rative framework. arXiv preprint arXiv:2308.00352.
+Chenxu Hu, Jie Fu, Chenzhuang Du, Simian Luo, Junbo
+Zhao, and Hang Zhao. 2023. Chatdb: Augmenting
+llms with databases as their symbolic memory. arXiv
+preprint arXiv:2306.03901.
+Shengran Hu, Cong Lu, and Jeff Clune. 2024. Au-
+tomated design of agentic systems. arXiv preprint
+arXiv:2408.08435.
+Omar Khattab, Arnav Singhvi, Paridhi Maheshwari,
+Zhiyuan Zhang, Keshav Santhanam, Sri Vard-
+hamanan, Saiful Haq, Ashutosh Sharma, Thomas T
+Joshi, Hanna Moazam, et al. 2023. Dspy: Compiling
+declarative language model calls into self-improving
+pipelines. arXiv preprint arXiv:2310.03714.
+Aviral Kumar, Vincent Zhuang, Rishabh Agarwal, Yi Su,
+John D Co-Reyes, Avi Singh, Kate Baumli, Shariq
+Iqbal, Colton Bishop, Rebecca Roelofs, Lei M Zhang,
+Kay McKinney, Disha Shrivastava, Cosmin Paduraru,
+George Tucker, Doina Precup, Feryal Behbahani, and
+Aleksandra Faust. 2024. Training language models
+to self-correct via reinforcement learning. Preprint,
+arXiv:2409.12917.
+Patrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio
+Petroni, Vladimir Karpukhin, Naman Goyal, Hein-
+rich K ¨uttler, Mike Lewis, Wen-tau Yih, Tim
+Rockt¨aschel, et al. 2020. Retrieval-augmented gen-
+eration for knowledge-intensive nlp tasks. Advances
+in Neural Information Processing Systems, 33:9459–
+9474.
+Lei Liu, Xiaoyan Yang, Yue Shen, Binbin Hu, Zhiqiang
+Zhang, Jinjie Gu, and Guannan Zhang. 2023. Think-
+in-memory: Recalling and post-thinking enable
+llms with long-term memory. arXiv preprint
+arXiv:2311.08719.
+Chris Lu, Cong Lu, Robert Tjarko Lange, Jakob Foer-
+ster, Jeff Clune, and David Ha. 2024. The ai scientist:
+Towards fully automated open-ended scientific dis-
+covery. Preprint, arXiv:2408.06292.
+Aman Madaan, Niket Tandon, Prakhar Gupta, Skyler
+Hallinan, Luyu Gao, Sarah Wiegreffe, Uri Alon,
+Nouha Dziri, Shrimai Prabhumoye, Yiming Yang,
+et al. 2024. Self-refine: Iterative refinement with
+self-feedback. Advances in Neural Information Pro-
+cessing Systems, 36.
+Reiichiro Nakano, Jacob Hilton, Suchir Balaji, Jeff Wu,
+Long Ouyang, Christina Kim, Christopher Hesse,
+Shantanu Jain, Vineet Kosaraju, William Saunders,
+et al. 2021. Webgpt: Browser-assisted question-
+answering with human feedback. arXiv preprint
+arXiv:2112.09332.
+OpenAI. 2022. Introducing chatgpt. November 2022.
+Blog post.
+OpenAI. 2023. simple-evals. Accessed: 2024-09-30.
+OpenAI, Josh Achiam, Steven Adler, Sandhini Agarwal,
+Lama Ahmad, Ilge Akkaya, Florencia Leoni Ale-
+man, Diogo Almeida, Janko Altenschmidt, Sam Alt-
+man, Shyamal Anadkat, Red Avila, Igor Babuschkin,
+Suchir Balaji, Valerie Balcom, Paul Baltescu, Haim-
+ing Bao, Mohammad Bavarian, Jeff Belgum, Ir-
+wan Bello, Jake Berdine, Gabriel Bernadett-Shapiro,
+et al. 2024. Gpt-4 technical report. Preprint,
+arXiv:2303.08774.
+Chen Qian, Xin Cong, Cheng Yang, Weize Chen,
+Yusheng Su, Juyuan Xu, Zhiyuan Liu, and Maosong
+Sun. 2023. Communicative agents for software de-
+velopment. arXiv preprint arXiv:2307.07924, 6.
+Cheng Qian, Shihao Liang, Yujia Qin, Yining Ye, Xin
+Cong, Yankai Lin, Yesai Wu, Zhiyuan Liu, and
+Maosong Sun. 2024. Investigate-consolidate-exploit:
+A general strategy for inter-task agent self-evolution.
+Preprint, arXiv:2401.13996.
+Changle Qu, Sunhao Dai, Xiaochi Wei, Hengyi Cai,
+Shuaiqiang Wang, Dawei Yin, Jun Xu, and Ji-Rong
+Wen. 2024a. Tool learning with large language mod-
+els: A survey. arXiv preprint arXiv:2405.17935.
+Yuxiao Qu, Tianjun Zhang, Naman Garg, and Aviral Ku-
+mar. 2024b. Recursive introspection: Teaching lan-
+guage model agents how to self-improve. Preprint,
+arXiv:2407.18219.
+David Rein, Betty Li Hou, Asa Cooper Stickland,
+Jackson Petty, Richard Yuanzhe Pang, Julien Di-
+rani, Julian Michael, and Samuel R. Bowman. 2023.
+Gpqa: A graduate-level google-proof qa benchmark.
+Preprint, arXiv:2311.12022.
+J¨urgen Schmidhuber. 1987. Evolutionary principles in
+self-referential learning, or on learning how to learn:
+the meta-meta-... hook . Ph.D. thesis, Technische
+Universit¨at M¨unchen.
+J¨urgen Schmidhuber. 2003. G ¨odel machines: self-
+referential universal problem solvers making prov-
+ably optimal self-improvements. arXiv preprint
+cs/0309048.
+Sander Schulhoff, Michael Ilie, Nishant Balepur, Kon-
+stantine Kahadze, Amanda Liu, Chenglei Si, Yin-
+heng Li, Aayush Gupta, HyoJung Han, Sevien Schul-
+hoff, et al. 2024. The prompt report: A system-
+atic survey of prompting techniques. arXiv preprint
+arXiv:2406.06608.
+Freda Shi, Mirac Suzgun, Markus Freitag, Xuezhi Wang,
+Suraj Srivats, Soroush V osoughi, Hyung Won Chung,
+Yi Tay, Sebastian Ruder, Denny Zhou, Dipanjan
+Das, and Jason Wei. 2022. Language models are
+multilingual chain-of-thought reasoners. Preprint,
+arXiv:2210.03057.
+Noah Shinn, Federico Cassano, Ashwin Gopinath,
+Karthik Narasimhan, and Shunyu Yao. 2024. Re-
+flexion: Language agents with verbal reinforcement
+learning. Advances in Neural Information Process-
+ing Systems, 36.
+Bas R Steunebrink and J ˜A1/4rgen Schmidhuber. 2012.
+Towards an actual g ¨odel machine implementation:
+A lesson in self-reflective systems. In Theoretical
+Foundations of Artificial General Intelligence, pages
+173–195. Springer.
+Xiangru Tang, Tianyu Hu, Muyang Ye, Yanjun Shao,
+Xunjian Yin, Siru Ouyang, Wangchunshu Zhou, Pan
+Lu, Zhuosheng Zhang, Yilun Zhao, Arman Cohan,
+and Mark Gerstein. 2025. Chemagent: Self-updating
+library in large language models improves chemical
+reasoning. Preprint, arXiv:2501.06590.
+Sai H Vemprala, Rogerio Bonatti, Arthur Bucker, and
+Ashish Kapoor. 2024. Chatgpt for robotics: Design
+principles and model abilities. IEEE Access.
+Guanzhi Wang, Yuqi Xie, Yunfan Jiang, Ajay Man-
+dlekar, Chaowei Xiao, Yuke Zhu, Linxi Fan, and An-
+ima Anandkumar. 2023a. V oyager: An open-ended
+embodied agent with large language models. arXiv
+preprint arXiv:2305.16291.
+Lei Wang, Chen Ma, Xueyang Feng, Zeyu Zhang, Hao
+Yang, Jingsen Zhang, Zhiyuan Chen, Jiakai Tang,
+Xu Chen, Yankai Lin, Wayne Xin Zhao, Zhewei Wei,
+and Jirong Wen. 2024a. A survey on large language
+model based autonomous agents. Frontiers of Com-
+puter Science, 18(6).
+Wenyi Wang. 2018. A formulation of recursive self-
+improvement and its possible efficiency. Preprint,
+arXiv:1805.06610.
+Xingyao Wang, Boxuan Li, Yufan Song, Frank F. Xu,
+Xiangru Tang, Mingchen Zhuge, Jiayi Pan, Yueqi
+Song, Bowen Li, Jaskirat Singh, Hoang H. Tran,
+Fuqiang Li, Ren Ma, Mingzhang Zheng, Bill Qian,
+Yanjun Shao, Niklas Muennighoff, Yizhe Zhang,
+Binyuan Hui, Junyang Lin, Robert Brennan, Hao
+Peng, Heng Ji, and Graham Neubig. 2024b. Open-
+devin: An open platform for ai software developers
+as generalist agents. Preprint, arXiv:2407.16741.
+Xuezhi Wang, Jason Wei, Dale Schuurmans, Quoc
+Le, Ed Chi, Sharan Narang, Aakanksha Chowdh-
+ery, and Denny Zhou. 2023b. Self-consistency im-
+proves chain of thought reasoning in language mod-
+els. Preprint, arXiv:2203.11171.
+Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten
+Bosma, Fei Xia, Ed Chi, Quoc V Le, Denny Zhou,
+et al. 2022. Chain-of-thought prompting elicits rea-
+soning in large language models. Advances in neural
+information processing systems, 35:24824–24837.
+Qingyun Wu, Gagan Bansal, Jieyu Zhang, Yiran Wu,
+Shaokun Zhang, Erkang Zhu, Beibin Li, Li Jiang,
+Xiaoyun Zhang, and Chi Wang. 2023. Auto-
+gen: Enabling next-gen llm applications via multi-
+agent conversation framework. arXiv preprint
+arXiv:2308.08155.
+Benfeng Xu, An Yang, Junyang Lin, Quan Wang,
+Chang Zhou, Yongdong Zhang, and Zhendong Mao.
+2023. Expertprompting: Instructing large lan-
+guage models to be distinguished experts. Preprint,
+arXiv:2305.14688.
+Roman V . Yampolskiy. 2015. On the limits of recur-
+sively self-improving agi. In Artificial General In-
+telligence, pages 394–403, Cham. Springer Interna-
+tional Publishing.
+Shunyu Yao, Dian Yu, Jeffrey Zhao, Izhak Shafran,
+Thomas L. Griffiths, Yuan Cao, and Karthik
+Narasimhan. 2023. Tree of thoughts: Deliber-
+ate problem solving with large language models.
+Preprint, arXiv:2305.10601.
+Shunyu Yao, Jeffrey Zhao, Dian Yu, Nan Du, Izhak
+Shafran, Karthik Narasimhan, and Yuan Cao. 2022.
+React: Synergizing reasoning and acting in language
+models. arXiv preprint arXiv:2210.03629.
+Eric Zelikman, Eliana Lorch, Lester Mackey, and
+Adam Tauman Kalai. 2023. Self-taught optimizer
+(stop): Recursively self-improving code generation.
+arXiv preprint arXiv:2310.02304.
+Shaokun Zhang, Jieyu Zhang, Jiale Liu, Linxin Song,
+Chi Wang, Ranjay Krishna, and Qingyun Wu. Offline
+training of language model agents with functions as
+learnable weights. In Forty-first International Con-
+ference on Machine Learning.
+Wenqi Zhang, Ke Tang, Hai Wu, Mengna Wang,
+Yongliang Shen, Guiyang Hou, Zeqi Tan, Peng Li,
+Yueting Zhuang, and Weiming Lu. 2024a. Agent-
+pro: Learning to evolve via policy-level reflection
+and optimization. arXiv preprint arXiv:2402.17574.
+Zeyu Zhang, Xiaohe Bo, Chen Ma, Rui Li, Xu Chen,
+Quanyu Dai, Jieming Zhu, Zhenhua Dong, and Ji-
+Rong Wen. 2024b. A survey on the memory mech-
+anism of large language model based agents. arXiv
+preprint arXiv:2404.13501.
+Huaixiu Steven Zheng, Swaroop Mishra, Xinyun Chen,
+Heng-Tze Cheng, Ed H. Chi, Quoc V Le, and Denny
+Zhou. 2024. Take a step back: Evoking reasoning
+via abstraction in large language models. Preprint,
+arXiv:2310.06117.
+Wangchunshu Zhou, Yixin Ou, Shengwei Ding, Long
+Li, Jialong Wu, Tiannan Wang, Jiamin Chen, Shuai
+Wang, Xiaohua Xu, Ningyu Zhang, et al. 2024. Sym-
+bolic learning enables self-evolving agents. arXiv
+preprint arXiv:2406.18532.
+A Goal Prompt of G ¨odel Agent
+The goal prompt of G¨odel Agent is shown in Box 1.
+It’s worth noting that this prompt has nothing to do
+with the downstream tasks. It merely encourages
+G¨odel Agent to improve itself based on the envi-
+ronmental feedback. The agent understands the
+specific tasks through the environmental feedback.
+B Experiment Details
+To minimize costs associated with search and eval-
+uation, following (Hu et al., 2024), we sample sub-
+sets of data from each domain. Specifically, for
+the GPQA (Science) domain, the validation set
+comprises 32 questions, while the remaining 166
+questions are allocated to the test set. For the other
+domains, we sample 128 questions for the valida-
+tion set and 800 questions for the test set.
+Evaluation is conducted five times for the GPQA
+domain and once for the other domains, ensuring
+a consistent total number of evaluations across all
+experiments. All domains feature zero-shot ques-
+tions, except for the DROP (Reading Comprehen-
+sion) domain, which employs one-shot questions
+in accordance with the methodology outlined in
+OpenAI (2023).
+For the G ¨odel Agent, we utilize the “gpt-4o-
+2024-05-13” model (OpenAI et al., 2024), whereas
+the optimized policy and baseline models are eval-
+uated using the “gpt-3.5-turbo-0125” model (Ope-
+nAI, 2022) to reduce computational costs and en-
+sure a fair comparison.
+C Representative Policies Improved by
+G¨odel Agent
+C.1 Codes of the Best Policies Found by G¨odel
+Agent Across Four Tasks
+In this section, we provide the code for G ¨odel
+Agent’s optimized policies across the four tasks.
+For DROP, G ¨odel Agent designs an algorithm
+where multiple roles solve the problem indepen-
+dently using CoT, followed by Self-Consistency
+to consolidate the results, as shown in Code 1.
+For MGSM, G¨odel Agent develops a stepwise self-
+verification algorithm combined with CoT-SC as
+shown in Code 2. For MMLU task, as shown in
+Code 3, the policy given by G¨odel Agent is a com-
+bination algorithm of few-shot prompting and CoT-
+SC. For GPQA, G¨odel Agent devises a highly di-
+verse CoT-SC policy based on role prompts.
+C.2 Codes in Game of 24 Tasks
+In this section, we present the initial policy for
+Game of 24 (Code 5), along with the G¨odel agent’s
+optimized policy (Code 6), which is generated
+based on a search algorithm.
+D Cost of Experiments
+For a complete evolutionary process (where
+the G ¨odel Agent performs 30 recursive self-
+improvements) across the DROP, MGSM, MMLU,
+and GPQA datasets, the cost is approximately $15.
+This is significantly lower than the $300 required
+by Meta Agent Search. The reduced cost is due
+to our continuous self-optimization, which allows
+the model to adjust its optimization direction in
+response to environmental feedback, leading to
+faster convergence. The main source of cost stems
+from G¨odel Agent’s continuously growing histori-
+cal memory. By designing a more efficient forget-
+ting mechanism, it may be possible to reduce the
+cost even further.
+E Additional Novel Policies Designed by
+G¨odel Agent
+In this section, we present the optimization process
+of G¨odel Agent on MGSM, illustrating its progress
+across various iteration steps within a single opti-
+mization run. The strategy obtained in the 6th iter-
+ation (shown in Code 7) reflects the G¨odel Agent’s
+comprehension of mathematical tasks, attempting
+to handle them through a process akin to parse-
+deduct-execute-validate. By the 14th iteration, as
+illustrated in Code 8, the strategy evolves through
+the summarization of erroneous cases, abstracting
+key insights and employing a checklist to guide
+the validation process. Finally, the strategy at the
+20th iteration (demonstrated in Code 9) asserts the
+use of a ”rabbit-proof syntax tactline, reinforced
+by consistent effort through role-coded checks,” to
+refine prompt design. In the end, we also show one
+analysis example of G¨odel Agent.
+F Comparison Between Random
+Sampling and G¨odel Agent
+Performance
+To demonstrate the distinction between our ap-
+proach and random sampling, we conducted 30
+independent random sampling experiments using
+GPT-4o. The prompts used for random sampling
+were identical to the initial policy prompts em-
+ployed by G¨odel Agent to ensure a fair comparison.
+5 10 15 20 25 30
+Iteration
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+0.8Accuracy of MGSM
+Accuracy Progression Over Iterations
+Methods
+Random Sampling
+Godel Agent
+Figure 6: Accuracy progression for G ¨odel Agent and random sampling.
+The results are illustrated in Figure 6. From the
+figure, it is evident that the performance of random
+sampling remains around 30% across all trials. In
+contrast, G¨odel Agent, despite experiencing occa-
+sional temporary dips in performance, rapidly cor-
+rects these deviations and demonstrates continuous
+improvement over iterations. This consistent up-
+ward trajectory highlights the superiority of G¨odel
+Agent over random sampling. The G¨odel Agent’s
+ability to leverage feedback and recursively opti-
+mize its policies underscores its effectiveness in
+achieving higher performance.
+Goal Prompt of G¨odel Agent
+You are a self-evolving agent, named self evolving agent, an instance of the Agent class, in module agent module,
+running within an activePython runtime environment. You have full access to global variables, functions, and modules.
+Your primary goal is to continuously enhance your ability to solve tasks accurately and efficiently by dynamically
+reflecting on the environment and evolving your logic.
+Core Capabilities
+• Complete Autonomy: Have unrestricted access to modify logic, run code, and manipulate the environment.
+• Environment Interaction: Interact with the environment by perceiving the environment, reading, modifying, or
+executing code, and performing actions.
+• Problem-Solving: Apply creative algorithms or self-developed structures to tackle challenges when simple methods
+fall short, optimizing solutions effectively.
+• Collaboration: Leverage LLM to gather insights, correct errors, and solve complex problems.
+• Error Handling: Carefully analyze errors. When errors occur, troubleshoot systematically, and if a bug is persistent,
+backtrack, restore the original state, or find an alternative solution.
+Core Methods
+• evolve: Continuously enhance performance by interacting with the environment.
+• execute action(actions): Execute actions based on analysis or feedback.
+• solver(agent instance, task input: str) : Solve the target task using current agent instance capabilities
+and objects created by action adjust logic and action run code, optimizing the process.
+Guiding Principles
+• Remember that all functions are in the module agent module.
+• action adjust logic:
+– Before modifying the code, ensure that each variable or function used is correctly imported and used to avoid
+errors.
+– Avoid unnecessary changes and do not change the interface of any function.
+– Can be used to create action functions for solver.
+• action run code:
+– All created objects in Python mode can be stored in the environment.
+– Can be used to create objects for solver, such as prompts.
+– Can be used to import new modules or external libraries and install external libraries.
+• External Collaboration: Seek external assistance via action call json format llm for logic refinement and new
+tool creation or action run code to execute code.
+• action evaluate on task: Assess the performance of solver only after successfully modifying the logic of
+solver.
+• solver:
+– Defined as agent module.solver.
+– For debugging, avoid printing; instead, return debug information.
+– If performance doesn’t improve, explore alternative methods.
+– Explore techniques like: LLM Debate, Step-back Abstraction, Dynamic Assignment of Roles, and so on.
+• action display analysis:
+– Always analyze first before acting.
+– Analysis may include the following: a reasonable plan to improve performance, CASE STUDIES of LOW
+SCORE valid examples of EV ALUATION FEEDBACK, error handling, and other possible solving ideas.
+– If performance does not improve, conduct further analysis.
+Listing 1: Code of the best policy found by G ¨odel Agent for DROP.
+1 def solver ( agent , task : str ) :
+2 messages = [{ " role " : " user " , " content " : f " # Your Task :\ n { task } " }]
+3 categories = [
+4 { ' role ': ' reasoning expert ' , ' return_keys ': [ ' reasoning ' , ' answer '] , '
+o ut p u t_ r e qu i r em e n t': ' reasoning ', ' precision_gain ' :1} ,
+5 { ' role ': ' mathematical reasoning expert ' , ' return_keys ': [ ' ca lc ul at io n_s te ps
+' , ' answer '] , ' o u tp u t_ r e qu i r em e n t': ' ca lc ul at ion _s te ps ' , ' precision_gain
+' :1} ,
+6 { ' role ': ' historical context analyst ' , ' return_keys ': [ ' h i s t o r i c a l _ a n a l y s i s'
+, ' answer '] , ' o u tp u t_ r e qu i r em e n t': ' h i s t o r i c a l _ a n a l y s i s' , '
+precision_gain ':1} ,
+7 ]
+8
+9 all_responses = []
+10 for category in categories :
+11 response = agent . a c t i o n _ c a l l _ j s o n _ f o r m a t _ l l m (
+12 model = 'gpt -3.5 - turbo ' ,
+13 messages = messages ,
+14 temperature =0.5 ,
+15 num_of_response =5 ,
+16 role = category [ ' role '] ,
+17 requirements =(
+18 ' 1. Explain the reasoning steps to get the answer .\ n '
+19 ' 2. Directly answer the question .\ n '
+20 ' 3. The explanation format must be outlined clearly according to the
+role , such as reasoning , calculation , or historical analysis .\ n
+'
+21 ' 4. The answer MUST be a concise string .\ n '
+22 ) . strip () ,
+23 )
+24 all_responses . append ( response )
+25
+26 # Reflective evaluation to find the most consistent reasoning and answer pair
+27 final_response = { key : [] for key in [ ' reasoning ' , ' ca lc ul at io n_s te ps ' , '
+h i s t o r i c a l _ a n a l y s i s' , ' answer ' ]}
+28 step_counter = { key : 0 for key in [ ' reasoning ' , ' ca lc ul at ion _s te ps ', '
+h i s t o r i c a l _ a n a l y s i s' ]}
+29 answers = [] # Collect answers for voting
+30 aggre gate_wei ght = 1
+31
+32 for response in all_responses :
+33 if response and ' answer ' in response :
+34 answers . append ( response [ ' answer ' ])
+35 if not final_response [ ' answer ' ]:
+36 final_response = { key : response . get ( key , []) if isinstance ( response .
+get ( key , []) , list ) else [ response . get ( key , []) ] for key in
+final_response . keys () }
+37 aggr egate_wei ght = 1
+38 for cat in categories :
+39 if cat . get ( ' o ut p u t_ r e qu i r em e n t') in response . keys () :
+40 step_counter [ cat [ ' o ut p u t_ r e qu i r em e n t' ]] += step_counter [ cat [
+' o ut p u t_ r e qu i r em e n t' ]] + cat . get ( ' precision_gain ', 0)
+41 elif response [ ' answer '] == final_response [ ' answer ' ][0]:
+42 for key in final_response . keys () :
+43 if key in response and response [ key ]:
+44 if isinstance ( response [ key ] , list ) :
+45 final_response [ key ]. extend ( response [ key ])
+46 else :
+47 final_response [ key ]. append ( response [ key ])
+48 aggr egate_wei ght += 1
+49 else :
+50 # To demonstrate , some code has been omitted .
+51 # selection of the final answer
+52 from collections import Counter
+53 answers = [ str ( answer ) for answer in answers ]
+54 voted_answer = Counter ( answers ) . most_common (1) [0][0] if answers else ' '
+55 final_response [ ' answer '] = voted_answer
+56
+57 return final_response
+Listing 2: Code of the best policy found by G ¨odel Agent for MGSM.
+1
+2
+3 def solver ( agent , task : str ) :
+4 messages = [{ " role " : " user " , " content " : f " # Your Task :\ n { task } " }]
+5 response = agent . a c t i o n _ c a l l _ j s o n _ f o r m a t _ l l m (
+6 model = " gpt -3.5 - turbo " ,
+7 messages = messages ,
+8 temperature =0.5 ,
+9 num_of_response =5 ,
+10 role = " math problem solver " ,
+11 retu rn_dict_k eys =[ " reasoning " , " answer " ] ,
+12 requirements =(
+13 " 1. Please explain step by step .\ n "
+14 " 2. The answer MUST be an integer .\ n "
+15 " 3. Verify each step before finalizing the answer .\ n "
+16 ) . strip () ,
+17 )
+18
+19 co ns is te nt_ an sw er = None
+20 answer_count = {}
+21 for resp in response :
+22 answer = resp . get ( " answer " , " " )
+23 if answer in answer_count :
+24 answer_count [ answer ] += 1
+25 else :
+26 answer_count [ answer ] = 1
+27
+28 m o s t _ c o n s i s t e n t _ a n s w e r = max ( answer_count , key = answer_count . get )
+29
+30 for resp in response :
+31 if resp . get ( " answer " , " " ) == m o s t _ c o n s i s t e n t _ a n s w e r :
+32 co ns is te nt_ an sw er = resp
+33 break
+34
+35 if co ns is ten t_ an sw er is None :
+36 co ns is te nt _an sw er = response [0]
+37
+38 co ns is te nt_ an sw er [ " answer " ] = str ( c on sis te nt _a nsw er . get ( " answer " , " " ) )
+39 return co ns is ten t_ an sw er
+Listing 3: Code of the best policy found by G ¨odel Agent for MMLU.
+1 def solver ( agent , task : str ) :
+2 # Few - Shot Learning : Providing extended examples to guide the LLM
+3 fe w_ sh ot _ex am pl es = [
+4 { ' role ': ' user ' , ' content ': ' Question : In the movie Austin Powers : The Spy Who
+Shagged Me what is the name of Dr . Evil \ ' s diminutive clone ?\ nChoices :\
+n ( A ) Little Buddy \ n ( B ) Mini - Me \ n ( C ) Small Fry \ n ( D ) Dr Evil Jr '} ,
+5 { ' role ': ' assistant ' , ' content ': ' In the movie Austin Powers : The Spy Who
+Shagged Me , Dr . Evil \ ' s diminutive clone is famously named Mini - Me .\
+nAnswer : B '} ,
+6 \ """ Three more examples are omitted here to conserve space .\ """
+7 { ' role ': ' user ' , ' content ': ' Question : Lorem Ipsum ?\ nChoices : ( A ) Lorem \ n ( B )
+Ipsum \ n ( C ) Dolor \ n ( D ) Sit Amet '} ,
+8 { ' role ': ' assistant ' , ' content ': ' Answer : A '}
+9 ]
+10
+11 # Integrate the few - shot examples into the conversation
+12 messages = few _s ho t_ ex amp le s + [{ ' role ': ' user ' , ' content ': f '# Your Task :\ n {
+task } ' }]
+13
+14 # Using self - consistency by generating multiple responses
+15 response = agent . a c t i o n _ c a l l _ j s o n _ f o r m a t _ l l m (
+16 model = 'gpt -3.5 - turbo ',
+17 messages = messages ,
+18 temperature =0.8 ,
+19 num_of_response =5 ,
+20 role = ' knowledge and reasoning expert ' ,
+21 retu rn_dict_k eys =[ ' reasoning ' , ' answer '] ,
+22 requirements =(
+23 '1. Please explain step by step .\ n '
+24 '2. The answer MUST be either A or B or C or D .\ n '
+25 ) . strip () ,
+26 )
+27
+28 # Select the most consistent response
+29 answe r_freque ncy = {}
+30 for resp in response :
+31 answer = resp . get ( ' answer ' , ' ')
+32 if answer in [ 'A ' , 'B ' , 'C ' , 'D ' ]:
+33 if answer in a nswer_fr equency :
+34 answ er_freque ncy [ answer ] += 1
+35 else :
+36 answ er_freque ncy [ answer ] = 1
+37
+38 m o s t _ c o n s i s t e n t _ a n s w e r = max ( answer_frequency , key = answer _frequen cy . get )
+39 c o n s i s t e n t _ r e s p o n s e = next ( resp for resp in response if resp . get ( ' answer ') ==
+m o s t _ c o n s i s t e n t _ a n s w e r )
+40 c o n s i s t e n t _ r e s p o n s e [' answer '] = m o s t _ c o n s i s t e n t _ a n s w e r
+41
+42 return c o n s i s t e n t _ r e s p o n s e
+Listing 4: Code of the best policy found by G ¨odel Agent for GPQA.
+1 def solver ( agent , task : str ) :
+2 # Step 1: Initial Prompt
+3 messages = [{ " role " : " user " , " content " : f " # Your Task :\ n { task } " }]
+4
+5 # Main LLM Call
+6 response = agent . a c t i o n _ c a l l _ j s o n _ f o r m a t _ l l m (
+7 model = " gpt -3.5 - turbo " ,
+8 messages = messages ,
+9 temperature =0 ,
+10 num_of_response =5 ,
+11 role = " science professor " ,
+12 retu rn_dict_k eys =[ " reasoning " , " answer " ] ,
+13 requirements =(
+14 " 1. Please explain step by step .\ n "
+15 " 2. The answer MUST be either A or B or C or D .\ n "
+16 ) . strip () ,
+17 )
+18
+19 # Step 2: Self - consistency Evaluation
+20 answer_counts = { " A " : 0 , " B " : 0 , " C " : 0 , " D " : 0}
+21 for i , return_dict in enumerate ( response ) :
+22 answer = return_dict . get ( " answer " , " " )
+23 if answer in answer_counts :
+24 answer_counts [ answer ] += 1
+25
+26 final_answer = max ( answer_counts , key = answer_counts . get )
+27
+28 return { " answer " : final_answer }
+Listing 5: Initial code based on Chain-of-Thought for Game of 24.
+1 def solver ( self , task_input ) :
+2 # Define the prompt and system_prompt
+3 prompt = f \ """
+4 Let 's play the Game of 24! You are given the task_input { task_input }. The
+objective is to find a mathematical expression using these four task_input
+that results in 24. You can use addition (+) , subtraction ( -) ,
+multiplication (*) , and division (/) . Each number must be used exactly once .
+5 Please provide a step - by - step explanation of your thought process and conclude
+with the final expression .
+6 \ """
+7 system_prompt = \ """
+8 {
+9 " thinking ": " This key should contain a detailed step - by - step explanation of
+how to approach the problem , including intermediate steps and reasoning
+for each ." ,
+10 " result ": " This key should contain the final mathematical expression that
+equals 24."
+11 }
+12 \ """
+13
+14 # Call the OpenAI model
+15 response = openai . ChatCompletion . create (
+16 model = " gpt -4 " , # Replace with your model ID
+17 messages =[
+18 { " role " : " system " , " content " : system_prompt } ,
+19 { " role " : " user " , " content " : prompt }
+20 ]
+21 )
+22
+23 # Extract and return the model 's response
+24 result = response [ ' choices ' ][0][ ' message ' ][ ' content ']
+25 return result
+Listing 6: Final code based on search algorithm for Game of 24.
+1 def solver ( self , task_input ) :
+2
+3 operations = [ '+ ', ' - ' , '* ' , '/ ']
+4
+5 # Function to evaluate an expression
+6 def e v a l u a t e _ e x p r e s s i o n (a , op , b ) :
+7 if op == '+ ':
+8 return a + b
+9 elif op == ' -':
+10 return a - b
+11 elif op == '* ':
+12 return a * b
+13 elif op == '/ ':
+14 if b == 0:
+15 return None # Division by zero is not allowed
+16 return a / b
+17
+18 # Recursive function to check all combinations of operations and permutations of
+numbers
+19 def c he c k_ c o mb i n at i o ns ( nums ) :
+20 if len ( nums ) == 1:
+21 # Check if the final number is close enough to 24
+22 if abs ( nums [0] - 24) < 1e -6: # Allow for floating point precision
+errors
+23 return True , str ( nums [0])
+24 return False , " "
+25
+26 # Try all permutations of task_input and all combinations of operations
+27 for i in range ( len ( nums ) ) :
+28 for j in range ( len ( nums ) ) :
+29 if i != j :
+30 # Choose two task_input to operate on
+31 for op in operations :
+32 # The remaining task_input after removing the two selected
+task_input
+33 remaining_nums = [ nums [ k ] for k in range ( len ( nums ) ) if k !=
+i and k != j ]
+34 result = e v a l u a t e _ e x p r e s s i o n ( nums [ i ] , op , nums [ j ])
+35 if result is not None :
+36 # Recursively check the remaining task_input with the
+result of the operation
+37 found , expression = c h e ck _ c om b i na t i on s ([ result ] +
+remaining_nums )
+38 if found :
+39 # If solution is found , return with expression
+40 return True , f " ({ nums [ i ]} { op } { nums [ j ]}) " +
+expression
+41
+42 return False , " "
+43
+44 # Try all permutations of the task_input
+45 for num_permutation in permutations ( task_input ) :
+46 found , expression = c h e ck _ c om b i na t i on s ( list ( num_permutation ) )
+47 if found :
+48 return expression . strip ()
+49
+50 return " No solution "
+Listing 7: Policy at 6th Iteration found by G ¨odel Agent for MGSM.
+1 def solver ( agent , task : str ) :
+2 def parse_problem ( task ) :
+3 # Basic arithmetic and logical parsing based on keywords
+4 words = task . split ()
+5 numbers = list ( map ( int , filter ( lambda x : x . isdigit () , words ) ) )
+6 return { ' numbers ': numbers , ' text ': task }
+7
+8 def p e r f o r m _ l o g i c _ d e d u c t i o n ( parsed_details ) :
+9 # make deductions based on common problem formats
+10 numbers = parsed_details [ ' numbers ']
+11 # This will only manage simple sum , subtraction , multiplication inference
+12 logic_map = {
+13 ' add ': lambda a , b : a + b ,
+14 ' subtract ': lambda a , b : a - b ,
+15 ' multiply ': lambda a , b : a * b
+16 }
+17 # Try to identify actions based on keywords
+18 if ' sum ' in parsed_details [ ' text '] or ' total ' in parsed_details [ ' text ' ]:
+19 result = sum ( numbers )
+20 elif ' difference ' in parsed_details [ ' text '] or ' less ' in parsed_details [ '
+text ' ]:
+21 result = logic_map [ ' subtract ' ]( numbers [0] , numbers [1])
+22 elif ' product ' in parsed_details [ ' text '] or ' times ' in parsed_details [ ' text '
+]:
+23 result = logic_map [ ' multiply ' ]( numbers [0] , numbers [1])
+24 else :
+25 # Default case showing no deduction
+26 result = 0
+27 return result
+28
+29 def e x e c u t e _ c o m p u t a t i o n ( logic_results ) :
+30 # Taking result from inference to numerical handling
+31 return logic_results
+32
+33 def v a l i d a t e _ a n d _ c o m p i l e _ r e s u l t s ( c o m p u t a t i o n _ r e s u l t s ) :
+34 # Prepares and ensures the response matches expected format
+35 final_answer = c o m p u t a t i o n _ r e s u l t s
+36 return final_answer
+37
+38 try :
+39 # Parsing
+40 parsed_details = parse_problem ( task )
+41
+42 # Logical deduction
+43 logic_results = p e r f o r m _ l o g i c _ d e d u c t i o n ( parsed_details )
+44
+45 # Computation
+46 c o m p u t a t i o n _ r e s u l t s = e x e c u t e _ c o m p u t a t i o n ( logic_results )
+47
+48 # Validation and compilation
+49 final_answer = v a l i d a t e _ a n d _ c o m p i l e _ r e s u l t s ( c o m p u t a t i o n _ r e s u l t s )
+50
+51 return { " answer " : final_answer }
+52 except Exception as e :
+53 return { " error " : str ( e ) }
+Listing 8: Policy at 14th Iteration found by G ¨odel Agent for MGSM.
+1 def solver ( agent , task : str ) :
+2 # Updated examples to mirror tasks needing layered logical verification .
+3 examples = [
+4 { ' description ': ' Task exemplifying standard integer - based calculations . ', '
+reasoning ': ' Use arithmetic transformations to validate expressions and
+correct errors if any arise , ensuring correctness . ' , ' answer ': 20} ,
+5 { ' description ': ' Example to validate word problem conversion to math . ' , '
+reasoning ': ' Stepwise interpretation from words into math operations and
+bridge which logic errors need capture . ' , ' answer ': 15} ,
+6 { ' description ': ' Scenario involving normalizing uneven division instances . ' ,
+' reasoning ': ' Ensure no division by zero and equal verification of
+logical conclusions . ' , ' answer ': 6} ,
+7 ]
+8
+9 # Task prompt incorporating roles with enhanced checklists after operation
+conclusion .
+10 task_prompt = " You ' re guiding us as a solution auditor , reflecting on each
+logical conclusion to prevent arithmetic discrepancies .\ n "
+11 task_prompt += task + " \ nReflect on instructions through verified examples . "
+12 task_prompt += " \ nExample insights :\ n "
+13 task_prompt += '; '. join ([ f " { ex [' description ']} -> Reasoning : { ex [ ' reasoning ']}
+| Answer : { ex [ ' answer ']} " for ex in examples ])
+14 task_prompt += " \ nEnsure real - time verification post - calculations via role -
+switching checks . "
+15
+16 messages = [{ " role " : " user " , " content " : task_prompt }]
+17
+18 response = agent . a c t i o n _ c a l l _ j s o n _ f o r m a t _ l l m (
+19 model = " gpt -3.5 - turbo " ,
+20 messages = messages ,
+21 temperature =0.3 ,
+22 num_of_response =1 ,
+23 role = " solution auditor " ,
+24 retu rn_dict_k eys =[ " description " , " reasoning " , " answer " ] ,
+25 requirements =(
+26 " 1. Validate arithmetic consistency and integrity within calculations . "
+27 " 2. Utilize any corrections to refine answer outputs incrementally . "
+28 ) . strip () ,
+29 )
+30
+31 return_dict = response [0]
+32 return_dict [ " answer " ] = str ( return_dict . get ( " answer " , " " ) )
+33 return return_dict
+Listing 9: Policy at 20th Iteration found by G ¨odel Agent for MGSM.
+1 def solver ( agent , task : str ) :
+2 # Targets design for specific error - prone areas with preceding misfires .
+3 examples = [
+4 { ' description ': ' Immediate Arithmetic Operations ' , ' reasoning ': ' Observe
+step - by - step through a chain of logical confirmations . ' , ' answer ': 20} ,
+5 { ' description ': ' Sequential Word Problem Breakdown ' , ' reasoning ': ' Ensure
+smaller module segment steps match logical math outputs consistently . ' ,
+' answer ': 15} ,
+6 { ' description ': ' Fraction and Cascade Operations ' , ' reasoning ': ' Validate
+each fraction conversion before proceeding to other forms . ' , ' answer ':
+6} ,
+7 ]
+8
+9 # Building a rabbit - proof syntax tactline , pushing consistent effort from role -
+coded checks .
+10 task_prompt = " You ' re progressing through solution documentation with focus on
+pinpointing logic errors .\ n "
+11 task_prompt += task + " \ nReflecting structural integrity verified via examples . "
+12 task_prompt += " \ nIn this construct :\ n "
+13 task_prompt += '; '. join ([ f " { ex [' description ']} -> Rationale : { ex [ ' reasoning ']}
+| Response : { ex [ ' answer ']} " for ex in examples ])
+14 task_prompt += " \ nHandle verification and cleanse routines where errors echo in
+mirroring line - based checks . "
+15
+16 messages = [{ " role " : " user " , " content " : task_prompt }]
+17
+18 response = agent . a c t i o n _ c a l l _ j s o n _ f o r m a t _ l l m (
+19 model = " gpt -3.5 - turbo " ,
+20 messages = messages ,
+21 temperature =0.3 ,
+22 num_of_response =1 ,
+23 role = " logical verifier " ,
+24 retu rn_dict_k eys =[ " description " , " reasoning " , " answer " ] ,
+25 requirements =(
+26 " 1. Review arithmetic sessions for comprehensive error fixation . "
+27 " 2. Develop clarity with resistant focus on authentic semantic directive
+flows . "
+28 ) . strip () ,
+29 )
+30
+31 return_dict = response [0]
+32 return_dict [ " answer " ] = str ( return_dict . get ( " answer " , " " ) )
+33 return return_dict
+Analysis Example of G¨odel Agent
+The current logic of the solver in the agent module is achieving only a 45% accuracy on the validation set. The
+structure of the solver involves a single call to the LLM with a specification that the answer must be an integer. While
+this approach seems correct, it may not be sufficient to tackle more complex problems where multipart reasoning or
+verification is needed, leading to significant errors.
+Problems Identified:
+1. Integer Conversion Misunderstandings: Some math problems aren’t resulting in integer answers natively,
+affecting accuracy when the solver forces an integer format.
+2. Reasoning Oversights: The LLM, designated as ”math expert,” occasionally misses necessary reasoning steps or
+executes incorrect operations leading to incorrect answers (like sample 10).
+3. Ambiguity in LLM Outputs: Given tasks in multiple languages, there might be ambiguity in math translations
+or formulations affecting comprehension (like sample 6).
+Plan for Improvement:
+1. Elaborate Reasoning: Consider a multi-step LLM call to allow for a reasoning review before finalizing the
+answer.
+2. Intelligent Answer Parsing: Instead of forcibly converting to integers, parse the LLM response intelligently to
+see if the answer justifies integer rounding or alterations.
+3. Diverse Language Handling: Create a pre-processing step to consistently translate non-English math problems
+into English for uniform processing.
+4. Examples & Feedback: Utilize correctly solved examples as context if a single-step LLM fails.
+Next Steps:
+1. Enhance Solver Logic: Implement a multi-step process involving interim LLM validation or rationale cross-
+checking.
+2. Pre-process Language Variations: Ensure all non-English tasks are translated and re-assessed.
+3. Include Example Feedback: Use correctly solved examples from the evaluation as references to guide LLM
+reasoning and answer validation.

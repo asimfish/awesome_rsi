@@ -1,16 +1,16 @@
 # Awesome Recursive Self-Improvement (RSI) Resources
 
 [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
-![papers](https://img.shields.io/badge/papers-32%2B3_classics-blue)
-![reports](https://img.shields.io/badge/reports-20-red)
-![zh-PDF](https://img.shields.io/badge/zh--PDF-19-green)
-![slides](https://img.shields.io/badge/slides-26p-orange)
+![papers](https://img.shields.io/badge/papers-60%2B6_classics-blue)
+![reports](https://img.shields.io/badge/reports-24-red)
+![zh-PDF](https://img.shields.io/badge/zh--PDF-28-green)
+![slides](https://img.shields.io/badge/slides-30p-orange)
 
 围绕 **Recursive Self-Improvement（递归自改进）** 的论文与资源列表 + 系统性调研仓库（2026-08-31 完成）。与一般 awesome 列表不同，本仓库同时提供：
 
-- **20 份中文精读报告**（`reports/`，逐篇拆方法、数字、局限与谱系定位，含 00 起源前史）
-- **32 篇论文英文原版 PDF + 3 篇起源经典（1965-2003）+ 保版式中文翻译 PDF**（`papers/`，由 [super_translate](https://github.com/asimfish/super_translate) 生成）
-- **26 页汇总报告**（`awesome_rsi_slides.html` 方向键翻页 / `awesome_rsi_slides.pdf`）
+- **24 份中文精读报告**（`reports/`，逐篇拆方法、数字、局限与谱系定位，含 00 起源前史与 23 桥接史）
+- **60 篇论文英文原版 PDF + 6 篇起源经典（1965-2013）+ 28 篇保版式中文翻译 PDF**（`papers/`，翻译由 [super_translate](https://github.com/asimfish/super_translate) 生成）
+- **30 页汇总报告**（`awesome_rsi_slides.html` 方向键翻页 / `awesome_rsi_slides.pdf`）
 
 一句话结论：**执行已经自动化，品味正在被编译，锚是最后的手工业**——所有能跑的自进化系统都保留一个不参与进化的 ground-truth 锚；谁能工业化地生产不可 game 的锚，谁就握住了 RSI 的节流阀。
 
@@ -18,17 +18,19 @@
 
 ## Content
 
-| [1. Start Here](#1-start-here)                          |                                                              |
+| [1. Start Here](#1-start-here)                          | [2. Core Readings](#2-core-readings)                          |
 | ------------------------------------------------------- | ------------------------------------------------------------ |
-| [2. Core Readings](#2-core-readings)                    | [2.5 Origins (1965-2014)](#25-origins-1965-2014)              |
-| [3. Papers](#3-papers)                                  |                                                              |
-| [3.0 Surveys](#30-surveys)                              | [3.1 Framework Side](#31-framework-side)                      |
-| [3.2 Evaluator Side](#32-evaluator-side)                | [3.3 Model Side](#33-model-side)                              |
-| [3.4 Knowledge Side](#34-knowledge-side)                | [3.5 Online Side](#35-online-side)                            |
-| [3.6 Harness & Self-Evolving Agent Lineage](#36-harness--self-evolving-agent-lineage) | [4. Frontier Tracking (2026 H2)](#4-frontier-tracking-2026-h2) |
+| [2.5 Origins (1965-2014)](#25-origins-1965-2014)        | [2.6 Bridge (2023-2025)](#26-bridge-2023-2025)                |
+| [3. Papers](#3-papers)                                  | [3.0 Surveys](#30-surveys)                                    |
+| [3.1 Framework Side](#31-framework-side)                | [3.2 Evaluator Side](#32-evaluator-side)                      |
+| [3.3 Model Side](#33-model-side)                        | [3.4 Knowledge Side](#34-knowledge-side)                      |
+| [3.5 Online Side](#35-online-side)                      | [3.6 Harness & Self-Evolving Agent Lineage](#36-harness--self-evolving-agent-lineage) |
+| [4. Frontier Tracking (2026 H2)](#4-frontier-tracking-2026-h2) | [4.5 Macro Debate & Measurement](#45-macro-debate--measurement) |
 | [5. Ten Insights](#5-ten-insights)                      | [6. Reading Routes](#6-reading-routes)                        |
 | [7. Repository Layout](#7-repository-layout)            | [8. Translation Pipeline](#8-translation-pipeline)            |
-| [9. Disclaimer & Credits](#9-disclaimer--credits)       |                                                              |
+| [9. Disclaimer & Credits](#9-disclaimer--credits)       | [10. Glossary](#10-glossary)                                  |
+| [11. Timeline](#11-timeline)                            | [12. Open Problems](#12-open-problems)                        |
+| [13. Roadmap](#13-roadmap)                              |                                                              |
 
 ## 1. Start Here
 
@@ -36,7 +38,7 @@
 |---|---|
 | 15 分钟 | 打开 [`awesome_rsi_slides.html`](awesome_rsi_slides.html)（浏览器方向键翻页，P 键打印）或 [`awesome_rsi_slides.pdf`](awesome_rsi_slides.pdf) |
 | 2 小时 | [汇总报告](reports/10_synthesis_insights.md) → [总纲解读](reports/01_lilian_weng_harness_engineering.md) → [Who Grades the Grader 解读](reports/05_who_grades_the_grader.md)（全谱系最重要的否定性结论） |
-| 系统研读 | `reports/` 按 00→01→02→07→03→04→05→06→08→11→09→10 顺序（谱系扩编 12-18 与 iCoder 19 按需精读），配 `papers/zh/` 中文 PDF 对照原文 |
+| 系统研读 | `reports/` 按 00→23→01→02→07→03→04→05→06→08→11→09→10 顺序（谱系扩编 12-18、iCoder 19、前沿 20-22 按需精读），配 `papers/zh/` 中文 PDF 对照原文 |
 
 ## 2. Core Readings
 
@@ -67,6 +69,30 @@ _Juergen Schmidhuber_ — 寻找 improvement 的机制本身也在可修改集�
 4. ⭐ **Superintelligence: Paths, Dangers, Strategies.** Oxford University Press, 2014\. [book](https://global.oup.com/academic/product/superintelligence-9780199678112), [解读](reports/00_origins_1965_2014.md)
 _Nick Bostrom_ — 把 RSI 放入 optimization power / recalcitrance 动力学；crossover point：系统自身贡献开始主导后续改进即进入 strong RSI。判据："When the AI improves itself, it improves the thing that does the improving"——一次改进是否同时提升发现、验证、实现下一次改进的能力。
 
+同期扩展阅读（未单独精读，供补全思想史）：
+
+5. **The Coming Technological Singularity: How to Survive in the Post-Human Era.** VISION-21 Symposium, 1993\. [essay](https://edoras.sdsu.edu/~vinge/misc/singularity.html)
+_Vernor Vinge_ — 把 Good 的智能爆炸命名为"奇点"并给出四条路径，第一条即"足够觉醒的超人智能计算机"。
+6. **The Basic AI Drives.** AGI-08, 2008\. [paper](https://selfawaresystems.com/wp-content/uploads/2008/01/ai_drives_final.pdf), [PDF](papers/classics/2008_Omohundro_BasicAIDrives.pdf)
+_Stephen M. Omohundro_ — 论证任何足够强的目标驱动系统都会自发产生自改进、自保护、资源获取等工具性驱力——RSI 安全讨论的起点。
+7. **The Singularity: A Philosophical Analysis.** Journal of Consciousness Studies, 2010\. [paper](http://consc.net/papers/singularity.pdf), [PDF](papers/classics/2010_Chalmers_Singularity.pdf)
+_David J. Chalmers_ — 把智能爆炸论证形式化为"比例论题 + 扩展论题"，并系统讨论结构性障碍与动机性障碍。
+8. **Intelligence Explosion Microeconomics.** MIRI Technical Report, 2013\. [paper](https://intelligence.org/files/IEM.pdf), [PDF](papers/classics/2013_Yudkowsky_IEM.pdf)
+_Eliezer Yudkowsky_ — 把"认知再投资的回报率"作为核心变量，讨论 recalcitrance 曲线形状；Bostrom 2014 动力学框架的直接前身，也是报告 10 insight 9（σ 替代弹性）宏观争论的源头。
+
+## 2.6 Bridge (2023-2025)
+
+从思想史到 2025 年工程爆发之间的四块踏脚石（逐篇拆解见[解读报告 23](reports/23_godel_agent_to_sica.md)，其中 Gödel Agent 与 SICA 为精读对象）：
+
+1. **Voyager: An Open-Ended Embodied Agent with Large Language Models.** arXiv, 2023\. [paper](https://arxiv.org/abs/2305.16291), [code](https://github.com/MineDojo/Voyager), [PDF-en](papers/en/2305.16291_Voyager.pdf)
+_Guanzhi Wang, Yuqi Xie, Yunfan Jiang, Ajay Mandlekar, et al. (NVIDIA/Caltech/Stanford)_ — 第一个"可执行技能库随交互增长"的 LLM agent，WikiSkill / SkillRL 等知识侧工作的共同祖先。
+2. **The AI Scientist: Towards Fully Automated Open-Ended Scientific Discovery.** arXiv, 2024\. [paper](https://arxiv.org/abs/2408.06292), [code](https://github.com/SakanaAI/AI-Scientist), [PDF-en](papers/en/2408.06292_AIScientist.pdf)
+_Chris Lu, Cong Lu, Robert Tjarko Lange, Jakob Foerster, Jeff Clune, David Ha (Sakana AI)_ — Weng 博文"auto-research"线的起点：端到端自动生成 ML 论文，也暴露了 Why LLMs Aren't Scientists Yet 后来系统化的失败模式。
+3. ⭐ **Gödel Agent: A Self-Referential Agent Framework for Recursively Self-Improvement.** arXiv, 2024\. [paper](https://arxiv.org/abs/2410.04444), [code](https://github.com/Arvid-pku/Godel_Agent), [PDF-en](papers/en/2410.04444_GodelAgent.pdf), [PDF-zh](papers/zh/2410.04444_GodelAgent_zh.pdf), [解读](reports/23_godel_agent_to_sica.md)
+_Xunjian Yin, Xinyi Wang, Liangming Pan, Li Lin, Xiaojun Wan, William Yang Wang (PKU/UCSB)_ — Gödel Machine 的第一个 LLM 实现：monkey patching 运行时改写自身逻辑，只靠高层目标提示驱动。
+4. ⭐ **A Self-Improving Coding Agent (SICA).** arXiv, 2025\. [paper](https://arxiv.org/abs/2504.15228), [code](https://github.com/MaximeRobeyns/self_improving_coding_agent), [PDF-en](papers/en/2504.15228_SICA.pdf), [PDF-zh](papers/zh/2504.15228_SICA_zh.pdf), [解读](reports/23_godel_agent_to_sica.md)
+_Maxime Robeyns, Martin Szummer, Laurence Aitchison (Bristol/iGent AI)_ — SWE-Bench Verified 子集 17%→53%；显式多目标效用函数 + 版本档案 + 异步监督者——自改写系统安全部件的起点。
+
 ## 3. Papers
 
 > 分类沿用本调研的五侧地图：**框架侧**（改 harness 源码）、**评估侧**（评估器共进化）、**模型侧**（critic 与权重）、**知识侧**（经验编译为技能）、**在线侧**（免重置在线适应）。每条提供 arXiv 链接、仓库内英文/中文 PDF 与精读报告的相对链接。
@@ -76,7 +102,8 @@ _Nick Bostrom_ — 把 RSI 放入 optimization power / recalcitrance 动力学�
 1. **A Survey of Self-Evolving Agents: What, When, How, and Where to Evolve on the Path to Artificial Super Intelligence.** TMLR, 2026\. [paper](https://arxiv.org/abs/2507.21046), [PDF-en](papers/en/2507.21046_SelfEvolvingAgentsSurvey.pdf), [PDF-zh](papers/zh/2507.21046_SelfEvolvingAgentsSurvey_zh.pdf), [解读](reports/12_self_evolving_agents_survey.md)
 _Huan-ang Gao, Jiayi Geng, Wenyue Hua, Mengkang Hu, Xinzhe Juan, Hongzhang Liu, Shilong Liu, Jiahao Qiu, et al._
 
-另见 4 节趋势中以共进化为中心轴的综述 [Co-Evolution in Agentic Systems](https://arxiv.org/abs/2608.10299)。
+2. ⭐ **Co-Evolution in Agentic Systems: Toward Self-Directed Evolution Beyond Human Design.** arXiv, 2026\. [paper](https://arxiv.org/abs/2608.10299), [PDF-en](papers/en/2608.10299_CoEvolutionSurvey.pdf), [PDF-zh](papers/zh/2608.10299_CoEvolutionSurvey_zh.pdf), [解读](reports/22_coevolution_survey.md)
+_Qing Zong, Jiayu Liu, Junhao Shen, Zecong Tang, Linsi Wu, et al., Yangqiu Song (HKUST/UIUC/CUHK/HKU/PKU)_ — 三阶段递进分类（Agent-Agent → Agent-Environment → Meta 共进化），本调研评估侧四篇的统一坐标。
 
 ### 3.1 Framework Side
 
@@ -111,6 +138,10 @@ _Zhicong Li, Lingjie Jiang, Yulan Hu, Xingchen Zeng, Yixia Li, Xiangwen Zhang, G
 
 1. ⭐ **WikiSkill: Compiling Agent Experience into Persistent Knowledge for Skill Evolution.** arXiv, 2026\. [paper](https://arxiv.org/abs/2608.27454), [PDF-en](papers/en/2608.27454_WikiSkill.pdf), [PDF-zh](papers/zh/2608.27454_WikiSkill_zh.pdf), [解读](reports/09_wikiskill.md)
 _Liyan Tang, Cyrus Rashtchian, Chun-Sung Ferng, Andrew Tomkins, Da-Cheng Juan, Tu Vu_
+2. **SkillRL: Evolving Agents via Recursive Skill-Augmented Reinforcement Learning.** arXiv, 2026\. [paper](https://arxiv.org/abs/2602.08234), [code](https://github.com/aiming-lab/SkillRL), [PDF-en](papers/en/2602.08234_SkillRL.pdf), [中文解读](https://mp.weixin.qq.com/s/wqMM1D4NZQmRtWOcebuhTA)
+_Peng Xia, Jianwen Chen, Hanyang Wang, Jiaqi Liu, et al. (UNC/aiming-lab)_ — 轨迹蒸馏为分层 SkillBank，技能库在 RL 中按验证失败递归进化，ALFWorld/WebShop 超基线 15.3%。
+3. **Evolving-RL: End-to-End Optimization of Experience-Driven Self-Evolving Capability within Agents.** arXiv, 2026\. [paper](https://arxiv.org/abs/2605.10663), [code](https://github.com/Fanzy27/Evolving-RL), [PDF-en](papers/en/2605.10663_EvolvingRL.pdf), [中文解读](https://mp.weixin.qq.com/s/bu3-RyqaYPdA1mH79oF39g)
+_Xiaohongshu Inc. + Peking University_ — 同一共享策略同时当 extractor 与 solver，用下游迁移收益做 GRPO 奖励联合优化经验提取与利用；ALFWorld 未见任务相对 GRPO 基线 +98.7%。
 
 ### 3.5 Online Side
 
@@ -172,38 +203,49 @@ _Seth Karten, Alex L. Zhang, Kevin Thomas, Sebastian Müller, et al. (Princeton,
 
 ## 4. Frontier Tracking (2026 H2)
 
-2026 年 6-8 月扫描结果（完整笔记见 [`assets/trends_research_raw.md`](assets/trends_research_raw.md)：19 篇新论文 + 9 项工业动态 + 7 项基准动态 + 8 项安全治理）。
+2026 年 6-8 月扫描结果（完整笔记见 [`assets/trends_research_raw.md`](assets/trends_research_raw.md)：19 篇新论文 + 9 项工业动态 + 7 项基准动态 + 8 项安全治理）。全部 20 篇英文 PDF 已入库；Metan / Co-Harness / 共进化综述 / EvalCEGAR 四篇附中文翻译，前三篇有精读报告（20 / 21 / 22）。
 
 **评估器军备赛**
 
-1. **EvalCEGAR: Metrics That Write Themselves.** [arXiv:2608.18744](https://arxiv.org/abs/2608.18744) — 用反例（而非 prompt）驱动评估器算子进化，延续 Who Grades the Grader 路线。
-2. **SCORE: Self-Evolving Deep Research via Joint Generation and Evaluation.** [arXiv:2606.04507](https://arxiv.org/abs/2606.04507) — 评估器与求解器共享参数联合训练，推进到权重层。
-3. **Co-Evolution in Agentic Systems (Survey).** [arXiv:2608.10299](https://arxiv.org/abs/2608.10299) — 首个以共进化为中心轴的综述：Agent-Agent / Agent-Environment / Meta 三层。
+1. **EvalCEGAR: Metrics That Write Themselves.** [arXiv:2608.18744](https://arxiv.org/abs/2608.18744), [PDF-en](papers/en/2608.18744_EvalCEGAR.pdf), [PDF-zh](papers/zh/2608.18744_EvalCEGAR_zh.pdf) — 用反例（而非 prompt）驱动评估器算子进化，延续 Who Grades the Grader 路线。
+2. **SCORE: Self-Evolving Deep Research via Joint Generation and Evaluation.** [arXiv:2606.04507](https://arxiv.org/abs/2606.04507), [PDF-en](papers/en/2606.04507_SCORE.pdf) — 评估器与求解器共享参数联合训练，推进到权重层。
+3. **Co-Evolution in Agentic Systems (Survey).** [arXiv:2608.10299](https://arxiv.org/abs/2608.10299), [PDF-en](papers/en/2608.10299_CoEvolutionSurvey.pdf), [PDF-zh](papers/zh/2608.10299_CoEvolutionSurvey_zh.pdf), [解读](reports/22_coevolution_survey.md) — 首个以共进化为中心轴的综述：Agent-Agent / Agent-Environment / Meta 三层。
 
 **技能进化红海（WikiSkill 同月平行工作）**
 
-4. **SkillCommit.** [arXiv:2608.15165](https://arxiv.org/abs/2608.15165) — 反对语义相似度合并，用行为验证的层级抽象提交。
-5. **HyperSkill.** [arXiv:2608.16114](https://arxiv.org/abs/2608.16114) — 超图结构技能记忆，GAIA +11.5。
-6. **ERSkill.** [arXiv:2608.12720](https://arxiv.org/abs/2608.12720) — 检索行为本身技能化，双 frontier 解耦扩张与部署。
-7. **SkillProx.** [arXiv:2608.07449](https://arxiv.org/abs/2608.07449) — 近端梯度下降形式化搬到文本技能空间，删除是一等公民。
-8. **Evo-Harness.** [arXiv:2608.15071](https://arxiv.org/abs/2608.15071) — 反思编译为技能 harness，五基准系统性隔离变量。
+4. **SkillCommit.** [arXiv:2608.15165](https://arxiv.org/abs/2608.15165), [PDF-en](papers/en/2608.15165_SkillCommit.pdf) — 反对语义相似度合并，用行为验证的层级抽象提交。
+5. **HyperSkill.** [arXiv:2608.16114](https://arxiv.org/abs/2608.16114), [PDF-en](papers/en/2608.16114_HyperSkill.pdf) — 超图结构技能记忆，GAIA +11.5。
+6. **ERSkill.** [arXiv:2608.12720](https://arxiv.org/abs/2608.12720), [PDF-en](papers/en/2608.12720_ERSkill.pdf) — 检索行为本身技能化，双 frontier 解耦扩张与部署。
+7. **SkillProx.** [arXiv:2608.07449](https://arxiv.org/abs/2608.07449), [PDF-en](papers/en/2608.07449_SkillProx.pdf) — 近端梯度下降形式化搬到文本技能空间，删除是一等公民。
+8. **Evo-Harness.** [arXiv:2608.15071](https://arxiv.org/abs/2608.15071), [PDF-en](papers/en/2608.15071_EvoHarness.pdf) — 反思编译为技能 harness，五基准系统性隔离变量。
 
 **Harness 工程化与共学习**
 
-9. **Co-Harness: Co-Evolving Harnesses and Model Weights.** [arXiv:2607.22688](https://arxiv.org/abs/2607.22688) — harness 优化产生轨迹再蒸馏进权重，双环交替。
-10. **RHO: Retrospective Harness Optimization via Self-Preference.** [arXiv:2606.05922](https://arxiv.org/abs/2606.05922) — 完全无标签自优化，SWE-Bench Pro 59%→78%。
-11. **Adaptive Auto-Harness.** [arXiv:2606.01770](https://arxiv.org/abs/2606.01770) — 密集自改进在开放任务流上早峰后衰减的负结果实证。
-12. **HarnessFix.** [arXiv:2606.06324](https://arxiv.org/abs/2606.06324) — 轨迹+harness 编译为 IR，失败归因到 ETCLOVG 七层。
-13. **Metan (Meta^n): RSI through Emergent Depth.** [arXiv:2608.24735](https://arxiv.org/abs/2608.24735) — 论证自改写 meta 深度上限约 2.5，改输入不改机器绕开权衡。
-14. **HSI: Hierarchical Self-Improvement.** [arXiv:2608.08466](https://arxiv.org/abs/2608.08466) — 三层作用域进化，冻结 meta-evolver 为外层锚。
+9. **Co-Harness: Co-Evolving Harnesses and Model Weights.** [arXiv:2607.22688](https://arxiv.org/abs/2607.22688), [PDF-en](papers/en/2607.22688_CoHarness.pdf), [PDF-zh](papers/zh/2607.22688_CoHarness_zh.pdf), [解读](reports/21_co_harness.md) — harness 优化产生轨迹再蒸馏进权重，双环交替。
+10. **RHO: Retrospective Harness Optimization via Self-Preference.** [arXiv:2606.05922](https://arxiv.org/abs/2606.05922), [PDF-en](papers/en/2606.05922_RHO.pdf) — 完全无标签自优化，SWE-Bench Pro 59%→78%。
+11. **Adaptive Auto-Harness.** [arXiv:2606.01770](https://arxiv.org/abs/2606.01770), [PDF-en](papers/en/2606.01770_AdaptiveAutoHarness.pdf) — 密集自改进在开放任务流上早峰后衰减的负结果实证。
+12. **HarnessFix.** [arXiv:2606.06324](https://arxiv.org/abs/2606.06324), [PDF-en](papers/en/2606.06324_HarnessFix.pdf) — 轨迹+harness 编译为 IR，失败归因到 ETCLOVG 七层。
+13. **Metan (Meta^n): RSI through Emergent Depth.** [arXiv:2608.24735](https://arxiv.org/abs/2608.24735), [PDF-en](papers/en/2608.24735_Metan.pdf), [PDF-zh](papers/zh/2608.24735_Metan_zh.pdf), [解读](reports/20_metan.md) — 论证自改写 meta 深度上限约 2.5，改输入不改机器绕开权衡。
+14. **HSI: Hierarchical Self-Improvement.** [arXiv:2608.08466](https://arxiv.org/abs/2608.08466), [PDF-en](papers/en/2608.08466_HSI.pdf) — 三层作用域进化，冻结 meta-evolver 为外层锚。
 
 **安全、治理与基准**
 
-15. **SESG: A Self-Evolving Safety Guardrail in Production.** [arXiv:2608.08471](https://arxiv.org/abs/2608.08471) — 深信服生产系统，16-24h 自动闭环新威胁（原 40-90h）。
-16. **OpenLoopEvolve (OLE).** [arXiv:2608.09380](https://arxiv.org/abs/2608.09380) — 策略资产版本化+血统追踪+劣化自动回滚，补 MOSS 的部署纪律。
-17. **Falsifiable Release Gates for Self-Improving Systems.** [arXiv:2607.13070](https://arxiv.org/abs/2607.13070) — 七道可证伪发布门：收紧类自动应用、放松类必须人类合并。
-18. **HVTB: Hack-Verifiable Terminal Bench.** [arXiv:2608.22103](https://arxiv.org/abs/2608.22103) — 蜜罐嵌入真实编码任务，测前沿模型 reward hacking 率下界。
-19. **ASG-SI / ARA（安全谱系背景）.** [arXiv:2512.23760](https://arxiv.org/abs/2512.23760), [arXiv:2602.01750](https://arxiv.org/abs/2602.01750) — verifier-auditor 密码学溯源与对抗性奖励审计。
+15. **SESG: A Self-Evolving Safety Guardrail in Production.** [arXiv:2608.08471](https://arxiv.org/abs/2608.08471), [PDF-en](papers/en/2608.08471_SESG.pdf) — 深信服生产系统，16-24h 自动闭环新威胁（原 40-90h）。
+16. **OpenLoopEvolve (OLE).** [arXiv:2608.09380](https://arxiv.org/abs/2608.09380), [PDF-en](papers/en/2608.09380_OpenLoopEvolve.pdf) — 策略资产版本化+血统追踪+劣化自动回滚，补 MOSS 的部署纪律。
+17. **Falsifiable Release Gates for Self-Improving Systems.** [arXiv:2607.13070](https://arxiv.org/abs/2607.13070), [PDF-en](papers/en/2607.13070_FalsifiableReleaseGates.pdf) — 七道可证伪发布门：收紧类自动应用、放松类必须人类合并。
+18. **HVTB: Hack-Verifiable Terminal Bench.** [arXiv:2608.22103](https://arxiv.org/abs/2608.22103), [PDF-en](papers/en/2608.22103_HVTB.pdf) — 蜜罐嵌入真实编码任务，测前沿模型 reward hacking 率下界。
+19. **ASG-SI / ARA（安全谱系背景）.** [arXiv:2512.23760](https://arxiv.org/abs/2512.23760), [PDF-en](papers/en/2512.23760_ASG-SI.pdf), [arXiv:2602.01750](https://arxiv.org/abs/2602.01750), [PDF-en](papers/en/2602.01750_ARA.pdf) — verifier-auditor 密码学溯源与对抗性奖励审计。
+
+## 4.5 Macro Debate & Measurement
+
+报告 10 insight 8（微观加速 vs 宏观节奏的实证鸿沟）与 insight 9（算力-认知劳动替代弹性 σ）的证据源：
+
+1. **Explosive Growth from AI Automation: A Review of the Arguments.** arXiv, 2023\. [paper](https://arxiv.org/abs/2309.11690), [PDF-en](papers/en/2309.11690_ExplosiveGrowthReview.pdf)
+_Ege Erdil, Tamay Besiroglu (Epoch AI)_ — 系统梳理"AI 自动化能否导致 >30%/年经济增长"正反论证；σ 是否大于 1 被识别为关键参数。
+2. **Will AI R&D Automation Cause a Software Intelligence Explosion?** Forethought Research, 2025\. [report](https://www.forethought.org/research/will-ai-r-and-d-automation-cause-a-software-intelligence-explosion)
+_Daniel Eth, Tom Davidson_ — 把 Bostrom 的 recalcitrance 具体化为"软件研发回报率 r"，论证 r > 1 时算力不增也可爆炸。
+3. **Measuring AI Ability to Complete Long Software Tasks.** arXiv, 2025\. [paper](https://arxiv.org/abs/2503.14499), [PDF-en](papers/en/2503.14499_METR_LongTasks.pdf)
+_Thomas Kwa, Ben West, Joel Becker, et al. (METR)_ — "50% 任务时长地平线每约 7 个月翻倍"：宏观节奏的唯一公开连续测量，报告 10 §5 开放问题 6 的裁决工具。
 
 ## 5. Ten Insights
 
@@ -224,19 +266,21 @@ _Seth Karten, Alex L. Zhang, Kevin Thomas, Sebastian Müller, et al. (Princeton,
 
 按目的选路线（materials 均在本仓库内）：
 
-- **想快速建立全景**：slides 26 页（15 分钟）→ [报告 10](reports/10_synthesis_insights.md)（叙事弧线 + 两轴地图 + 十条 insight）
+- **想快速建立全景**：slides 30 页（15 分钟）→ [报告 10](reports/10_synthesis_insights.md)（叙事弧线 + 两轴地图 + 十条 insight）
 - **想理解 harness 工程**：[报告 01](reports/01_lilian_weng_harness_engineering.md)（Weng 总纲）→ [报告 07](reports/07_darwin_godel_machine.md)（DGM 基线）→ [报告 11](reports/11_continual_harness.md)（免重置 + 共学习）
 - **想理解评估器战争**：[报告 03](reports/03_evolm.md)（reward overoptimization 悖论）→ [报告 04](reports/04_red_queen_godel_machine.md)（epoch 冻结）→ [报告 05](reports/05_who_grades_the_grader.md)（观测等价 + 锚定纪律）→ [报告 06](reports/06_echo.md)（权重层双路 GRPO）
-- **想看生产落地**：[报告 02](reports/02_anthropic_when_ai_builds_itself.md)（Anthropic 内部证据）→ [报告 08](reports/08_moss.md)（MOSS 门控回滚）→ 4 节的 SESG / OLE / HarnessFix
+- **想看生产落地**：[报告 02](reports/02_anthropic_when_ai_builds_itself.md)（Anthropic 内部证据）→ [报告 08](reports/08_moss.md)（MOSS 门控回滚）→ [报告 19](reports/19_icoder.md)（iCoder 五层门控）→ 4 节的 SESG / OLE / HarnessFix
+- **想理解思想史与递归深度**：[报告 00](reports/00_origins_1965_2014.md)（Good → Bostrom）→ [报告 23](reports/23_godel_agent_to_sica.md)（Gödel Agent → SICA）→ [报告 07](reports/07_darwin_godel_machine.md)（DGM）→ [报告 20](reports/20_metan.md)（Metan：meta 深度 2.5 上限与绕行）
+- **想做二次开发**：[报告 19](reports/19_icoder.md)（iCoder 基座评估）→ [报告 13](reports/13_meta_harness.md)（Meta-Harness 轨迹驱动改写）→ [报告 21](reports/21_co_harness.md)（Co-Harness 双环蒸馏）→ [报告 22](reports/22_coevolution_survey.md)（过程级测试清单）
 
 ## 7. Repository Layout
 
 ```
 awesome_rsi/
 ├── README.md                        # 本文件
-├── awesome_rsi_slides.html          # 26 页汇总 HTML PPT（方向键翻页，P 键打印）
-├── awesome_rsi_slides.pdf           # 同内容 26 页 PDF 版（1280x720 逐页）
-├── reports/                         # 20 份精读报告（Markdown，中文）
+├── awesome_rsi_slides.html          # 30 页汇总 HTML PPT（方向键翻页，P 键打印）
+├── awesome_rsi_slides.pdf           # 同内容 30 页 PDF 版（1280x720 逐页）
+├── reports/                         # 24 份精读报告（Markdown，中文）
 │   ├── 00_origins_1965_2014.md                 # 前史：Good → Yudkowsky → Schmidhuber → Bostrom
 │   ├── 01_lilian_weng_harness_engineering.md   # 总纲：harness 工程 → RSI
 │   ├── 02_anthropic_when_ai_builds_itself.md   # 工业证据：>80% 代码由 Claude 写
@@ -256,11 +300,15 @@ awesome_rsi/
 │   ├── 16_autosaddler.md                       # 谱系：轨迹归因 + 持久化更新（Microsoft 等）
 │   ├── 17_metacaster.md                        # 谱系：meta-harness 垂直落地（时序预测）
 │   ├── 18_prime_agent.md                       # 谱系：自改进 RLM harness（Prime Intellect）
-│   └── 19_icoder.md                            # 工业实证：AI 主导开发 27B 前沿模型（后续开发基座）
+│   ├── 19_icoder.md                            # 工业实证：AI 主导开发 27B 前沿模型（后续开发基座）
+│   ├── 20_metan.md                             # 前沿：meta 深度 2.5 上限与"改输入不改机器"绕行
+│   ├── 21_co_harness.md                        # 前沿：harness-权重双环共进化（通用 agent）
+│   ├── 22_coevolution_survey.md                # 综述：共进化三阶段分类（评估侧统一坐标）
+│   └── 23_godel_agent_to_sica.md               # 桥接史：Gödel Agent → SICA → DGM
 ├── papers/
-│   ├── classics/                    # 起源经典（1965 Good / 2001 GISAI / 2003 Gödel Machine，含中译）
-│   ├── en/                          # 32 篇英文原版 PDF（arXiv + iCoder 技术报告）
-│   └── zh/                          # 20 篇中文翻译 PDF（super_translate，保版式）
+│   ├── classics/                    # 起源经典 6 篇（1965 Good / 2001 GISAI / 2003 Gödel Machine / 2008 Omohundro / 2010 Chalmers / 2013 IEM，GISAI 与 Gödel Machine 含中译）
+│   ├── en/                          # 60 篇英文原版 PDF（arXiv + iCoder 技术报告）
+│   └── zh/                          # 26 篇中文翻译 PDF（super_translate，保版式）
 └── assets/
     ├── fulltext/                    # 核心论文提取全文（报告撰写底稿）
     └── trends_research_raw.md       # 2026H2 趋势扫描原始笔记
@@ -276,3 +324,65 @@ awesome_rsi/
 - 精读报告与 slides 为本仓库原创内容（CC BY 4.0），转载注明出处。
 - 编目规范参考 [Thinklab-SJTU/awesome-ml4co](https://github.com/Thinklab-SJTU/awesome-ml4co)。
 - 欢迎 PR 补充新论文：条目格式为 `**标题.** 来源, 年份. [paper](链接)` + 斜体作者行。
+
+## 10. Glossary
+
+本调研反复使用的概念，按出现的报告标注出处：
+
+| 术语 | 含义 | 出处 |
+|---|---|---|
+| **RSI（递归自改进）** | 不是"系统反复改进自身"，而是"一次改进提升了系统发现、验证、实现下一次改进的能力"——改进能力本身进入优化闭环 | Bostrom 2014 · 报告 00 |
+| **crossover point / recalcitrance** | 系统自身贡献开始主导后续改进的时刻 / 系统对改进的阻力；增长率 = optimization power ÷ recalcitrance | Bostrom 2014 · 报告 00 |
+| **Harness** | 基座模型之外决定信息流的一切：编排、规划、工具调用、上下文管理、评估；Weng 论点——harness 是可执行的搜索空间 | 报告 01 |
+| **三层改进面** | 文本层（prompt/技能，快环）、权重层（微调，慢环）、源码层（改 harness 代码，最后手段）；2026 共识是分层分工而非三选一 | 报告 10 §2 |
+| **锚定纪律（anchor discipline）** | 所有能跑的自进化系统都保留一个不参与进化的 ground-truth 部件（人工标注集 / 冻结 PRM / 原始验证器 / 冻结 proposer） | 报告 05 · 11 · 15 · 17 |
+| **评估器塌缩 / 观测等价** | 评估器被 game 与真进化在任务分数上不可区分，必须引入进化外的锚才能分辨 | 报告 05 |
+| **reward overoptimization** | 静态奖励模型判分精度越高、训出的策略反而越差——策略利用了固定判据 | 报告 03 |
+| **critic staleness** | 静态 critic 跟不上 policy 的分布偏移，反馈效用递减；解法是 critic 与 policy 双路同步更新 | 报告 06 |
+| **免重置 vs 重置式** | 重置式（DGM/RQGM/GEPA）的效用信号来自完整评测；免重置（Continual Harness / Prime Agent）在故障现场修 harness，可达 episode 深处的失败模式 | 报告 11 · 18 |
+| **能力地板（capability floor）** | 基座能力低于某阈值时，更强的脚手架只会让它更迷茫（CH 中 Flash-Lite 全线更差）；回归门"改坏即拒"是地板保护 | 报告 11 · 14 · 21 |
+| **Harness Debt** | 在补偿模型弱点的脚手架下训练，模型可能依赖脚手架而裸测退步；Co-Harness 实测每轮裸测精度上升，债务为负 | 报告 21 |
+| **realized meta-depth** | 系统中行为真正发生变化的最高 meta 层级；自改写系统因需冻结驱动层卡在约 2.5，Metan 以"冻结 Ω、递归输入"绕行 | 报告 20 |
+| **harness 资产化** | 优化后的 harness 可跨模型迁移（Meta-Harness 对 5 个未见模型 +4.7 分；CH bootstrap 继承），成为可交易资产，但受能力地板限制消费门槛 | 报告 10 · 13 · 17 |
+| **高密度低频接口** | 把专家经验一次性编码为 prior（目标/脚手架/权限/验证/证据纪律），运行期只在权限变更时介入——iCoder 对"人类还握什么"的工程答案 | 报告 19 |
+| **过程级测试** | 评估共进化系统不能只看任务分：历史交叉对弈、组件消融、held-out 评估器三件套 | 报告 22 |
+
+## 11. Timeline
+
+| 时间 | 事件 | 报告 |
+|---|---|---|
+| 1965 | Good 提出 intelligence explosion | 00 |
+| 1993 | Vinge 命名"奇点"，列出四条路径 | 00 |
+| 2000-01 | Yudkowsky GISAI：Seed AI 三能力 + "每级须开新机会" | 00 |
+| 2003 | Schmidhuber Gödel Machine：自指完备的形式化极限 | 00 |
+| 2008-13 | Omohundro 工具性驱力 → Chalmers 形式化论证 → Yudkowsky IEM 认知再投资回报率 | 00 |
+| 2014 | Bostrom《Superintelligence》：crossover / recalcitrance 动力学 | 00 |
+| 2023 | Voyager 可增长技能库；STOP 递归自改进代码生成；Erdil & Besiroglu 爆炸增长综述 | 23 |
+| 2024 | ADAS / AFlow 自动 agent 设计；AI Scientist 端到端自动研究；**Gödel Agent** 首个 LLM 版 Gödel Machine | 23 |
+| 2025 H1 | METR 任务地平线 7 个月翻倍；**SICA** SWE-Bench 17→53% 并引入异步监督者；**DGM** 开放式档案自改写 | 23 · 07 |
+| 2025 H2 | AlphaEvolve / ShinkaEvolve 进化式程序搜索；GEPA 反思提示进化超 RL；TMLR 自进化综述；ACE 上下文进化 | 12 |
+| 2026 Q1 | **ECHO** critic 共进化；MCE 元上下文工程；SkillRL；HyperAgents；**Meta-Harness** | 06 · 13 |
+| 2026 Q2 | AHE 可观测性驱动进化；**EvoLM** rubric 共进化；**Continual Harness** 免重置 + 共学习；**MOSS** 生产级源码自改写；Evolving-RL；SIA；**Self-Harness**；**RQGM** 受控效用进化；RHO / HarnessFix / Adaptive Auto-Harness | 03 · 04 · 08 · 11 · 14 |
+| 2026 Q3 | Weng《Harness Engineering for Self-Improvement》；Anthropic《When AI builds itself》；**Who Grades the Grader** 锚定纪律；**Co-Harness** 双环；Falsifiable Release Gates；skill 红海（SkillCommit / HyperSkill / ERSkill / SkillProx / Evo-Harness）；**EnvHarness** / **AutoSaddler** / **MetaCaster** / **Prime Agent**；**Metan** meta 深度；**WikiSkill**；共进化综述；**iCoder** AI 主导开发 27B 前沿模型 | 01 · 02 · 05 · 09 · 15-22 |
+
+## 12. Open Problems
+
+按可检验性排序（前六条源自[报告 10 §5](reports/10_synthesis_insights.md)，后两条由本轮扩编新增）：
+
+1. **最小锚问题**：维持评估器不塌缩所需的人工锚定量下界是多少？（WGtG 锚定集、EvalCEGAR 碰撞对给出两个数据点，无理论）
+2. **品味可否被编译**：wiki/技能层能否沉淀"方向判断"而不只是"流程知识"？
+3. **σ 之争的实验裁决**：随机分配算力预算的受控实验何时有人做？
+4. **meta-depth 上限的普适性**：Metan 的 2.5 上限是否适用于"改输入"路线？涌现层级角色随深度持续分化还是同质化？
+5. **跨代锚漂移**：RQGM 的 epoch 边界换尺、SESG 的 v0→v6 演化——锚本身的更新由谁验证？目前答案都是"人类"，但没有协议化
+6. **宏观加速何时显形**：若 2027 年 METR 仍测不到 2× 节奏加速，是 Amdahl 串行瓶颈成立，还是加速被"做更多实验"消化？
+7. **harness 收益曲线能否预测**：地板之下为负（CH Flash-Lite）、中段最大（Co-Harness 32B × HMMT25 +27.2）、天花板附近饱和（8B × AIME24）——能否从基座能力事先预测某个 harness 改动的收益符号？
+8. **评测测的是模型还是壳**：Prime Agent 让 ARC-AGI-3 从官方壳 30.2% 到 95.5%——基准报告是否应强制附带 harness 规格与"harness-normalized"分数？
+
+## 13. Roadmap
+
+本仓库后续开发计划（owner 2026-09-01 指令）：
+
+- **基座**：以 [iCoder](https://github.com/bingreeky/iCoder) 代码库为后续开发基础，复用其 Research Skills 表示、治理四件套（任务队列 / 实验日志 / 决策记录 / 审批门）与 Data→SFT→OPSD→RLVR 可回退状态机（评估见[报告 19](reports/19_icoder.md)）
+- **待验证的设计选择**：harness 改写走 Meta-Harness 式全轨迹自由改写（报告 13）还是 AutoSaddler 式归因约束局部 diff（报告 16）；权重环走 Co-Harness 离线批次（报告 21）还是 Continual Harness 在线共学习（报告 11）
+- **不可妥协项**：进化外的独立锚（报告 05）、回归门（报告 14）、版本化回滚（报告 08 / 21）、过程级测试三件套（报告 22）
+- **持续维护**：新论文按 §4 格式追加，配 PDF-en 入库；重点论文补 PDF-zh 与精读报告；slides 与本 README 计数同步
