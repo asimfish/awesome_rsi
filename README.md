@@ -2,15 +2,15 @@
 
 [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
 ![papers](https://img.shields.io/badge/papers-60%2B6_classics-blue)
-![reports](https://img.shields.io/badge/reports-24-red)
+![reports](https://img.shields.io/badge/reports-26-red)
 ![zh-PDF](https://img.shields.io/badge/zh--PDF-28-green)
-![slides](https://img.shields.io/badge/slides-30p-orange)
+![slides](https://img.shields.io/badge/slides-31p-orange)
 
 围绕 **Recursive Self-Improvement（递归自改进）** 的论文与资源列表 + 系统性调研仓库（2026-08-31 完成）。与一般 awesome 列表不同，本仓库同时提供：
 
-- **24 份中文精读报告**（`reports/`，逐篇拆方法、数字、局限与谱系定位，含 00 起源前史与 23 桥接史）
+- **26 份中文精读报告**（`reports/`，逐篇拆方法、数字、局限与谱系定位，含 00 起源前史与 23 桥接史）
 - **60 篇论文英文原版 PDF + 6 篇起源经典（1965-2013）+ 28 篇保版式中文翻译 PDF**（`papers/`，翻译由 [super_translate](https://github.com/asimfish/super_translate) 生成）
-- **30 页汇总报告**（`awesome_rsi_slides.html` 方向键翻页 / `awesome_rsi_slides.pdf`）
+- **31 页汇总报告**（`awesome_rsi_slides.html` 方向键翻页 / `awesome_rsi_slides.pdf`）
 
 一句话结论：**执行已经自动化，品味正在被编译，锚是最后的手工业**——所有能跑的自进化系统都保留一个不参与进化的 ground-truth 锚；谁能工业化地生产不可 game 的锚，谁就握住了 RSI 的节流阀。
 
@@ -38,7 +38,7 @@
 |---|---|
 | 15 分钟 | 打开 [`awesome_rsi_slides.html`](awesome_rsi_slides.html)（浏览器方向键翻页，P 键打印）或 [`awesome_rsi_slides.pdf`](awesome_rsi_slides.pdf) |
 | 2 小时 | [汇总报告](reports/10_synthesis_insights.md) → [总纲解读](reports/01_lilian_weng_harness_engineering.md) → [Who Grades the Grader 解读](reports/05_who_grades_the_grader.md)（全谱系最重要的否定性结论） |
-| 系统研读 | `reports/` 按 00→23→01→02→07→03→04→05→06→08→11→09→10 顺序（谱系扩编 12-18、iCoder 19、前沿 20-22 按需精读），配 `papers/zh/` 中文 PDF 对照原文 |
+| 系统研读 | `reports/` 按 00→23→01→02→07→03→04→05→06→08→11→09→10 顺序（谱系扩编 12-18、iCoder 19、前沿 20-22、评估器两极 24-25 按需精读），配 `papers/zh/` 中文 PDF 对照原文 |
 
 ## 2. Core Readings
 
@@ -203,11 +203,11 @@ _Seth Karten, Alex L. Zhang, Kevin Thomas, Sebastian Müller, et al. (Princeton,
 
 ## 4. Frontier Tracking (2026 H2)
 
-2026 年 6-8 月扫描结果（完整笔记见 [`assets/trends_research_raw.md`](assets/trends_research_raw.md)：19 篇新论文 + 9 项工业动态 + 7 项基准动态 + 8 项安全治理）。全部 20 篇英文 PDF 已入库；Metan / Co-Harness / 共进化综述 / EvalCEGAR 四篇附中文翻译，前三篇有精读报告（20 / 21 / 22）。
+2026 年 6-8 月扫描结果（完整笔记见 [`assets/trends_research_raw.md`](assets/trends_research_raw.md)：19 篇新论文 + 9 项工业动态 + 7 项基准动态 + 8 项安全治理）。全部 20 篇英文 PDF 已入库；Metan / Co-Harness / 共进化综述 / EvalCEGAR 四篇附中文翻译；Metan / Co-Harness / 共进化综述 / EvalCEGAR / RHO 有精读报告（20 / 21 / 22 / 24 / 25，其中 24-25 构成"锚 vs 无锚"对照组）。
 
 **评估器军备赛**
 
-1. **EvalCEGAR: Metrics That Write Themselves.** [arXiv:2608.18744](https://arxiv.org/abs/2608.18744), [PDF-en](papers/en/2608.18744_EvalCEGAR.pdf), [PDF-zh](papers/zh/2608.18744_EvalCEGAR_zh.pdf) — 用反例（而非 prompt）驱动评估器算子进化，延续 Who Grades the Grader 路线。
+1. **EvalCEGAR: Metrics That Write Themselves.** [arXiv:2608.18744](https://arxiv.org/abs/2608.18744), [PDF-en](papers/en/2608.18744_EvalCEGAR.pdf), [PDF-zh](papers/zh/2608.18744_EvalCEGAR_zh.pdf), [解读](reports/24_evalcegar.md) — 用反例（而非 prompt）驱动评估器算子进化，延续 Who Grades the Grader 路线。
 2. **SCORE: Self-Evolving Deep Research via Joint Generation and Evaluation.** [arXiv:2606.04507](https://arxiv.org/abs/2606.04507), [PDF-en](papers/en/2606.04507_SCORE.pdf) — 评估器与求解器共享参数联合训练，推进到权重层。
 3. **Co-Evolution in Agentic Systems (Survey).** [arXiv:2608.10299](https://arxiv.org/abs/2608.10299), [PDF-en](papers/en/2608.10299_CoEvolutionSurvey.pdf), [PDF-zh](papers/zh/2608.10299_CoEvolutionSurvey_zh.pdf), [解读](reports/22_coevolution_survey.md) — 首个以共进化为中心轴的综述：Agent-Agent / Agent-Environment / Meta 三层。
 
@@ -222,7 +222,7 @@ _Seth Karten, Alex L. Zhang, Kevin Thomas, Sebastian Müller, et al. (Princeton,
 **Harness 工程化与共学习**
 
 9. **Co-Harness: Co-Evolving Harnesses and Model Weights.** [arXiv:2607.22688](https://arxiv.org/abs/2607.22688), [PDF-en](papers/en/2607.22688_CoHarness.pdf), [PDF-zh](papers/zh/2607.22688_CoHarness_zh.pdf), [解读](reports/21_co_harness.md) — harness 优化产生轨迹再蒸馏进权重，双环交替。
-10. **RHO: Retrospective Harness Optimization via Self-Preference.** [arXiv:2606.05922](https://arxiv.org/abs/2606.05922), [PDF-en](papers/en/2606.05922_RHO.pdf) — 完全无标签自优化，SWE-Bench Pro 59%→78%。
+10. **RHO: Retrospective Harness Optimization via Self-Preference.** [arXiv:2606.05922](https://arxiv.org/abs/2606.05922), [PDF-en](papers/en/2606.05922_RHO.pdf), [解读](reports/25_rho.md) — 完全无标签自优化，SWE-Bench Pro 59%→78%。
 11. **Adaptive Auto-Harness.** [arXiv:2606.01770](https://arxiv.org/abs/2606.01770), [PDF-en](papers/en/2606.01770_AdaptiveAutoHarness.pdf) — 密集自改进在开放任务流上早峰后衰减的负结果实证。
 12. **HarnessFix.** [arXiv:2606.06324](https://arxiv.org/abs/2606.06324), [PDF-en](papers/en/2606.06324_HarnessFix.pdf) — 轨迹+harness 编译为 IR，失败归因到 ETCLOVG 七层。
 13. **Metan (Meta^n): RSI through Emergent Depth.** [arXiv:2608.24735](https://arxiv.org/abs/2608.24735), [PDF-en](papers/en/2608.24735_Metan.pdf), [PDF-zh](papers/zh/2608.24735_Metan_zh.pdf), [解读](reports/20_metan.md) — 论证自改写 meta 深度上限约 2.5，改输入不改机器绕开权衡。
@@ -266,9 +266,9 @@ _Thomas Kwa, Ben West, Joel Becker, et al. (METR)_ — "50% 任务时长地平�
 
 按目的选路线（materials 均在本仓库内）：
 
-- **想快速建立全景**：slides 30 页（15 分钟）→ [报告 10](reports/10_synthesis_insights.md)（叙事弧线 + 两轴地图 + 十条 insight）
+- **想快速建立全景**：slides 31 页（15 分钟）→ [报告 10](reports/10_synthesis_insights.md)（叙事弧线 + 两轴地图 + 十条 insight）
 - **想理解 harness 工程**：[报告 01](reports/01_lilian_weng_harness_engineering.md)（Weng 总纲）→ [报告 07](reports/07_darwin_godel_machine.md)（DGM 基线）→ [报告 11](reports/11_continual_harness.md)（免重置 + 共学习）
-- **想理解评估器战争**：[报告 03](reports/03_evolm.md)（reward overoptimization 悖论）→ [报告 04](reports/04_red_queen_godel_machine.md)（epoch 冻结）→ [报告 05](reports/05_who_grades_the_grader.md)（观测等价 + 锚定纪律）→ [报告 06](reports/06_echo.md)（权重层双路 GRPO）
+- **想理解评估器战争**：[报告 03](reports/03_evolm.md)（reward overoptimization 悖论）→ [报告 04](reports/04_red_queen_godel_machine.md)（epoch 冻结）→ [报告 05](reports/05_who_grades_the_grader.md)（观测等价 + 锚定纪律）→ [报告 06](reports/06_echo.md)（权重层双路 GRPO）→ [报告 24](reports/24_evalcegar.md) vs [报告 25](reports/25_rho.md)（锚驱动进化 vs 完全无锚自偏好，两个极端）
 - **想看生产落地**：[报告 02](reports/02_anthropic_when_ai_builds_itself.md)（Anthropic 内部证据）→ [报告 08](reports/08_moss.md)（MOSS 门控回滚）→ [报告 19](reports/19_icoder.md)（iCoder 五层门控）→ 4 节的 SESG / OLE / HarnessFix
 - **想理解思想史与递归深度**：[报告 00](reports/00_origins_1965_2014.md)（Good → Bostrom）→ [报告 23](reports/23_godel_agent_to_sica.md)（Gödel Agent → SICA）→ [报告 07](reports/07_darwin_godel_machine.md)（DGM）→ [报告 20](reports/20_metan.md)（Metan：meta 深度 2.5 上限与绕行）
 - **想做二次开发**：[报告 19](reports/19_icoder.md)（iCoder 基座评估）→ [报告 13](reports/13_meta_harness.md)（Meta-Harness 轨迹驱动改写）→ [报告 21](reports/21_co_harness.md)（Co-Harness 双环蒸馏）→ [报告 22](reports/22_coevolution_survey.md)（过程级测试清单）
@@ -278,9 +278,9 @@ _Thomas Kwa, Ben West, Joel Becker, et al. (METR)_ — "50% 任务时长地平�
 ```
 awesome_rsi/
 ├── README.md                        # 本文件
-├── awesome_rsi_slides.html          # 30 页汇总 HTML PPT（方向键翻页，P 键打印）
-├── awesome_rsi_slides.pdf           # 同内容 30 页 PDF 版（1280x720 逐页）
-├── reports/                         # 24 份精读报告（Markdown，中文）
+├── awesome_rsi_slides.html          # 31 页汇总 HTML PPT（方向键翻页，P 键打印）
+├── awesome_rsi_slides.pdf           # 同内容 31 页 PDF 版（1280x720 逐页）
+├── reports/                         # 26 份精读报告（Markdown，中文）
 │   ├── 00_origins_1965_2014.md                 # 前史：Good → Yudkowsky → Schmidhuber → Bostrom
 │   ├── 01_lilian_weng_harness_engineering.md   # 总纲：harness 工程 → RSI
 │   ├── 02_anthropic_when_ai_builds_itself.md   # 工业证据：>80% 代码由 Claude 写
@@ -304,7 +304,9 @@ awesome_rsi/
 │   ├── 20_metan.md                             # 前沿：meta 深度 2.5 上限与"改输入不改机器"绕行
 │   ├── 21_co_harness.md                        # 前沿：harness-权重双环共进化（通用 agent）
 │   ├── 22_coevolution_survey.md                # 综述：共进化三阶段分类（评估侧统一坐标）
-│   └── 23_godel_agent_to_sica.md               # 桥接史：Gödel Agent → SICA → DGM
+│   ├── 23_godel_agent_to_sica.md               # 桥接史：Gödel Agent → SICA → DGM
+│   ├── 24_evalcegar.md                         # 评估侧：碰撞对驱动评估器进化（锚利用效率最高）
+│   └── 25_rho.md                               # 评估侧：完全无外部评分的自偏好优化（锚的对极）
 ├── papers/
 │   ├── classics/                    # 起源经典 6 篇（1965 Good / 2001 GISAI / 2003 Gödel Machine / 2008 Omohundro / 2010 Chalmers / 2013 IEM，GISAI 与 Gödel Machine 含中译）
 │   ├── en/                          # 60 篇英文原版 PDF（arXiv + iCoder 技术报告）
@@ -377,6 +379,7 @@ awesome_rsi/
 6. **宏观加速何时显形**：若 2027 年 METR 仍测不到 2× 节奏加速，是 Amdahl 串行瓶颈成立，还是加速被"做更多实验"消化？
 7. **harness 收益曲线能否预测**：地板之下为负（CH Flash-Lite）、中段最大（Co-Harness 32B × HMMT25 +27.2）、天花板附近饱和（8B × AIME24）——能否从基座能力事先预测某个 harness 改动的收益符号？
 8. **评测测的是模型还是壳**：Prime Agent 让 ARC-AGI-3 从官方壳 30.2% 到 95.5%——基准报告是否应强制附带 harness 规格与"harness-normalized"分数？
+9. **无锚自偏好能否多轮单调**：RHO 单轮 +0.19 不用任何外部评分，但只测了一轮且自认不保证多轮单调；AutoSaddler 去掉泛化门即负收益——两者的分歧是锚定纪律最需要被复现裁决的地方（报告 25 §连线 2）
 
 ## 13. Roadmap
 
