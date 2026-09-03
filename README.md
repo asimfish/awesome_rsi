@@ -1,16 +1,16 @@
 # Awesome Recursive Self-Improvement (RSI) Resources
 
 [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
-![papers](https://img.shields.io/badge/papers-60%2B6_classics-blue)
-![reports](https://img.shields.io/badge/reports-28-red)
-![zh-PDF](https://img.shields.io/badge/zh--PDF-28-green)
-![slides](https://img.shields.io/badge/slides-31p-orange)
+![papers](https://img.shields.io/badge/papers-61%2B6_classics-blue)
+![reports](https://img.shields.io/badge/reports-29-red)
+![zh-PDF](https://img.shields.io/badge/zh--PDF-29-green)
+![slides](https://img.shields.io/badge/slides-32p-orange)
 
 围绕 **Recursive Self-Improvement（递归自改进）** 的论文与资源列表 + 系统性调研仓库（2026-08-31 完成）。与一般 awesome 列表不同，本仓库同时提供：
 
-- **28 份中文精读报告**（`reports/`，逐篇拆方法、数字、局限与谱系定位，含 00 起源前史、23 桥接史与 26/27 两份合评）
-- **60 篇论文英文原版 PDF + 6 篇起源经典（1965-2013）+ 28 篇保版式中文翻译 PDF**（`papers/`，翻译由 [super_translate](https://github.com/asimfish/super_translate) 生成）
-- **31 页汇总报告**（`awesome_rsi_slides.html` 方向键翻页 / `awesome_rsi_slides.pdf`）
+- **29 份中文精读报告**（`reports/`，逐篇拆方法、数字、局限与谱系定位，含 00 起源前史、23 桥接史与 26/27 两份合评）
+- **61 篇论文英文原版 PDF + 6 篇起源经典（1965-2013）+ 29 篇保版式中文翻译 PDF**（`papers/`，翻译由 [super_translate](https://github.com/asimfish/super_translate) 生成）
+- **32 页汇总报告**（`awesome_rsi_slides.html` 方向键翻页 / `awesome_rsi_slides.pdf`）
 
 一句话结论：**执行已经自动化，品味正在被编译，锚是最后的手工业**——所有能跑的自进化系统都保留一个不参与进化的 ground-truth 锚；谁能工业化地生产不可 game 的锚，谁就握住了 RSI 的节流阀。
 
@@ -31,6 +31,7 @@
 | [9. Disclaimer & Credits](#9-disclaimer--credits)       | [10. Glossary](#10-glossary)                                  |
 | [11. Timeline](#11-timeline)                            | [12. Open Problems](#12-open-problems)                        |
 | [13. Roadmap](#13-roadmap)                              | [14. System Comparison Matrix](#14-system-comparison-matrix)  |
+| [15. Related Resources](#15-related-resources)          |                                                              |
 
 ## 1. Start Here
 
@@ -55,6 +56,7 @@ _Anthropic_
 7. **Agentic RL 系列（中）：SkillRL，如何把一次失败变成可复用的 Skill.** 微信公众号, 2026\. [article](https://mp.weixin.qq.com/s/wqMM1D4NZQmRtWOcebuhTA)
 8. **Agentic RL 系列（下）：Evolving-RL，用 Reward 训练 Agent 总结经验.** 微信公众号, 2026\. [article](https://mp.weixin.qq.com/s/bu3-RyqaYPdA1mH79oF39g)
 9. **AI到底能不能自己造AI？别吵了，有人做出来了**（iCoder 中文解读）. 微信公众号, 2026\. [article](https://mp.weixin.qq.com/s/28q7O59IzEXl_tiWulYbDA)
+10. **一篇 Self-Evolving Coding Agents 最新综述**（arXiv 2608.03392 中文解读）. 微信公众号, 2026\. [article](https://mp.weixin.qq.com/s/hSrJLcZN3j7J7X02N2HIMg)
 
 ## 2.5 Origins (1965-2014)
 
@@ -104,6 +106,10 @@ _Huan-ang Gao, Jiayi Geng, Wenyue Hua, Mengkang Hu, Xinzhe Juan, Hongzhang Liu, 
 
 2. ⭐ **Co-Evolution in Agentic Systems: Toward Self-Directed Evolution Beyond Human Design.** arXiv, 2026\. [paper](https://arxiv.org/abs/2608.10299), [PDF-en](papers/en/2608.10299_CoEvolutionSurvey.pdf), [PDF-zh](papers/zh/2608.10299_CoEvolutionSurvey_zh.pdf), [解读](reports/22_coevolution_survey.md)
 _Qing Zong, Jiayu Liu, Junhao Shen, Zecong Tang, Linsi Wu, et al., Yangqiu Song (HKUST/UIUC/CUHK/HKU/PKU)_ — 三阶段递进分类（Agent-Agent → Agent-Environment → Meta 共进化），本调研评估侧四篇的统一坐标。
+3. ⭐ **Self-Evolving Coding Agents.** arXiv, 2026\. [paper](https://arxiv.org/abs/2608.03392), [awesome list](https://github.com/iSEngLab/Awesome-Self-Evolving-Coding-Agents), [PDF-en](papers/en/2608.03392_SelfEvolvingCodingAgentsSurvey.pdf), [PDF-zh](papers/zh/2608.03392_SelfEvolvingCodingAgentsSurvey_zh.pdf), [解读](reports/28_self_evolving_coding_agents_survey.md), [中文解读](https://mp.weixin.qq.com/s/hSrJLcZN3j7J7X02N2HIMg)
+_Hao Zhou, Haichuan Hu, Ye Shang, Quanjun Zhang (NJUST/NJU, iSEngLab)_ — 编码域垂直综述：进化对象六类 × 进化时间三类（任务时 / 任务后 / 阶段式）× 进化证据三类（结果 / 环境 / 轨迹）；核心警告——不可靠的测试或基准捷径会被存进记忆、蒸馏成技能、更新进模型，错误被持久化。
+
+三份综述的分工：报告 12 给单体自进化四维坐标，报告 22 给多组件共进化三阶段，报告 28 给编码域对象-时间-证据三维——本仓库每篇论文都能在至少两张图里找到位置。
 
 ### 3.1 Framework Side
 
@@ -266,7 +272,7 @@ _Thomas Kwa, Ben West, Joel Becker, et al. (METR)_ — "50% 任务时长地平�
 
 按目的选路线（materials 均在本仓库内）：
 
-- **想快速建立全景**：slides 31 页（15 分钟）→ [报告 10](reports/10_synthesis_insights.md)（叙事弧线 + 两轴地图 + 十条 insight）
+- **想快速建立全景**：slides 32 页（15 分钟）→ [报告 10](reports/10_synthesis_insights.md)（叙事弧线 + 两轴地图 + 十条 insight）→ 三份综述解读 [12](reports/12_self_evolving_agents_survey.md) / [22](reports/22_coevolution_survey.md) / [28](reports/28_self_evolving_coding_agents_survey.md)
 - **想理解 harness 工程**：[报告 01](reports/01_lilian_weng_harness_engineering.md)（Weng 总纲）→ [报告 07](reports/07_darwin_godel_machine.md)（DGM 基线）→ [报告 11](reports/11_continual_harness.md)（免重置 + 共学习）
 - **想理解评估器战争**：[报告 03](reports/03_evolm.md)（reward overoptimization 悖论）→ [报告 04](reports/04_red_queen_godel_machine.md)（epoch 冻结）→ [报告 05](reports/05_who_grades_the_grader.md)（观测等价 + 锚定纪律）→ [报告 06](reports/06_echo.md)（权重层双路 GRPO）→ [报告 24](reports/24_evalcegar.md) vs [报告 25](reports/25_rho.md)（锚驱动进化 vs 完全无锚自偏好，两个极端）
 - **想看生产落地**：[报告 02](reports/02_anthropic_when_ai_builds_itself.md)（Anthropic 内部证据）→ [报告 08](reports/08_moss.md)（MOSS 门控回滚）→ [报告 19](reports/19_icoder.md)（iCoder 五层门控）→ [报告 27](reports/27_safety_governance.md)（SESG / OLE / HarnessFix / 发布门 / HVTB 部署纪律合评）
@@ -279,9 +285,9 @@ _Thomas Kwa, Ben West, Joel Becker, et al. (METR)_ — "50% 任务时长地平�
 ```
 awesome_rsi/
 ├── README.md                        # 本文件
-├── awesome_rsi_slides.html          # 31 页汇总 HTML PPT（方向键翻页，P 键打印）
-├── awesome_rsi_slides.pdf           # 同内容 31 页 PDF 版（1280x720 逐页）
-├── reports/                         # 28 份精读报告（Markdown，中文）
+├── awesome_rsi_slides.html          # 32 页汇总 HTML PPT（方向键翻页，P 键打印）
+├── awesome_rsi_slides.pdf           # 同内容 32 页 PDF 版（1280x720 逐页）
+├── reports/                         # 29 份精读报告（Markdown，中文）
 │   ├── 00_origins_1965_2014.md                 # 前史：Good → Yudkowsky → Schmidhuber → Bostrom
 │   ├── 01_lilian_weng_harness_engineering.md   # 总纲：harness 工程 → RSI
 │   ├── 02_anthropic_when_ai_builds_itself.md   # 工业证据：>80% 代码由 Claude 写
@@ -309,11 +315,12 @@ awesome_rsi/
 │   ├── 24_evalcegar.md                         # 评估侧：碰撞对驱动评估器进化（锚利用效率最高）
 │   ├── 25_rho.md                               # 评估侧：完全无外部评分的自偏好优化（锚的对极）
 │   ├── 26_skill_evolution_wave.md              # 合评：技能进化红海五篇（结构分歧 + 生命周期共识）
-│   └── 27_safety_governance.md                 # 合评：安全治理五篇（生产闭环 / 资产版本化 / 归因 / 发布门 / hack 测量）
+│   ├── 27_safety_governance.md                 # 合评：安全治理五篇（生产闭环 / 资产版本化 / 归因 / 发布门 / hack 测量）
+│   └── 28_self_evolving_coding_agents_survey.md # 综述：编码域对象-时间-证据三维（配套 iSEngLab awesome 列表）
 ├── papers/
 │   ├── classics/                    # 起源经典 6 篇（1965 Good / 2001 GISAI / 2003 Gödel Machine / 2008 Omohundro / 2010 Chalmers / 2013 IEM，GISAI 与 Gödel Machine 含中译）
-│   ├── en/                          # 60 篇英文原版 PDF（arXiv + iCoder 技术报告）
-│   └── zh/                          # 26 篇中文翻译 PDF（super_translate，保版式）
+│   ├── en/                          # 61 篇英文原版 PDF（arXiv + iCoder 技术报告）
+│   └── zh/                          # 27 篇中文翻译 PDF（super_translate，保版式）
 └── assets/
     ├── fulltext/                    # 核心论文提取全文（报告撰写底稿）
     └── trends_research_raw.md       # 2026H2 趋势扫描原始笔记
@@ -368,7 +375,7 @@ awesome_rsi/
 | 2025 H2 | AlphaEvolve / ShinkaEvolve 进化式程序搜索；GEPA 反思提示进化超 RL；TMLR 自进化综述；ACE 上下文进化 | 12 |
 | 2026 Q1 | **ECHO** critic 共进化；MCE 元上下文工程；SkillRL；HyperAgents；**Meta-Harness** | 06 · 13 |
 | 2026 Q2 | AHE 可观测性驱动进化；**EvoLM** rubric 共进化；**Continual Harness** 免重置 + 共学习；**MOSS** 生产级源码自改写；Evolving-RL；SIA；**Self-Harness**；**RQGM** 受控效用进化；RHO / HarnessFix / Adaptive Auto-Harness | 03 · 04 · 08 · 11 · 14 |
-| 2026 Q3 | Weng《Harness Engineering for Self-Improvement》；Anthropic《When AI builds itself》；**Who Grades the Grader** 锚定纪律；**Co-Harness** 双环；Falsifiable Release Gates；skill 红海（SkillCommit / HyperSkill / ERSkill / SkillProx / Evo-Harness）；**EnvHarness** / **AutoSaddler** / **MetaCaster** / **Prime Agent**；**Metan** meta 深度；**WikiSkill**；共进化综述；**iCoder** AI 主导开发 27B 前沿模型 | 01 · 02 · 05 · 09 · 15-22 |
+| 2026 Q3 | Weng《Harness Engineering for Self-Improvement》；Anthropic《When AI builds itself》；**Who Grades the Grader** 锚定纪律；**Co-Harness** 双环；Falsifiable Release Gates；skill 红海（SkillCommit / HyperSkill / ERSkill / SkillProx / Evo-Harness）；**EnvHarness** / **AutoSaddler** / **MetaCaster** / **Prime Agent**；**Metan** meta 深度；**WikiSkill**；共进化综述；Self-Evolving Coding Agents 综述；**iCoder** AI 主导开发 27B 前沿模型 | 01 · 02 · 05 · 09 · 15-22 · 28 |
 
 ## 12. Open Problems
 
@@ -421,3 +428,12 @@ awesome_rsi/
 | SESG | 权重（1.7B 护栏） | 红队测试集 + 人工约 2h/威胁 | — | 是（深信服主管线） | 两个月自动闭合 14/15 新威胁 | 27 |
 
 读法：**"锚在哪"一列没有空白**——除 RHO 明确选择无锚（且只测单轮）外，所有能跑的系统都保留了一个不参与进化的部件；**"生产部署"一列只有五个"是"**，且其中 MOSS / iCoder / SESG 的锚都是最保守的形态（门控、锁死、人工标注）。
+
+## 15. Related Resources
+
+同类 awesome 列表与持续更新的资源，与本仓库互补（本仓库按"锚在哪"组织 RSI 全谱系，它们各有专门切口）：
+
+- [iSEngLab/Awesome-Self-Evolving-Coding-Agents](https://github.com/iSEngLab/Awesome-Self-Evolving-Coding-Agents) — arXiv 2608.03392 综述的配套论文清单，按进化对象（框架 / 记忆 / 技能工具 / 模型 / 工作流拓扑 / 环境上下文）六类组织，编码域最全（解读见[报告 28](reports/28_self_evolving_coding_agents_survey.md)）
+- [Thinklab-SJTU/awesome-ml4co](https://github.com/Thinklab-SJTU/awesome-ml4co) — 本仓库编目格式的参考规范
+- [asimfish/super_translate](https://github.com/asimfish/super_translate) — 本仓库全部中文 PDF 的翻译工具
+- [Lil'Log · Harness Engineering for Self-Improvement](https://lilianweng.github.io/posts/2026-07-04-harness/) — 本调研的总纲，其参考文献列表是 §3.6 谱系节的种子
