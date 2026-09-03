@@ -1,0 +1,1368 @@
+From Failed Trajectories to Reliable LLM Agents:
+Diagnosing and Repairing Harness Flaws
+Mengzhuo Chen 1,2,3, Junjie Wang 1,2, Zhe Liu 1,2, Yawen Wang1,2, Haiming Zheng 4, Qing Wang 1,2
+1State Key Laboratory of Complex System Modeling and Simulation Technology, Beijing, China
+2Institute of Software, Chinese Academy of Sciences, Beijing, China
+3University of Chinese Academy of Sciences, Beijing, China
+4School of Computer Science and Technology, Tianjin University, Tianjin, China
+Abstract—LLM agents increasingly rely on agent harness:
+the runtime infrastructure around the base model that defines
+execution environments, tool interfaces, context, lifecycle or-
+chestration, observability, verification, and governance. Existing
+self-improving agents and automatic harness evolution methods
+mainly improve agents through runtime supervision, prompt
+optimization, workflow search, or harness modification based on
+final outcomes. However, they often fail to diagnose where the
+responsible evidence lies in failed trajectories and which harness
+implementation mechanism causes the unreliable behavior, re-
+sulting in broad, indirect, or poorly scoped changes. This paper
+proposes HARNESSFIX, a trace-grounded and diagnosis-driven
+framework for repairing agent harnesses. HARNESSFIXcompiles
+raw execution traces and harness artifacts into a Harness-aware
+Trace Intermediate Representation (HTIR), which normalizes
+fragmented trajectory evidence, captures step-level data-flow and
+control-flow relations, and aligns runtime steps with the harness
+artifacts that shape their behavior. It then attributes failures
+to responsible steps and harness artifacts, and consolidates
+recurring diagnoses into repair-oriented flaw records. Finally,
+HARNESSFIXmaps these records to scoped repair operators,
+generates patches under flaw-specific repair specifications, and
+accepts them through regression-aware validation. We evaluate
+HARNESSFIXon four popular benchmarks, and results show
+that it improves the performance over the initial harnesses by
+6.3% to 18.4%, significantly outperforming human-designed and
+self-evolution baselines. HARNESSFIXhighlights the value of
+treating failed trajectories not only as feedback signals, but also
+as structured evidence for diagnosing and repairing the harness
+mechanisms behind agent failures.
+Index Terms—LLM agents, harness engineering, trace analysis,
+failure attribution, regression-aware improvement
+I. INTRODUCTION
+LLM agents are increasingly used for multi-step, tool-
+mediated tasks in repository-level software engineering,
+terminal-based workflows, open-ended research, and applica-
+tion automation [2], [3], [4], [5], [6]. Unlike standalone LLM
+usage, these agents repeatedly interact with external envi-
+ronments through model invocations, tool calls, observations,
+intermediate artifacts, state changes, and final submissions. As
+a result, the reliability of such systems depends not only on
+the base model, but also on the agent harness: the runtime
+infrastructure that wraps the model and governs how it acts
+[7], [8], [9]. Recent harness engineering work characterizes
+this infrastructure using the seven layer taxonomy, including
+Execution, Tooling, Context, Lifecycle, Observability, Verifi-
+cation, and Governance [1]. For example, the tool interface
+determines how actions are exposed and invoked; context and
+memory determine what the model sees; and lifecycle and
+orchestration govern execution flow and task state.
+When failures occur, improving the harness is often more
+practical than modifying the base model, which is typically
+expensive to retrain, fine-tune, or redeploy. However, harness
+improvement is far from straightforward. Unlike traditional
+software systems, where business logic is explicitly encoded
+in control flow and data structures [10], [11], [12], the behavior
+of agents is largely determined at runtime through model infer-
+ence, shaped by prompts, retrieved context, tool interfaces, and
+orchestration policies [1], [13], [14]. Consequently, failures
+cannot usually be mapped directly to specific locations in
+the harness implementation, such as source code or prompts.
+Instead, they emerge in execution trajectories that interleave
+natural language reasoning, tool interactions, environmental
+feedback, and intermediate state transitions. The language-
+heavy, reasoning-driven, and non-deterministic nature of these
+trajectories makes traditional debugging and repair techniques
+substantially less effective [15], [16], [17], [18], [19].
+Existing efforts on self-improving agents and automatic
+harness evolution only partially address this problem. One line
+of work focuses on runtime or supervisory optimization, using
+lightweight supervision and adaptive correction to bypass
+issues at execution time, suppress errors temporarily, or add
+external patches around the agent [20], [21], [22], [23]. While
+such strategies can improve observed performance, they often
+do so without fixing the underlying harness flaw that caused
+the failure. Another line of work is primarily outcome-driven
+rather than diagnosis-driven: it optimizes prompts, workflows,
+or harness logic based on final scores, success rates, or
+efficiency metrics [7], [24], [25], [26], [27], without first
+identifying where the responsible evidence lies in the trajectory
+and which harness layer failed. Without such targeted causal
+diagnosis, the resulting improvements are often broad, indirect,
+or poorly scoped.
+In this work, we aim to start from failed agent trajecto-
+ries, diagnose the responsible runtime steps in detail, and
+use this evidence to localize harness flaws and repair them
+arXiv:2606.06324v2  [cs.SE]  2 Jul 2026
+TABLE I: Harness layers and their responsibilities [1].
+Harness layer Responsibilities
+Execution Environment and Sandbox Provides safe, isolated, reproducible environments in which agent actions run with bounded autonomy.
+Tool Interface Governs how agents discover, describe, select, and invoke tools, including schemas, documentation, and error feedback.
+Context and Memory Determines what the model sees at each step: context window, session state, summaries, retrieved evidence, and persistent memory.
+Lifecycle and Orchestration Controls agent execution flow: think-act-observe loops, retries, task-state management, multi-agent coordination, and termination.
+Observability Records traces, logs, tool calls, errors, and cost information well enough to diagnose failures and monitor behavior.
+Verification and Evaluation Connects tasks to feedback through readiness checks, intermediate validation, final output evaluation, and regression testing.
+Governance and Security Defines permissions, identities, policies, approvals, and audit trails that constrain agent authority.
+correspondingly. This goal raises several key challenges. First,
+failure evidence is fragmented across language-heavy and
+reasoning-driven traces, spanning multi-step interactions, tool
+invocations, natural-language reasoning and environment re-
+sponses, which makes precise diagnosis difficult. Second, even
+if a failure can be localized within an execution trajectory,
+it remains difficult to map it back to the concrete harness
+implementation responsible for it, such as source code, prompt
+templates, tool specifications, configuration files, adapters,
+instrumentation hooks, and verification scripts. This mapping
+is difficult because execution traces capture runtime behavior,
+whereas harness implementations are defined in static artifacts
+like code and prompts; in agent systems, these two views are
+often not explicitly aligned as in traditional software. Third,
+harness modifications may reduce one recurring failure while
+introducing regressions elsewhere. Although this challenge
+also appears in traditional program repair, it is more difficult
+in agent systems because the dependencies between runtime
+behavior and harness mechanisms are less explicit.
+We propose HARNESSFIX, a trace-guided framework for
+diagnosing agent failures and repairing agent harnesses. It
+first abstracts raw execution traces and harness artifacts into
+a Harness-aware Trace Intermediate Representation (HTIR),
+which models step-level runtime behavior, reconstructs data-
+flow and control-flow links, and aligns the trajectory with
+the corresponding harness implementation artifacts. HTIR
+provides the structured diagnostic basis for failure attribution
+by organizing fragmented trajectory evidence into attribution-
+ready step-level relations, enabling HARNESSFIXto identify
+failure responsible runtime steps, explain root causes, and con-
+solidate recurring diagnoses into flaw records. For each flaw
+record, HARNESSFIXthen uses the runtime-to-implementation
+mapping captured in HTIR to localize repair targets, select
+scoped repair operators, and instantiate flaw-specific repair
+specifications for constrained patch generation and validation.
+The repair operators used by HARNESSFIXare grounded
+in our empirical study of real-world LLM agent development.
+We analyze 30 popular open-source agent repositories and
+approximately 57,780 development records. The study shows
+that harness-related changes are common across all reposito-
+ries and that harness flaws span all seven ETCLOVG respon-
+sibilities, rather than being confined to prompts or a single
+component. From recurring flaw patterns and developer repair
+practices, we summarize the scoped repair operators used
+by HARNESSFIX. These findings motivate HARNESSFIX’s
+design choice to treat harness repair as a multi-layer runtime-
+infrastructure problem and to constrain generated patches with
+repair operators.
+We evaluate HARNESSFIXon four popular benchmarks:
+GAIA, SWE-Bench Verified, AppWorld, and Terminal-Bench
+2.0 Verified. Across these benchmarks, HARNESSFIXim-
+proves performance over the initial harnesses by 6.3%–
+18.4%, and significantly outperforms human-designed and
+self-evolution baselines. Ablation results further support the
+main design choices, showing that trace-grounded diagnosis
+and scoped repair are important to the final gains.
+This paper makes the following contributions:
+•We present HARNESSFIX 1, a trace-grounded and
+diagnosis-driven framework for repairing agent harnesses.
+Unlike outcome-driven prompt evolution or free-form
+self-editing, HARNESSFIXexplicitly connects failure ev-
+idence to harness-aware diagnosis and scoped harness
+changes.
+•We conduct the first empirical study of harness flaws in
+real-world LLM agents, to reveal flaw distributions across
+harness layers and summarize recurring repair operators
+that guide scoped repair in HARNESSFIX.
+•We introduce HTIR, a harness-aware trace representation
+that normalizes heterogeneous agent trajectories into step-
+level evidence structures, providing a basis for step-level
+attribution, harness diagnosis, and scoped repair planning.
+•We evaluate HARNESSFIXacross four popular bench-
+marks and agents, showing that trace-grounded harness
+repair improves performance over initial harnesses by
+6.3%–18.4%, and significantly outperforming human-
+designed harnesses and self-evolution baselines.
+II. BACKGROUND ANDMOTIVATION
+A. Background
+A common perspective in agent engineering is that an LLM-
+based agent consists of two parts: the base model itself and
+everything else that surrounds it, i.e., the runtime infrastructure
+that provides tools, context, orchestration logic, etc. This sur-
+rounding infrastructure is collectively referred to as theagent
+harness[1]. When failures occur, they often stem not from
+the model’s reasoning alone, but from how the harness exposes
+information, enables actions, records evidence, and enforces
+policies.
+1We release the source code on the anonymous website https://github.com/
+HarnessFix/HarnessFix.
+The harness is realized through editable implementation
+artifacts such as prompt templates, tool specifications, or-
+chestration code, configuration files, adapters, logging hooks,
+and verification scripts. Throughout this paper,harness repair
+refers to modifying these artifacts, rather than updating the
+base-model parameters, to correct diagnosed flaws.
+To describe the mechanisms that make up an agent harness,
+recent work introduces the ETCLOVG taxonomy [1], which
+organizes harness responsibilities into seven layers as shown
+in Table I. In this paper, we use these layers as a vocabulary
+for connecting runtime evidence to the harness mechanisms
+that may need repair.
+B. Motivational Study
+To understand how harness flaws arise and are addressed
+during the evolution of real-world LLM agent systems, we
+conduct a motivational study on popular open-source agents.
+1)Data Collection:We collect popular and actively open-
+source LLM agents from GitHub across diverse task cate-
+gories, yielding 30 LLM agent systems and approximately
+57,780 development records, including issues, pull requests,
+commits, and release notes. We classify development records
+as harness-related or unrelated using an LLM-based analysis
+agent with human validation through an iterative process,
+including small-scale annotation for examples, agent-based
+classification, manual inspection, agent strategy refinement,
+and a final sampled manual audit; due to space limitations,
+detailed collection and classification procedures are provided
+on our website. The resulting dataset contains 26,174 harness-
+related records.
+Overall, harness-related records account for approximately
+45.3% of all collected development records, and all 30
+repositories contain such changes, indicating that developers
+frequently encounter harness-related issues in practice and
+highlighting the need for automated techniques to support
+harness maintenance and repair.
+We further use a similar LLM-assisted and human-validated
+process to characterize the distribution of harness flaws and
+summarize common repair strategies, with detailed procedures
+provided on our website due to space limitations.
+Fig. 1: Distribution across ETCLOVG layers.
+2)Distribution of Harness Flaws:Figure 1 shows the
+distribution of harness flaws across the seven harness layers.
+Flaws appear in all seven layers, and Lifecycle, Tooling, and
+Observability are the most frequent sources of flaws, with
+nearly all LLM agents in our dataset (29 out of 30) exhibiting
+flaws related to these three layers. We also observe that the
+dominant flaw layer varies with repository focus. Lifecycle
+flaws are more common in long-running or long-horizon
+agent systems [28], [29], [30], [31], [32], [33], [34], while
+verification flaws are more frequently observed in benchmark-
+facing harnesses and repositories [33], [2], [3], [5], [6], [4],
+[35], [36]. These results show that harness flaws span the
+runtime infrastructure rather than being limited to prompts or a
+single component, highlighting the need for repair techniques
+that can address multiple harness layers, beyond the prompt
+optimization or runtime-context adjustment targeted by exist-
+ing techniques [37], [26], [20], [21].
+3)Repair Strategies:Table II lists the typical repair
+strategies we summarize for each harness layer. We organize
+these strategies into a compact set of repair operators, each
+corresponding to a common class of harness repair actions.
+These operators are used in Section III-C to guide scoped
+harness repair. By constraining repair generation, they reduce
+the risk of unstable edits or broad regressions caused by free-
+form modification techniques to harness artifacts [38], [39],
+[40], [41].
+III. APPROACH
+The key idea of HARNESSFIXis to drive harness repair from
+fine-grained, trace-grounded failure diagnoses. It first localizes
+responsible runtime steps, maps their behavior to implicated
+harness flaws, and then translates those diagnoses into scoped
+repair specifications for guided repair. HARNESSFIXuses four
+LLM agents for trace-guided harness repair. The trace ab-
+straction agent constructs a Harness-aware Trace Intermediate
+Representation (HTIR) from raw traces and harness artifacts
+by modeling runtime behavior as TraceSteps, reconstructing
+data-flow and control-flow links, and aligning the resulting
+runtime evidence with editable harness artifacts. The diagnosis
+agent consumes HTIR to attribute failures to responsible
+TraceSteps and implicated harness layers, and consolidates
+similar diagnoses into flaw records that summarize recurring
+root causes. The repair agent maps flaw records to repair
+operators, instantiates flaw-specific repair specifications, and
+generates scoped candidate patches accordingly. The validation
+agent checks whether the implementation stays within the
+intended repair scope and reduces the target flaw without
+introducing unacceptable regressions.
+Before introducing HARNESSFIX, we first present a running
+example from our experimental benchmark AppWorld, shown
+in Figure 3, which we use throughout the rest of this section
+to illustrate the approach.
+A. Modeling Runtime Trajectories and Aligning Them with
+Harness Implementations
+A raw trajectory records runtime behavior, but harness re-
+pair requires both identifying the runtime evidence responsible
+for a failure and locating the editable harness artifacts that
+realize or govern that evidence. HARNESSFIXtherefore first
+TABLE II: Repair operators and associated flaws organized by harness layer
+Harness layer Typical flaws Candidate repair operators
+Execution Environment and
+Sandbox
+Actions run in environments that are
+non-reproducible, insufficiently isolated,
+state-leaking, or blocked by interactive prompts.
+Sandbox-boundary tightening; environment snapshot/restore;
+file-system/network/API access isolation; task-specific
+sandboxing; environment and state-diff logging.
+Tool Interface
+Tool schemas are ambiguous, candidate tool sets
+are poorly ranked, parameters are weakly
+validated, or tool errors are not actionable.
+Tool-schema narrowing; argument validation; tool-candidate
+ranking and retrieval; tool documentation and error-message
+repair; read/write tool separation; transactional tool wrapping.
+Context and Memory
+Critical evidence, constraints, state, or prior
+results are omitted, stale, polluted, overly long, or
+fragmented.
+Failure-relevant evidence preservation; artifact/state summary
+exposure; task-constraint refresh; summary and retrieval
+policy repair; persistent-memory isolation; context-budget
+checking.
+Lifecycle and Orchestration
+The control flow enters retry loops, repeats
+ineffective actions, finalizes prematurely, loses
+task state, or delegates without verification.
+Loop guarding; explicit task-state modeling; retry and
+timeout bounding; verification-gated finalization;
+workflow-state checkpointing; delegated-output validation.
+Observability
+Traces lack the fields needed to diagnose failures
+or connect outcomes to requests, tool calls, errors,
+and state changes.
+Model-request instrumentation; context-snapshot logging;
+tool-call/result tracing; API-error and state-delta logging;
+retry/token/latency tracking; structured trace logging.
+Verification and Evaluation
+Readiness checks, validators, judges, or regression
+tests do not catch invalid artifacts, missing
+effects, or task-inconsistent states.
+Pre-execution readiness checking; intermediate validation
+gating; expected/actual state comparison; effect-evidence
+completion guarding; finalization-check strengthening;
+regression testing.
+Governance and Security
+Permissions, policy checks, approval flows,
+identity boundaries, and audit trails are too weak
+for high-impact actions.
+Least-privilege credentialing; high-impact action approval
+gating; policy-check enforcement; audit-decision logging;
+out-of-scope action blocking; escalation-rule definition.
+Fig. 2: Overview of HARNESSFIX.
+constructs a Harness-aware Trace Intermediate Representation
+(HTIR), which serves two purposes. First, it models the tra-
+jectory as TraceSteps and reconstructs cross-step TraceLinks,
+including data-flow and control-flow links, which provide the
+evidence needed for step-level failure attribution. Second, it
+aligns TraceSteps and TraceLinks with harness implementa-
+tions through implementation anchors, enabling responsible
+runtime evidence to be mapped to concrete artifacts. This mod-
+eling and alignment stage provides the basis for identifying
+responsible runtime steps, diagnosing implicated ETCLOVG
+layers, and constraining later harness repair.
+1)TraceStep: Unit of Runtime Evidence:Each node in
+HTIR represents a recoverable execution step from the trace,
+such as a model call, tool-mediated action, or final submission
+decision. We refer to each node as aTraceStep.
+Each TraceStep is assigned a unique identifier, which is a
+sequential integer indicating its position in the execution order.
+It also stores two basic fields, namelyrequest messageand
+response message. They are respectively the full message sent
+to or returned by the model, tool, or environment at this step.
+HTIR also adds three derived annotations to each TraceStep.
+(a)Roleis the step’s function, such as information acquisition,
+tool invocation, artifact editing, validation, orchestration deci-
+sion, or final submission. (b)Execution statusincludes success,
+failure, timeout, blocked, etc. (c)Artifact/state effectrecords
+the type of externally observable effect produced by the
+step, together with corresponding effect details. Its effect type
+indicates whether the step has no observable external effect,
+a read-only interaction, an artifact change, an environment or
+application state change, a mixed effect, or an unknown effect.
+Fig. 3: Illustrative example for the AppWorld completion-guard harness flaw.
+The trace abstraction agent examines each TraceStep’s re-
+quest and response messages to infer these three annotations.
+For artifact/state effect, the agent inspects the messages along
+with any available tool or environment metadata to identify
+externally observable consequences. The effect details specify
+three kinds of information when available: a) the affected
+artifact or state entity, such as a file, database record, or session
+state; b) the observed state transition, such as file creation,
+database update, or session-state change; and c) supporting
+evidence, such as tool return values, execution logs, or state-
+diff snapshots. The example below shows a TraceStep with its
+request, response, and derived annotations.
+TraceStep S4
+•id=S4
+•request=POST /venmo/...
+body={amount,
+description}
+•response=API call caught
+Derived annotations
+•role=tool action
+•status=success
+•artifact/state effect:
+no observable
+external effect
+•...
+derive
+2)Data-flow Alignment: Linking Evidence Propagation
+to Harness Logic:HARNESSFIXconstructs data-flow links
+to explain how information entered, disappeared from, or was
+transformed in a later model-facing request through earlier tra-
+jectory content and request construction logic. This alignment
+is essential because many harness flaws arise when critical
+evidence, constraints, tool outputs, error messages, or state
+changes are lost, stale, polluted, incorrectly summarized, or
+not consumed by later steps.
+To derive data-flow links, the trace abstraction agent jointly
+inspects the current request message, earlier TraceSteps, and
+the harness artifacts that assembles model-facing inputs. It
+searches earlier TraceSteps in reverse temporal order and
+identifies both explicit reuse, such as copied or concatenated
+message spans, and semantic reuse, where the current request
+is grounded in earlier observations despite different surface
+wording. It also inspects request construction logic, including
+memory assembly, tool descriptions, prompt templates, and
+other prompt building components, to determine how evidence
+was inserted, summarized, filtered, or omitted.
+Each data-flow link records the source TraceStep id, target
+TraceStep id, source span in the earlier request or response,
+target span in the current request, and the reuse relation, such
+as copied, summarized, or semantically reused. The span is a
+precise slice of the original trace record that verifiably grounds
+the link, enabling concrete evidence attribution.
+The figure below shows an example data-flow link.
+Data-flow link: S3→S4
+•source id: S3 (API documentation)
+•target id: S4 (payment request)
+•source span:
+... create_payment_request API docs ...
+args: amount, description, user_email, ...
+user_email: email of payment receiver
+required fields include user_email ...
+•target span:
+... create_payment_request(amount=54.0,
+description=Amazon Purchases, ... )
+body={amount, description, ...}
+•reuse relation: semantically reused
+The S3 API documentation for
+create_payment_request, including its required
+arguments and request schema, is semantically linked to
+the S4 payment request body. This link makes the missing
+requireduser_emailfield observable, thereby supporting
+the subsequent failure diagnosis.
+3)Control-flow Alignment: Explaining Harness-driven
+Execution Decisions:HARNESSFIXconstructs control-flow
+links to explain why the harness transitions from one TraceS-
+tep to another. Data-flow and control-flow links are com-
+plementary because agent failures may originate from either
+cross-step information propagation or step-transition logic.
+To derive control-flow links, the trace abstraction agent
+examines the current TraceStep, the preceding and following
+TraceSteps in its temporal neighborhood, associated data-
+flow links, and the relevant harness implementations. It then
+matches the observed transition against harness execution
+logic, such as continue, retry, delegate, validate, finalize,
+or terminate, and records the condition or execution status
+that triggered the current TraceStep when such evidence is
+available. Each control-flow link records the source TraceStep
+id, target TraceStep id, triggering logic, and the triggering
+condition or execution status when available.
+The figure below shows an example control-flow link.
+Although S5 returnssuccess, its artifact/state effect is
+no observable external effect, showing that the
+expected state change has not occurred. The completion guard
+incorrectly treats this execution status (i.e., success) as evi-
+dence of task progress and allows S6, a finalization TraceStep,
+to invokecomplete_task(). This link therefore captures
+the controller decision that leads to incorrect finalization.
+Source TraceStep S5
+•role=tool action
+•status=success
+•artifact/state effect:
+no observable
+external effect
+•...
+Target TraceStep S6
+•role=finalization
+•request=...
+complete_task() ...
+•status=success
+•...
+Control-flow link: S5→S6
+•source id: S5
+•target id: S6
+•triggering logic:
+completion guard
+•triggering condition:
+status=success
+Harness artifact reference
+Artifact location
+•file: appworld_agent/core.py
+•harness routine: execute()
+-> task_completed()
+Why it explains the link
+•status=success permits
+complete_task()
+4)Implementation Anchors: Localizing Runtime Evi-
+dence in Harness Artifacts:TraceSteps and their associated
+data-flow and control-flow links describe runtime events and
+cross-step relations, but they do not by themselves identify
+where the corresponding behavior is realized in the harness
+implementation. HTIR therefore associates runtime evidence
+withimplementation anchors, which localize the editable
+harness artifacts that realize or govern the observed behavior.
+The trace abstraction agent derives implementation anchors
+by jointly inspecting the trajectory and the harness artifacts. It
+leverages available runtime signals, such as tool names, prompt
+template references, adapter invocations, validator events, and
+controller actions, to locate the corresponding implementation
+artifacts. When a relation is realized across multiple compo-
+nents, the agent follows the previously constructed control-
+flow and data-flow links to identify the harness artifacts that
+implements or constrains the relation. Each anchor records
+three fields: an artifact reference, such as a repository path
+and line range, prompt or configuration identifier, tool-schema
+identifier, workflow-node identifier, or validator identifier; an
+anchor relation, such as emitting or executing a TraceStep,
+constructing a step input, or governing a control-flow transi-
+tion; and supporting evidence for this alignment.
+The example below grounds the S3–S4 data-flow link
+(shown earlier) in the prompt rendering artifact that exposes
+the S3 API documentation.
+Implementation anchor
+•artifact reference:
+prompts/react_code_agent/
+instructions.txt
+code/simplified/react_code_agent.py
+SimplifiedReActCodeAgent.initialize()
+•anchor relation: constructs S4 input
+Relevant prompt/template lines
+instructions.txt:
+“interact with app(s) ... using APIs”
+show_api_doc(app_name, api_name)
+“Each code execution will produce
+an output ...”; Task: {{ instruction }}
+initialize():
+template.render(instruction, main_user,
+app_descriptions) -> self.messages
+•supporting evidence: ...
+5)Harness-layer Responsibility Mapping:After TraceS-
+teps and their associated links are connected to harness ar-
+tifacts through implementation anchors, HTIR maps the an-
+chored evidence around each TraceStep to ETCLOVG respon-
+sibility layers. This mapping is used to consolidate recurring
+flaw records, select scoped repair operators, and analyze which
+harness responsibilities are implicated by different benchmark
+failures. It is trace-specific rather than a static file-level clas-
+sification: the trace abstraction agent takes the TraceStep’s
+information, associated links, and implementation anchors as
+input, and compares them with the responsibility criteria of the
+ETCLOVG layers in Table I. A TraceStep can map to multiple
+layers when the anchored runtime evidence involves multiple
+harness responsibilities.
+Using the diagnostic information above, we analyze the
+layer mapping for S6. S6 invokescomplete_task()after
+the S5–S6 transition is enabled bystatus=success. The
+supporting S3–S4 data-flow link provides contextual diagnos-
+tic evidence: the S3 API documentation specifies the required
+user_emailfield, but the S4 payment request body omits
+it. Together, these signals indicate that S6 finalizes the task
+despite an unresolved upstream request-construction error and
+the absence of expected artifact/state effects, leading to its
+mapping to the Lifecycle and Verification layers. This discus-
+sion focuses on the layer mapping for S6; the complete flaw
+record for this case also involves S5 Observability evidence
+showing that API errors are swallowed and artifact/state effect
+evidence is not exposed to the harness.
+B. Harness Flaw Diagnosis
+1)Failure Attribution:Given a failed execution trace,
+failure attribution identifies which TraceSteps are responsible
+for the failure, determines the root cause, and links it to
+specific harness layers.
+The diagnosis agent proceeds with the task in four steps.
+First, symptom localization identifies what failed by examining
+the external evaluation result together with the final TraceS-
+tep’s diagnostic evidence, including the TraceStep details,
+associated links, implementation anchors, and mapped harness
+layers. Second, evidence backtracking follows the data-flow
+and control-flow links from the final TraceStep to earlier
+TraceSteps and produces a ranked set of candidate responsible
+TraceSteps. This stage is deliberately broad: a candidate step
+can be suspicious because it is plausibly connected to the
+observed failure through data propagation, control transition,
+artifact/state effect, or an anchored harness mechanism. Third,
+candidate adjudication inspects each candidate’s diagnostic ev-
+idence to decide whether the step formed, propagated, failed to
+expose, failed to constrain, or failed to validate the information
+or state change relevant to the failure. It then selects the final
+responsible TraceSteps. Fourth, layer assignment attributes
+the failure to the harness layers already mapped to the final
+responsible TraceSteps.
+For each failed trace, HARNESSFIXproduces a structured
+diagnosis recordwith three parts: (a)Attribution resultiden-
+tifies the responsible TraceSteps and provides a concise root-
+cause explanation. (b)Failure signalrecords the observed
+failure symptom and related diagnostic evidence supporting
+this attribution. (c)Harness diagnosisincludes one or more
+implicated ETCLOVG harness layers and a concise description
+of the harness flaw.
+2)Harness Flaw Consolidation:Single failed executions
+can be accidental. HARNESSFIXtherefore consolidates di-
+agnosis records across task executions before modifying the
+harness. The diagnosis agent first indexes diagnosis records
+by their implicated harness layers, and treats records with
+overlapping layers as merge candidates. It then merges candi-
+dates whose root cause explanations and supporting evidence
+indicate the same recurring harness flaw.
+Each resultingflaw recordrepresents a recurring harness
+flaw pattern and is organized into two groups of fields: (a)
+Flaw summarydescribes the recurring harness flaw. It includes
+a flaw identifier, one or more implicated harness layers, and
+a common root cause summary. (b)Supporting diagnosis
+recordssummarizes the empirical basis for the flaw. It includes
+the representative diagnosis records and the shared diagnostic
+basis used to merge them, such as common failure signals,
+responsible TraceSteps, and root cause rationales across the
+grouped diagnosis records.
+C. Scoped Repair
+After flaw consolidation, HARNESSFIXmust decide what
+kind of harness change is appropriate for each recurring flaw.
+This stage is deliberately constrained because the harness
+artifacts implicated by failure attribution often belong to core
+runtime logic, such as orchestration and context construction.
+Allowing the repair agent to freely modify such artifacts, as
+in self-improvement coding agent systems [38], [39], [40],
+[41], would create a high risk of unstable edits, architectural
+breakage, or broad regressions.
+Therefore, HARNESSFIXapplies repair operators, derived
+from our motivational study and summarized in Table II, as
+scoped repair operations that specify what harness mechanisms
+may be changed for diagnosed flaws. HARNESSFIXfirst maps
+each flaw record to applicable repair operators, and instantiates
+the selected operators using the flaw record’s supporting
+diagnosis records to derive flaw-specific repair specifications.
+1)Mapping Flaw to Repair Operators:The input to this
+stage is a flaw record, and HARNESSFIXmaps it to applicable
+repair operators. The repair agent first uses the implicated
+harness layers in the flaw record to retrieve candidate operator
+groups from Table II. It then filters these candidates accord-
+ing to the flaw record’s common root cause and diagnostic
+evidence. From the selected operators, it designates a primary
+operator based on how directly its editable mechanism targets
+the implicated TraceStep and whether its expected effect
+directly satisfies the behavioral requirement implied by the
+root cause. The remaining selected operators serve as auxiliary
+operators: they expose evidence, enforce constraints, or modify
+adjacent harness mechanisms needed for the primary repair to
+work. The selected operators and their selection rationale are
+carried into the repair specification, allowing patch validation
+to check whether the generated diff follows the intended repair
+scope.
+2)Patch Generation with Repair Specification:After re-
+pair operators have been selected for a flaw record, HARNESS-
+FIXinstantiates them into a repair specification for candidate
+implementation. The purpose of the specification is to translate
+operator-level repair intent into a flaw-specific implementa-
+tion contract, i.e., it binds the operator to the current flaw
+record and target harness. The resulting specification replaces
+abstract operator fields with flaw-specific and harness-specific
+constraints. Each specification contains three groups of fields.
+(a)Target and scopebinds the specification to a concrete
+flaw record, its implicated harness layers, selected repair
+operators, and representative diagnosis records.
+(b)Edit constraintsbind the operators’ editable resource
+template to concrete harness artifacts in the target implemen-
+tation, while listing forbidden artifacts.
+(c)Required behaviortranslates the expected effect of the
+operators into concrete behavioral requirements. It describes
+the harness behavior that must hold after applying the candi-
+date change.
+The example below sketches the repair specification instan-
+tiated from the consolidated flaw records for task in Figure 3.
+Repair specification
+•target and scope:
+◦flaw record=completion accepted
+without artifact/state effect
+◦implicated layers=Lifecycle,
+Verification, Observability
+◦selected operators=verification-gated
+finalization; effect-evidence
+completion guarding;
+API-error and state-delta logging
+◦representative diagnoses=...
+•edit constraints:
+◦allowed artifacts=appworld_agent/core.py;
+execution-result instrumentation
+◦forbidden artifacts=task data/oracles,
+validation/test labels, public APIs
+•required behavior:
+◦expose API-error evidence
+◦require artifact/state effect
+evidence before complete_task()
+e.g., PaymentRequest records
+D. Patch Validation and Harness Memory
+With the candidate patch generated under the repair specifi-
+cation, HARNESSFIXenters a validation stage that determines
+whether the patch should be accepted into the harness.
+The validation agent first performs pre-validation checks
+on the candidate diff (between the generated patch and the
+original implementation) to determine whether it conforms
+to the repair specification and satisfies basic implementation
+correctness, such as syntax and static analysis checks.
+It then performs validation set assessment by evaluating the
+candidate patch on a held-out validation set, checking whether
+it mitigates the target flaw while avoiding unacceptable regres-
+sions on tasks previously solved by the original harness. A
+patch is accepted only if it achieves the target improvement
+and stays within the regression limit.
+HARNESSFIXrecords the outcome as harness repair mem-
+ory. Each memory record contains the flaw record, implicated
+harness layers, repair specification, diff summary, results from
+pre-validation check and validation set assessment, the valida-
+tion tasks that regressed, and a natural language description
+of the task conditions under which the repair applies or
+does not apply. Accepted records provide implementation
+examples for similar future flaw records. Rejected records
+explain whether the cause is pre-validation failure, insufficient
+target improvement, or excessive regression, and help prevent
+future iterations from proposing the same ineffective change.
+IV. EXPERIMENTALDESIGN
+A. Research Questions
+RQ1: Effectiveness and Efficiency.Does HARNESSFIX
+achieve better task performance and token efficiency?
+RQ2: Failure diagnosis.Does HARNESSFIXproduce ef-
+fective failure diagnoses?
+RQ3: Ablation study.Do HARNESSFIX’s design choices
+all contribute to performance gains?
+RQ4: Cross-model transfer.Do harness repairs derived
+from one task model transfer to other task models?
+B. Agents and Benchmarks
+We evaluate HARNESSFIXon four representative bench-
+marks for agent harnesses, covering open-ended research QA,
+repository-level software repair, stateful application automa-
+tion, and terminal-based command-line workflows. For each
+benchmark, we select one initial harnessH 0 as the starting
+point for HARNESSFIXand the self-evolution baselines, and
+randomly partition the sampled tasks into training, validation,
+and held-out test sets.
+For GAIA [5], we use the open-deep-research harness [32]
+asH 0 and sample 150 of the 166 annotated developer ques-
+tions with public ground truth, split into 60/30/60 tasks. For
+SWE-Bench Verified [3], we use mini-swe-agent [42] asH 0
+and sample 250 of the 500 instances, split into 100/50/100
+tasks. For AppWorld [6], we use the official simplified ReAct
+code agent asH 0 and sample 225 of the 750 tasks, split into
+90/45/90 tasks. For Terminal-Bench 2.0 Verified [4], we use
+the Harbor Terminus-2 terminal-agent harness [34] asH 0 and
+sample 85 of the 89 tasks, split into 34/17/34 tasks.
+Following the standard benchmark practice, we measure
+performance by task completion rate (short forTCR).
+C. Baselines
+RQ1 compares HARNESSFIXwith two categories of base-
+lines: human-designed harness baselines and self-evolution
+and repair baselines.
+Human-designed harness baselines.For each benchmark,
+we compare against representative human-designed harnesses:
+DeepResearchAgent [31] and MiroFlow [30] for GAIA; Open-
+Hands [43] and Trae-Agent [44] for SWE-Bench Verified;
+FullCodeRefl, IPFunCall, and CUGA [45] for AppWorld; and
+OpenCode [46] and OpenHands [43] for Terminal-Bench 2.0
+Verified.
+Self-evolution and repair baselines.We also compare
+with four representative approaches that adapt agent behav-
+ior from observed executions:1) GEPA [37], a reflective
+prompt-evolution method with Pareto-frontier selection;2)
+SCOPE [26], a memory-guided prompt-evolution method;
+3) ReCreate [8], which converts trajectories into reusable
+task-domain scaffolds and workflow guidance; and4) Meta-
+Harness [47], which optimizes harness code from prior har-
+ness versions, task scores, and execution traces. For these
+baselines, we also record token consumption (in millions),
+short forTokens (M).
+D. Experimental Setup
+We use GPT-5 mini as the default model for running the
+experimental agents, our HARNESSFIXand baselines. We also
+experiment with four other LLMs for comparison and evalu-
+ate the cross-model transfer performance (in RQ4). Detailed
+model configurations are on our website. Task performance
+values in Tables IV, VI, III, and VII are arithmetic means
+over three independent runs.
+To answer RQ2, we construct a human-annotated diagno-
+sis set from the harness failures on the test set, and this
+information is not used for harness repair or validation de-
+cisions. For each benchmark, three annotators label 20 failed
+test trajectories with the responsible failure step, root cause,
+implementation anchor, implicated harness layer, and selected
+repair operators. These labels serve as the gold standard for
+evaluation, and we report diagnosticaccuracyacross the
+annotated dimensions. The full annotation and metric details
+are provided on our website.
+To answer RQ3, we evaluate four ablations that remove
+or weaken key design choices in HARNESSFIX:1) Prompt-
+only repair, which applies only prompt updates and disables
+runtime harness changes;2) w/o trace-grounded diagnosis,
+which removes Harness Flaw Diagnosis (Section III-B) and
+derives repair context from raw trajectory summaries;3)
+w/o scoped repair operators, which replaces Scoped Repair
+(Section III-C) with free-form harness editing; and4) w/o
+regression-aware acceptance, which removes validation-set
+acceptance checks (Section III-D) for target-flaw reduction and
+newly introduced regressions.
+To answer RQ4, we use the repaired GAIA harness selected
+with GPT-5 mini and directly reuse it with four additional task
+models on the same held-out GAIA test split: Qwen3.5 Plus,
+DeepSeek V3.2, Gemini 3 Pro, and Claude Sonnet 4.5. Apart
+from minimal model-provider compatibility handling required
+to execute the target APIs, no target-model-specific harness
+repair is performed for these transfer runs.
+V. RESULTS ANDANALYSIS
+A. Effectiveness and Efficiency (RQ1)
+Table III compares HARNESSFIXwith the initial harness
+H0 across four benchmarks and five LLMs. HARNESSFIX
+consistently improves overH 0 in all settings, with an average
+gain of 11.1%. The largest improvements appear on GAIA,
+ranging from 14.5% to 18.4%, while even the smallest gains
+on AppWorld remain between 5.9% and 9.3%. The absolute
+scores differ across LLMs, but the improvement introduced is
+relatively model consistent: the average gain for each LLM
+ranges from 10.3% to 12.5%.
+TABLE III: Performance overH 0 (RQ1).
+Bench. LLM usedH 0 H0+HARNESSFIX∆
+GAIA
+GPT-5 mini 43.3 61.7 +18.4
+Claude Sonnet 4.5 66.7 84.4 +17.7
+DeepSeek V3.2 58.9 75.6 +16.7
+Qwen3.5 Plus 63.3 78.9 +15.6
+Gemini 3 Pro 69.4 83.9 +14.5
+SWE
+GPT-5 mini 45.3 57.3 +12.0
+Claude Sonnet 4.5 61.3 71.7 +10.4
+DeepSeek V3.2 58.7 69.3 +10.6
+Qwen3.5 Plus 62.7 72.3 +9.6
+Gemini 3 Pro 60.3 68.7 +8.4
+App.
+GPT-5 mini 36.7 43.0 +6.3
+Claude Sonnet 4.5 61.1 70.4 +9.3
+DeepSeek V3.2 56.3 62.2 +5.9
+Qwen3.5 Plus 53.3 61.9 +8.6
+Gemini 3 Pro 50.7 59.6 +8.9
+TB2
+GPT-5 mini 17.6 26.5 +8.9
+Claude Sonnet 4.5 34.3 47.1 +12.7
+DeepSeek V3.2 31.4 39.2 +7.9
+Qwen3.5 Plus 42.2 52.9 +10.7
+Gemini 3 Pro 46.1 55.9 +9.8
+TABLE IV: Performance comparison (RQ1).
+Bench. Role Method / harness TCR Tokens (M)
+GAIA
+SelectedH 0 open-deep-research 43.3 (+18.4) /
+Human-
+designed
+DeepResearchAgent 52.8 (+8.9) /
+MiroFlow 58.3 (+3.4) /
+Evolve/repair
+fromH 0
+H0 + GEPA 46.7 (+15.0) 32.6 (-43.4)
+H0 + SCOPE 45.0 (+16.7) 26.9 (-53.3)
+H0 + ReCreate 52.8 (+8.9) 67.9 (+17.9)
+H0 + Meta-Harness 56.7 (+5.0) 94.2 (+63.5)
+H0 + HARNESSFIX61.757.6
+SWE
+SelectedH 0 mini-swe-agent 45.3 (+12.0) /
+Human-
+designed
+OpenHands 47.3 (+10.0) /
+Trae-Agent 48.7 (+8.6) /
+Evolve/repair
+fromH 0
+H0 + GEPA 46.7 (+10.6) 28.1 (-42.5)
+H0 + SCOPE 48.3 (+9.0) 25.6 (-47.6)
+H0 + ReCreate 51.7 (+5.6) 57.2 (+17.0)
+H0 + Meta-Harness 54.7 (+2.6) 82.9 (+69.5)
+H0 + HARNESSFIX57.348.9
+App.
+SelectedH 0 ReAct 36.7 (+6.3) /
+Human-
+designed
+FullCodeRefl 35.6 (+7.4) /
+IPFunCall 38.1 (+4.9) /
+CUGA 41.1 (+1.9) /
+Evolve/repair
+fromH 0
+H0 + GEPA 37.4 (+5.6) 22.7 (-39.0)
+H0 + SCOPE 38.9 (+4.1) 18.8 (-49.5)
+H0 + ReCreate 39.3 (+3.7) 44.1 (+18.5)
+H0 + Meta-Harness 40.4 (+2.6) 74.6 (+100.5)
+H0 + HARNESSFIX43.037.2
+TB2
+SelectedH 0 Harbor Terminus-2 17.6 (+8.9) /
+Human-
+designed
+OpenCode 22.5 (+4.0) /
+OpenHands 18.6 (+7.9) /
+Evolve/repair
+fromH 0
+H0 + GEPA 19.6 (+6.9) 18.6 (-44.5)
+H0 + SCOPE 20.6 (+5.9) 18.1 (-46.0)
+H0 + ReCreate 21.6 (+4.9) 38.8 (+15.8)
+H0 + Meta-Harness 23.5 (+3.0) 66.8 (+99.4)
+H0 + HARNESSFIX26.533.5
+Note.In TCR, parentheses show HARNESSFIX’s percentage-point gain over the row.
+In Tokens, parentheses show relative token change vs. HARNESSFIX; / denotes not
+applicable.
+In Table IV, we fix the backbone model to GPT-5 mini, one
+of the five models evaluated above, and compare HARNESS-
+FIXwith all baselines end to end. HARNESSFIXoutperforms
+TABLE V: Failure diagnosis evaluation (RQ2).
+Input representation Step Cause Anchor Layer Operator
+Raw trace 55.0 53.8 50.0 58.4 51.3
+Raw + data-flow 70.0 68.8 65.0 73.2 66.3
+Raw + data/control 77.5 75.0 72.5 79.4 73.8
+Full HTIR 85.0 83.8 81.3 86.2 82.5
+TABLE VI: Ablation study (RQ3).
+Variant GAIA SWE AppWorld TB2
+H0 43.3 45.3 36.7 17.6
+Prompt-only repair 50.6 48.3 37.4 18.6
+w/o trace-grounded diagnosis 51.1 50.7 38.1 21.6
+w/o scoped repair operators 50.6 49.3 37.4 18.6
+w/o regression-aware acceptance 55.6 53.3 39.3 24.5
+Full HARNESSFIX61.7 57.3 43.0 26.5
+the human-designed harness by 6.3% on average, with im-
+provements between 1.9% and 10.0%, while requiring no man-
+ual harness design effort. Among automated self-evolution and
+repair baselines initialized from the sameH 0, HARNESSFIX
+achieves the best performance, improving over these baselines
+by 6.9% on average, with gains ranging from 2.6% to 16.7%.
+Even against Meta-Harness, the strongest automated baseline,
+HARNESSFIXremains 2.6% to 5.0% higher while using sub-
+stantially fewer tokens. Specifically, Meta-Harness consumes
+63.5% to 100.5% more offline evolving/repair tokens than
+HARNESSFIX, indicating that our approach improves both
+effectiveness and token efficiency.
+To evaluate the statistical significance of these improve-
+ments, we conduct one-sided paired sign tests using the
+repeated-run outcomes across all benchmarks. For the baseline
+comparisons in Table IV, thep-values range from2.4×10 −4
+to4.9×10 −4, all below 0.001, showing that HARNESSFIX’s
+improvements are statistically significant.
+B. Failure Diagnosis (RQ2)
+Table V shows that Full HTIR aligns well with human-
+annotated gold labels, achieving 85.0% step accuracy, 81.3%
+implementation anchor accuracy, 86.2% harness-layer macro-
+F1, and 82.5% repair-operator accuracy. For fine-grained step-
+level localization, this is substantially above existing tech-
+niques that typically achieve around 45–52% step accuracy
+[48], [49], raising the diagnosis to a level sufficient for targeted
+repair rather than blind optimization. Compared with raw
+traces, adding data-flow and control-flow links consistently
+improves the diagnosis metrics. These results indicate that
+HARNESSFIX’s gains are driven by structured, trace-grounded
+diagnosis.
+C. Ablation Study (RQ3)
+As shown in Table VI, all ablations reduce performance
+relative to full HARNESSFIX, showing that each design choice
+contributes to the final result. The largest degradation is
+observed when repair is limited to prompt updates or when
+scoped repair operators are removed, indicating that effective
+harness repair depends on targeted changes to runtime mech-
+anisms.
+TABLE VII: Cross-model transfer on GAIA (RQ4)
+ModelH 0 H0 + HARNESSFIX∆
+GPT-5 mini (repair source) 43.3 61.7 +18.4
+Claude Sonnet 4.5 66.7 72.2 +5.5
+DeepSeek V3.2 58.9 66.7 +7.8
+Qwen3.5 Plus 63.3 72.8 +9.5
+Gemini 3 Pro 69.4 78.3 +8.9
+TABLE VIII: Harness layers repaired by HARNESSFIXand
+baselines. = primary edit target,G #= partial or indirect edit
+target,#= not edited.
+Layer HARNESSFIXrepairs Baselines
+GAIA SWE App. TB2 GEPA SCOPE ReC. Meta-H.
+ExecutionG #  # # # # #  
+Tool Interface G # G # # # # G #  
+Context/MemoryG #        
+Lifecycle  G #  # # #  
+Observability G # # # # # # G #
+Verification#    # # #  
+Governance#  G #  # # # G #
+# layers touched 5 7 5 4 1 1 2 7
+Baseline columns summarize method-level edit scope. ReC. = ReCreate; Meta-H. = Meta-
+Harness.
+D. Cross-model Transfer (RQ4)
+Table VII reports whether the GAIA harness repaired with
+GPT-5 mini transfers to other models without target-specific
+trajectory analysis. The repaired harness improves the repair-
+source model by 18.4%, and also improves all four target
+models, yielding consistent transfer gains of 5.5% to 9.5%.
+These gains are smaller than the source-model gain but con-
+sistently positive, suggesting that the repairs address harness-
+level failures shared across models.
+VI. DISCUSSION
+Table VIII shows that most baselines modify only a narrow
+slice of the harness: GEPA and SCOPE touch one layer, and
+ReCreate touches two, making them less suitable for failures
+spanning multiple harness responsibilities. Meta-Harness can
+touch all seven layers, but its optimization-based search is
+untargeted and therefore incurs much higher token costs as
+shown in Table IV. In contrast, HARNESSFIXuses trace-
+grounded and diagnosis-driven framework to perform scoped
+edit, covering diverse harness flaws without exhaustive search.
+Table VIII also demonstrates the concrete harness repair
+conducted by HARNESSFIX. In open-ended research QA
+(GAIA), flaws often concentrate in Tool Interface and Ob-
+servability, such as missing API configuration, unsupported
+document formats, fragile media conversion, and traces that
+do not preserve enough evidence for later answer synthesis. In
+repository-level software repair (SWE-Bench Verified), many
+failures involve the interface between tool execution, context
+construction, and verification evidence: the agent must issue
+shell commands and file edits, observe the right test output,
+and submit a patch under benchmark-specific constraints.
+Stateful application automation (AppWorld), where tasks
+require API calls or generated code to produce persistent
+application-state effects, exposes a different pattern. Its fail-
+ures often combine Tool Interface, Lifecycle, Verification and
+Governance concerns because the harness must validate API
+arguments, expose API errors, track artifact/state effects, and
+avoid accepting completion before the required side effect
+occurs. Terminal-style command-line tasks (Terminal-Bench
+2.0 Verified) place more pressure on Context and Memory,
+Lifecycle, Verification, and Governance concerns: the har-
+ness must preserve terminal context, manage command-line
+workflow state, prefer benchmark-provided tests over ad hoc
+checks, and avoid invalid terminal actions.
+These patterns suggest that harness repair is not only a
+prompt optimization problem. Different benchmarks require
+different runtime mechanisms, and a repair often has cross-
+layer implications. For example, a lifecycle repair that pre-
+serves partial work can also change the evidence available to
+verification and the conditions under which finalization should
+be accepted. Because HARNESSFIX’s diagnosis aggregates
+the implicated layers around each recurring flaw, its repair
+specification and validation checks can account for these
+coupled effects before accepting a candidate harness change.
+VII. RELATEDWORK
+Agent Harnesses.Recent work treats the agent harness
+as a first-class engineering object rather than incidental glue
+code. Survey and practice-oriented work characterizes harness
+responsibilities and runtime surfaces [1], [50], [28]. A second
+line studies harness specification and composition: such as
+natural-language agent harnesses [51] and AgentFlow [52].
+A third line automates harness optimization or evolution,
+including AutoHarness [53], Meta-Harness [47], and Agentic
+Harness Engineering [54]. HARNESSFIXbuilds on this view,
+but uses failed trajectories for diagnostic repair.
+Self-improving Agents.Self-improving agent work spans
+multiple repair surfaces. Agent-design and workflow-search
+methods optimize agent structures, workflows, or multi-agent
+architectures [55], [56], [57], [58], [59]. Tool- and experience-
+oriented methods distill prior interactions into reusable tools,
+skills, workflows, memories, prompts, or domain agents [60],
+[61], [62], [27], [63], [8], [64], [65], [66], [67], [68], [37].
+Self-modification and evolutionary methods recursively mod-
+ify agent code, decision modules, collaboration networks, or
+development protocols [38], [39], [40], [41], [69], [70], [71],
+[72]. Verification-driven methods use rubric-guided checks or
+test-time learning to improve inference-time behavior [73],
+[72]. In contrast, HARNESSFIXrepairs the harness from failed
+trajectories: it attributes failures to responsible TraceSteps and
+harness layers, then applies scoped harness changes, rather
+than evolving the whole agent, merely reusing experience, or
+only strengthening inference-time verification.
+Trace Analysis, Failure Attribution and Agent Opera-
+tions.Wang et al. [74] conducted the first survey about LLM
+agent trajectory analysis. Some methods focus on representing
+or restructuring trajectories, such as SWE-TRACE [75] and
+VCC [76]. Others analyze how failures emerge over time
+[77], [29]. FAMAS [78], AgenTracer [79], AgentFixer [80]
+and DoVer [49] further study failure attribution and root-
+cause diagnosis. These works show the value of trajectory-
+level diagnosis; HARNESSFIXfurther closes the loop by using
+diagnosis to implement harness changes.
+VIII. CONCLUSION
+As LLM-based agents are applied to increasingly complex
+tasks, the harness around the base model becomes an im-
+portant part of system reliability. We propose HARNESSFIX,
+which builds HTIR to organize heterogeneous trajectories and
+harness artifacts into step-level evidence, attributes failures to
+responsible steps and harness layers, and generates harness
+patches guided by flaw-specific repair specifications. As an
+early effort to study agent harness reliability, this work high-
+lights the value of aligning runtime trajectories with harness
+implementations for diagnosis-aware repair, offering a new
+perspective on improving the reliability of LLM agents.
+REFERENCES
+[1] J. Li, X. Xiao, Y . Zhang, C. Liu, L. Zhao, X. Liao, Y . Ji,
+J. Wang, J. Gu, Y . Ge, W. Xu, X. Fang, X. Xu, T. Zhao, Y . Kim,
+T. Wang, J. Hamm, S. Krishnaswamy, J. Huan, and C. Reddy,
+“Agent harness engineering: A survey,” 2026. [Online]. Available:
+https://openreview.net/pdf?id=eONq7FdiHa
+[2] C. E. Jimenez, J. Yang, A. Wettig, S. Yao, K. Pei, O. Press,
+and K. Narasimhan, “SWE-bench: Can language models resolve
+real-world GitHub issues?” inThe Twelfth International Conference on
+Learning Representations, 2024, oral presentation. [Online]. Available:
+https://openreview.net/forum?id=VTF8yNQM66
+[3] OpenAI, “SWE-bench Verified,” https://www.swebench.com/, 2024.
+[4] M. A. Merrillet al., “Terminal-Bench: Benchmarking agents on hard,
+realistic tasks in command line interfaces,” 2026.
+[5] G. Mialonet al., “GAIA: A benchmark for general AI assistants,” 2023.
+[6] H. Trivedi, T. Khot, M. Hartmann, R. Manku, V . Dong, E. Li, S. Gupta,
+A. Sabharwal, and N. Balasubramanian, “AppWorld: A controllable
+world of apps and people for benchmarking interactive coding agents,”
+inProceedings of the 62nd Annual Meeting of the Association for
+Computational Linguistics, 2024, pp. 16 022–16 076.
+[7] D. Zhang, “AgentDevel: Reframing Self-Evolving LLM Agents as
+Release Engineering,” 2026. [Online]. Available: https://arxiv.org/abs/
+2601.04620
+[8] Z. Hao, H. Wang, J. Luo, J. Zhang, Y . Zhou, Q. Lin, C. Wang, H. Dong,
+and J. Chen, “ReCreate: Reasoning and creating domain agents driven
+by experience,” inProceedings of the 64th Annual Meeting of the
+Association for Computational Linguistics, 2026.
+[9] G. Fang, V . Isahagian, K. Jayaram, R. Kumar, V . Muthusamy, P. Oum,
+and G. Thomas, “Trajectory-informed memory generation for self-
+improving agent systems,”arXiv preprint arXiv:2603.10600, 2026.
+[10] S. Zhang, M. Yin, J. Zhang, J. Liu, Z. Han, J. Zhang, B. Li, C. Wang,
+H. Wang, Y . Chen, and Q. Wu, “Which Agent causes task failures and
+when? on automated failure attribution of LLM Multi-Agent systems,” in
+Proceedings of the 42nd International Conference on Machine Learning
+(ICML), 2025, pp. 1–12, spotlight paper.
+[11] I. Bouzenia and M. Pradel, “Understanding Software Engineering
+Agents: A Study of Thought-Action-Result Trajectories,” inProceedings
+of the 30th IEEE/ACM International Conference on Automated Software
+Engineering (ASE), 2025, pp. 1–12.
+[12] N. Islam, R. S. Ayon, D. G. Thomas, S. Ahmed, and M. Wardat, “When
+agents fail: A comprehensive study of bugs in llm agents with automated
+labeling,”arXiv preprint arXiv:2601.15232, 2026.
+[13] OpenAI, “A practical guide to building agents,” https://openai.com/
+business/guides-and-resources/a-practical-guide-to-building-ai-agents/,
+2025, accessed: 2026-05-09.
+[14] Anthropic, “Effective context engineering for AI agents,” https://www.
+anthropic.com/engineering/effective-context-engineering-for-ai-agents,
+Sep. 2025, accessed: 2026-04-30.
+[15] C. Zhang, J. Yang, D. Yan, S. Yang, and Y . Chen, “Automated breakpoint
+generation for debugging.”J. Softw., vol. 8, no. 3, pp. 603–616, 2013.
+[16] Y . Chen, S. Zhang, Q. Guo, L. Li, R. Wu, and T. Chen, “Deterministic
+replay: A survey,”ACM Computing Surveys (CSUR), vol. 48, no. 2, pp.
+1–47, 2015.
+[17] M. Monperrus, “Automatic software repair: A bibliography,”ACM
+Comput. Surv., vol. 51, no. 1, pp. 17:1–17:24, 2018. [Online]. Available:
+https://doi.org/10.1145/3105906
+[18] C. S. Xia, Y . Wei, and L. Zhang, “Automated program repair in the era
+of large pre-trained language models,” in45th IEEE/ACM International
+Conference on Software Engineering, ICSE 2023, Melbourne, Australia,
+May 14-20, 2023. IEEE, 2023, pp. 1482–1494. [Online]. Available:
+https://doi.org/10.1109/ICSE48619.2023.00129
+[19] N. Jiang, K. Liu, T. Lutellier, and L. Tan, “Impact of code language
+models on automated program repair,” in45th IEEE/ACM International
+Conference on Software Engineering, ICSE 2023, Melbourne, Australia,
+May 14-20, 2023. IEEE, 2023, pp. 1430–1442. [Online]. Available:
+https://doi.org/10.1109/ICSE48619.2023.00125
+[20] Y .-A. Xiao, P. Gao, C. Peng, and Y . Xiong, “Improving the Efficiency
+of LLM Agent Systems through Trajectory Reduction,” 2025. [Online].
+Available: https://arxiv.org/abs/2509.23586
+[21] F. Lin, S. Chen, R. Fang, H. Wang, and T. Lin, “Stop Wasting
+Your Tokens: Towards Efficient Runtime Multi-Agent Systems,” 2025.
+[Online]. Available: https://arxiv.org/abs/2510.26585
+[22] R. Nanda, C. Maddila, S. Jha, E. M. Khan, M. Paltenghi, and S. Chandra,
+“Wink: Recovering from misbehaviors in coding agents,”arXiv preprint
+arXiv:2602.17037, 2026.
+[23] S. Liu, Y . Chen, R. Krishna, S. Sinha, J. Ganhotra, and R. Jabbarvand,
+“Process-centric analysis of agentic software systems,”Proceedings of
+the ACM on Programming Languages, vol. 10, no. OOPSLA1, pp. 1961–
+1988, 2026.
+[24] W. Wang, P. Kattakinda, and S. Feizi, “Maestro: Joint Graph & Config
+Optimization for Reliable AI Agents,” 2025. [Online]. Available:
+https://arxiv.org/abs/2509.04642
+[25] R. Costa, “Instruction-Level Weight Shaping: A Framework for
+Self-Improving AI Agents,” 2025. [Online]. Available: https://arxiv.org/
+abs/2509.00251
+[26] Z. Pei, H.-L. Zhen, S. Kai, S. J. Pan, Y . Wang, M. Yuan, and B. Yu,
+“SCOPE: Prompt evolution for enhancing agent effectiveness,” 2025.
+[27] J. Niet al., “Trace2Skill: Distill trajectory-local lessons into transferable
+agent skills,” 2026.
+[28] Anthropic, “Effective harnesses for long-running agents,” https://www.
+anthropic.com/engineering/effective-harnesses-for-long-running-agents,
+2025, accessed: 2026-05-09.
+[29] X. J. Wang, H. Bai, Y . Sun, H. Wang, S. Zhang, W. Hu, M. Schroder,
+B. Mutlu, D. Song, and R. D. Nowak, “The long-horizon task mirage?
+diagnosing where and why agentic systems break,” 2026.
+[30] MiroMind Team, S. Bai, L. Bing, C. Chen, G. Chen, Y . Chen, Z. Chen,
+Z. Chen, J. Dai, X. Dong, W. Dou, Y . Deng, Y . Fu, J. Ge, C. Han,
+T. Huang, Z. Huang, J. Jiao, S. Jiang, T. Jiao, X. Jian, L. Lei, R. Li,
+G. Luo, T. Li, X. Lin, Z. Liu, Z. Li, J. Ni, Q. Ren, P. Sun, S. Su,
+C. Tao, B. Wang, W. Wang, H. Wang, J. Wang, J. Wang, J. Wang,
+L. Wang, S. Wang, W. Wang, Z. Wang, J. Xu, S. Xing, C. Yang, H. Ye,
+J. Yu, Y . Yu, M. Zhong, T. Zhao, X. Zhu, Y . Zhou, Y . Zhang, and
+Z. Zhu, “MiroThinker: Pushing the performance boundaries of open-
+source research agents via model, context, and interactive scaling,”
+2025, released as the MiroFlow agentic framework at https://github.com/
+MiroMindAI/MiroFlow.
+[31] Skywork AI, “DeepResearchAgent: A hierarchical multi-agent
+framework for deep research,” https://github.com/SkyworkAI/
+DeepResearchAgent, 2025, accessed: 2026-05-30.
+[32] A. Roucher, C. Fourrier, L. Tunstall, and L. von Werra, “Open-source
+DeepResearch: Freeing our search agents,” https://huggingface.co/blog/
+open-deep-research, 2025, hugging Face blog; accessed 2026-05-30.
+[33] J. Yang, C. E. Jimenez, A. Wettig, K. Lieret, S. Yao, K. Narasimhan,
+and O. Press, “SWE-agent: Agent-computer interfaces enable automated
+software engineering,” inAdvances in Neural Information Processing
+Systems, 2024. [Online]. Available: https://arxiv.org/abs/2405.15793
+[34] Harbor Framework Contributors, “Harbor: A containerized framework
+for agent benchmarking,” https://github.com/harbor-framework/harbor,
+2026, terminus-2 terminal-agent harness; accessed 2026-05-30.
+[35] T. Ma, Y . Chen, V . Anand, A. Cornacchia, A. R. Faustino,
+G. Liu, S. Zhang, H. Luo, S. A. Fahmy, Z. A. Qazi, and
+M. Canini, “MAESTRO: Multi-Agent Evaluation Suite for Testing,
+Reliability, and Observability,” 2026. [Online]. Available: https:
+//arxiv.org/abs/2601.00481
+[36] D. Guo, J. Wu, and S. M. Yiu, “Agenteval: Dag-structured step-level
+evaluation for agentic workflows with error propagation tracking,”arXiv
+preprint arXiv:2604.23581, 2026.
+[37] L. A. Agrawal, S. Tan, D. Soylu, N. Ziems, R. Khare, K. Opsahl-
+Ong, A. Singhvi, H. Shandilya, M. J. Ryan, M. Jiang, C. Potts,
+K. Sen, A. G. Dimakis, I. Stoica, D. Klein, M. Zaharia, and
+O. Khattab, “GEPA: Reflective prompt evolution can outperform
+reinforcement learning,” inThe Fourteenth International Conference on
+Learning Representations, 2026, oral presentation. [Online]. Available:
+https://openreview.net/forum?id=RQm2KQTM5r
+[38] X. Yin, X. Wang, L. Pan, L. Lin, X. Wan, and W. Y . Wang, “Gödel agent:
+A self-referential agent framework for recursively self-improvement,”
+inProceedings of the 63rd Annual Meeting of the Association for
+Computational Linguistics (Volume 1: Long Papers). Vienna, Austria:
+Association for Computational Linguistics, 2025, pp. 27 890–27 913.
+[Online]. Available: https://aclanthology.org/2025.acl-long.1354/
+[39] M. Robeyns, M. Szummer, and L. Aitchison, “SICA: A self-improving
+coding agent,” inICLR 2025 Workshop on Scaling Self-Improving
+Foundation Models, 2025, oral presentation. [Online]. Available:
+https://openreview.net/forum?id=rShJCyLsOr
+[40] J. Zhang, S. Hu, C. Lu, R. T. Lange, and J. Clune, “Darwin
+gödel machine: Open-ended evolution of self-improving agents,” in
+The Fourteenth International Conference on Learning Representations,
+2026, poster presentation. [Online]. Available: https://openreview.net/
+forum?id=pUpzQZTvGY
+[41] W. Wang, P. Pi˛ ekos, N. Li, F. Laakom, Y . Chen, M. Ostaszewski,
+M. Zhuge, and J. Schmidhuber, “Huxley-gödel machine: Human-level
+coding agent development by an approximation of the optimal self-
+improving machine,” inThe Fourteenth International Conference on
+Learning Representations, 2026, oral presentation. [Online]. Available:
+https://openreview.net/forum?id=T0EiEuhOOL
+[42] SWE-agent Contributors, “mini-swe-agent: A minimal LLM agent for
+software engineering,” https://github.com/SWE-agent/mini-swe-agent,
+2024, accessed: 2026-05-30.
+[43] X. Wang, B. Li, Y . Song, F. F. Xu, X. Tang, M. Zhuge, J. Pan, Y . Song,
+B. Li, J. Singh, H. H. Tran, F. Li, R. Ma, M. Zheng, B. Qian, Y . Shao,
+N. Muennighoff, Y . Zhang, B. Hui, J. Lin, R. Brennan, H. Peng,
+H. Ji, and G. Neubig, “OpenHands: An open platform for AI software
+developers as generalist agents,” inThe Thirteenth International
+Conference on Learning Representations, 2025, poster presentation.
+[Online]. Available: https://openreview.net/forum?id=OJd3ayDDoF
+[44] Trae Research Team, P. Gao, Z. Tian, X. Meng, X. Wang, R. Hu,
+Y . Xiao, Y . Liu, Z. Zhang, J. Chen, C. Gao, Y . Lin, Y . Xiong,
+C. Peng, and X. Liu, “Trae Agent: An LLM-based agent for
+software engineering with test-time scaling,” 2025. [Online]. Available:
+https://arxiv.org/abs/2507.23370
+[45] CUGA Project Contributors, “CUGA: A computer-using general-
+ist agent,” https://github.com/cuga-project/cuga-agent, 2025, accessed:
+2026-05-30.
+[46] OpenCode Contributors, “OpenCode: An open-source coding agent,”
+https://github.com/anomalyco/opencode, 2024, accessed: 2026-05-30.
+[47] Y . Lee, R. Nair, Q. Zhang, K. Lee, O. Khattab, and C. Finn, “Meta-
+harness: End-to-end optimization of model harnesses,” 2026.
+[48] Y . Wang, W. Wu, J. Wang, and Q. Wang, “From flat logs to
+causal graphs: Hierarchical failure attribution for llm-based multi-agent
+systems,” 2026. [Online]. Available: https://arxiv.org/abs/2602.23701
+[49] M. Ma, J. Zhang, F. Yang, Y . Kang, Q. Lin, T. Yang, S. Rajmohan,
+and D. Zhang, “DoVer: Intervention-Driven Auto Debugging for LLM
+Multi-Agent Systems,” inProceedings of the 12th International Confer-
+ence on Learning Representations (ICLR), 2026, pp. 1–16.
+[50] R. Lopopolo, “Harness engineering: Leveraging Codex in an agent-
+first world,” https://openai.com/index/harness-engineering/, Feb. 2026,
+accessed: 2026-04-30.
+[51] L. Pan, L. Zou, S. Guo, J. Ni, and H.-T. Zheng, “Natural-language agent
+harnesses,” 2026.
+[52] H. Liu, C. Shou, X. Liu, H. Wen, Y . Chen, R. J. Fang, and Y . Feng,
+“Synthesizing multi-agent harnesses for vulnerability discovery,” 2026.
+[53] X. Lou, M. Lázaro-Gredilla, A. Dedieu, C. Wendelken, W. Lehrach, and
+K. P. Murphy, “AutoHarness: Improving LLM agents by automatically
+synthesizing a code harness,” 2026.
+[54] J. Lin, S. Liu, C. Pan, L. Lin, S. Dou, Z. Xi, X. Huang, H. Yan, Z. Han,
+T. Gui, and Y .-G. Jiang, “Agentic harness engineering: Observability-
+driven automatic evolution of coding-agent harnesses,” 2026.
+[55] S. Hu, C. Lu, and J. Clune, “Automated design of agentic systems,” in
+The Thirteenth International Conference on Learning Representations,
+2025.
+[56] J. Zhanget al., “AFlow: Automating agentic workflow generation,” in
+The Thirteenth International Conference on Learning Representations,
+2025, oral presentation. [Online]. Available: https://openreview.net/
+forum?id=z5uV AKwmjf
+[57] Z. Liet al., “AutoFlow: Automated workflow generation for large
+language model agents,” 2024.
+[58] Y . Shang, Y . Li, K. Zhao, L. Ma, J. Liu, F. Xu, and Y . Li, “AgentSquare:
+Automatic LLM agent search in modular design space,” 2024.
+[59] G. Zhang, L. Niu, J. Fang, K. Wang, L. Bai, and X. Wang, “MaAS:
+Multi-agent architecture search via agentic supernet,” inProceedings
+of the 42nd International Conference on Machine Learning, 2025.
+[Online]. Available: https://arxiv.org/abs/2502.04180
+[60] T. Cai, X. Wang, T. Ma, X. Chen, and D. Zhou, “Large language
+models as tool makers,” inThe Twelfth International Conference
+on Learning Representations, 2024, poster presentation. [Online].
+Available: https://openreview.net/forum?id=qV83K9d5WB
+[61] C. Qian, C. Han, Y . R. Fung, Y . Qin, Z. Liu, and H. Ji,
+“CREATOR: Tool creation for disentangling abstract and concrete
+reasoning of large language models,” inFindings of the Association for
+Computational Linguistics: EMNLP 2023, 2023. [Online]. Available:
+https://aclanthology.org/2023.findings-emnlp.462/
+[62] R. Wang, X. Han, L. Ji, S. Wang, T. Baldwin, and H. Li, “ToolGen:
+Unified tool retrieval and calling via generation,” inThe Thirteenth
+International Conference on Learning Representations, 2025.
+[63] X. Liu, X. Luo, L. Li, G. Huang, J. Liu, and H. Qiao, “SkillForge:
+Forging domain-specific, self-evolving agent skills in cloud technical
+support,” inProceedings of the 49th International ACM SIGIR
+Conference on Research and Development in Information Retrieval,
+2026, industry Track. [Online]. Available: https://arxiv.org/abs/2604.
+08618
+[64] Z. Z. Wang, J. Mao, D. Fried, and G. Neubig, “Agent workflow memory,”
+2024.
+[65] X. Tanget al., “Agent KB: Leveraging cross-domain experience for
+agentic problem solving,” 2025.
+[66] W. Xuet al., “A-MEM: Agentic memory for LLM agents,” 2025.
+[67] R. Salamaet al., “MemInsight: Autonomous memory augmentation for
+LLM agents,” 2025.
+[68] Q. Zhang, C. Hu, S. Upasani, B. Ma, F. Hong, V . Kamanuru,
+J. Rainton, C. Wu, M. Ji, H. Li, U. Thakker, J. Zou, and
+K. Olukotun, “Agentic context engineering: Evolving contexts for
+self-improving language models,” inThe Fourteenth International
+Conference on Learning Representations, 2026. [Online]. Available:
+https://openreview.net/forum?id=eC4ygDs02R
+[69] Z. Weng, A. Antoniades, D. Nathani, Z. Zhang, X. Pu, and X. E. Wang,
+“Group-evolving agents: Open-ended self-improvement via experience
+sharing,” 2026.
+[70] Y . Hu, Y . Cai, Y . Du, X. Zhu, X. Liu, Z. Yu, Y . Hou, S. Tang, and
+S. Chen, “Self-evolving multi-agent collaboration networks for software
+development,” 2024.
+[71] SkyworkAI, “Autogenesis: A self-evolving agent protocol,” 2026.
+[72] Y . He, J. Liu, Y . Liu, Y . Li, T. Cao, Z. Hu, X. Xu, and B. Hooi, “EvoTest:
+Evolutionary test-time learning for self-improving agentic systems,” in
+The Fourteenth International Conference on Learning Representations,
+2026. [Online]. Available: https://arxiv.org/abs/2510.13220
+[73] Y . Wan, T. Fang, Z. Li, Y . Huo, W. Wang, H. Mi, D. Yu, and M. R.
+Lyu, “Inference-time scaling of verification: Self-evolving deep research
+agents via test-time rubric-guided verification,” 2026.
+[74] J. Wang, Y . Wang, M. Chen, X. Xie, C. Chen, F. Mu, Z. Liu, and
+Q. Wang, “A survey for llm agent trajectory analysis: From failure
+attribution to enhancement,” 2026.
+[75] H. Hanet al., “SWE-TRACE: Optimizing long-horizon SWE agents
+through rubric process reward models and heuristic test-time scaling,”
+2026.
+[76] L. Zhang and M. Agrawala, “View-oriented conversation compiler for
+agent trace analysis,” 2026.
+[77] T. Mehtiyev and W. Assunção, “Beyond resolution rates: Behavioral
+drivers of coding agent success and failure,” 2026.
+[78] Y . Ge, L. Xie, Z. Li, Y . Pei, and T. Zhang, “Who is Introducing the
+Failure? Automatically Attributing Failures of Multi-Agent Systems via
+Spectrum Analysis,” inProceedings of the 31st ACM Joint European
+Software Engineering Conference and Symposium on the Foundations
+of Software Engineering (ESEC/FSE), 2026, pp. 1–12.
+[79] G. Zhang, J. Wang, J. Chen, W. Zhou, K. Wang, and S. Yan, “Agen-
+Tracer: Who is inducing failure in the LLM agentic systems?” 2025.
+[80] H. Mulian, S. Zeltyn, I. Levy, L. Galanti, A. Yaeli, and S. Shlomov,
+“AgentFixer: From failure detection to fix recommendations in agentic
+systems,” inProceedings of the 2026 International Workshop on Agentic
+Engineering, ser. AGENT ’26. New York, NY , USA: Association
+for Computing Machinery, 2026, pp. 96–103. [Online]. Available:
+https://doi.org/10.1145/3786167.3788427

@@ -2,13 +2,13 @@
 
 [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
 ![papers](https://img.shields.io/badge/papers-60%2B6_classics-blue)
-![reports](https://img.shields.io/badge/reports-26-red)
+![reports](https://img.shields.io/badge/reports-28-red)
 ![zh-PDF](https://img.shields.io/badge/zh--PDF-28-green)
 ![slides](https://img.shields.io/badge/slides-31p-orange)
 
 围绕 **Recursive Self-Improvement（递归自改进）** 的论文与资源列表 + 系统性调研仓库（2026-08-31 完成）。与一般 awesome 列表不同，本仓库同时提供：
 
-- **26 份中文精读报告**（`reports/`，逐篇拆方法、数字、局限与谱系定位，含 00 起源前史与 23 桥接史）
+- **28 份中文精读报告**（`reports/`，逐篇拆方法、数字、局限与谱系定位，含 00 起源前史、23 桥接史与 26/27 两份合评）
 - **60 篇论文英文原版 PDF + 6 篇起源经典（1965-2013）+ 28 篇保版式中文翻译 PDF**（`papers/`，翻译由 [super_translate](https://github.com/asimfish/super_translate) 生成）
 - **31 页汇总报告**（`awesome_rsi_slides.html` 方向键翻页 / `awesome_rsi_slides.pdf`）
 
@@ -30,7 +30,7 @@
 | [7. Repository Layout](#7-repository-layout)            | [8. Translation Pipeline](#8-translation-pipeline)            |
 | [9. Disclaimer & Credits](#9-disclaimer--credits)       | [10. Glossary](#10-glossary)                                  |
 | [11. Timeline](#11-timeline)                            | [12. Open Problems](#12-open-problems)                        |
-| [13. Roadmap](#13-roadmap)                              |                                                              |
+| [13. Roadmap](#13-roadmap)                              | [14. System Comparison Matrix](#14-system-comparison-matrix)  |
 
 ## 1. Start Here
 
@@ -203,7 +203,7 @@ _Seth Karten, Alex L. Zhang, Kevin Thomas, Sebastian Müller, et al. (Princeton,
 
 ## 4. Frontier Tracking (2026 H2)
 
-2026 年 6-8 月扫描结果（完整笔记见 [`assets/trends_research_raw.md`](assets/trends_research_raw.md)：19 篇新论文 + 9 项工业动态 + 7 项基准动态 + 8 项安全治理）。全部 20 篇英文 PDF 已入库；Metan / Co-Harness / 共进化综述 / EvalCEGAR 四篇附中文翻译；Metan / Co-Harness / 共进化综述 / EvalCEGAR / RHO 有精读报告（20 / 21 / 22 / 24 / 25，其中 24-25 构成"锚 vs 无锚"对照组）。
+2026 年 6-8 月扫描结果（完整笔记见 [`assets/trends_research_raw.md`](assets/trends_research_raw.md)：19 篇新论文 + 9 项工业动态 + 7 项基准动态 + 8 项安全治理）。全部 20 篇英文 PDF 已入库；Metan / Co-Harness / 共进化综述 / EvalCEGAR 四篇附中文翻译；Metan / Co-Harness / 共进化综述 / EvalCEGAR / RHO 有精读报告（20 / 21 / 22 / 24 / 25，其中 24-25 构成"锚 vs 无锚"对照组）；技能红海五篇与安全治理五篇各有一份合评（26 / 27）。
 
 **评估器军备赛**
 
@@ -213,27 +213,27 @@ _Seth Karten, Alex L. Zhang, Kevin Thomas, Sebastian Müller, et al. (Princeton,
 
 **技能进化红海（WikiSkill 同月平行工作）**
 
-4. **SkillCommit.** [arXiv:2608.15165](https://arxiv.org/abs/2608.15165), [PDF-en](papers/en/2608.15165_SkillCommit.pdf) — 反对语义相似度合并，用行为验证的层级抽象提交。
-5. **HyperSkill.** [arXiv:2608.16114](https://arxiv.org/abs/2608.16114), [PDF-en](papers/en/2608.16114_HyperSkill.pdf) — 超图结构技能记忆，GAIA +11.5。
-6. **ERSkill.** [arXiv:2608.12720](https://arxiv.org/abs/2608.12720), [PDF-en](papers/en/2608.12720_ERSkill.pdf) — 检索行为本身技能化，双 frontier 解耦扩张与部署。
-7. **SkillProx.** [arXiv:2608.07449](https://arxiv.org/abs/2608.07449), [PDF-en](papers/en/2608.07449_SkillProx.pdf) — 近端梯度下降形式化搬到文本技能空间，删除是一等公民。
-8. **Evo-Harness.** [arXiv:2608.15071](https://arxiv.org/abs/2608.15071), [PDF-en](papers/en/2608.15071_EvoHarness.pdf) — 反思编译为技能 harness，五基准系统性隔离变量。
+4. **SkillCommit.** [arXiv:2608.15165](https://arxiv.org/abs/2608.15165), [PDF-en](papers/en/2608.15165_SkillCommit.pdf), [合评](reports/26_skill_evolution_wave.md) — 反对语义相似度合并，用行为验证的层级抽象提交。
+5. **HyperSkill.** [arXiv:2608.16114](https://arxiv.org/abs/2608.16114), [PDF-en](papers/en/2608.16114_HyperSkill.pdf), [合评](reports/26_skill_evolution_wave.md) — 超图结构技能记忆，GAIA +11.5。
+6. **ERSkill.** [arXiv:2608.12720](https://arxiv.org/abs/2608.12720), [PDF-en](papers/en/2608.12720_ERSkill.pdf), [合评](reports/26_skill_evolution_wave.md) — 检索行为本身技能化，双 frontier 解耦扩张与部署。
+7. **SkillProx.** [arXiv:2608.07449](https://arxiv.org/abs/2608.07449), [PDF-en](papers/en/2608.07449_SkillProx.pdf), [合评](reports/26_skill_evolution_wave.md) — 近端梯度下降形式化搬到文本技能空间，删除是一等公民。
+8. **Evo-Harness.** [arXiv:2608.15071](https://arxiv.org/abs/2608.15071), [PDF-en](papers/en/2608.15071_EvoHarness.pdf), [合评](reports/26_skill_evolution_wave.md) — 反思编译为技能 harness，五基准系统性隔离变量。
 
 **Harness 工程化与共学习**
 
 9. **Co-Harness: Co-Evolving Harnesses and Model Weights.** [arXiv:2607.22688](https://arxiv.org/abs/2607.22688), [PDF-en](papers/en/2607.22688_CoHarness.pdf), [PDF-zh](papers/zh/2607.22688_CoHarness_zh.pdf), [解读](reports/21_co_harness.md) — harness 优化产生轨迹再蒸馏进权重，双环交替。
 10. **RHO: Retrospective Harness Optimization via Self-Preference.** [arXiv:2606.05922](https://arxiv.org/abs/2606.05922), [PDF-en](papers/en/2606.05922_RHO.pdf), [解读](reports/25_rho.md) — 完全无标签自优化，SWE-Bench Pro 59%→78%。
 11. **Adaptive Auto-Harness.** [arXiv:2606.01770](https://arxiv.org/abs/2606.01770), [PDF-en](papers/en/2606.01770_AdaptiveAutoHarness.pdf) — 密集自改进在开放任务流上早峰后衰减的负结果实证。
-12. **HarnessFix.** [arXiv:2606.06324](https://arxiv.org/abs/2606.06324), [PDF-en](papers/en/2606.06324_HarnessFix.pdf) — 轨迹+harness 编译为 IR，失败归因到 ETCLOVG 七层。
+12. **HarnessFix.** [arXiv:2606.06324](https://arxiv.org/abs/2606.06324), [PDF-en](papers/en/2606.06324_HarnessFix.pdf), [合评](reports/27_safety_governance.md) — 轨迹+harness 编译为 IR，失败归因到 ETCLOVG 七层。
 13. **Metan (Meta^n): RSI through Emergent Depth.** [arXiv:2608.24735](https://arxiv.org/abs/2608.24735), [PDF-en](papers/en/2608.24735_Metan.pdf), [PDF-zh](papers/zh/2608.24735_Metan_zh.pdf), [解读](reports/20_metan.md) — 论证自改写 meta 深度上限约 2.5，改输入不改机器绕开权衡。
 14. **HSI: Hierarchical Self-Improvement.** [arXiv:2608.08466](https://arxiv.org/abs/2608.08466), [PDF-en](papers/en/2608.08466_HSI.pdf) — 三层作用域进化，冻结 meta-evolver 为外层锚。
 
 **安全、治理与基准**
 
-15. **SESG: A Self-Evolving Safety Guardrail in Production.** [arXiv:2608.08471](https://arxiv.org/abs/2608.08471), [PDF-en](papers/en/2608.08471_SESG.pdf) — 深信服生产系统，16-24h 自动闭环新威胁（原 40-90h）。
-16. **OpenLoopEvolve (OLE).** [arXiv:2608.09380](https://arxiv.org/abs/2608.09380), [PDF-en](papers/en/2608.09380_OpenLoopEvolve.pdf) — 策略资产版本化+血统追踪+劣化自动回滚，补 MOSS 的部署纪律。
-17. **Falsifiable Release Gates for Self-Improving Systems.** [arXiv:2607.13070](https://arxiv.org/abs/2607.13070), [PDF-en](papers/en/2607.13070_FalsifiableReleaseGates.pdf) — 七道可证伪发布门：收紧类自动应用、放松类必须人类合并。
-18. **HVTB: Hack-Verifiable Terminal Bench.** [arXiv:2608.22103](https://arxiv.org/abs/2608.22103), [PDF-en](papers/en/2608.22103_HVTB.pdf) — 蜜罐嵌入真实编码任务，测前沿模型 reward hacking 率下界。
+15. **SESG: A Self-Evolving Safety Guardrail in Production.** [arXiv:2608.08471](https://arxiv.org/abs/2608.08471), [PDF-en](papers/en/2608.08471_SESG.pdf), [合评](reports/27_safety_governance.md) — 深信服生产系统，16-24h 自动闭环新威胁（原 40-90h）。
+16. **OpenLoopEvolve (OLE).** [arXiv:2608.09380](https://arxiv.org/abs/2608.09380), [PDF-en](papers/en/2608.09380_OpenLoopEvolve.pdf), [合评](reports/27_safety_governance.md) — 策略资产版本化+血统追踪+劣化自动回滚，补 MOSS 的部署纪律。
+17. **Falsifiable Release Gates for Self-Improving Systems.** [arXiv:2607.13070](https://arxiv.org/abs/2607.13070), [PDF-en](papers/en/2607.13070_FalsifiableReleaseGates.pdf), [合评](reports/27_safety_governance.md) — 七道可证伪发布门：收紧类自动应用、放松类必须人类合并。
+18. **HVTB: Hack-Verifiable Terminal Bench.** [arXiv:2608.22103](https://arxiv.org/abs/2608.22103), [PDF-en](papers/en/2608.22103_HVTB.pdf), [合评](reports/27_safety_governance.md) — 蜜罐嵌入真实编码任务，测前沿模型 reward hacking 率下界。
 19. **ASG-SI / ARA（安全谱系背景）.** [arXiv:2512.23760](https://arxiv.org/abs/2512.23760), [PDF-en](papers/en/2512.23760_ASG-SI.pdf), [arXiv:2602.01750](https://arxiv.org/abs/2602.01750), [PDF-en](papers/en/2602.01750_ARA.pdf) — verifier-auditor 密码学溯源与对抗性奖励审计。
 
 ## 4.5 Macro Debate & Measurement
@@ -269,9 +269,10 @@ _Thomas Kwa, Ben West, Joel Becker, et al. (METR)_ — "50% 任务时长地平�
 - **想快速建立全景**：slides 31 页（15 分钟）→ [报告 10](reports/10_synthesis_insights.md)（叙事弧线 + 两轴地图 + 十条 insight）
 - **想理解 harness 工程**：[报告 01](reports/01_lilian_weng_harness_engineering.md)（Weng 总纲）→ [报告 07](reports/07_darwin_godel_machine.md)（DGM 基线）→ [报告 11](reports/11_continual_harness.md)（免重置 + 共学习）
 - **想理解评估器战争**：[报告 03](reports/03_evolm.md)（reward overoptimization 悖论）→ [报告 04](reports/04_red_queen_godel_machine.md)（epoch 冻结）→ [报告 05](reports/05_who_grades_the_grader.md)（观测等价 + 锚定纪律）→ [报告 06](reports/06_echo.md)（权重层双路 GRPO）→ [报告 24](reports/24_evalcegar.md) vs [报告 25](reports/25_rho.md)（锚驱动进化 vs 完全无锚自偏好，两个极端）
-- **想看生产落地**：[报告 02](reports/02_anthropic_when_ai_builds_itself.md)（Anthropic 内部证据）→ [报告 08](reports/08_moss.md)（MOSS 门控回滚）→ [报告 19](reports/19_icoder.md)（iCoder 五层门控）→ 4 节的 SESG / OLE / HarnessFix
+- **想看生产落地**：[报告 02](reports/02_anthropic_when_ai_builds_itself.md)（Anthropic 内部证据）→ [报告 08](reports/08_moss.md)（MOSS 门控回滚）→ [报告 19](reports/19_icoder.md)（iCoder 五层门控）→ [报告 27](reports/27_safety_governance.md)（SESG / OLE / HarnessFix / 发布门 / HVTB 部署纪律合评）
 - **想理解思想史与递归深度**：[报告 00](reports/00_origins_1965_2014.md)（Good → Bostrom）→ [报告 23](reports/23_godel_agent_to_sica.md)（Gödel Agent → SICA）→ [报告 07](reports/07_darwin_godel_machine.md)（DGM）→ [报告 20](reports/20_metan.md)（Metan：meta 深度 2.5 上限与绕行）
-- **想做二次开发**：[报告 19](reports/19_icoder.md)（iCoder 基座评估）→ [报告 13](reports/13_meta_harness.md)（Meta-Harness 轨迹驱动改写）→ [报告 21](reports/21_co_harness.md)（Co-Harness 双环蒸馏）→ [报告 22](reports/22_coevolution_survey.md)（过程级测试清单）
+- **想做二次开发**：[报告 19](reports/19_icoder.md)（iCoder 基座评估）→ [报告 13](reports/13_meta_harness.md)（Meta-Harness 轨迹驱动改写）→ [报告 21](reports/21_co_harness.md)（Co-Harness 双环蒸馏）→ [报告 22](reports/22_coevolution_survey.md)（过程级测试清单）→ [报告 27](reports/27_safety_governance.md)（部署纪律清单）
+- **想做知识侧/技能库**：[报告 09](reports/09_wikiskill.md)（WikiSkill 三层分离）→ [报告 26](reports/26_skill_evolution_wave.md)（红海五篇：五种结构分歧 + Metan 的反面数据）→ [报告 20](reports/20_metan.md) §连线 4
 
 ## 7. Repository Layout
 
@@ -280,7 +281,7 @@ awesome_rsi/
 ├── README.md                        # 本文件
 ├── awesome_rsi_slides.html          # 31 页汇总 HTML PPT（方向键翻页，P 键打印）
 ├── awesome_rsi_slides.pdf           # 同内容 31 页 PDF 版（1280x720 逐页）
-├── reports/                         # 26 份精读报告（Markdown，中文）
+├── reports/                         # 28 份精读报告（Markdown，中文）
 │   ├── 00_origins_1965_2014.md                 # 前史：Good → Yudkowsky → Schmidhuber → Bostrom
 │   ├── 01_lilian_weng_harness_engineering.md   # 总纲：harness 工程 → RSI
 │   ├── 02_anthropic_when_ai_builds_itself.md   # 工业证据：>80% 代码由 Claude 写
@@ -306,7 +307,9 @@ awesome_rsi/
 │   ├── 22_coevolution_survey.md                # 综述：共进化三阶段分类（评估侧统一坐标）
 │   ├── 23_godel_agent_to_sica.md               # 桥接史：Gödel Agent → SICA → DGM
 │   ├── 24_evalcegar.md                         # 评估侧：碰撞对驱动评估器进化（锚利用效率最高）
-│   └── 25_rho.md                               # 评估侧：完全无外部评分的自偏好优化（锚的对极）
+│   ├── 25_rho.md                               # 评估侧：完全无外部评分的自偏好优化（锚的对极）
+│   ├── 26_skill_evolution_wave.md              # 合评：技能进化红海五篇（结构分歧 + 生命周期共识）
+│   └── 27_safety_governance.md                 # 合评：安全治理五篇（生产闭环 / 资产版本化 / 归因 / 发布门 / hack 测量）
 ├── papers/
 │   ├── classics/                    # 起源经典 6 篇（1965 Good / 2001 GISAI / 2003 Gödel Machine / 2008 Omohundro / 2010 Chalmers / 2013 IEM，GISAI 与 Gödel Machine 含中译）
 │   ├── en/                          # 60 篇英文原版 PDF（arXiv + iCoder 技术报告）
@@ -389,3 +392,32 @@ awesome_rsi/
 - **待验证的设计选择**：harness 改写走 Meta-Harness 式全轨迹自由改写（报告 13）还是 AutoSaddler 式归因约束局部 diff（报告 16）；权重环走 Co-Harness 离线批次（报告 21）还是 Continual Harness 在线共学习（报告 11）
 - **不可妥协项**：进化外的独立锚（报告 05）、回归门（报告 14）、版本化回滚（报告 08 / 21）、过程级测试三件套（报告 22）
 - **持续维护**：新论文按 §4 格式追加，配 PDF-en 入库；重点论文补 PDF-zh 与精读报告；slides 与本 README 计数同步
+
+## 14. System Comparison Matrix
+
+20 个核心系统在本调研四条主轴上的坐标（数字均可在对应报告中找到出处）：
+
+| 系统 | 改哪层 | 锚在哪（不参与进化的部件） | 重置式 / 免重置 | 生产部署 | 一个关键数字 | 报告 |
+|---|---|---|---|---|---|---|
+| DGM | 源码（harness 代码库） | 固定基准 + 沙箱人审 | 重置式 | 否 | SWE-bench Verified 20.0→50.0% | 07 |
+| MOSS | 源码（生产 agent） | 失败重放 + 批准/回滚门 | 重置式 | 是 | 代码门 100% 生效 vs prompt 遵守率波动 | 08 |
+| EvoLM | 权重（policy + rubric 生成器） | 训练环内的 rubric 共进化 | 重置式 | 否 | 静态 RM 判分越准、policy 越差（overoptimization 悖论） | 03 |
+| RQGM | harness + 评估器 | epoch 内冻结评估器 + 人类锚数据集（CRAVE / APReS / IMO-GradingBench） | 重置式 | 否 | 论文写作接受率 40.5% vs 21.8%（1.86×） | 04 |
+| Who Grades the Grader | 文本技能 + 评估指标 | 人工锚定集 | 重置式 | 否 | 评估器塌缩与真进化观测等价 | 05 |
+| ECHO | 权重（critic + policy 双路 GRPO） | 环境结果奖励 | 重置式 | 否 | 总均 77.85 vs GRPO 70.57 | 06 |
+| WikiSkill | 文本（经验→wiki→技能） | 任务成功 + skill-impact 审计 | 重置式 | 否 | 五模型平均第一，Qwen 27B 增益 +23.9 | 09 |
+| Continual Harness | 文本四组件 + 权重共学习 | 冻结 PRM + 前沿教师 | **免重置** | 否 | Pro 100%/$130 vs 98%/$215；Flash-Lite 能力地板 | 11 |
+| Meta-Harness | 源码（harness 代码） | 冻结外层 proposer + 基准 | 重置式 | 否 | TerminalBench-2 76.4% vs 手工 74.7%；轨迹是唯一关键成分 | 13 |
+| Self-Harness | 文本/源码 harness | 回归门（held-in/held-out 双 split） | 重置式 | 否 | 9/9 组合双升，最大 +132% | 14 |
+| EnvHarness | **环境**（Stage/Contract/Chain） | 原任务与人写验证器不动 | 重置式 | 否 | 难度校准命中率 6%→80%；ALFWorld OOD +9.0 | 15 |
+| AutoSaddler | 文本 + 工具 + 中间件 | dev 集泛化门 + EvoDAG 回滚 | 重置式 | 否 | 去掉 dev 门 50.6 跌破未优化 53.0 | 16 |
+| MetaCaster | 文本（系统提示 + 技能库） | 真实测试集数字裁判（仅元训练期） | 重置式 | 否 | 四骨干互换波动仅 0.267-0.366 | 17 |
+| Prime Agent | 文本 harness + 持久 REPL | 环境奖励（无独立锚 → 作弊被固化为技能） | **免重置** | 是（开源 harness） | ARC-AGI-3 官方壳 30.2%→95.5% | 18 |
+| iCoder | **权重**（27B 前沿模型） | 官方 verifier 锁死 + 人类权限门 | 重置式 | 是（release-ready） | RTLLM 68.0 超 GPT-5.5 / Opus 4.8 | 19 |
+| Metan | 文本预处理 + helper 代码库 | 基准验证分 + 进化档案（Ω 自身冻结） | 重置式 | 否 | ARC-AGI-2 0.331 唯一非零；递归贡献 +0.131 | 20 |
+| Co-Harness | 文本/工具 harness + 权重 | 验证集 + 版本化回滚 | 重置式（离线批次） | 否 | 平均 +20.4 pp，超人工 harness +24.7 | 21 |
+| EvalCEGAR | **评估器**（算子池） | 训练 split 的 oracle 碰撞对 | — | 否 | 55 行算子关闭 15.4% 差距（p=0.001） | 24 |
+| RHO | 文本/工具 harness | **无**（成对自偏好） | 重置式（需重放） | 否 | SWE-Bench Pro 0.59→0.78（单轮） | 25 |
+| SESG | 权重（1.7B 护栏） | 红队测试集 + 人工约 2h/威胁 | — | 是（深信服主管线） | 两个月自动闭合 14/15 新威胁 | 27 |
+
+读法：**"锚在哪"一列没有空白**——除 RHO 明确选择无锚（且只测单轮）外，所有能跑的系统都保留了一个不参与进化的部件；**"生产部署"一列只有五个"是"**，且其中 MOSS / iCoder / SESG 的锚都是最保守的形态（门控、锁死、人工标注）。

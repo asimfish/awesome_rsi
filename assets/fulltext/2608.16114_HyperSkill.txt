@@ -1,0 +1,2083 @@
+HYPERSKILL: Self-Evolving LLM Agents via Hypergraph-Structured
+Skill Memory
+Ruiyao Xu1 Tiankai Yang2 Wei-Chieh Huang3
+1Northwestern University
+2University of Southern California
+3University of Illinois at Chicago
+Abstract
+As agentic tasks grow in complexity, LLM
+agents increasingly rely on experiential mem-
+ory to reuse procedural knowledge across tasks.
+Effective memory design must jointly address
+what to store,how is structured and retrieved,
+andhow memory evolves. Existing systems
+tackle each only partially: they store trajec-
+tories, insights, or workflows as isolated en-
+tries, discarding compositional relationships
+among subtasks and reusable skills; retrieve
+by flat embedding similarity that ignores re-
+lational signals; and maintain memory with-
+out leveraging its relational structure. We
+propose HYPERSKILL , a hypergraph-based
+memory framework that jointly improves all
+three. HYPERSKILL represents memory as
+a hypergraph with two node types, subtask
+steps and reusable skills, where each hyper-
+edge links the subtasks and skills from a sin-
+gle trajectory. Dual-path retrieval queries
+both subtask and trajectory levels, ranking
+skills by co-occurrence across retrieved tra-
+jectories. Periodic structure-informed main-
+tenance prunes low-utility nodes and merges
+redundant skills via quality-weighted propaga-
+tion. Across xBench, GAIA, and WebWalk-
+erQA with GPT-4o and Qwen3-30B-A3B, HY-
+PERSKILLoutperforms ten memory baselines,
+yielding gains of up to +11.51 on GAIA and
++11.18on WebWalkerQA. 1
+1 Introduction
+The rapid development of LLM agents (Liu et al.,
+2025b; Yao et al., 2022; Shinn et al., 2023) has
+significantly broadened the scope of tasks that
+autonomous systems can tackle, spanning long-
+horizon web navigation (Chen et al., 2025; Gur
+et al., 2024; Mialon et al., 2023), interactive com-
+puter use (Yang et al., 2024; Xie et al., 2024), and
+multi-step scientific reasoning (Ghafarollahi and
+Buehler, 2025; Ren et al., 2025). As tasks grow in
+1Code is available atὑ7
+How is Structured and Retrieved
+…StoreasFlatVectorDB
+What to Store
+Subtasks
+TrajectoriesWorkflowsSkills
+How Memory Evolves
+HyperSkill
+StoreasPairwiseGraphs
+Task1Searchforthe…
+Skills
+Dual-pathRetrieval
+UnconditionalAccumulation
+LightweightManagement
+Structure-informedMaintenance
+Figure 1: Three design dimensions of experiential agent
+memory. HYPERSKILL unifieswhat to store,how mem-
+ory is structured and retrieved, andhow memory evolves
+via hyperedges over subtasks and skills, dual-path re-
+trieval, and structure-informed maintenance.
+complexity and agents operate across a continuous
+stream of episodes, a single interaction is rarely
+sufficient to solve a problem reliably. Agent mem-
+ory systems (Huang et al., 2026; Hu et al., 2025)
+address this by storing and retrieving information
+beyond a single context window. Among them,
+experiential memory(Wang et al., 2025b; Ouyang
+et al., 2026) is uniquely important: rather than en-
+coding external facts, it distills the agent’s own past
+trajectories into reusable knowledge, enablingself-
+evolving(Gao et al., 2025; Lopez-Paz and Ranzato,
+2017) agents that grow more competent with each
+trajectory instead of starting from scratch.
+This has motivated a growing line of research on
+self-evolving agent memory (Ouyang et al., 2026;
+Wang et al., 2025b; Tang et al., 2025b; Zhang
+et al., 2025b). Early work stored raw interaction
+trajectories as flat records (Wang et al., 2023a;
+Zheng et al., 2024; Zhao et al., 2024), while subse-
+quent approaches shifted toward distilling experi-
+ence into more compact, transferable units such as
+workflows (Wang et al., 2025b), reasoning strate-
+gies (Ouyang et al., 2026), and execution skills (Xia
+et al., 2026). Despite this progress, the design of ex-
+1
+arXiv:2608.16114v1  [cs.CL]  17 Aug 2026
+periential memory systems remains an open prob-
+lem that can be decomposed into three fundamental
+questions:what to store,how is structured and re-
+trieved, andhow memory evolves. Existing systems
+address each only partially, leaving significant gaps
+that limit their capacity for self-improvement.
+Onwhat to store, early systems retain raw tra-
+jectories or distill them into insights and work-
+flows (Zhao et al., 2024; Wang et al., 2023a,
+2025b), while recent work abstracts experience
+into reusable skills (Ouyang et al., 2026; Zheng
+et al., 2025; Anthropic, 2024). However, these
+systems discard the compositional relationships
+among subtasks and skills. Since tasks are in-
+herently compositional, retrieval cannot leverage
+shared procedural structure across superficially dif-
+ferent tasks when these relationships are not re-
+tained. Onhow memory is structured and retrieved,
+most approaches adopt flat vector stores or simple
+binary graphs (Zhang et al., 2025a; Chhikara et al.,
+2025; Rasmussen et al., 2025) and retrieve by em-
+bedding similarity alone, which cannot represent
+nn n-ary co-occurrence between a skill and the sub-
+task patterns it has repeatedly succeeded with. On
+how memory evolves, the majority of systems ac-
+cumulate knowledge without any curation (Wang
+et al., 2023a; Zhao et al., 2024), and the few that
+do introduce only lightweight operations such as
+pruning or deduplication (Fang et al., 2026; Zheng
+et al., 2025), applied independently to each node.
+These gaps share a commonstructural root: a
+trajectory is not a single unit of knowledge but
+an n-ary association among subtasks, skills, and
+an outcome, structure that flat lists and pairwise
+edges represent only lossily. Hypergraphs (Zhou
+et al., 2006; Tang et al., 2025a) preserve such as-
+sociations natively by letting each hyperedge con-
+nect more than two nodes simultaneously. We pro-
+pose HYPERSKILL , which organizes experiential
+memory as a hypergraph G= (V,E) with subtask
+nodes Vu and skill nodes Vs, where each hyper-
+edge groups the subtasks and skills from a single
+trajectory together with a distilled lesson and a
+utility score. This design directly improves the
+three gaps: ❶ hyperedges preserve the full com-
+positional context that flat stores discard; ❷ skill
+nodes are shared across hyperedges, enabling us to
+rank a candidate skill by how frequently it appears
+across the retrieved trajectories, a structural signal
+that semantic similarity alone cannot provide; and
+❸ quality-weighted propagation over the hyper-
+graph enables merging redundant skills by jointly
+considering node utility and neighborhood topol-
+ogy. Across three agentic benchmarks (xBench,
+GAIA, and WebWalkerQA) under two different
+model families, HYPERSKILL consistently outper-
+forms ten memory baselines.
+2 Related Work
+Memory Mechanisms in Agent Systems.LLM
+agents are increasingly equipped with exter-
+nal memory to overcome fixed context win-
+dows (Huang et al., 2026), serving roles such as
+factual memory (Gutiérrez et al., 2024; Rasmussen
+et al., 2025), working memory (Packer et al., 2023),
+and experiential memory, which distills the agent’s
+own trajectories into reusable knowledge for self-
+improvement. We focus on the latter and cate-
+gorize prior work along three dimensions, iden-
+tifying a gap in each.(i) What is stored:Early
+works retain raw trajectories (Zheng et al., 2024;
+Wen et al., 2024), which preserve context but carry
+noise; later approaches abstract trajectories into
+insights or workflows (Zhao et al., 2024; Ouyang
+et al., 2026; Wang et al., 2025b; Fang et al., 2026),
+gaining generality at the cost of procedural detail;
+recent work distills reusable skills (Zheng et al.,
+2025; Wang et al., 2023a; Xia et al., 2026) but treats
+each skill in isolation. None preserves reusable
+subtask decompositions, limiting transfer of com-
+positional planning across episodes.(ii) How mem-
+ory is structured and retrieved:Most systems use
+flat vector or JSON stores with embedding-based
+retrieval (Zhao et al., 2024; Ouyang et al., 2026;
+Wang et al., 2025b; Zheng et al., 2025); a few adopt
+graph structures (Zhang et al., 2025a; Yang et al.,
+2026) to capture relational dependencies, but pair-
+wise edges decompose nn n-ary co-occurrence into
+disconnected binary links and discard the joint com-
+positional context of an episode.(iii) How memory
+evolves:Most systems accumulate uncondition-
+ally (Wang et al., 2023a; Zhao et al., 2024; Wang
+et al., 2025b); a few add lightweight per-entry prun-
+ing (Zheng et al., 2025), consolidation (Zhang et al.,
+2025a), or deduplication (Tang et al., 2025b), but
+none leverages structural signals or jointly consid-
+ers quality and graph topology. A more detailed
+discussion is in Appendix E.
+and retrieved, andhowmemory evolves over
+time, identifying a gap in each.(i) What is
+stored:Early works store raw trajectories of en-
+tire episodes (Zheng et al., 2024; Wen et al., 2024),
+which preserve full context but include substan-
+2
+tial noise; later approaches abstract experience
+into insights and workflows (Zhao et al., 2024;
+Ouyang et al., 2026; Wang et al., 2025b; Fang et al.,
+2026), improving generalizability but discarding
+fine-grained procedural detail; while others distil
+reusable skills from trajectories (Zheng et al., 2025;
+Wang et al., 2023a; Xia et al., 2026), retaining con-
+cise knowledge units but treating each skill in iso-
+lation without compositional structure. Existing
+systems don’t maintain reusable subtask decompo-
+sitions that capture what procedural sequence was
+used to solve a task, limiting the agent’s ability to
+transfer compositional planning knowledge across
+episodes.(ii) How memory is structured and re-
+trieved:Most systems store memory as flat vector
+databases or JSON files and rely solely on semantic
+similarity for retrieval (Zhao et al., 2024; Ouyang
+et al., 2026; Wang et al., 2025b; Zheng et al., 2025),
+limiting both the relevance and comprehensive-
+ness of retrieved knowledge. A few works explore
+graph structures to capture relational dependen-
+cies (Zhang et al., 2025a; Yang et al., 2026; Xu
+and Ding, 2026), enabling structural traversal, but
+rely on pairwise edges that decompose n-ary co-
+occurrence into disconnected binary links and dis-
+card the joint compositional context of an episode.
+(iii) How memory evolves:Most systems accumu-
+late memory unconditionally (Wang et al., 2023a;
+Zhao et al., 2024; Wang et al., 2025b); a few add
+lightweight management such as pruning (Zheng
+et al., 2025), consolidation (Zhang et al., 2025a), or
+deduplication (Tang et al., 2025b), but all operate
+on individual entries without leveraging structural
+information, with no maintenance guided jointly
+by quality signals and graph topology. A more
+detailed discussion is provided in Appendix E.
+3HYPERSKILL
+3.1 Preliminaries
+Agent, Environment, and Memory.Following
+previous work (Zhang et al., 2025b), we formal-
+ize an LLM-based agent system as a policy πθ
+interacting with an environment over trajectories
+τi = (di, oi, ai, ri), where di is a task description,
+oi and ai are observation and action sequences, and
+ri ∈ {success,fail}is the outcome. At each
+stept, the agent selectsa t ∼π θ(· |ot, mt), where
+mt is a memory context retrieved from an exter-
+nal memory module M. Given growing history
+H={τ 1, . . . , τN }, M supports retrieval mt =
+gM(d,H) and update M ←UPDATE(M, τ i),
+with the objective of maximizing expected task
+performance:
+max
+M
+Ed∼D [R(πθ(· |d, gM(d,H)))].(1)
+3.2HYPERSKILLMemory Architecture
+A hypergraph (Zhou et al., 2006) G= (V,E) gen-
+eralizes ordinary graphs by allowing each hyper-
+edge e∈ E ⊆2V to connect an arbitrary subset
+of nodes ( |e| ≥2), capturing higher-order n-ary
+relationships among multiple nodes that pairwise
+edges cannot represent. HYPERSKILL exploits this
+structure to encode both compositional task decom-
+positions and reusable execution knowledge in a
+single unified memory.
+[➢]Nodes.Each vi ∈ Vis a discrete, reusable unit
+of task knowledge distilled from agent experience.
+The node set partitions as V=V u ∪ Vs, where each
+node can be represented by a tuple:
+vi ≜
+ 
+ci, ℓi, γi
+
+, ℓ i ∈ {u,s},(2)
+with ci as natural-language content, ℓi as type label,
+and γi ∈[0,1] asutility score, a dynamic mea-
+sure that tracks empirical success rate and step ef-
+ficiency. Concretely, for all nodes and hyperedges
+that participated in retrieval during trajectory τi,
+we increment σ(·) on success and update ¯T(·) with
+step countT i, then recompute:
+γ(·) =β· σ(·)
+ν(·) + (1−β)·
+
+1−
+¯T(·)−T min
+Tmax −T min
+
+,
+(3)
+where ν(·) is the total retrieval count, σ(·) the suc-
+cess count, ¯T(·) the running average step count,
+and β balances success rate against step efficiency.
+The two node types reflect complementary sides of
+task knowledge:subtask nodesencode the compo-
+sitional workflow structure of a task, whileskill
+nodesencode reusable execution strategies that
+transfer across tasks.
+◦ Subtask nodes Vu: each vu ≜(c u,u, γu) cap-
+tures one step in a task decomposition. The con-
+tent cu encodes a step description together with
+any preconditions under which it applies.
+◦ Skill nodes Vs: each vs ≜(c s,s, γs) cap-
+tures reusable knowledge extracted via outcome-
+conditioned prompting. The content cs encodes
+a concise strategy label and a description cov-
+ering what to do, when to apply it, and why it
+works (or fails). Successful trajectories yield
+positive strategiesto follow; failed trajectories
+yielderror patternsto avoid.
+3
+HyperSkillMemory Architecture
+From Subtasks to Trajectories: Hyperedge Retrieval
+From Trajectories to Skills: Skill Retrieval
+HyperSkillMemory Evolving
+SubtaskNodeSkillNode(PositiveStrategy)SkillNode(ErrorPattern)
+TaskQueryFindVisaSponsorforACL2024
+ Quality-drivenPruning
+…
+MergedNode+Quality-weightedCo-occurrenceMatrixStructuralEmbeddingsConsolidatedSkills
+Structure-informedMerging
+…
+11232Keyword_refinement
+Search_local_sponsors
+Generic_search…
+1.Collectskillsfromretrievedhyperedges2.Rankby#co-occurrences of the skill in hyperedges2 311…To p-kRetrievedSkillsKeyword_refinementGeneric_searchDouble_check_details…
+DecomposeintoSubtasksExplore_siteNavigate_sectionFind_local_sponsor
+SubtaskPath
+PrunedExamplesMergedExamples
+…
+…
+FusionHyperedge_1
+TrajectoryPathWhich local sponsor for ACL … Search_local_sponsorsBroad_searchGeneric_search+Ineffective_query
+Hyperedge
+ExampleHyperedgeTask:“FindVisaSponsorforACL2024”SubtasksExplore_siteNavigate_visa_sectionSkillsSearch_local_sponsorsLesson:Thistaskrequirestouseprecise…
+Explore_siteNavigate_sectionFind_local_sponsorHyperedge_2
+Hyperedge_N…
+Figure 2: Overview of HYPERSKILL . Given a new task, the agent decomposes it into subtasks, retrieves relevant
+trajectories via dual-path hyperedge retrieval, ranks skills by co-occurrence, and executes with the retrieved context.
+After task completion, new nodes and a hyperedge are added to the memory, which periodically undergoes pruning
+and merging.
+[➢]Hyperedges.Each hyperedge ej ∈ Ecorre-
+sponds to a single trajectory τj and is defined as a
+tuple ej ≜(V j, dj, ℓj, γj), where Vj =V u
+j ∪V s
+j ,
+with V u
+j ⊆ Vu the subtask nodes and V s
+j ⊆ Vs the
+skill nodes extracted from τj; dj is the original task
+description; and ℓj is a concisedistilled lessoncap-
+turing the transferable pattern the trajectory reveals.
+For retrieval, each hyperedge is represented by the
+embedding he =ϕ(d j ∥ℓ j), which concatenates
+the task description with the distilled lesson so that
+similarity matching captures both surface wording
+and the underlying transferable pattern.
+3.3 From Subtasks to Trajectories:
+Hyperedge Retrieval
+Prior methods explore diverse forms of experi-
+ential knowledge, from raw trajectories (Zheng
+et al., 2024; Wen et al., 2024) and distilled in-
+sights (Ouyang et al., 2026; Zhao et al., 2024) to
+reusable skills (Zheng et al., 2025; Wang et al.,
+2023a), but most rely on the full task description
+as the sole retrieval query. This misses trajecto-
+ries that are superficially different yet share similar
+procedural subtask patterns. To retrieve more com-
+prehensive trajectory-level context, HYPERSKILL
+queries the hypergraph through two complemen-
+tary paths: one decomposes the current task into
+subtasks and matches them against stored subtask
+nodes, surfacing trajectories with shared procedural
+structure regardless of task-level wording; the other
+matches the task description directly against hyper-
+edge representations that encode both the original
+task and its distilled lesson.
+Task decomposition and subtask path.Upon re-
+ceiving a new task dq, the agent first invokes an
+LLM call to produce a fine-grained decomposition
+P0 ={d 1, . . . , dm}, where each di describes a sub-
+task unit. This decomposition mirrors the subtask
+structure already stored in the hypergraph, enabling
+retrieval at the subtask level rather than the full-task
+level. We encode the full decomposition as a sin-
+gle vector hP0 =ϕ(P 0) using a fixed-length text
+encoder ϕ, and retrieve the top-ku subtask nodes
+whose embeddingsh v =ϕ(c v)are most similar:
+Ru = top-k u
+v∈Vu
+sim
+ 
+hP0,h v
+
+.(4)
+Because each subtask node is incident to one or
+more hyperedges, the matched nodes naturally ex-
+pand to a set of candidate trajectories: Esub ={e∈
+E |Ve ∩R u ̸=∅} , where Ve denotes the node
+set of hyperedge e. This path is particularly effec-
+tive at surfacing trajectories that share procedural
+substructure with the current task, even when their
+task-level descriptions differ substantially.
+Trajectory path and fusion.The subtask path
+alone may miss trajectories whose overall task
+descriptions are highly relevant but whose indi-
+vidual subtask nodes were not among the top- ku
+matches. A complementary trajectory-level path
+addresses this by encoding the full task description
+as hdq =ϕ(d q) and ranking hyperedges directly
+4
+by similarity to the query:
+Etraj = top-k e
+e∈E
+sim
+ 
+hdq ,h e
+
+,(5)
+where he =ϕ(d e ∥ℓ e) concatenates the original
+task description with the distilled lesson, so that
+ranking captures both surface wording and the un-
+derlying transferable pattern. Candidates from both
+paths are merged into a unified trajectory set:
+E ∗ =E sub ∪ Etraj.(6)
+Together, the two paths are complementary: the
+subtask path retrieves trajectories with shared pro-
+cedural substructure, while the trajectory path re-
+trieves those with similar high-level task semantics.
+The distilled lessons Lq ={ℓ e |e∈ E∗} from the
+fused set are provided to the agent as trajectory-
+level context during execution.
+3.4 From Trajectories to Skills: Skill Retrieval
+Given the fused trajectory set E ∗, the next step is to
+select which skills to surface as execution guidance.
+Each hyperedge in E ∗ contains the skill nodes ex-
+tracted from that trajectory, so the candidate pool
+is their union:
+Rs =
+[
+e∈E ∗
+V s
+e ⊆ Vs,(7)
+where V s
+e denotes the skill nodes of hyperedge e.
+A flat memory system would rank these candidates
+by embedding similarity to dq alone. However,
+semantic similarity only measures whether a skill’s
+descriptionlooks likethe current task; it does not
+capture whether the skill has actually been applied
+in trajectories relevant to the current task.
+Co-occurrence ranking. HYPERSKILL exploits
+the fact that skill nodes, unlike subtask nodes, are
+deduplicated and reused across trajectories. A skill
+that appears in many of the retrieved trajectories
+has been repeatedly applied in task-relevant con-
+texts and is therefore more likely to be useful. We
+formalize this with a simple co-occurrence count:
+for each candidate v∈R s, we count how many
+retrieved hyperedges containv:
+κ(v) =
+
+e∈ E∗  v∈V e
+	.(8)
+The top-ks skills by κ are selected as execution
+guidance, with ties broken by embedding similarity
+tod q:
+Sq = top-k s
+v∈Rs
+κ(v).(9)
+Execution and memory update.The retrieved
+context (Sq,L q) is assembled once per task and
+held fixed throughout execution, instantiating the
+memory context mt = (Sq,L q). At each step t, the
+agent selects an action conditioned on the current
+observation ot, the retrieved skills Sq, the distilled
+lessons Lq, and a sliding window of recent interac-
+tion history:
+at ∼π θ
+ 
+·
+ ot,S q,L q,hist t−w:t−1
+
+.(10)
+Upon task completion with outcome ri and step
+count Ti, an outcome-conditioned LLM call ex-
+tracts skill nodes Snew
+i and a distilled lesson ℓei
+from the full trajectory. Subtask nodes U new
+i are
+taken directly from P0. Before inserting each
+newly extracted skill node into Vs, we compute
+its embedding similarity to all existing skill nodes;
+if the similarity exceeds a thresholdδdedup, the new
+node is merged into its nearest existing neighbor
+rather than added as a duplicate, keeping the skill
+vocabulary compact and reusable. A new hyper-
+edge over U new
+i ∪S new
+i is then added to E with
+lesson ℓei and task description dq; its embedding
+is ϕ(dq ∥ℓ ei), matching Eq. 5. The utility score
+γ(·) is recomputed via Eq. 3 for all elements that
+participated in retrieval.
+3.5HYPERSKILLMemory Evolving
+As HYPERSKILL accumulates tasks, G risks grow-
+ing stale: nodes may become semantically re-
+dundant, and repeatedly retrieved but low-quality
+knowledge can actively mislead future decisions.
+To keep memory compact, non-redundant, and
+high-quality, HYPERSKILL periodically refines G
+every Nmaint tasks via two operations:quality-
+driven pruningandstructure-informed merging.
+Quality-driven pruning.Nodes that have been
+retrieved sufficiently often but consistently fail to
+improve agent outcomes are explicitly removed
+fromG:
+V ← V \
+
+v∈ V
+ ν(v)≥N min
+∧γ(v)< τ prune
+	
+, (11)
+where ν(v) is the total number of times v has been
+retrieved and γ(v) is its composite quality score
+(Eq. 3), reflecting empirical success rate and step
+efficiency accumulated over those retrievals. When
+a node is deleted, it is removed from all hyperedge
+memberships.
+Structure-informed merging.Skill nodes that ex-
+hibit strong quality-weighted co-occurrenceanden-
+code semantically similar execution knowledge are
+5
+Table 1: Main results across three benchmarks. We report success rate (SR %), average number of steps (#Steps),
+and average tool calls (#Calls) per task. Best ; 2nd best per backbone. ↑/↓: change vs. No Memory. For #Steps
+and #Calls, lower is better.
+Backbone Method xBench GAIA WebWalkerQA
+SR #Steps #Calls SR #Steps #Calls SR #Steps #Calls
+Qwen3-30B-A3B
+No Memory 46.00 ↑0.00 4.87↑0.00 5.05↑0.00 32.12↑0.00 8.23↑0.00 4.75↑0.00 39.41↑0.00 4.07↑0.00 3.87↑0.00
+ReasoningBank 43.00↓3.00 4.47↓0.40 4.72↓0.33 29.70↓2.42 7.44↓0.79 4.42↓0.33 44.71↑5.30 3.64↓0.43 3.72↓0.15
+ExpeL 45.00 ↓1.00 5.14↑0.27 6.06↑1.01 33.33↑1.21 7.38↓0.85 4.15↓0.60 47.06↑7.65 4.04↓0.03 3.94↑0.07
+AWM 44.00 ↓2.00 4.86↓0.01 5.49↑0.44 32.73↑0.61 7.07↓1.16 3.92↓0.83 41.76↑2.35 3.84↓0.23 3.72↓0.15
+Generative 49.00 ↑3.00 4.46↓0.41 4.97↓0.08 34.55↑2.43 7.43↓0.80 3.97↓0.78 41.18↑1.77 3.82↓0.25 3.87↑0.00
+V oyager 50.00 ↑4.00 4.77↓0.10 5.05↑0.00 34.55↑2.43 7.47↓0.76 4.16↓0.59 46.47↑7.06 3.84↓0.23 3.82↓0.05
+DILU 52.00↑6.00 5.01↑0.14 5.45↑0.40 32.12↑0.00 7.14↓1.09 4.17↓0.58 44.12↑4.71 3.87↓0.20 3.95↑0.08
+Cheatsheet 37.00 ↓9.00 4.03↓0.84 4.84↓0.21 27.88↓4.24 6.84↓1.39 5.28↑0.53 39.41↑0.00 3.62↓0.45 4.06↑0.19
+MemP 45.00 ↓1.00 4.42↓0.45 4.24↓0.81 32.73↑0.61 6.97↓1.26 4.42↓0.33 45.88↑6.47 3.72↓0.35 3.66↓0.21
+MemEvolve 39.00 ↓7.00 4.64↓0.23 4.72↓0.33 28.48↓3.64 5.08↓3.15 3.67↓1.08 37.06↓2.35 3.61↓0.46 3.32↓0.55
+PlugMem 42.00 ↓4.00 5.07↑0.20 5.18↑0.13 34.55↑2.43 7.02↓1.21 4.18↓0.57 35.88↓3.53 3.96↓0.11 3.83↓0.04
+HYPERSKILL 52.00↑6.00 4.52↓0.35 4.88↓0.17 36.97↑4.85 7.25↓0.98 5.48↑0.73 50.59↑11.18 4.04↓0.03 4.06↑0.19
+GPT-4o
+No Memory 54.00 ↑0.00 6.29↑0.00 6.33↑0.00 32.73↑0.00 6.59↑0.00 8.23↑0.00 46.47↑0.00 5.82↑0.00 7.04↑0.00
+ReasoningBank 57.00↑3.00 8.22↑1.93 12.27↑5.94 33.33↑0.60 7.21↑0.62 10.17↑1.94 47.65↑1.18 5.59↓0.23 6.45↓0.59
+ExpeL 54.00 ↑0.00 5.27↓1.02 6.11↓0.22 35.76↑3.03 6.63↑0.04 9.48↑1.25 47.06↑0.59 5.58↓0.24 6.32↓0.72
+AWM 52.00 ↓2.00 6.47↑0.18 8.12↑1.79 35.15↑2.42 7.13↑0.54 9.08↑0.85 47.65↑1.18 5.77↓0.05 6.49↓0.55
+Generative 56.00 ↑2.00 7.65↑1.36 11.34↑5.01 36.36↑3.63 6.39↓0.20 7.68↓0.55 51.18↑4.71 5.77↓0.05 6.33↓0.71
+V oyager 47.00 ↓7.00 7.99↑1.70 11.27↑4.94 31.52↓1.21 6.52↓0.07 9.15↑0.92 48.82↑2.35 6.07↑0.25 6.93↓0.11
+DILU 53.00 ↓1.00 7.16↑0.87 9.98↑3.65 33.33↑0.60 5.34↓1.25 5.63↓2.60 48.24↑1.77 6.05↑0.23 6.97↓0.07
+Cheatsheet 55.00 ↑1.00 7.56↑1.27 10.92↑4.59 35.15↑2.42 6.27↓0.32 8.36↑0.13 47.06↑0.59 6.02↑0.20 7.25↑0.21
+MemP 48.00 ↓6.00 7.59↑1.30 10.76↑4.43 33.33↑0.60 7.04↑0.45 8.64↑0.41 50.59↑4.12 5.66↓0.16 6.03↓1.01
+MemEvolve 47.00 ↓7.00 6.68↑0.39 9.06↑2.73 36.36↑3.63 6.97↑0.38 7.29↓0.94 48.24↑1.77 6.09↑0.27 7.34↑0.30
+PlugMem 59.00↑5.00 5.94↓0.35 6.22↓0.11 41.94↑9.21 5.73↓0.86 5.11↓3.12 47.06↑0.59 5.96↑0.14 6.49↓0.55
+HYPERSKILL 62.00↑8.00 5.27↓1.02 6.52↑0.19 44.24↑11.51 6.01↓0.58 7.35↓0.88 51.18↑4.71 5.93↑0.11 7.04↑0.00
+candidates for consolidation into a single higher-
+order skill. Subtask nodes Vu are excluded, as
+merging planning steps would corrupt the composi-
+tional structure of task decompositions. To identify
+merge candidates within Vs, we computequality-
+weighted structural embeddings. We first construct
+a co-occurrence matrixW∈R |Vs|×|Vs|:
+Wij = min
+ 
+γ(vi), γ(vj)
+
+·
+X
+e∈E
+vi∈Ve, vj ∈Ve
+1
+|Ve| ,(12)
+where 1/|Ve| normalises by hyperedge size follow-
+ing the homophily assumption (Tang et al., 2025a)—
+nodes sharing a small, tight hyperedge are more
+likely to encode similar knowledge than those shar-
+ing a large one—and min(γ(vi), γ(vj)) ensures
+that high edge weights occur only whenbothnodes
+are useful. Structural embeddings are then obtained
+via L-step symmetric propagation following (Tang
+et al., 2025a):
+˜Z=S Z,
+S= (1−α) L ˆWL +α
+L−1X
+l=0
+(1−α) l ˆWl,
+ˆW= ˆD−1/2 
+W+I
+ ˆD−1/2,
+(13)
+where Z∈R |Vs|×d stacks plain skill node embed-
+dings, ˆD is the degree matrix of (W+I) , α∈
+(0,1) balances individual node identity against
+neighbourhood context, and L controls the propa-
+gation depth. Since node utility is already encoded
+in W, the propagated embeddings ˜Z jointly reflect
+structural co-occurrence and skill quality, and a
+pair (va, vb) is selected as a merge candidate by
+similarity alone:
+sim(˜za, ˜zb)≥δ merge.(14)
+For each selected pair, the agent reasons over the
+contents of va, vb, and their shared trajectory frag-
+ments to propose a merged node vnew that con-
+solidates their knowledge into a higher-order skill.
+All hyperedge memberships are reassigned to vnew,
+preserving structural integrity acrossG.
+4 Experiments
+4.1 Experiment Setup
+Datasets and Benchmarks.We evaluate HY-
+PERSKILL across three diverse benchmarks span-
+ning different domains and capability requirements:
+(i)xBench(Chen et al., 2025), a benchmark as-
+sessing agentic planning, tool use, and multi-step
+6
+46 48 50 52 54 56 58 60 62
+Performance (%)
+60
+70
+80
+90
+100
+110
+120Avg Tokens per Task (K)
+xBench
+No Memory
+ReasoningBank
+ExpeL
+MemP
+DiLuVoyager
+Generative
+HyperSkill
+PlugMem
+32 34 36 38 40 42 44
+Performance (%)
+60
+80
+100
+120
+140
+160
+GAIA
+No Memory
+ReasoningBank
+ExpeL
+MemP
+DiLu
+Voyager
+Generative
+HyperSkill
+PlugMem
+46 47 48 49 50 51 52
+Performance (%)
+50
+60
+70
+80
+90
+WebWalkerQA
+No MemoryReasoningBank
+ExpeL
+MemP
+DiLu
+Voyager
+Generative
+HyperSkill
+PlugMem
+Figure 3: Performance vs. average tokens per task (K) across three benchmarks. Bubble size reflects the performance-
+to-token ratio.
+reasoning across a broad range of real-world tasks;
+(ii)GAIA(Mialon et al., 2023), a set of real-world
+questions requiring multi-hop reasoning, multi-
+modality handling, web browsing, and tool-use
+proficiency; and (iii)WebWalkerQA(Wu et al.,
+2025a), a benchmark testing complex multi-turn
+web navigation across diverse real-world queries
+and webpages. Together, these benchmarks cover
+tool-augmented reasoning, open-ended web inter-
+action, and compositional planning. More details
+are provided in Appendix A.
+Baselines.We compare HYPERSKILL against ten
+representative memory systems spanning three cat-
+egories.Trajectory-level methodsthat store raw or
+lightly processed trajectories: V oyager (Wang et al.,
+2023a), DILU (Wen et al., 2024), ExpeL (Zhao
+et al., 2024), and Generative (Shang et al., 2025).
+Workflow- or insight-level methodsthat extract and
+manage reusable knowledge units: AWM (Wang
+et al., 2025b), ReasoningBank (Ouyang et al.,
+2026), MemP (Fang et al., 2026), Cheatsheet (Suz-
+gun et al., 2026), and MemEvolve (Zhang et al.,
+2025b).Graph-based methodsthat organize mem-
+ory with relational structure: PlugMem (Yang et al.,
+2026). We also include aNo Memorybaseline that
+operates without any external memory module. All
+baselines use the same agent backbone and tool
+access for a fair comparison. More details are pro-
+vided in Appendix A.
+Implementation Details.We conduct all experi-
+ments with two backbone models: GPT-4o (Hurst
+et al., 2024) and Qwen3-30B-A3B (Yang et al.,
+2025), covering both proprietary and open-
+source settings. For HYPERSKILL , we use
+all-MiniLM-L6-v2 as the shared encoder ϕ(·) for
+all node and hyperedge embeddings. A single re-
+trieval budget governs subtask node retrieval, hy-
+peredge retrieval, and the final skill ranking. Main-
+tenance is triggered every ⌈0.1×N⌉ episodes,
+with pruning threshold τprune=0.2 and minimum
+retrieval count Nmin=3. The utility score blending
+coefficient is β=0.7. All hyperparameter and im-
+plementation details are provided in Appendix A.
+4.2 Main Results
+Table 1 reports success rate (SR), average steps,
+and average tool calls across xBench, GAIA, and
+WebWalkerQA under two backbone models. HY-
+PERSKILL achieves the highest or success rate on
+nearly every benchmark–backbone combination.
+We highlight three observations. ❶ Consistent
+gains across benchmarks and backbones.Under
+GPT-4o, HYPERSKILL outperforms all baselines
+on SR by +3.00 on xBench, +2.30 on GAIA, and
++0.59 on WebWalkerQA relative to the second-
+best method. Under Qwen3-30B-A3B, the trend
+holds with gains of +6.00, +4.85, and +11.18
+over No Memory, confirming that the improve-
+ments stem from the memory framework rather
+than backbone-specific behaviors. ❷ Improved SR
+without inflated execution cost.A common con-
+cern with memory-augmented agents is that richer
+retrieved context may increase per-step overhead.
+HYPERSKILL largely avoids this: under GPT-4o
+on xBench, it achieves the highest SR while match-
+ing ExpeL for the fewest steps (5.27) and maintain-
+ing competitive tool calls (6.52). In contrast, meth-
+ods such as ReasoningBank and V oyager require
+up to 8.22 steps and 12.27 calls on the same bench-
+mark while delivering lower SR, indicating that
+their retrieved context introduces overhead without
+proportional benefit. ❸ Naive memory accumu-
+lation can hurt.Several baselines fall below No
+Memory on at least one setting: Cheatsheet drops
+−9.00on xBench (Qwen3-30B-A3B), and V oyager
+drops −7.00 on xBench (GPT-4o). Without princi-
+7
+30
+35
+40
+45
+50
+55
+60
+65Success Rate (%)
+xBench GAIA WebWalkerQA
+62.0
+44.2
+51.2
+k=2 k=3 k=4 k=5 k=6
+(a) Retrieval budgetk.
+30
+35
+40
+45
+50
+55
+60
+65Success Rate (%)
+xBench GAIA WebWalkerQA
+62.0
+44.2
+51.2
+=0.0
+ =0.1
+ =0.2
+ =0.3
+ =0.4
+ (b) Maintenance ratioρ.
+Setting xBench GAIA WQA
+w/o hypergraph 41.00 35.76 44.71
+w/o subtask retr. 43.00 32.73 47.06
+w/o trajectory retr. 48.00 35.76 43.53
+Full model 52.00 36.97 50.59
+(c) Ablation study with
+Qwen3-30B-A3B.
+Figure 4: Sensitivity analysis and ablation study. (a, b) Success rate (%) on GPT-4o as we vary retrieval budget k
+and maintenance ratio ρ on xBench, GAIA, and WebWalkerQA. (c) Ablation of HYPERSKILL ’s trajectory retrieval,
+subtask retrieval, and hypergraph structure.
+pled maintenance, accumulated entries introduce
+noise that actively harms the agent. This under-
+scores the importance of HYPERSKILL ’s structure-
+aware evolution mechanism, which prunes low-
+utility nodes and merges redundant skills to keep
+memory compact and high-quality.
+4.3 Analysis and Ablation Study
+Cost Analysis.Figure 3 plots average tokens per
+task against performance, with bubble size pro-
+portional to the performance-to-token ratio. HY-
+PERSKILL occupies the bottom-right region across
+all three benchmarks, achieving the highest perfor-
+mance at moderate token cost (67K, 72K, and 57K
+on xBench, GAIA, and WebWalkerQA, respec-
+tively). Methods such as Generative and V oyager
+consume over 100K tokens yet fall well below HY-
+PERSKILL in performance. PlugMem, despite its
+knowledge-centric memory graph, incurs substan-
+tially higher token cost than HYPERSKILL while
+delivering lower performance. The gap stems from
+memory construction: PlugMem incurs separate
+LLM calls to extract state, subgoal, and reward
+annotations.
+Sensitivity Analysis.We analyze the sensitivity of
+HYPERSKILL to two key hyperparameters: (i) re-
+trieval budget k, which controls the number of can-
+didates surfaced during both hyperedge and skill
+retrieval; and (ii) maintenance ratio ρ, which con-
+trols the fraction of low-utility entries pruned dur-
+ing each maintenance cycle. Figures 4(a–b) reveal
+two consistent patterns. First, performance favors
+smaller retrieval budgets: k=2 achieves the best
+results across all three benchmarks, with perfor-
+mance declining as k increases. This suggests that
+a compact retrieval set minimizes noise from lower-
+ranked candidates, and surfacing too many entries
+dilutes the signal from the most relevant skills. Sec-
+ond, the maintenance ratio peaks at ρ=0.1, with
+ρ=0.2 and ρ=0.3 performing similarly, indicating
+that light pruning is sufficient to keep the mem-
+ory effective. Disabling pruning entirely ( ρ=0)
+lets low-utility entries accumulate and degrades
+retrieval quality, while overly aggressive pruning
+(ρ=0.4) removes still-useful skills.
+Ablation Study.We ablate the two retrieval paths
+and the hypergraph structure, with results in Fig-
+ure 4(c).w/o trajectory retrievalremoves the path
+that matches the full task description against hyper-
+edge embeddings, relying solely on plan decom-
+position into subtask nodes and expansion through
+their incident hyperedges. Performance drops no-
+tably on WQA (50.59→43.53 ), suggesting that
+trajectory-level matching captures task-wide pat-
+terns that subtask expansion alone misses.w/o sub-
+task retrievalremoves the fine-grained path, collect-
+ing skills only from top-k task-matched hyperedges
+without plan decomposition or subtask-level expan-
+sion. This hurts xBench most and causes GAIA
+to drop to 32.73, indicating that subtask decom-
+position is essential for retrieving relevant skills
+on complex, multi-step tasks.w/o hypergraphre-
+places the entire dual-path pipeline with flat text-
+embedding retrieval over stored skills, removing all
+hypergraph structure. This yields the lowest results
+across all three benchmarks, confirming that the hy-
+pergraph’s n-ary co-occurrence relationships pro-
+vide meaningful gains over a standard vector-store
+baseline. The full model combining both retrieval
+paths achieves the best results on all benchmarks,
+validating their complementarity.
+4.4 Hypergraph Analysis
+To illustrate how HYPERSKILL ’s hypergraph or-
+ganizes experiential knowledge, Figure 5 visual-
+izes a representative subgraph of six trajectories
+from xBench. Subtask nodes are mostly trajectory-
+specific, whereas skill nodes are shared across hy-
+peredges:Cross-Source ValidationandTargeted
+Database Searcheach appear in multiple trajecto-
+8
+e1
+e2
+e3
+e4
+e5
+e6
+Difference between max and min prices of Shanghai
+Gold Exchange's Au(T+D) by ...
+Chess player Zhan Ying's 2024 match
+record: X wins, Y losses.
+China's gold, silver, bronze medals at 2012
+London Olympics, as of Dec 31, 2024.
+How many prefecture-level divisions in
+Heilongjiang, Jilin, Liaoning border f...
+The 7000m+ peak nearest to China's national
+central city is the world's how m...
+"Jade belt hung in woods, gold hairpin buried in
+snow"  the emperor from the...
+crawl_page: Extract th...
+Cross-Verified
+Aggregator Use
+Targeted
+Database Search
+extract_match_data: us...
+summarize_record: use ...
+search_olympic_results...
+extract_medal_data: us...
+validate_and_format_da...
+search for administrat...
+identify bordering cit...Source Reliability
+Blind SpotIgnoring Administrative
+Hierarchy Nuances
+web_search: use web_se...
+Accepting Incomplete
+Data as Final
+find_emperor_with_film...
+Premature Entity
+AssumptionOverreliance on
+Pop-Culture Framing
+Figure 5: Hypergraph visualization on xBench. Tra-
+jectory hyperedges (3 success, 2 failure) connect skill
+nodes (⃝success,⃝failure) and subtask nodes (•).
+ries, enabling compositional reuse. Failed trajecto-
+ries contribute error-pattern skills such asPrema-
+ture Entity Assumptionthat cluster separately from
+positive strategies, allowing the agent to retrieve
+targeted warnings when similar subtask patterns re-
+cur. More examples are provided in Appendix B.
+5 Conclusion
+We presented HYPERSKILL , a hypergraph mem-
+ory framework for self-evolving LLM agents. Each
+trajectory is stored as a hyperedge binding subtask
+decompositions and outcome-conditioned skills,
+preserving compositional structure that flat and
+pairwise designs discard. Dual-path retrieval sur-
+faces relevant trajectories through both subtask-
+level and task-level matching, then ranks skills
+by co-occurrence frequency across retrieved hy-
+peredges. Periodic maintenance prunes low-
+utility nodes and merges redundant skills via
+quality-weighted propagation, keeping memory
+compact as it grows. Experiments on xBench,
+GAIA, and WebWalkerQA with GPT-4o and
+Qwen3-30B-A3B-Instruct show consistent gains
+over ten baselines in success rate. Beyond accu-
+racy, HYPERSKILL also attains the demonstrative
+performance-to-token ratio, reaching the highest
+success rate at a moderate token cost.
+Limitations
+HYPERSKILL relies on additional LLM calls for
+task decomposition, skill extraction, and merge de-
+cisions during memory maintenance, introducing
+extra inference cost. The current evaluation covers
+web navigation and multi-step reasoning bench-
+marks; generalization to others can be future work.
+Finally, the effectiveness of hypergraph-based re-
+trieval and maintenance depends on a sufficient
+number of accumulated trajectories, so HYPER-
+SKILL may offer limited benefit in extremely low-
+data regimes where the memory graph is sparse.
+References
+Petr Anokhin, Nikita Semenov, Artyom Sorokin, Dmitry
+Evseev, Andrey Kravchenko, Mikhail Burtsev, and
+Evgeny Burnaev. 2025. Arigraph: learning knowl-
+edge graph world models with episodic memory for
+llm agents. InIJCAI.
+Anthropic. 2024. The claude 3 model family: Opus,
+sonnet, haiku.
+Kaiyuan Chen, Yixin Ren, Yang Liu, Xiaobo Hu, Hao-
+tong Tian, Tianbao Xie, Fangfu Liu, Haoye Zhang,
+Hongzhang Liu, Yuan Gong, and 1 others. 2025.
+xbench: Tracking agents productivity scaling with
+profession-aligned real-world evaluations.arXiv
+preprint arXiv:2506.13651.
+Prateek Chhikara, Dev Khant, Saket Aryan, Taranjeet
+Singh, and Deshraj Yadav. 2025. Mem0: Building
+production-ready ai agents with scalable long-term
+memory.arXiv preprint arXiv:2504.19413.
+Runnan Fang, Yuan Liang, Xiaobin Wang, Jialong Wu,
+Shuofei Qiao, Pengjun Xie, Fei Huang, Huajun Chen,
+and Ningyu Zhang. 2026. Memp: Exploring agent
+procedural memory. InACL Findings.
+Huan-ang Gao, Jiayi Geng, Wenyue Hua, Mengkang Hu,
+Xinzhe Juan, Hongzhang Liu, Shilong Liu, Jiahao
+Qiu, Xuan Qi, Yiran Wu, and 1 others. 2025. A
+survey of self-evolving agents: What, when, how,
+and where to evolve on the path to artificial super
+intelligence.arXiv preprint arXiv:2507.21046.
+Alireza Ghafarollahi and Markus J. Buehler. 2025. Scia-
+gents: Automating scientific discovery through bioin-
+spired multi-agent intelligent graph reasoning.Ad-
+vanced Materials.
+Izzeddin Gur, Hiroki Furuta, Austin V Huang, Mustafa
+Safdari, Yutaka Matsuo, Douglas Eck, and Aleksan-
+dra Faust. 2024. A real-world webagent with plan-
+ning, long context understanding, and program syn-
+thesis. InICLR.
+Bernal J Gutiérrez, Yiheng Shu, Yu Gu, Michihiro Ya-
+sunaga, and Yu Su. 2024. Hipporag: Neurobiologi-
+cally inspired long-term memory for large language
+models. InNeurIPS.
+Yuyang Hu, Shichun Liu, Yanwei Yue, Guibin Zhang,
+Boyang Liu, Fangyi Zhu, Jiahang Lin, Honglin
+Guo, Shihan Dou, Zhiheng Xi, and 1 others. 2025.
+Memory in the age of ai agents.arXiv preprint
+arXiv:2512.13564.
+9
+Wei-Chieh Huang, Weizhi Zhang, Yueqing Liang,
+Yuanchen Bei, Yankai Chen, Tao Feng, xinyu Pan,
+Zhen Tan, Yu Wang, Tianxin Wei, Shanglin Wu,
+Ruiyao Xu, Liangwei Yang, Rui Yang, Wooseong
+Yang, Chin-Yuan Yeh, Hanrong Zhang, Haozhen
+Zhang, Siqi Zhu, and 41 others. 2026. A survey
+of agent memory in the second half: Towards self-
+evolving and long-horizon agents.TMLR.
+Aaron Hurst, Adam Lerer, Adam P Goucher, Adam
+Perelman, Aditya Ramesh, Aidan Clark, AJ Ostrow,
+Akila Welihinda, Alan Hayes, Alec Radford, and 1
+others. 2024. Gpt-4o system card.arXiv preprint
+arXiv:2410.21276.
+Dongming Jiang, Yi Li, Guanpeng Li, and Bingzhe Li.
+2026. Magma: A multi-graph based agentic memory
+architecture for ai agents. InACL.
+Woosuk Kwon, Zhuohan Li, Siyuan Zhuang, Ying
+Sheng, Lianmin Zheng, Cody Hao Yu, Joseph E.
+Gonzalez, Hao Zhang, and Ion Stoica. 2023. Effi-
+cient memory management for large language model
+serving with pagedattention. InProceedings of the
+ACM SIGOPS 29th Symposium on Operating Systems
+Principles.
+Guohao Li, Hasan Hammoud, Hani Itani, Dmitrii
+Khizbullin, and Bernard Ghanem. 2023. Camel:
+Communicative agents for" mind" exploration of
+large language model society.NeurIPS.
+Bang Liu, Xinfeng Li, Jiayi Zhang, Jinlin Wang,
+Tanjin He, Sirui Hong, Hongzhang Liu, Shaokun
+Zhang, Kaitao Song, Kunlun Zhu, and 1 others.
+2025a. Advances and challenges in foundation
+agents: From brain-inspired intelligence to evolution-
+ary, collaborative, and safe systems.arXiv preprint
+arXiv:2504.01990.
+Yitao Liu, Chenglei Si, Karthik R Narasimhan, and
+Shunyu Yao. 2025b. Contextual experience replay
+for self-improvement of language agents. InProceed-
+ings of the 63rd Annual Meeting of the Association
+for Computational Linguistics (Volume 1: Long Pa-
+pers), pages 14179–14198, Vienna, Austria. Associa-
+tion for Computational Linguistics.
+David Lopez-Paz and Marc’Aurelio Ranzato. 2017.
+Gradient episodic memory for continual learning. In
+NeurIPS.
+Haoran Luo, Guanting Chen, Yandan Zheng, Xiaobao
+Wu, Yikai Guo, Qika Lin, Yu Feng, Zemin Kuang,
+Meina Song, Yifan Zhu, and 1 others. 2025. Hy-
+pergraphrag: Retrieval-augmented generation via
+hypergraph-structured knowledge representation. In
+NeurIPS.
+Grégoire Mialon, Clémentine Fourrier, Thomas Wolf,
+Yann LeCun, and Thomas Scialom. 2023. Gaia: a
+benchmark for general ai assistants. InICLR.
+Siru Ouyang, Jun Yan, I-Hung Hsu, Yanfei Chen,
+Ke Jiang, Zifeng Wang, Rujun Han, Long Le, Samira
+Daruki, Xiangru Tang, Vishy Tirumalashetty, George
+Lee, Mahsan Rofouei, Hangfei Lin, Jiawei Han,
+Chen-Yu Lee, and Tomas Pfister. 2026. Reasoning-
+bank: Scaling agent self-evolving with reasoning
+memory. InICLR.
+Charles Packer, Vivian Fang, Shishir_G Patil, Kevin
+Lin, Sarah Wooders, and Joseph_E Gonzalez. 2023.
+Memgpt: towards llms as operating systems.arXiv
+preprint arXiv:2305.00000.
+Preston Rasmussen, Pavlo Paliychuk, Travis Beauvais,
+Jack Ryan, and Daniel Chalef. 2025. Zep: a tempo-
+ral knowledge graph architecture for agent memory.
+arXiv preprint arXiv:2501.13956.
+Shuo Ren, Can Xie, Pu Jian, Zhenjiang Ren, Chunlin
+Leng, and Jiajun Zhang. 2025. Towards scientific
+intelligence: A survey of llm-based scientific agents.
+arXiv preprint arXiv:2503.24047.
+Yu Shang, Yu Li, Keyu Zhao, Likai Ma, Jiahe Liu,
+Fengli Xu, and Yong Li. 2025. Agentsquare: Auto-
+matic LLM agent search in modular design space. In
+ICLR.
+Noah Shinn, Federico Cassano, Ashwin Gopinath,
+Karthik R Narasimhan, and Shunyu Yao. 2023. Re-
+flexion: language agents with verbal reinforcement
+learning. InNeurIPS.
+Haotian Sun, Yuchen Zhuang, Lingkai Kong, Bo Dai,
+and Chao Zhang. 2023. Adaplanner: Adaptive
+planning from feedback with language models. In
+NeurIPS.
+Mirac Suzgun, Mert Yuksekgonul, Federico Bianchi,
+Dan Jurafsky, and James Zou. 2026. Dynamic cheat-
+sheet: Test-time learning with adaptive memory. In
+Proceedings of the 19th Conference of the European
+Chapter of the Association for Computational Lin-
+guistics (Volume 1: Long Papers), pages 7080–7106,
+Rabat, Morocco. Association for Computational Lin-
+guistics.
+Yashar Talebirad and Amirhossein Nadiri. 2023. Multi-
+agent collaboration: Harnessing the power of intelli-
+gent llm agents.arXiv preprint arXiv:2306.03314.
+Bohan Tang, Zexi Liu, Keyue Jiang, Siheng Chen, and
+Xiaowen Dong. 2025a. Training-free message pass-
+ing for learning on hypergraphs. InICLR.
+Xiangru Tang, Tianrui Qin, Tianhao Peng, Ziyang Zhou,
+Daniel Shao, Tingting Du, Xinming Wei, Peng Xia,
+Fang Wu, He Zhu, and 1 others. 2025b. Agent kb:
+Leveraging cross-domain experience for agentic prob-
+lem solving.arXiv preprint arXiv:2507.06229.
+Guanzhi Wang, Yuqi Xie, Yunfan Jiang, Ajay Man-
+dlekar, Chaowei Xiao, Yuke Zhu, Linxi Fan, and An-
+ima Anandkumar. 2023a. V oyager: An open-ended
+embodied agent with large language models.arXiv
+preprint arXiv: Arxiv-2305.16291.
+10
+Lei Wang, Wanyu Xu, Yihuai Lan, Zhiqiang Hu,
+Yunshi Lan, Roy Ka-Wei Lee, and Ee-Peng Lim.
+2023b. Plan-and-solve prompting: Improving zero-
+shot chain-of-thought reasoning by large language
+models. InACL.
+Zhenhailong Wang, Haiyang Xu, Junyang Wang,
+Xi Zhang, Ming Yan, Ji Zhang, Fei Huang, and
+Heng Ji. 2025a. Mobile-agent-e: Self-evolving mo-
+bile assistant for complex tasks.arXiv preprint
+arXiv:2501.11733.
+Zora Zhiruo Wang, Jiayuan Mao, Daniel Fried, and
+Graham Neubig. 2025b. Agent workflow memory.
+InICML.
+Tianxin Wei, Ting-Wei Li, Zhining Liu, Xuying Ning,
+Ze Yang, Jiaru Zou, Zhichen Zeng, Ruizhong Qiu,
+Xiao Lin, Dongqi Fu, and 1 others. 2026. Agentic
+reasoning for large language models.arXiv preprint
+arXiv:2601.12538.
+Licheng Wen, Daocheng Fu, Xin Li, Xinyu Cai, Tao Ma,
+Pinlong Cai, Min Dou, Botian Shi, Liang He, and
+Yu Qiao. 2024. Dilu: A knowledge-driven approach
+to autonomous driving with large language models.
+InICLR.
+Jialong Wu, Wenbiao Yin, Yong Jiang, Zhenglin Wang,
+Zekun Xi, Runnan Fang, Linhai Zhang, Yulan He,
+Deyu Zhou, Pengjun Xie, and Fei Huang. 2025a.
+WebWalker: Benchmarking LLMs in web traversal.
+InProceedings of the 63rd Annual Meeting of the
+Association for Computational Linguistics (Volume 1:
+Long Papers), pages 10290–10305, Vienna, Austria.
+Association for Computational Linguistics.
+Qingyun Wu, Gagan Bansal, Jieyu Zhang, Yiran Wu,
+Beibin Li, Erkang Zhu, Li Jiang, Xiaoyun Zhang,
+Shaokun Zhang, Jiale Liu, and 1 others. 2024. Au-
+togen: Enabling next-gen llm applications via multi-
+agent conversations. InCOLM.
+Rong Wu, Xiaoman Wang, Jianbiao Mei, Pinlong Cai,
+Daocheng Fu, Cheng Yang, Licheng Wen, Xue-
+meng Yang, Yufan Shen, Yuxin Wang, and 1 others.
+2025b. Evolver: Self-evolving llm agents through
+an experience-driven lifecycle.arXiv preprint
+arXiv:2510.16079.
+Zhaofen Wu, Hanrong Zhang, Fulin Lin, Wujiang Xu,
+Xinran Xu, Yankai Chen, Henry Peng Zou, Shaowen
+Chen, Weizhi Zhang, Xue Liu, and 1 others. 2026.
+Gam: Hierarchical graph-based agentic memory for
+llm agents.arXiv preprint arXiv:2604.12285.
+Zhiheng Xi, Wenxiang Chen, Xin Guo, Wei He, Yiwen
+Ding, Boyang Hong, Ming Zhang, Junzhe Wang,
+Senjie Jin, Enyu Zhou, and 1 others. 2025. The rise
+and potential of large language model based agents:
+A survey.Science China Information Sciences.
+Peng Xia, Jianwen Chen, Hanyang Wang, Jiaqi
+Liu, Kaide Zeng, Yu Wang, Siwei Han, Yiyang
+Zhou, Xujiang Zhao, Haifeng Chen, and 1 others.
+2026. Skillrl: Evolving agents via recursive skill-
+augmented reinforcement learning.arXiv preprint
+arXiv:2602.08234.
+Tianbao Xie, Danyang Zhang, Jixuan Chen, Xiaochuan
+Li, Siheng Zhao, Ruisheng Cao, Toh J Hua, Zhoujun
+Cheng, Dongchan Shin, Fangyu Lei, and 1 others.
+2024. Osworld: Benchmarking multimodal agents
+for open-ended tasks in real computer environments.
+InNeurIPS.
+Ruiyao Xu and Kaize Ding. 2026. GNN-as-judge: Un-
+leashing the power of LLMs for graph learning with
+GNN feedback. InICLR.
+Wujiang Xu, Zujie Liang, Kai Mei, Hang Gao, Juntao
+Tan, and Yongfeng Zhang. 2026. A-mem: Agentic
+memory for LLM agents. InNeurIPS.
+An Yang, Anfeng Li, Baosong Yang, Beichen Zhang,
+Binyuan Hui, Bo Zheng, Bowen Yu, Chang
+Gao, Chengen Huang, Chenxu Lv, and 1 others.
+2025. Qwen3 technical report.arXiv preprint
+arXiv:2505.09388.
+John Yang, Carlos E Jimenez, Alexander Wettig, Kilian
+Lieret, Shunyu Yao, Karthik Narasimhan, and Ofir
+Press. 2024. Swe-agent: Agent-computer interfaces
+enable automated software engineering. InNeurIPS.
+Ke Yang, Zixi Chen, Xuan He, Jize Jiang, Michel Galley,
+Chenglong Wang, Jianfeng Gao, Jiawei Han, and
+ChengXiang Zhai. 2026. Plugmem: A task-agnostic
+plugin memory module for llm agents.arXiv preprint
+arXiv:2603.03296.
+Shunyu Yao, Jeffrey Zhao, Dian Yu, Nan Du, Izhak
+Shafran, Karthik R Narasimhan, and Yuan Cao. 2022.
+React: Synergizing reasoning and acting in language
+models. InICLR.
+Juwei Yue, Chuanrui Hu, Jiawei Sheng, Zuyi Zhou,
+Wenyuan Zhang, Tingwen Liu, Li Guo, and Yafeng
+Deng. 2026. Hypermem: Hypergraph memory for
+long-term conversations. InACL.
+Guibin Zhang, Muxin Fu, Guancheng Wan, Miao Yu,
+Kun Wang, and Shuicheng Yan. 2025a. G-memory:
+Tracing hierarchical memory for multi-agent systems.
+InNeurIPS.
+Guibin Zhang, Haotian Ren, Chong Zhan, Zhenhong
+Zhou, Junhao Wang, He Zhu, Wangchunshu Zhou,
+and Shuicheng Yan. 2025b. Memevolve: Meta-
+evolution of agent memory systems.arXiv preprint
+arXiv:2512.18746.
+Haozhen Zhang, Quanyu Long, Jianzhu Bao, Tao Feng,
+Weizhi Zhang, Haodong Yue, and Wenya Wang.
+2026. Memskill: Learning and evolving mem-
+ory skills for self-evolving agents.arXiv preprint
+arXiv:2602.02474.
+Andrew Zhao, Daniel Huang, Quentin Xu, Matthieu
+Lin, Yong-Jin Liu, and Gao Huang. 2024. Expel:
+Llm agents are experiential learners. InAAAI.
+11
+Boyuan Zheng, Michael Y Fatemi, Xiaolong Jin,
+Zora Zhiruo Wang, Apurva Gandhi, Yueqi Song,
+Yu Gu, Jayanth Srinivasa, Gaowen Liu, Graham Neu-
+big, and 1 others. 2025. Skillweaver: Web agents can
+self-improve by discovering and honing skills.arXiv
+preprint arXiv:2504.07079.
+Longtao Zheng, Rundong Wang, Xinrun Wang, and
+Bo An. 2024. Synapse: Trajectory-as-exemplar
+prompting with memory for computer control. In
+ICLR.
+Dengyong Zhou, Jiayuan Huang, and Bernhard
+Schölkopf. 2006. Learning with hypergraphs: Clus-
+tering, classification, and embedding. InNeurIPS.
+Appendix Overview
+• Appendix A: Datasets and Implementation De-
+tails
+• Appendix B: More Analysis
+• Appendix C: Broader Impact
+• Appendix D: Disclosure of LLM Use
+• Appendix E: Extended Related Works
+• Appendix F: Ethics Statement
+• Appendix G: Additional Case Studies
+• Appendix H: Algorithm
+• Appendix I: Prompts
+A Datasets and Implementation Details
+A.1 Dataset Details
+We follow the evaluation protocol of
+MemEvolve (Zhang et al., 2025b) and adopt the
+same three benchmarks.
+GAIA(Mialon et al., 2023) consists of 165 tasks
+organized into three difficulty levels: Level-1 (53
+tasks), Level-2 (86 tasks), and Level-3 (26 tasks),
+requiring multi-hop reasoning, web browsing, and
+tool use.
+WebWalkerQA(Wu et al., 2025a) covers com-
+plex multi-turn web navigation with 680 queries
+across four domains and over 1,373 webpages. We
+use the same 170-query subset as (Zhang et al.,
+2025b).
+xBench(Chen et al., 2025) contains 100 tasks
+assessing agentic planning, tool use, and multi-step
+reasoning across diverse real-world scenarios.
+A.2 Implementation Details
+We build on the MemEvolve (Zhang et al., 2025b)
+codebase and adopt the same agent architecture
+across all methods for fair comparison. For
+all baselines, the memory retrieval count is set
+to 3 and text embeddings are computed using
+all-MiniLM-L6-v2 with cosine similarity as the
+retrieval metric.
+LLM backends.For GPT-4o, we use the Ope-
+nAI API with temperature 0.7 and retrieval budgets
+(ku, ke, ks) = (2,2,2) . For Qwen3-30B-A3B, we
+serve the model locally via vLLM (Kwon et al.,
+2023) on NVIDIA A100 80 GB GPUs with tem-
+perature 0.7 and retrieval budgets (ku, ke, ks) =
+(5,5,5) . The sliding window of recent interaction
+history is set tow= 3steps.
+12
+Memory update.The skill deduplication thresh-
+old is δdedup = 0.9 and untested nodes receive a
+neutral prior γ= 0.5 . The utility score blending
+coefficient isβ= 0.7(Eq. 3).
+Maintenance.Maintenance is triggered every
+⌈0.1×N⌉ tasks, where N is the total number of
+tasks in the benchmark, with pruning threshold
+τprune = 0.2 and minimum retrieval count Nmin =
+3. The merge candidate threshold is δmerge = 0.85.
+Reproducibility.Tasks are processed sequen-
+tially in a fixed random order (seed 42), shared
+across all methods.
+e1
+e2
+e3
+e4
+e5
+e6
+When was the first upload of the Zhejiang
+University CS program's design mana...
+Which technology standard was used for the
+accelerator project 'Design Your W ...
+Prof. Xu Hao led a NSFC project
+(2021 2024) on [topic].
+Nikko signed agreements on Jun 4 and Jul 15,
+2024, with companies for specifi...
+How many teams from Hangzhou Dianzi University's
+CS  participated in the 201...
+When are the online course and SRTP mid-term
+check deadlines at SWJTU for 202...
+navigate_section: craw...
+Cross-Source
+Validation
+navigate_section: craw...
+find_target: web_searc...
+explore_site: crawl_pa...
+navigate_section: craw...
+find_target: web_searc...
+explore_site: crawl_pa...
+navigate_section: craw...Overreliance on
+Outdated Search Results
+Failing to
+Cross-Validate Sources
+navigate_section: craw...
+Inadequate Search
+Query Refinement
+navigate_academics: cr...
+find_course_schedule: ...
+Ignoring
+Temporal Context
+Figure 6: Hypergraph subgraph visualization on Web-
+WalkerQA. Trajectory hyperedges (3 success, 2 failure)
+connect skill nodes (⃝ success, ⃝ failure) and subtask
+nodes (•).
+B More Analysis
+B.1 Self-Evolving Analysis
+To examine whether HYPERSKILL ’s hypergraph
+memory genuinely improves with experience, we
+plot the cumulative success rate as a function of
+episode index across all three benchmarks.
+Figure 7 reveals three key findings. First, HY-
+PERSKILL is the only method that exhibits a sus-
+tained upward trajectory: on GAIA, its cumulative
+accuracy climbs steadily from the early episodes
+through the final ones, confirming that the hy-
+pergraph memory accumulates transferable skills
+over time. Second, baselines with comparable fi-
+nal success rates, such as DiLu on xBench, reach
+their peak early and stagnate or dip in the middle
+episodes before recovering, indicating that their
+memory does not compound across tasks. Third,
+the self-evolving effect is more pronounced on
+benchmarks with greater task diversity (GAIA,
+WebWalkerQA) than on xBench, suggesting that
+HYPERSKILL benefits most when the hypergraph
+can capture diverse cross-task skill co-occurrence
+patterns.
+B.2 Latency Analysis
+Beyond success rate, practical deployment requires
+acceptable wall-clock latency. Figure 8 reports
+average per-task execution time across all three
+benchmarks under both backbones.
+Under Qwen3-30B-A3B, HYPERSKILL adds
+moderate overhead relative to the fastest baseline
+(No Memory): 42.6s vs. 26.5s on xBench, 33.6s
+vs. 33.6s on GAIA (matching DILU), and 31.3s vs.
+23.9s on WebWalkerQA. Under GPT-4o, the pat-
+tern is similar: HYPERSKILL runs at 48.3s, 47.6s,
+and 55.3s, while the fastest baselines reach 29.7s,
+32.5s, and 41.9s respectively. In both settings, the
+overhead stems primarily from the additional LLM
+call for task decomposition and skill extraction,
+not from hypergraph operations themselves. Com-
+bined with the token-efficiency results in Figure 3,
+these results confirm that HYPERSKILL achieves
+the best performance at a practical latency cost.
+B.3 Memory Growth Analysis
+Figure 9 shows how the hypergraph evolves over
+successive tasks. Subtask nodes grow roughly
+linearly since each task introduces a new de-
+composition, while both skill types grow sub-
+linearly: insertion-time deduplication prevents
+near-duplicate skills from entering the graph, and
+periodic structure-informed merging consolidates
+redundant entries, together keeping skill counts
+well below the number of hyperedges across all
+benchmarks and backbones.
+B.4 Robustness Analysis
+Ground-truth labels may be unavailable after each
+task in practice, yet following prior work (Fang
+et al., 2026; Zhang et al., 2025b), HYPERSKILL
+uses outcome signals to assign success/failure to
+extracted skills. We evaluate aself-judgevariant
+in which the agent assesses its own trajectory out-
+come without access to the gold answer, and com-
+pare it against theGT-judgesetting used in our
+main experiments. Table 2 reports results on GPT-
+4o. The self-judge variant retains 87.7–96.8% of
+the GT-judge performance across all three bench-
+marks, with the smallest gap on xBench ( −2.00
+SR) and the largest on GAIA ( −5.37 SR). The
+modest degradation suggests that HYPERSKILL is
+robust to noisy outcome signals: co-occurrence
+ranking over multiple retrieved hyperedges dilutes
+13
+0 20 40 60 80 100
+Episode Index
+0
+20
+40
+60
+80
+100Cumulative Success Rate (%)
+xBench
+No Memory
+Generative
+Voyager
+DiLu
+ExpeL
+AWM
+MemP
+Cheatsheet
+MemEvolve
+ReasoningBank
+PlugMem
+HyperSkill
+0 25 50 75 100 125 150
+Episode Index
+0
+20
+40
+60
+80
+100
+GAIA
+0 25 50 75 100 125 150 175
+Episode Index
+0
+10
+20
+30
+40
+50
+WebWalkerQA
+Figure 7: Cumulative success rate (%) over episode index on Qwen3-30B-A3B. HYPERSKILL exhibits an upward
+trend across benchmarks.
+Table 2: Comparison of GT-judge and self-judge on
+GPT-4o. Retention = Self-judge SR / GT-judge SR ×
+100%.
+Benchmark GT-judge Self-judge Retention
+xBench 62.00 60.00 96.8%
+GAIA 44.24 38.87 87.7%
+WebWalkerQA 51.18 47.33 92.4%
+the effect of occasional mislabeled skills, allowing
+the structural signal to remain reliable even without
+ground-truth feedback.
+B.5 Hypergraph Visualization
+Figure 6 shows the WebWalkerQA counterpart of
+the xBench hypergraph subgraph in Figure 5.
+C Broader Impact
+HYPERSKILL is a general-purpose memory frame-
+work for LLM agents and does not target any spe-
+cific high-risk application. By enabling agents to
+learn from past failures, it may reduce redundant
+computation and improve efficiency in deployed
+systems. However, as with any self-evolving sys-
+tem, accumulated memory could reinforce biases
+present in early trajectories if not periodically au-
+dited. We encourage practitioners to monitor stored
+skills for unintended patterns.
+D Disclosure of LLM Use
+During the preparation of this manuscript, LLM-
+based tools were used to assist with grammar cor-
+rection, code debugging, and figure design. All
+scientific content, experimental design, and analy-
+sis were conducted by the authors, who take full
+responsibility for the final manuscript.
+E Extended Related Works
+LLM Agent Systems.Large language models are
+increasingly being deployed as autonomous agents
+that interact with complex environments through
+multi-step reasoning and actions, moving beyond
+traditional one-shot chatbot paradigms (Liu et al.,
+2025a; Xi et al., 2025; Wei et al., 2026). A central
+challenge is enabling agents to decompose com-
+plex tasks into manageable sub-problems and make
+sequential decisions. ReAct (Yao et al., 2022) in-
+terleaves chain-of-thought reasoning with environ-
+ment actions, establishing a foundational paradigm
+for single-agent planning. Subsequent work im-
+proves task decomposition through hierarchical
+planning (Wang et al., 2023b; Sun et al., 2023) and
+enhances decision quality via self-reflection (Shinn
+et al., 2023). Multi-agent systems (Li et al., 2023;
+Wu et al., 2024; Talebirad and Nadiri, 2023) ex-
+tend this paradigm further by assigning specialized
+roles to multiple agents that communicate and co-
+ordinate, enabling collaborative problem-solving
+on tasks beyond the scope of a single agent. While
+these advances have significantly broadened the
+capability frontier of LLM agents, most systems
+treat each task episode in isolation, limiting their
+ability to improve over time on recurring or com-
+positionally related task patterns.
+Memory Mechanisms in Agent Systems.We
+organize existing experiential memory systems
+along three dimensions:what is stored,how mem-
+ory is structured and retrieved, andhow memory
+evolves. Table 3 summarizes the comparison.
+On what is stored, early systems retain raw
+trajectories or extract insights from each trajec-
+tory (Zhao et al., 2024; Wen et al., 2024; Wang
+et al., 2023a). Subsequent work abstracts experi-
+ence into more compact forms: workflows (Wang
+et al., 2025b), reasoning strategies (Ouyang et al.,
+14
+20
+30
+40
+50
+60
+70
+80Latency (seconds)
+xBench GAIA WebWalkerQA
+26.5
+42.6
+33.6
+44.1
+23.9
+31.3
+No Memory
+ReasoningBank
+ExpeL
+AWM
+Generative
+Voyager
+DILU
+Cheatsheet
+MemP
+PlugMem
+MemEvolve
+HyperSkill
+323s 467s 285s
+(a)Qwen3-30B-A3B.
+20
+30
+40
+50
+60
+70
+80Latency (seconds)
+xBench GAIA WebWalkerQA
+29.7
+48.3
+32.5
+47.6
+41.9
+55.3
+No Memory
+ReasoningBank
+ExpeL
+AWM
+Generative
+Voyager
+DILU
+Cheatsheet
+MemP
+PlugMem
+MemEvolve
+HyperSkill
+1047s 1244s 856s
+(b)GPT-4o.
+Figure 8: Average per-task wall-clock latency (seconds) across xBench, GAIA, and WebWalkerQA. Lower is better.
+Annotated bars mark the fastest baseline in each panel andHYPERSKILL’s latency for reference.
+2026), executable API skills (Zheng et al., 2025),
+or tips and shortcuts (Suzgun et al., 2026; Wang
+et al., 2025a). Recent training-based approaches go
+further: SkillRL (Xia et al., 2026) distills trajecto-
+ries into a hierarchical skill library and co-evolves
+it with the agent’s policy via reinforcement learn-
+ing (GRPO), while MemSkill (Zhang et al., 2026)
+treats memory operations themselves as learnable
+skills whose selection is optimized through RL and
+whose skill bank evolves by analyzing hard cases.
+However, all of these systems store knowledge
+units in isolation, discarding the compositional re-
+lationships among subtasks and skills within each
+trajectory. HYPERSKILL is the only system that
+preserves this joint compositional structure.
+On how memory is structured and retrieved, the
+majority of systems use flat vector stores with se-
+mantic retrieval (Wang et al., 2023a; Wen et al.,
+2024; Shang et al., 2025), while a few adopt con-
+trastive retrieval that compares successes and fail-
+ures (Zhao et al., 2024; Ouyang et al., 2026).
+AWM (Wang et al., 2025b) concatenates all entries
+into the prompt, and SkillWeaver (Zheng et al.,
+2025) uses function signature matching. Graph-
+based systems such as G-Memory (Zhang et al.,
+2025a) and Agent-KB (Tang et al., 2025b) intro-
+duce pairwise edges but decompose the n-ary tra-
+jectory context into disconnected binary links. HY-
+PERSKILL uses hyperedges to preserve the full tra-
+jectory context and retrieves via a dual-path mech-
+15
+20 40 60 80 100
+0
+100
+200
+300Count
+xBench
+Subtask
+Skill (success)
+Skill (failure)
+Hyperedge
+25 50 75 100 125 150 175
+50
+100
+150
+GAIA
+25 50 75 100 125 150 175
+0
+100
+200
+300
+400
+500
+WebWalkerQA
+20 40 60 80 100
+Tasks completed
+0
+10
+20Cumul. count
+Pruned
+Merged
+25 50 75 100 125 150 175
+Tasks completed
+0
+20
+40
+60
+25 50 75 100 125 150 175
+Tasks completed
+0
+50
+100
+(a)Qwen3-30B-A3B
+20 40 60 80 100
+0
+100
+200
+300Count
+xBench
+Subtask
+Skill (success)
+Skill (failure)
+Hyperedge
+25 50 75 100 125 150 175
+50
+100
+150
+200
+250
+GAIA
+25 50 75 100 125 150 175
+0
+100
+200
+300
+400
+500
+WebWalkerQA
+20 40 60 80 100
+Tasks completed
+0
+25
+50
+75Cumul. count
+Pruned
+Merged
+25 50 75 100 125 150 175
+Tasks completed
+0
+25
+50
+75
+25 50 75 100 125 150 175
+Tasks completed
+0
+100
+200
+(b)GPT-4o
+Figure 9: Hypergraph memory growth (top row) and cumulative maintenance operations (bottom row) across
+benchmarks.
+anism that combines subtask-level and task-level
+queries.
+On how memory evolves, most systems accu-
+mulate knowledge without any curation (Wang
+et al., 2023a; Zhao et al., 2024; Wen et al., 2024;
+Ouyang et al., 2026; Wang et al., 2025b). The
+few that do maintain memory apply lightweight
+operations such as test-and-prune (Zheng et al.,
+2025), episodic consolidation (Zhang et al., 2025a),
+deduplication (Tang et al., 2025b), or failure-driven
+adjustment (Fang et al., 2026), each applied inde-
+pendently per node without considering memory
+topology. SkillRL (Xia et al., 2026) and Mem-
+Skill (Zhang et al., 2026) evolve their skill libraries
+through RL training loops, but this evolution op-
+erates on model weights rather than on an ex-
+plicit memory structure. HYPERSKILL performs
+structure-aware maintenance that jointly considers
+node utility and structural proximity via quality-
+weighted hypergraph propagation.
+We also compare graph-structured memory sys-
+tems specifically in Table 4. Most graph-based
+approaches target factual memory, recording en-
+vironmental or user knowledge in knowledge
+graphs (Gutiérrez et al., 2024; Chhikara et al.,
+2025), temporal graphs (Rasmussen et al., 2025),
+hierarchical graphs (Wu et al., 2026), or multi-
+view graphs (Jiang et al., 2026). HyperMem (Yue
+et al., 2026) uses a three-level hypergraph (top-
+ics, episodes, facts) with coarse-to-fine retrieval,
+but targets factual conversational memory rather
+than experiential task knowledge and does not per-
+form structure-aware maintenance. Among expe-
+riential memory systems, PlugMem (Yang et al.,
+2026) and G-Memory (Zhang et al., 2025a) use
+pairwise edges that lose the joint trajectory context,
+and Agent-KB (Tang et al., 2025b) combines lex-
+ical and semantic indices without explicit graph
+structure over skills. HYPERSKILL is the first
+experiential memory system to use n-ary hyper-
+16
+Table 3: Taxonomy of experiential memory systems for LLM agents. Traj. = raw trajectories; Strat. = reasoning
+strategies; Tool Lib. = callable function registries; Skill Lib. = hierarchical skill libraries. ‡ Training-based methods
+that internalize skills into model weights via reinforcement learning.
+What is Stored How Structured & Retrieved How Evolved
+Method Knowledge Form Compositional? Structure Retrieval Maintenance
+V oyager (Wang et al., 2023a) Traj. & Tips✗Vector DB Semantic None
+ExpeL (Zhao et al., 2024) Traj. & Insights✗Vector DB Contrastive None
+Generative (Shang et al., 2025) Traj. & Insights✗Vector DB Semantic None
+DILU (Wen et al., 2024) Traj.✗Vector DB Semantic None
+AWM (Wang et al., 2025b) Workflows✗In-Prompt All-in-Prompt None
+Mobile-E (Wang et al., 2025a) Tips & Shortcuts✗Vector DB Semantic None
+Cheatsheet (Suzgun et al., 2026) Tips & Shortcuts✗JSON Semantic None
+ReasoningBank (Ouyang et al., 2026) Reasoning Strat.✗Vector DB Contrastive None
+SkillWeaver (Zheng et al., 2025) APIs✗Tool Lib. Function Match Test & Prune
+G-Memory (Zhang et al., 2025a) Tips & Workflows✗Graph Graph + Semantic Consolidation
+Agent-KB (Tang et al., 2025b) Tips & Workflows✗Hybrid DB Hybrid Deduplication
+Memp (Fang et al., 2026) Tips & Workflows✗JSON Semantic Failure-driven
+EvolveR (Wu et al., 2025b) Tips & Workflows✗JSON Contrastive Update & Pruning
+SkillRL‡ (Xia et al., 2026) Hierarchical Skills✗Markdown Adaptive RL Co-Evolution
+MemSkill‡ (Zhang et al., 2026) Learnable Skills✗Markdown RL-guided Skill Evolution
+HYPERSKILL Workflows & Skills ✓ Hypergraph Dual-path Quality + Topology
+Table 4: Graph-structured memory systems for LLM agents. “Memory Type” categorizes the primary function:
+Factualrecords environmental or user knowledge;Experientialaccumulates reusable task knowledge from agent
+trajectories. “Edge Type” distinguishesPairwise(binary) from n-ary(hyperedges connecting arbitrary node sets).
+†Agent-KB shares knowledge across frameworks but executes with a single agent.
+Memory Scope Graph Structure Evolution
+Method Mem. Type MAS Graph Type Edge Retrieval Maintenance
+HippoRAG (Gutiérrez et al., 2024) Factual✗KG Pairwise PPR Activation None
+AriGraph (Anokhin et al., 2025) Factual✗KG + Episodic Pairwise Semantic + Episodic Graph Update
+A-Mem (Xu et al., 2026) Factual✗Zettelkasten Pairwise Semantic + Linking Self-Organizing
+Mem0g (Chhikara et al., 2025) Factual✗KG + Vector Pairwise Hybrid Deduplication
+Zep (Rasmussen et al., 2025) Factual✗Temporal KG Pairwise Temporal + Semantic Temporal Inval.
+GAM (Wu et al., 2026) Factual✗Hierarchical Pairwise Multi-factor Trav. Event-driven Consol.
+MAGMA (Jiang et al., 2026) Factual✗Multi-Graph Pairwise Policy-guided Trav. Async. Consol.
+HyperMem (Yue et al., 2026) Factual✗Hypergraphn-ary Coarse-to-fine None
+HyperGraphRAG (Luo et al., 2025) Factual✗Hypergraphn-ary Hypergraph Retrieval None
+PlugMem (Yang et al., 2026) Experiential✗Dual KG Pairwise Subgraph Retrieval None
+G-Memory (Zhang et al., 2025a) Experiential✓Hierarchical Pairwise Graph + Semantic Episodic Consol.
+Agent-KB† (Tang et al., 2025b) Experiential✗Hybrid Pairwise Hybrid Deduplication
+HYPERSKILL Experiential ✗ Hypergraph n-ary Dual-path +κ Quality + Topology
+edges, enabling co-occurrence-based skill ranking
+and topology-aware maintenance that pairwise de-
+signs cannot support.
+F Ethics Statement
+We provide comprehensive methodological details,
+including hyperparameters, prompts, and algorithm
+pseudocode, to enable full reproducibility. Our
+framework is evaluated on publicly available bench-
+marks (xBench, GAIA, WebWalkerQA) and does
+not collect or process personal information. LLM-
+based tools were used solely for grammar correc-
+tion, code debugging, and figure design; all sci-
+entific content, experimental design, and analysis
+were conducted by the authors. While HyperSkill is
+designed as a general-purpose memory framework
+for benign research, we acknowledge that accu-
+mulated memory could reinforce biases present in
+early trajectories if not periodically audited, and
+we encourage practitioners to monitor stored skills
+for unintended patterns.
+17
+G Additional Case Studies
+To illustrate how HYPERSKILL ’s retrieval and evolution mechanisms operate in practice, we walk through
+a representative GAIA task and a snapshot of memory maintenance in Figure 10. We also present
+three additional end-to-end case studies spanning the three benchmarks. Each case reports the task, the
+decomposition used to drive fine-grained retrieval, the skills and mistakes surfaced from the hypergraph,
+the agent’s step-wise execution trace, and the final outcome. Together they illustrate how HYPERSKILL ’s
+dual-path retrieval translates into concrete action improvements across heterogeneous domains.
+Case 1: xBench — Literary Trivia
+Task (translated from Chinese):A 19th-century French novel caused a morality scandal and
+lawsuit upon publication. In the 1991 film adaptation, what flavor of prop poison did the lead actress
+insist on using for the suicide scene?
+Golden answer:bitter-almond flavor.
+Plan Decomposition
+1.search_literary_work: identify the 19th-century French novel via scandal keywords.
+2.find_movie_adaptations: locate the 1991 film adaptation and lead actress.
+3.verify_prop_taste: crawl film trivia sources for the specific flavor detail.
+4.confirm_taste_detail: validate the exact flavor description.
+Retrieved Memory
+Past experience (distilled lessons):
+✓ When verifying historical details, prioritize authoritative sources and cross-verify claims
+across multiple trusted references.
+✗ Never assume that detailed data is available in public summaries; always use precise, entity-
+focused queries to locate authoritative sources.
+Skills:
+• Multi-Stage Verification: break complex cross-domain questions into sequential verification
+steps.
+•Direct Source Confirmation: prioritize official reference pages over aggregator sites.
+• Source Deep Dive: use page crawling to extract precise details rather than relying on snippets.
+Mistakes to avoid:
+• Over-Reliance on Web Search: repeatedly issuing general searches without verifying author-
+itative sources.
+Agent Execution (10 steps)
+1–2web_search→ identifiesMadame Bovaryby Gustave Flaubert; initial poison
+query.
+3–5 Confirms 1991 film by Claude Chabrol with Isabelle Huppert as Emma Bovary.
+6–8 Progressive refinement: searches behind-the-scenes trivia across multiple
+sources.
+9–10 Final verification: extracts bitter-almond flavor detail from an authoritative
+film database.
+18
+Outcome
+✓ SUCCESS— the lead actress insisted on using a bitter-almond-flavored prop poison to
+authentically replicate the taste of cyanide.
+How memory helped:TheMulti-Stage Verificationskill guided decomposition of a cross-domain
+chain (literature → film → behind-the-scenes trivia), while theOver-Reliance on Web Search
+error pattern prevented looping on generic queries. The retrieved lesson about cross-verifying
+across trusted references reinforced the agent’s move from aggregator snippets to authoritative
+film databases.
+Case 2: GAIA — Scientific Calculation
+Task:What integer-rounded percentage of the total length of the harlequin shrimp recorded in Omar
+Valencia-Mendez’s 2017 paper was the sea star fed to the same type of shrimp in G. Curt Fiedler’s
+2002 paper?
+Golden answer:22.
+Plan Decomposition
+1.inspect_file_as_text: read the attached file for data from both papers.
+2.python_code: calculate the integer-rounded percentage.
+Retrieved Memory
+Past experience (distilled lessons):
+✓ When seeking precise values from academic papers, prioritize direct access to the original
+source through targeted searches with author names and publication years.
+✗ Never retry a tool call without diagnosing system-level errors first; always verify infrastructure
+readiness before re-attempting.
+Skills:
+• Domain-Specific Query Refinement: include domain-specific terms and reliable source
+filters in queries for technical data.
+•Unit Conversion: convert units consistently before performing calculations.
+Mistakes to avoid:
+• Inadequate Context Refinement: failing to break tasks into verifiable sub-questions leads to
+unstructured search.
+Agent Execution (7 steps)
+1–2 Parallel web_search for both papers; crawl_page on Fiedler 2002 via Oxford
+Academic.
+3–4 Refines query with specific measurements; reads Valencia-Mendez 2017 PDF
+directly.
+5–6Cross-references: shrimp total length= 4.5cm, sea-star piece= 1cm.
+7final_answer:round(1/4.5×100) = 22%.
+19
+Outcome
+✓SUCCESS— the sea star was approximately 22% of the harlequin shrimp’s total length.
+How memory helped: Domain-Specific Query Refinementpushed the agent to use precise
+scientific terms (“total length”, “harlequin shrimp”) rather than generic queries. TheInadequate
+Context Refinementmistake warned against unstructured searching, guiding the agent to split
+the task into two parallel data-retrieval subtasks (one per paper) before computing the ratio.
+Case 3: WebWalkerQA — Game Knowledge
+Task (translated from Chinese):InAge of Empires IV, what are the strategic differences between
+the Malian and Chinese civilizations in their respective fourth age?
+Golden answer:the Malians leverage the Griot Bara landmark for global buffs, while the Chinese
+rely on the Great Wall as a defensive advantage.
+Plan Decomposition
+1.explore_site: crawlageofempires.comhomepage for site structure.
+2.navigate_section: crawl the civilizations section for Malian and Chinese details.
+3.find_target: search with domain-specific keywords on the official site.
+Retrieved Memory
+Past experience (distilled lessons):
+✓ When institutional websites fail to surface specific records, precise multi-source searches are
+essential for retrieving accurate information.
+✗ Relying on automated crawling without validating access or adapting to site-specific barriers
+leads to failed data retrieval.
+✗ Starting with external searches before fully navigating internal websites risks missing struc-
+tured and unindexed information.
+Skills:
+• Internal First Strategy: thoroughly explore internal site structure before resorting to external
+search tools.
+• Specific Query Refinement: use precise, domain-specific keywords when searching internal
+or external tools.
+• Verify with Multimodal Sources: when internal search yields limited results, use external
+sources to gather complementary information.
+Mistakes to avoid:
+• Premature External Search: relying on external web search before thoroughly exploring
+internal site navigation.
+• Incomplete Internal Crawling: failing to systematically access relevant sections of a website.
+20
+Agent Execution (11 steps)
+1–2crawl_page(ageofempires.com)→ explores homepage; web_search for
+general info.
+3–5Iterative crawling of official-site civilization sections.
+6–8Consults community sources (Reddit, YouTube) for fourth-age specifics.
+9–11crawl_page on the Fandom wiki for Malians and Chinese → extracts full
+details.
+Outcome
+✓ SUCCESS— detailed comparison: the Malians favor economic guerrilla tactics anchored by
+the Griot Bara landmark; the Chinese rely on fast building, Great Wall defense, and chemical
+technology.
+How memory helped:TheInternal First Strategyskill prevented the agent from jumping to
+external searches immediately, instead exploring the official site structure first. Three failure
+lessons all reinforced the same pattern: navigate internally before going external. This is a
+pattern learned across 6+ previous WebWalkerQA episodes involving institutional websites,
+now successfully transferred to a gaming wiki.
+TaskQuery(GAIATask59)Who nominated the only Featured Article on English Wikipedia about a dinosaur that was promoted in November 2016?
+1. web_search"Featured Article dinosaur English Wikipedia November 2016" to find the article title2. web_search"Wikipedia [article title] nomination" to find who nominated itRetrievedHyperedgesRetrievedSkills1. Context-Based Keyword Matching: When searching for a specific phrase or term within an article, combine precise metadata like article title...2. Ineffective Source Verification: The task failed because the approach relied heavily on repetitive surface-level web searches…
+1. [failure] The agent attempted to find overlapping animal mentions across three academic papers by searchingwith broad author-name queries, but kept getting irrelevant results…
+FunkMonk
+TaskDecompositions
+Memory
+HyperSkillSelf-EvolvingManagement(Round10)PrunedNodesUnvalidated Source Usage(γ=0.111, rc=3)Using unverified or irrelevant sources, such as websites or platforms outside the authoritative domain, often leads to inaccurate or incomplete results…
+Precise File Data Analysis(γ=0.245, rc=6)When analyzing structured files like PDB for domain-specific tasks, identify key data sections and extract relevant information using tools thatMergedNodesInadequate Query OptimizationFailing to iteratively refine search queries with precise terms and parameters can generate irrelevant or noisy results…
+Unfocused Query StrategyThe task involved repeatedly using broad and loosely related queries, which failed to efficiently identify the required information…
+Ineffective Query RefinementRepeatedly using vague or overly broad search queries…
+Figure 10: Case study on GAIA Task 59.
+21
+H Algorithm
+Algorithm 1 summarizes the full HYPERSKILL pipeline per task, and Algorithm 2 describes the periodic
+memory evolution.
+Algorithm 1HYPERSKILL: Per-Task Pipeline
+Require:Taskd q; memoryG= (V,E); budgetsk u, ke, ks; dedup thresholdδ dedup
+Ensure:Updated memoryG
+% Dual-path hyperedge retrieval (§3.3)
+1:P 0 ←LLM-DECOMPOSE(d q)▷Subtask decomposition
+2:R u ←top-k u subtask nodes bysim(ϕ(P 0),ϕ(c v))▷Eq. 4
+3:E sub ← {e∈ E |Ve ∩R u ̸=∅}▷Subtask path
+4:E traj ←top-k e hyperedges bysim(ϕ(d q),h e)▷Trajectory path▷Eq. 5
+5:E ∗ ← Esub ∪ Etraj ▷Fuse▷Eq. 6
+% Skill ranking & execution (§3.4)
+6:R s ← S
+e∈E ∗ V s
+e ;κ(v)← |{e∈ E ∗ |v∈V e}|for eachv∈R s ▷Eq. 8
+7:S q ←top-k s skills byκ(v);L q ← {ℓe |e∈ E∗}▷Eq. 9
+8:Execute task with context(S q,L q); observe outcomer i, stepsT i ▷Eq. 10
+% Memory update
+9:Extract skillsS new
+i and lessonℓ ei from trajectoryτ i
+10:Deduplicate: merge into existing skill ifsim≥δ dedup, else add new node
+11:Add hyperedgee new = (P0 ∪S new
+i , dq, ℓei)toE
+12:Update utilityγ(·)via Eq. 3 for all retrieved elements
+Algorithm 2HYPERSKILL: Periodic Memory Evolution (every⌈0.1×N⌉tasks)
+Require:MemoryG= (V,E); thresholdsτ prune, Nmin, δmerge; propagation depthL
+% Quality-driven pruning (§3.5)
+1:Remove allvwithν(v)≥N min andγ(v)< τ prune fromVand incident hyperedges▷Eq. 11
+% Structure-informed merging (skill nodesV s only)
+2:W ij ←min(γ(v i), γ(vj))· P
+e∈E
+vi∈Ve, vj ∈Ve
+|Ve|−1 ▷Quality-weighted co-occurrence▷Eq. 12
+3: ˜Z←S ZviaL-step propagation▷Structural embeddings▷Eq. 13
+4:foreach pair(v a, vb)withsim( ˜za, ˜zb)≥δ merge do
+5:v new ←LLM-MERGE(v a, vb); reassign hyperedge memberships▷Eq. 14
+6:end for
+22
+I Prompts
+Task Decomposition Prompt (GAIA)
+Decompose this task into 1–3 SHORT steps. Minimize steps to save context window.
+Available tools:
+•web_search(query): Search with SPECIFIC keywords (names, dates, exact phrases)
+•crawl_page(url): Read a URL — use ONLY when you need specific page content
+•inspect_file_as_text(path): Read attached files — START HERE if task has a file
+•inspect_file_as_image(path): View images/figures
+•python code: Calculations, counting, data processing
+Key principles:
+• If a file is attached, read it FIRST
+• Useweb_searchwith the MOST specific terms possible
+• Prefer python code for calculations over searching
+Task:{query}
+Return ONLY a JSON array: [{"name": "action_name", "description": "use <tool> to <specific action>"}]
+Task Decomposition Prompt (WebWalkerQA)
+Decompose this web navigation task into 2–4 steps.
+Available tools:
+•web_search(query): Search for specific pages on the website
+•crawl_page(url): Read content from a URL
+Navigation strategy:ALW AYS start by crawling the root URL to understand site structure. Then navigate to the relevant
+section (News, Awards, Faculty, etc.) before searching for specifics.
+Examplefor “Find what award Prof X won in 2021 on university.edu”:
+[{"name": "explore_site",
+"description": "crawl_page(root_url)
+to find navigation menu"},
+{"name": "navigate_section",
+"description":
+"crawl_page(root_url/awards)"},
+{"name": "find_target",
+"description":
+"web_search('Prof X award 2021
+site:university.edu')"}]
+Task:{query}
+Return ONLY a JSON array.
+Task Decomposition Prompt (xBench)
+Decompose this data task into 2–4 steps. Each step must specify WHICH DATA to get and HOW to process it.
+Available tools:
+•web_search(query): Search for data sources
+•crawl_page(url): Read data from specific URLs
+•python code: Run calculations, unit conversions, comparisons
+Task:{query}
+Return ONLY a JSON array: [{"name": "action_name", "description": "use <tool> to <specific data
+action>"}]
+23
+Skill Extraction Prompt (Success)
+Extract reusable knowledge from this SUCCESSFUL task.
+CRITICAL RULES:
+• Names must be SHORT reusable pattern names (3–5 words), NOT task-specific.
+Bad: “Search for Zip Codes”. Good: “Targeted Database Search”.
+• Content must be a COMPLETE paragraph (2–4 sentences) that covers: WHAT to do, WHEN to apply it, and WHY it
+works.
+• Extract 1–3 items max. Quality over quantity.
+• Do NOT include task-specific details (exact names, IDs, URLs). Make knowledge transferable.
+Task:{query}
+Trajectory:{trajectory}
+Result:{result}
+Extract skills (what strategies worked well).
+Extract as JSON:
+{
+"skills": [
+{"name": "Short Skill Name",
+"content":
+"2-4 sentence paragraph..."}],
+"knowledge_fragment":
+"ONE OR TWO sentences stating the
+core transferable lesson."
+}
+Mistake Extraction Prompt (Failure)
+Extract reusable lessons from this FAILED task.
+CRITICAL RULES:(same as success extraction)
+Task:{query}
+Trajectory:{trajectory}
+Result:{result}
+Extract mistakes (what went wrong and how to avoid it).
+Extract as JSON:
+{
+"mistakes": [{"name": "Short Mistake Name",
+"content": "2-4 sentence paragraph
+describing what fails, why, and
+what to do instead."}],
+"knowledge_fragment": "ONE OR TWO sentences
+stating the core failure mode to avoid."
+}
+Structure-Informed Merging Prompt
+These two {type}s are structurally and semantically related. Consolidate them into ONE higher-order {type} that captures
+the knowledge from both.
+{TYPE}A:
+Name:{name_a}
+Content:{content_a}
+{TYPE}B:
+Name:{name_b}
+Content:{content_b}
+Create a consolidated{type}that:
+• Has a SHORT reusable name (3–5 words)
+• Has content (2–4 sentences) covering BOTH strategies/patterns
+• Is more general and widely applicable than either individual{type}
+Reply with ONLY JSON:{"name": "...", "content": "..."}
+24
+Retrieved Memory Format (Agent Context)
+The following memory is assembled once per episode and provided to the agent at the beginning of execution:
+## Past Experience
+(Distilled lessons from top-kretrieved hyperedges)
+1. [success] When official exchange data is rate-limited, cross-verified third-party aggregators provide a reliable fallback...
+2. [failure] Relying on generic search terms instead of querying domain-specific databases yields incomplete data...
+## Relevant Skills
+1. Targeted Database Search: Search for specific financial metrics using precise query terms that include the asset, time
+frame, and required data points...
+## Mistakes to Avoid
+1. Overreliance on Unverified Aggregators: Using third-party summaries or social media posts as primary sources for
+quantitative claims leads to incorrect results...
+25

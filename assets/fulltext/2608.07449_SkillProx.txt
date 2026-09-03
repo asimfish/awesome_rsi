@@ -1,0 +1,1613 @@
+SkillProx: Self-Evolving Agent Skills via Proximal Textual Gradient Descent
+Mingxuan Zheng1∗, Yujin Zhou1∗, Chuxue Cao1∗, Boqin Yin1,
+Yuyao Zhang1, Jiapeng Sun1, Shuaishuai Gong2, Sirui Han1†Yike Guo1†
+1Hong Kong University of Science and Technology
+2Macau University
+mzhengan@connect.ust.hk
+Abstract
+LLM agents increasingly adapt to recurring tasks by accu-
+mulating procedural knowledge in skills. These skills are
+lightweight, reusable textual artifacts that are loaded into the
+agent’s context without weight updates. Recent methods re-
+fine skills through iterative task execution, failure diagno-
+sis, and trajectory-guided text-space updates. However, ex-
+isting frameworks lack explicit diagnosis–outcome feedback
+and treat deletion as a generic edit operation rather than a
+dedicated mechanism for consolidating accumulated knowl-
+edge. We introduceSkillProx, a proximal-gradient-inspired
+forward–backward framework that couples closed-loop diag-
+nostic evolution with utility-aware proximal refinement. Mo-
+tivated by a composite objective balancing task loss and skill
+complexity,theforwardstagere-executesdiagnosis-drivened-
+its on the same task batch, rolls back regressions, and feeds
+measuredoutcomesintosubsequentdiagnoses.Thebackward
+stage decomposes the resulting skill into auditable knowl-
+edge units, estimates their contributions using a frozen leave-
+one-out utility audit, and applies validation-gated consolida-
+tion, demotion, or removal. Experiments on in-distribution
+andout-of-distributionbenchmarksacrossmultiplebackbone
+LLMsshowthatSkillProximprovesaverageaccuracyby3.0
+percentage points over the strongest gradient-based baseline.
+Componentablationsdemonstratethecomplementaryeffects
+of closed-loop diagnosis and proximal refinement.1
+1 Introduction
+Large language model (LLM) agents have demonstrated
+strong capabilities in solving complex tasks through reason-
+ing,tooluse,andinteractionwithexternalenvironments(Yao
+et al. 2023; Feng et al. 2025; Luo et al. 2025; Team et al.
+2026b,a).Toreuseproceduralknowledgeacquiredfrompre-
+viousexperience,recentagentsincreasinglyexternalizetask-
+solving procedures,tool-use strategies (Yuanet al. 2024;Lu
+et al. 2025; Zhou et al. 2026b; Bai et al. 2026), and domain-
+specific heuristics as persistent and editableskills(Xu and
+Yan 2026a; Jiang et al. 2026). Previous studies primarily
+focus on skill synthesis, constructing reusable skills from
+demonstrations, successful trajectories, or external docu-
+ments (Chen et al. 2023). However, benchmarks such as
+SkillsBench (Li et al. 2026) show that one-shot synthesis
+1Code will be available at https://github.com/Steven011018/
+SkillProx.
+∗These authors contributed equally.
+†Corresponding author.
+can provide uneven or even negative gains across heteroge-
+neous tasks, since a skill constructed once cannot anticipate
+the diverse situation it will later encounter. This limitation
+motivates a shift from static skill construction to skill evolu-
+tion. Representative methods such as SkillGrad (Wang et al.
+2026a) treat task failures as textual gradients, diagnosing
+failures as new tasks arrive and directly commiting the in-
+ference experience as a patch, thereby tuning a static skill
+artifact into an evolving form of procedural memory.
+Despite this progress, existing skill evolution methodolo-
+gies face two critical limitations. (i)Unverified forward up-
+dates.An LLM-generated diagnosis is commonly treated as
+a valid update direction without verifying the realized effect
+of the resulting skill edit. Once a patch is generated, it is
+typically committed directly, and its effectiveness is neither
+measured through re-execution nor provided as feedback to
+subsequentdiagnoses.(ii)Unregulatedskillgrowth.Iterative
+patching continuously expands the skill without an explicit
+mechanism for reassessing accumulated knowledge. The re-
+sulting artifact may contain repetitive instructions, conflict-
+ing heuristics, or task-specific solutions incorrectly gener-
+alized as reusable rules, some of which can interfere with
+useful knowledge rather than merely increase textual com-
+plexity. This raises a central question:how can outcome-
+verifiedforwarddiagnosisbecoupledwithstructure-aware
+backward refinement, so that a skill’s task capability and
+its accumulated structure co-evolve?
+To explore this question, we conduct an analysis of open-
+loop,growth-orientedskillevolution,whichpointstotwoac-
+tionable design principles. On the forward side, we find that
+updatescannotbejudgedfromtheirdiagnostictextalone,but
+re-executingtheupdatedskillonthesametaskbatchdirectly
+revealswhetheranupdatehelpsorhurts,suggestingthatreal-
+izedoutcomesshouldgatewhetheranupdateisretained.On
+the backward side, we find that accumulated knowledge can
+be audited at the unit level, where removing negative-utility
+contentimprovesaccuracyfrom46%to54%,suggestingthat
+skill health should be maintained through selective consoli-
+dation rather than continual growth.
+Guided by these principles, we proposeSkillProx, a cou-
+pled forward–backward framework that realizesdiagnostic–
+proximal co-evolution. To resolve unverified forward up-
+dates,itsforwardcomponentre-executeseachcandidateskill
+on the same task batch and commits the update only when it
+arXiv:2608.07449v1  [cs.AI]  7 Aug 2026
+Figure 1:Pipeline ofSkillProx.The forward stage iteratively executes, diagnoses, and patches the current skill, using same-
+batchre-executiontoacceptbeneficialupdatesorrollbackrejectedoneswithoutcomefeedback.AfterKupdates,thebackward
+stage audits the utility of knowledge units on a fixed validation split and applies validation-gated consolidation, demotion, or
+removal. Accepted edits produce the final skillX⋆.
+satisfiesanoutcome-groundedperformancegate.Otherwise,
+theupdateisrolledbackandretried,whileitsmeasuredeffect
+and rejected edit direction are retained as feedback for sub-
+sequent diagnoses. The diagnostic process therefore evolves
+according to the realized consequences of previous updates
+rather than their semantic plausibility alone. To counter un-
+regulatedskillgrowth,thebackwardcomponentdecomposes
+theaccumulatedskillintoauditableknowledgeunitsandes-
+timates their contributions through a frozen leave-one-out
+utility audit. It then performs validation-gated proximal re-
+finement,proposingconsolidation,demotion,orremovaled-
+its and retaining only those that preserve structural validity
+and task performance. Together, the forward process deter-
+mines which newly proposed knowledge should enter the
+skill, while the backward process determines which accu-
+mulated knowledge should persist, allowing diagnostic evo-
+lution and proximal consolidation to jointly shape the skill.
+Our main contributions are summarized as follows:
+•A forward–backward formulation of skill evolution.
+We formulate skill evolution as composite optimization
+over task performance and skill complexity, revealing
+two missing components in existing methods: outcome-
+grounded verification of forward updates and utility-
+guided regularization of accumulated knowledge.
+•TheSkillProxframework.We introduceSkillProx,
+which combines closed-loop diagnostic co-evolution in-
+cluding same-batch re-execution, rollback, retry, and
+accept/reject memory with validation-gated proximal
+shrinkage.Thisdesignenablesonlinepreventionofharm-
+ful edits and retrospective removal of negative-utility
+knowledge.
+•Empirical validation of diagnostic–proximal co-
+evolution.Across three backbone LLMs, we compare
+SkillProxagainst six baselines on one in-distribution
+and two out-of-distribution benchmarks, observing per-
+formancegainsinmostevaluatedsettings.Componentab-
+lations further show that closed-loop diagnosis improves
+task accuracy, while proximal refinement provides addi-
+tional gains through utility-aware knowledge consolida-
+tion.
+2 Related Works
+Recent LLM agents increasingly externalize procedural
+knowledge intoskills—structured bundles of instructions,
+scripts, and resources that are loaded into the agent’s con-
+text at inference time and improve task execution without
+any weight update (Xia et al. 2026; Xu and Yan 2026b,b;
+Zhou et al. 2026a). Because authoring such skills by hand is
+label-intensive, hard to scale, and prone to human–machine
+cognitive misalignment (Alzubi et al. 2026; Li et al. 2026;
+Yuetal.2026;Yangetal.2026a),afirstlineofworkstudies
+skill synthesis, which distills reusable skills from agent ex-
+perience:Trace2Skill(Nietal.2026)distillstrajectoriesinto
+skill artifacts, EvoSkill (Alzubi et al. 2026) discovers and
+edits skills through iterative failure analysis with validation-
+based selection, CoEvoSkills (Zhang et al. 2026a) couples a
+skill generator with a co-evolving surrogate verifier to build
+multi-file packages without ground-truth tests, and Skill-
+Composer(Zhangetal.2026b)buildskillsviadecomposing
+skill construction into three learnable operations.
+However,SkillsBench(Lietal.2026)showsthatone-shot
+synthesis is far from sufficient: curated skills help unevenly
+across domains, and self-generated skills yield negligible or
+even negative gains. Motivated by this observation, a sec-
+ond line of work builds on prior advances in text-space op-
+timization, notably TextGrad’s backpropagation of natural-
+language feedback (Yuksekgonul et al. 2024) and GEPA’s
+reflective, Pareto-guided prompt evolution (Agrawal et al.
+2026), and transplants these ideas to the skill artifact itself.
+SkillOpt (Yang et al. 2026b) bounds each edit with a textual
+learningrateandaheld-outgate,whileSkillGrad(Wangetal.
+2026b) treats the skill package as a structured parameter up-
+datedbytrajectory-levellossevidence,textualgradients,and
+momentum.Thesemethods,however,remainopen-loopand
+growth-oriented: a diagnosis is accepted as a valid update
+directionwithoutverifyingitsrealizedeffect,soitsoutcome
+is never fed back to subsequent diagnoses, and deletion is
+treated as one generic edit among many rather than a ded-
+icated shrinkage mechanism, letting redundant, conflicting,
+or instance-specific content accumulate and interfere with
+useful knowledge. SkillProx addresses both gaps by closing
+the diagnosis–validation loop in the forward step and intro-
+ducingautility-awareproximalstepthatexplicitlyoptimizes
+the complexity term.
+3 Preliminaries & Motivation
+3.1 Problem Formulation
+LetXdenote a complete structured skill artifact. A skill
+consists of a primary instruction file,SKILL.md, and an
+optionalreferences/directory containing auxiliary in-
+structions,examples,orresources.LetXdenotethefeasible
+space of structurally valid skill artifacts. For any task setD,
+letH D(X)andC D(X)denote the hard accuracy and mean
+cellaccuracyobtainedusingskillX,respectively.LetG(X)
+denotethetextualcomplexityofX,implementedasthetotal
+number of characters inSKILL.mdand all active reference
+files.Becauseaskillisstructured,itcanbedecomposedinto
+a collection of knowledge units
+Q(X) ={q 1, q2, . . . , qm},(1)
+where each unit may correspond to an instruction section
+or a referenced resource. The concrete unit decomposition
+used bySkillProxis introduced in Section 4.3. Conceptu-
+ally, task loss and textual complexity define the following
+composite optimization problem:
+min
+X∈X
+Jλ(X) :=L T (X) +λG(X), λ≥0,(2)
+whereL T (X)denotes the expected loss ofXover an un-
+known task distributionT, andλrepresents a conceptual
+trade-off between task performance and textual complexity.
+Equation (2) characterizes the two objectives involved in
+skill evolution rather than an objective directly optimized
+by our implementation. Textual skills are discrete and non-
+differentiable, and our method does not takeλas an ex-
+plicit input. The formulation instead provides a common
+basis for examining performance-oriented skill updates and
+complexity-orientedknowledgeconsolidation,whichwemo-
+tivate empirically in the following two subsections.
+3.2 Motivation
+Learning from Realized Update Effects.Across ten
+Qwen3.6-27B training runs, open-loop skill evolution
+achieves an average OJ hard accuracy of50.30±2.50,
+whereasafeedback-controlledvariantachieves51.40±1.51.
+Inspection of representative training trajectories shows that
+some updates appear reasonable from the diagnosis alone
+but reduce task performance after being incorporated into
+theskill.Thisdiscrepancyindicatesthatthequalityofatex-
+tual update cannot be reliably determined from its semantic
+plausibilityaloneandinsteadneedstobeassessedthroughits
+realizedexecutionoutcomes.Re-evaluatingtheupdatedskill
+onthesametaskbatchprovidesdirectevidenceofwhetheran
+update improves, preserves, or degrades performance. This
+evidence can be used both to determine whether the update
+shouldberetainedandtoinformsubsequentdiagnosesabout
+previouslyeffectiveorineffectivedirections.Theseobserva-
+tionsmotivateaclosed-loopprocessofdiagnosis,evaluation,
+and outcome feedback, in which the skill and its diagnostic
+process co-evolve according to the realized effects of pro-
+posed updates.
+ConsolidatingAccumulatedKnowledge.Representative
+evolved skills exhibit repeated procedural instructions and
+task-specific solutions presented as reusable rules. Addi-
+tional skill content therefore does not necessarily translate
+into additional task-solving capability. Leave-one-out eval-
+uation further identifies accumulated knowledge units with
+negativeutility,meaningthattheirremovalimprovesvalida-
+tion performance. In one representative case, utility-aware
+consolidation reduces the skill size by 3.12% while improv-
+ing OJ hard accuracy from 46% to 54%. These observations
+motivate a backward process that reassesses accumulated
+knowledge at the unit level and selectively removes or con-
+solidates harmful content while preserving knowledge that
+contributes to task performance. Case studies of the above
+description are provided in the Appendix A.
+3.3 Proximal Gradient Descent
+The preceding observations motivate two complementary
+operations: a forward process that evaluates and improves
+newly proposed knowledge, and a backward process that re-
+assesses and consolidates accumulated knowledge (Tanabe,
+Fukuda, and Yamashita 2019). Proximal gradient descent
+provides a natural conceptual framework for relating these
+operations. For a continuous composite objective
+min
+x
+f(x) +λg(x),(3)
+proximal gradient descent first performs a forward gradi-
+ent step on the differentiable objectivefand then applies a
+backward proximal step associated with the potentially non-
+smooth regularizerg:
+vk =x k −η∇f(x k),
+xk+1 = proxηλg (vk),
+proxηλg (v) = arg min
+x
+
+λg(x) + ∥x−v∥ 2
+2
+2η
+
+,
+(4)
+whereη >0denotes the forward step size andλ≥0con-
+trols the regularization strength. The forward step primarily
+reduces the task objective, whereas the proximal step con-
+trols the structure or complexity of the resulting solution.
+Skill text is discrete and non-differentiable and therefore
+does not admit a direct numerical gradient or a standard
+proximaloperator.Ourimplementationalsodoesnotexplic-
+itlyoptimizeEquation(2)ortakeηandλasinputs.Weretain
+onlytheforward–backwarddivisionofresponsibilities:diag-
+nostic evolution serves as an inexact, performance-oriented
+forward operator, while utility-aware consolidation serves
+as a discrete backward operator for controlling accumulated
+knowledge.Section4instantiatesthisdecompositionthrough
+closed-loopdiagnosticevolutionandvalidation-gatedproxi-
+mal refinement.
+4 Method
+4.1 Overview
+Figure1summarizestheSkillProxpipeline.Followingthe
+forward–backward view introduced in Section 3.3,Skill-
+Proxmaps an initial skillX 0 to an intermediate skillXf
+through forward diagnostic evolution and subsequently pro-
+duces the final skillX⋆ through backward proximal refine-
+ment. Forward iterationkuses a training batchBk, whereas
+utility auditing and backward validation use a fixed vali-
+dation splitV. Together, the two stages realizediagnostic–
+proximal co-evolution. Forward diagnosis evolves the task-
+solving content of the skill according to realized execution
+outcomes,whilebackwardProxevolvesitsstructurebyselec-
+tivelypreservingandconsolidatingaccumulatedknowledge.
+The remainder of this section follows the execution order
+of the method. We first introduce the closed-loop forward
+update, followed by the frozen utility audit and candidate
+construction, validation-gated proximal refinement, and the
+implementation-level properties of the resulting procedure.
+4.2 Closed-Loop Forward Update
+At forward iterationk, the current skillXk is executed on
+training batchB k. A diagnostician uses failed trajectories,
+contrastivesuccessfultrajectories,recenthistory,andthere-
+jection reason from the previous attempt to propose an edit
+direction. The Patcher then produces candidateeX (j)
+k for at-
+temptjfromthesamepre-iterationsnapshot.Thecandidate
+is re-executed on the same batch and accepted according to
+Gatefwd
+
+eX (j)
+k
+
+=1
+h
+HBk
+
+eX (j)
+k
+
+≥H Bk (Xk)
+i
+×1
+h
+CBk
+
+eX (j)
+k
+
+≥C Bk (Xk)
+i
+.
+(5)
+Here,1[·]denotes the indicator function, which equals1
+when its enclosed condition is true and0otherwise. Con-
+sequently, the forward gate equals1only when both the
+hard accuracy and mean cell accuracy satisfy their respec-
+tive acceptance conditions. The first candidate with a strict
+hard-accuracy gain terminates the search early. If no candi-
+date strictly improves hard accuracy, the method evaluates
+at most three attempts and selects the lexicographically best
+attempted candidate by hard and cell accuracy. The winner
+must still satisfy Eq. (5); otherwise, the iteration keepsXk
+unchanged. For a rejected attempt, the observed hard/cell
+changesandattempteddirectionsareprovidedtothenextdi-
+agnosis.Acrossiterations,compactaccept/rejectsummaries
+form a semantic history for subsequent diagnoses.
+Equation (5) constrains only the current training batch
+Bk.Becausedifferentiterationsusedifferentbatches,itdoes
+not imply monotonic performance across iterations, on the
+validation split, or on the test set.
+4.3 Frozen Utility Audit and Candidate Selection
+Afterforwardoptimization,X f isparsedintonauditableL2
+sections and L3 reference groups:
+Q(Xf ) ={q 1, q2, . . . , qn}.(6)
+LetAblate(X f , qi)denote a copy ofX f with unitq i
+fully removed. For an L2 unit, the corresponding section is
+removed. For an L3 unit, the reference file and all of its
+pointers are removed. We define the hard and cell marginal
+utilities ofqi as
+uhard
+i =H V (Xf )−H V (Ablate(Xf , qi)),
+ucell
+i =C V (Xf )−C V (Ablate(Xf , qi)).
+(7)
+A positive value in Eq. (7) means that removing the unit
+lowers performance; a negative value means that the ablated
+versionperformsbetter.Allutilitiesaremeasuredoncebefore
+Prox and remain frozen throughout the candidate traversal.
+Prox selects candidates directly from raw cell utility. The
+candidate set and processing order are
+Iτ =
+n
+i∈ {1, . . . , n}:ucell
+i < τ
+o
+, τ=−0.001,
+i≺j⇐ ⇒
+
+ucell
+i , uhard
+i
+
+<lex
+
+ucell
+j , uhard
+j
+
+.
+(8)
+Here,< lex denotes ascending lexicographic order, rather
+than an independent mathematical operator. Specifically,
+(a, b)<lex (c, d)holdsifa < c,orifa=candb < d.There-
+fore, candidates are first ordered by cell utility, with smaller
+values processed earlier, and ties are broken by hard utility.
+The audit determines only candidate eligibility and process-
+ing order. It evaluates full ablation, whereas the Shrinker
+may consolidate, demote, or remove the target. Every real-
+ized trial must therefore be evaluated again in the current
+state.
+4.4 Prox: Single-Pass Validation-Gated Shrinkage
+Let(i 1, . . . , iM )be the candidates ordered by Eq. (8), and
+initializeX (0) =X f. Each candidate is processed at most
+once. If an earlier consolidation has already removed its tar-
+get, the candidate is skipped. Otherwise, the Shrinker pro-
+ducesatrialT m inatemporarycopyofthecurrentskill.The
+trialmustfirstsatisfystructuralvalidityandstrictcomplexity
+reduction:
+StructOK(Tm) = 1, G(Tm)< G
+
+X (m)
+
+.(9)
+If Eq. (9) holds,Tm is evaluated on the fixed validation
+splitV.Itmustsatisfythehard,cell,andcompression-range
+conditions
+HV (Tm)≥H V
+
+X (m)
+
+−δ h,
+CV (Tm)≥C V
+
+X (m)
+
+−δ c,
+1−
+G
+
+X (m)
+
+G(Xf ) < ρ,
+δh = 0, δc = 0.02, ρ= 0.10.
+(10)
+Here,δ h ≥0andδ c ≥0are the maximum absolute per-
+edit decreases allowed in hard accuracy and cell accuracy,
+Component Standard PGD Proposed method
+Objective Composite task lossfand complexity regular-
+izerg
+Two-stage task optimization and text complexity control
+Forward direction Analytical direction−∇fNatural-languageeditdirectioninferredfromtasktrajec-
+tories
+Forward updatev k =x k −η∇f(x k)Diagnose,patch,same-batchre-execute,rejectfeedback,
+and rollback
+Backward step Solve a proximal subproblem Frozen utility audit, semantic shrinkage, structural
+checks, and validation gating
+Locality Distance penalty∥x−v∥ 2
+2/(2η)Local single-target edits and a soft compression capρ
+Shrinkage strength Controlled byηλCandidate, quality, and range controlled separately byτ,
+δh,δ c, andρ
+Analysis Convergence under smoothness and related as-
+sumptions
+Finite termination, empirical gating, and strict complex-
+ity reduction
+Table 1: Structural alignment between standard PGD and the proposed method.
+respectively, whileρ∈[0,1]is the cumulative compression
+threshold measured relative to the forward skillXf. We set
+δh = 0, requiring recorded validation hard accuracy not to
+decrease, andδ c = 0.02, allowing each accepted edit to
+reduce mean cell accuracy by at most0.02, or two percent-
+age points when the metric is normalized to[0,1]. We set
+ρ= 0.10. This condition is evaluated on the active skill
+X (m) before the trial is committed, rather than onTm itself.
+Therefore,ρis not a strict upper bound on the compression
+ratio of the final output; it is a soft stopping threshold that
+determineswhetheranothershrinkageattemptmayproceed.
+As long as the current cumulative compression remains be-
+lowρ, the next trial may be accepted and move the final
+compression ratio beyondρ. The active state is updated as
+X (m+1) =
+(
+Tm,if all gates pass,
+X (m),otherwise,
+X ⋆ =X (M) .
+(11)
+All edits are first applied to a trial copy. A rejected trial
+is deleted, while an accepted trial replaces the active skill.
+A candidate that produces no accepted deletion does not
+terminate the loop; processing continues until the candidate
+sequenceisexhausted.ThecompressionconditioninEq.(10)
+is evaluated onX(m) before applyingT m. Thus,ρ= 0.10
+is a soft cap: the final accepted edit may move the total
+compression beyond10%.
+4.5 Implementation-Level Properties and
+Trade-offs
+The Prox candidate set is finite, and each candidate is pro-
+cessed at most once; therefore, shrinkage terminates after
+a finite number of trials. Every accepted edit must strictly
+reduce text complexity, whereas a rejected trial leaves the
+active skill unchanged. The validation gate provides only
+a per-edit empirical constraint on recorded validation per-
+formanceanddoesnotimplytest-setmonotonicityorclassi-
+calPGDconvergence.Formalstatements,cumulativeperfor-
+mance bounds, and evaluation-complexity analysis are pro-
+vided in Appendix B.
+Shrinkage strength is jointly determined by the candi-
+date threshold, performance tolerances, and compression
+range. Varying these controls produces skills with different
+text-compression ratios and held-out performance, yielding
+an empirical compression–performance trade-off. We study
+this relationship primarily through a sweep over the candi-
+date thresholdτ; the sweep configuration, evaluation proto-
+col, and Pareto filtering procedure are described in Subsec-
+tion 5.4. Importantly,τchanges candidate coverage under
+the frozen utility audit but is not the explicit regularization
+weightλin the composite objective. Theτ-sweep should
+therefore be interpreted as a threshold-induced empirical
+trade-off curve rather than an exactλ-regularization path.
+Theidealregularizeddecisionruleanditsapproximaterela-
+tionship toτare discussed in Appendix B.
+5 Experiments
+5.1 Experimental Setups
+BenchmarksTo comprehensively assess the effectiveness
+of our approach, we conduct experiments under both in-
+distribution (IID) and out-of-distribution (OOD) settings.
+Forthe IIDevaluation, weadoptSpreadsheetBench Veri-
+fied(Ma et al. 2024), a human-validated subset of Spread-
+sheetBench that is specifically curated to enable reliable
+automatic evaluation. For the OOD evaluation, we further
+evaluateourmethodonWikiTableQuestions(Pasupatand
+Liang 2015) andHiTab(Cheng et al. 2022), which allows
+us to examine the generalization ability of the learned skills
+beyondthetrainingdistribution.Detaileddescriptionsofthe
+above datasets are provided in the Appendix C.
+BaselinesWe compare our method against a broad range
+ofbaselinesthatspanseveralrepresentativecategories.First,
+we consider two fundamental settings:No Skill, where the
+modeloperateswithoutanyauxiliaryskill,andHumanSkill,
+where a manually curated skill is provided. Note thatHu-
+man Skillalso serves as the base skill that SkillProx op-
+timizes. Second, for methods that leverage LLM-generated
+skills, we compare againstEvoSkill(Alzubi et al. 2026)
+andTrace2Skill(Ni et al. 2026). Third, for methods that
+focus on skill self-evolution, we compare againstSkill-
+Grad(Wangetal.2026b)andSkillOpt(Yangetal.2026b).
+AllbaselinesandourmethodareevaluatedonQwen3.5-4B,
+Model Method IID OOD
+Spreadsheet WikiTQ HiTab
+Qwen3.5-4B
+No Skill20.3 ±1.5 65.0±3.3 61.7±2.0
+Human Skill20.3 ±4.2 68.3±1.6 63.5±0.9
+EvoSkill6.7 ±2.1 76.8±8.1 63.3±2.3
+Trace2Skill10.0 ±0.0 66.0±2.3 57.5±1.7
+SkillOpt15.3 ±2.5 26.0±6.6 16.0±1.3
+SkillGrad19.3 ±0.5 69.7±0.8 65.4±3.4
+SkillProx (ours)21.0 ±1.4 78.5±2.9 69.2±2.3
+Qwen3.5-27B
+No Skill44.0 ±6.1 85.3±1.8 78.5±1.0
+Human Skill38.3 ±7.6 85.5±0.0 78.7±1.3
+EvoSkill8.7 ±3.5 86.0±0.5 78.7±0.3
+Trace2Skill32.0 ±9.6 84.2±0.8 76.7±1.9
+SkillOpt51.3 ±4.7 77.1±1.9 66.8±0.3
+SkillGrad51.3 ±0.9 85.2±0.6 77.5±0.4
+SkillProx (ours)51.3 ±1.2 86.8±1.1 78.5±1.1
+Qwen3.6-27B
+No Skill45.3 ±4.7 85.8±0.8 78.2±1.0
+Human Skill36.7 ±8.1 85.7±1.2 78.0±0.9
+EvoSkill13.0 ±4.4 87.7±1.8 77.8±2.0
+Trace2Skill35.3 ±3.1 85.2±0.6 78.7±2.3
+SkillOpt53.3 ±7.6 82.2±0.6 79.7±0.8
+SkillGrad50.0 ±3.3 84.8±0.6 78.3±0.3
+SkillProx (ours)54.5 ±0.5 86.2±0.3 80.0±1.3
+Table 2: Main results across three benchmarks. R is the average score (0–100,↑); values are mean±std over seeds. Spreadsheet
+is the in-domain setting; WikiTQ and HiTab are out-of-domain. Best inbold, second-best underlined.
+Qwen3.5-27B,andQwen3.6-27Btoensureacomprehensive
+and fair comparison across model scales and versions.
+Implementation DetailsFor the training configuration,
+wefollowthesettingsofSkillOptandSkillGrad.Specif-
+ically,wepartitioneachdatasetintotraining,validation,and
+test splits with a ratio of 2:1:8. The maximum number of
+interaction turns is set to 30 for all methods. ForEvoSkill
+andTrace2Skill, we adopt their official configurations to
+guaranteeafaithfulcomparison.Fortheevaluationprotocol,
+we report accuracy as the primary metric. More details are
+provided in the Appendix C.
+Variant Mean±Std∆Acc.
+w/o closed-loop diagnosis53.0 ±1.0 −1.5
+w/o Prox52.0 ±1.0 −2.5
+SkillProx (full)54.5 ±0.5 −
+Table 3: Component ablation on SpreadsheetBench with
+Qwen3.6-27B. The variant “w/o closed-loop diagnosis”
+keepsonlyproximalgradientdescent(Prox);thevariant“w/o
+Prox”keepstheclosed-loopforwardupdate;thefullmethod
+combines both stages. Best inbold.
+5.2 Main results
+SkillProx reliably improves the base skill into a net-
+positive signal across all backbones.Starting from the
+Human Skill initialization it optimizes, SkillProx delivers
+consistent gains on every backbone: it lifts the base skill by
+13.0pp on Qwen3.5-27B (38.3→51.3) and by17.8pp on
+Qwen3.6-27B (36.7→54.5), while remaining slightly pos-
+itive on the smaller Qwen3.5-4B (20.3→21.0). By treating
+the skill as an optimizable artifact rather than a fixed input,
+SkillProxconvertsthebaseinitializationintostable,positive
+guidance.
+SkillProx outperforms both LLM-generated and self-
+evolving skill baselines on the in-domain task.On
+SpreadsheetBench, SkillProx attains the best IID accuracy
+on all three backbones (21.0,51.3, and54.5). The margin
+over LLM-generated skills is largest on the weaker 4B ex-
+ecutor, where SkillProx exceeds EvoSkill by14.3pp and
+Trace2Skill by11.0pp, and it still edges out the strongest
+self-evolving baseline SkillGrad (19.3→21.0). It also ex-
+hibits the lowest variance among the self-evolving methods
+(e.g.±0.5vs.±7.6for SkillOpt on Qwen3.6-27B), indicat-
+ingthatitsgainsarestableacrossseedsratherthananartifact
+of favorable initialization. Together, these results show that
+optimizing a skill yields more reliable behavior than merely
+generating one.
+SkillProx generalizes robustly to out-of-domain tasks
+without overfitting to the training distribution.Al-
+thoughtheskillsareoptimizedsolelyonSpreadsheetBench,
+theytransfertoOODbenchmarkswithdifferentformatsand
+outputspaces.OnWikiTQ,SkillProxachievesthebestaccu-
+racyonQwen3.5-4B(78.5),improvingoverNoSkillby13.5
+ppandoverSkillGradby8.8pp,andisalsobestonQwen3.5-
+27B (86.8) while remaining competitive on Qwen3.6-27B
+(86.2). On HiTab it is best on both Qwen3.5-4B (69.2) and
+Qwen3.6-27B (80.0). This robustness stands in sharp con-
+trast to SkillOpt, which overfits to the in-domain style and
+collapsesOOD,e.g.onthe4Bmodel(26.0onWikiTQ,16.0
+on HiTab) and even on Qwen3.5-27B (77.1and66.8).
+5.3 Ablation Studies
+We ablate the two core stages of SkillProx in Table (3):
+the closed-loop diagnostic forward update and the proximal
+shrinkagebackwardstage,i.e.Prox.Thisyieldstwovariants.
+The first removes the closed-loop diagnosis and keeps only
+proximalgradientdescent.Thesecondkeepstheclosed-loop
+forward update but removes Prox. All component ablations
+use Qwen3.6-27B with the same training configuration and
+a fixed training-set seed. We adopt the same evaluation pro-
+tocol and metric as the main experiments, reporting results
+on the in-domain SpreadsheetBench setting.
+Table3showsthatremovingeitherstagedegradesheld-out
+accuracy relative to the full method. Removing the closed-
+loop diagnosis lowers accuracy from54.5to53.0(−1.5
+pp), while removing Prox lowers it further to52.0(−2.5
+pp). The larger drop from removing Prox indicates that task-
+drivenforwardeditingaloneaccumulatesredundantoroverly
+instance-specificcontent,whichtheproximalshrinkagestage
+is needed to control; the smaller but consistent drop from
+removing the closed-loop diagnosis indicates that Prox still
+requiresawell-optimizedforwardskilltoshrink,ratherthan
+the raw base skill. The full method also attains the lowest
+variance (±0.5vs.±1.0), suggesting that the two stages
+act complementarily to produce stable gains rather than an
+artifact of a favorable initialization.
+5.4 Detailed Analysis
+Accuracy–Compression Analysis over the Proximal
+Thresholdτ.In Figure (2), we apply Prox offline to three
+closed-loop skills produced by Qwen3.6-27B without re-
+training. We evaluate the no-Prox anchor (τ=−∞), five
+negative thresholds, and six positive thresholds. The no-
+Prox setting achieves an OJ hard accuracy of50.3%. At
+τ=−0.001, accuracy reaches its maximum of52.3%with
+25.7%compression. Atτ= 0.005, the compression ratio
+increases to41.5%while accuracy remains at52.0%. Even
+atτ= 0.050,74.9%of the skill is removed while retaining
+51.0%accuracy. Performance begins to decline when com-
+pression exceeds approximately80%. Several Prox settings
+achieve both higher compression and higher accuracy than
+noProx,indicatingthatmoderateshrinkagemayalsoreduce
+duplicated rules and context interference.
+Model Size and Final Skill Length.We compare the fi-
+nal G3D skills produced by Qwen3.5-4B and Qwen3.5-27B
+after closed-loop training and proximal shrinkage. The final
+4B skill is approximately45%longer than the 27B skill on
+average. Interestingly, the main skill files converge to nearly
+thesamelengthofapproximately15kcharacters.Thediffer-
+encearisesalmostentirelyfromreferencefiles:the4Bmodel
+producesroughlytwiceasmuchreferencecontentasthe27B
+model. This suggests that model size affects the amount of
+supplementary guidance required rather than the size of the
+coreskillstructure.Together,theseresultssuggestthatlarger
+modelsnaturallyproducemoreselectiveandcompactskills,
+0 20 40 60 80 100
+skill compression vs no Prox (%)
+48
+49
+50
+51
+52
+53SpreadsheetBench OJ hard score (%, /100)
+no Prox ( = )
+-0.050
+-0.020
+-0.010
+-0.005
+-0.001
++0.005
++0.010
++0.025
++0.050
++0.075
++0.100
+no Prox accuracy
+prox at 
+no Prox
+Pareto frontier
+Figure2:Accuracy–compressionParetofrontierofQwen3.6-
+27B under different proximal thresholdsτ.
+Metric Qwen3.5-4B Qwen3.5-27B
+Total length40.4k±8.6k 27.9k±12.9k
+Main file14.8k±3.3k 15.4k±3.5k
+References25.6k±9.1k 12.6k±11.1k
+Prox compression29.4% 19.0%
+Table 4: Final skill length across model sizes. Results are
+averaged over three 4B runs and 27B runs.
+whileclosed-loopvalidationandproximalshrinkageprovide
+smallermodelswithanexternalmechanismforrejectingun-
+necessary updates. Consistent with this interpretation, G3D
+lengthisnegativelycorrelatedwithIIDhardaccuracywithin
+the 27B runs, indicating that a longer skill is not necessar-
+ily a more effective one. Further results are provided in the
+Appendix D.
+6 Conclusion
+In this paper, we presentSkillProx, a proximal-gradient-
+inspired framework for self-evolving agent skills.Skill-
+Proxcouples closed-loop diagnostic evolution, which ver-
+ifies candidate updates through execution feedback, with
+utility-awareproximalrefinement,whichreassessesandcon-
+solidatesaccumulatedknowledge.AcrossSpreadsheetBench
+Verified, WikiTableQuestions, and HiTab,SkillProxim-
+proves skill performance with multiple backbone LLMs un-
+derbothin-distributionandout-of-distributionsettings.Em-
+pirical results suggest a practical path for jointly improving
+diagnosticupdatesandaccumulatedskillknowledgethrough
+forward–backward optimization.
+References
+Agrawal, L. A.; Tan, S.; Soylu, D.; Ziems, N.; Khare, R.;
+Opsahl-Ong, K.; Singhvi, A.; Shandilya, H.; Ryan, M. J.;
+Jiang,M.;Potts,C.;Sen,K.;Dimakis,A.G.;Stoica,I.;Klein,
+D.; Zaharia, M.; and Khattab, O. 2026. GEPA: Reflective
+PromptEvolutionCanOutperformReinforcementLearning.
+arXiv:2507.19457.
+Alzubi, S.; Provenzano, N.; Bingham, J.; Chen, W.; and Vu,
+T. 2026. EvoSkill: Automated Skill Discovery for Multi-
+Agent Systems. arXiv:2603.02766.
+Bai, H.; Zhou, Y.; Wu, Y.; Chan, C.-M.; Wen, P.; Pan, K.;
+Han, S.; and Guo, Y. 2026. Glance-or-gaze: Incentivizing
+lmms to adaptively focus search via reinforcement learning.
+InFindingsoftheAssociationforComputationalLinguistics:
+ACL 2026, 34044–34062.
+Chen,M.;Roberts,N.;Bhatia,K.;Wang,J.;Zhang,C.;Sala,
+F.; and Ré, C. 2023. Skill-it! a data-driven skills framework
+forunderstandingandtraininglanguagemodels.Advancesin
+Neural Information Processing Systems, 36: 36000–36040.
+Cheng,Z.;Dong,H.;Wang,Z.;Jia,R.;Guo,J.;Gao,Y.;Han,
+S.; Lou, J.-G.; and Zhang, D. 2022. HiTab: A Hierarchical
+TableDatasetforQuestionAnsweringandNaturalLanguage
+Generation. arXiv:2108.06712.
+Feng, J.; Huang, S.; Qu, X.; Zhang, G.; Qin, Y.; Zhong,
+B.; Jiang, C.; Chi, J.; and Zhong, W. 2025. ReTool:
+Reinforcement Learning for Strategic Tool Use in LLMs.
+arXiv:2504.11536.
+Jiang, Y.; Li, D.; Deng, H.; Ma, B.; Wang, X.; Wang, Q.;
+and Yu, G. 2026. SoK: Agentic Skills – Beyond Tool Use in
+LLM Agents. arXiv:2602.20867.
+Li, X.; Liu, Y.; Chen, W.; You, B.; Di, Z.; He, Y.; Zheng, S.;
+Choe, K. W.; Sun, J.; Wang, S.; Tao, C.; Li, B.; Zhao, X.;
+Geng,H.;Wu,X.;Zhou,J.;Chen,X.;Xing,H.;Li,Y.;Zeng,
+Q.; Wang, D.; Wang, Y.; Chaim, R. B.; Jiang, P.; Shen, H.;
+Kong,L.;Liu,X.;Wang,R.;Liu,X.;Li,J.;Lan,X.;Lin,Y.;
+Ye,W.;He,J.;Li,S.;Zhang,Y.;Gao,Y.;Li,Y.;Ma,Z.;Jing,
+L.; Wang, T.; Li, K.; Xue, Y.; Lyu, H.; He, Y.; Tian, Y.; Wu,
+S.; Wang, B.; Gao, Y.; Chen, B.; Liu, L.; Cheng, S.; Bao, J.;
+Tong,S.;Xu,S.;Zhuo,T.Y.;Ye,T.;Qi,Q.;Li,M.;Liao,L.;
+Tan, Z.; Shi, C.; Tang, X.; Tankasala, S.; Yuan, B.; Qian, Y.;
+Tu, J.; Wang, C.; Sun, Y.; Wang, W.; Taylor, A.; Yang, Z.;
+Guan,C.;Dong,Z.;Zhang,X.;Dillmann,S.;chungLee,H.;
+and Song, D. 2026. SkillsBench: Benchmarking How Well
+AgentSkillsWorkAcrossDiverseTasks. arXiv:2602.12670.
+Lu, J.; Holleis, T.; Zhang, Y.; Aumayer, B.; Nan, F.; Bai,
+F.; Ma, S.; Ma, S.; Li, M.; Yin, G.; Wang, Z.; and Pang,
+R. 2025. ToolSandbox: A Stateful, Conversational, Interac-
+tive Evaluation Benchmark for LLM Tool Use Capabilities.
+arXiv:2408.04682.
+Luo,J.;Zhang,W.;Yuan,Y.;Zhao,Y.;Yang,J.;Gu,Y.;Wu,
+B.;Chen,B.;Qiao,Z.;Long,Q.;Tu,R.;Luo,X.;Ju,W.;Xiao,
+Z.; Wang, Y.; Xiao, M.; Liu, C.; Yuan, J.; Zhang, S.; Jin, Y.;
+Zhang,F.;Wu,X.;Zhao,H.;Tao,D.;Yu,P.S.;andZhang,M.
+2025. Large Language Model Agent: A Survey on Method-
+ology, Applications and Challenges. arXiv:2503.21460.
+Ma, Z.; Zhang, B.; Zhang, J.; Yu, J.; Zhang, X.; Zhang, X.;
+Luo, S.; Wang, X.; and Tang, J. 2024. SpreadsheetBench:
+TowardsChallengingRealWorldSpreadsheetManipulation.
+arXiv:2406.14991.
+Ni, J.; Liu, Y.; Liu, X.; Sun, Y.; Zhou, M.; Cheng, P.; Wang,
+D.;Zhao,E.;Jiang,X.;andJiang,G.2026. Trace2Skill:Dis-
+till Trajectory-Local Lessons into Transferable Agent Skills.
+arXiv:2603.25158.
+Pasupat, P.; and Liang, P. 2015. Compositional Semantic
+Parsing on Semi-Structured Tables. arXiv:1508.00305.
+Tanabe,H.;Fukuda,E.H.;andYamashita,N.2019.Proximal
+gradient methods for multiobjective optimization and their
+applications.ComputationalOptimizationandApplications,
+72(2): 339–361.
+Team, K.; Bai, T.; Bai, Y.; Bao, Y.; Cai, S. H.; Cao, Y.;
+Charles,Y.;Che,H.S.;Chen,C.;Chen,G.;Chen,H.;Chen,
+J.; Chen, J.; Chen, J.; Chen, J.; Chen, K.; Chen, L.; Chen,
+R.; Chen, X.; Chen, Y.; Chen, Y.; Chen, Y.; Chen, Y.; Chen,
+Y.;Chen,Y.;Chen,Y.;Chen,Y.;Chen,Z.;Chen,Z.;Cheng,
+D.; Chu, M.; Cui, J.; Deng, J.; Diao, M.; Ding, H.; Dong,
+M.; Dong, M.; Dong, Y.; Dong, Y.; Du, A.; Du, C.; Du, D.;
+Du, L.; Du, Y.; Fan, Y.; Fang, S.; Feng, Q.; Feng, Y.; Fu, G.;
+Fu, K.; Gao, H.; Gao, T.; Ge, Y.; Geng, S.; Gong, C.; Gong,
+X.; Gongque, Z.; Gu, Q.; Gu, X.; Gu, Y.; Guan, L.; Guo, Y.;
+Hao, X.; He, W.; He, W.; He, Y.; Hong, C.; Hu, H.; Hu, J.;
+Hu, Y.; Hu, Z.; Huang, K.; Huang, R.; Huang, W.; Huang,
+Z.; Jiang, T.; Jiang, Z.; Jin, X.; Jing, Y.; Lai, G.; Li, A.; Li,
+C.; Li, C.; Li, F.; Li, G.; Li, G.; Li, H.; Li, H.; Li, J.; Li, J.;
+Li, J.; Li, L.; Li, M.; Li, W.; Li, W.; Li, X.; Li, X.; Li, Y.; Li,
+Y.;Li,Y.;Li,Y.;Li,Z.;Li,Z.;Liao,W.;Lin,J.;Lin,X.;Lin,
+Z.;Lin,Z.;Liu,C.;Liu,C.;Liu,H.;Liu,L.;Liu,S.;Liu,S.;
+Liu,S.;Liu,T.;Liu,T.;Liu,W.;Liu,X.;Liu,Y.;Liu,Y.;Liu,
+Y.; Liu, Y.; Liu, Y.; Liu, Z.; Liu, Z.; Lu, E.; Lu, H.; Lu, Z.;
+Luo, J.; Luo, T.; Luo, Y.; Ma, L.; Ma, Y.; Mao, S.; Mei, Y.;
+Men,X.;Meng,F.;Meng,Z.;Miao,Y.;Ni,M.;Ouyang,K.;
+Pan, S.; Pang, B.; Qian, Y.; Qin, R.; Qin, Z.; Qiu, J.; Qu, B.;
+Shang, Z.; Shao, Y.; Shen, T.; Shen, Z.; Shi, J.; Shi, L.; Shi,
+S.; Song, F.; Song, P.; Song, T.; Song, X.; Su, H.; Su, J.; Su,
+Z.; Sui, L.; Sun, J.; Sun, J.; Sun, T.; Sung, F.; Tai, Y.; Tang,
+C.; Tang, H.; Tang, X.; Tang, Z.; Tao, J.; Teng, S.; Tian, C.;
+Tian,P.;Wang,A.;Wang,B.;Wang,C.;Wang,C.;Wang,C.;
+Wang, D.; Wang, D.; Wang, D.; Wang, F.; Wang, H.; Wang,
+H.; Wang, H.; Wang, H.; Wang, H.; Wang, J.; Wang, J.;
+Wang, J.; Wang, K.; Wang, L.; Wang, Q.; Wang, S.; Wang,
+S.; Wang, S.; Wang, W.; Wang, X.; Wang, X.; Wang, Y.;
+Wang, Y.; Wang, Y.; Wang, Y.; Wang, Y.; Wang, Y.; Wang,
+Z.;Wang,Z.;Wang,Z.;Wang,Z.;Wang,Z.;Wang,Z.;Wei,
+C.;Wei,M.;Wen,C.;Wen,Z.;Wu,C.;Wu,H.;Wu,J.;Wu,
+R.; Wu, W.; Wu, Y.; Wu, Y.; Wu, Y.; Wu, Z.; Xiao, C.; Xie,
+J.; Xie, X.; Xie, Y.; Xin, Y.; Xing, B.; Xu, B.; Xu, J.; Xu,
+J.; Xu, J.; Xu, L. H.; Xu, L.; Xu, S.; Xu, W.; Xu, X.; Xu,
+X.; Xu, Y.; Xu, Y.; Xu, Y.; Xu, Z.; Xu, Z.; Yan, J.; Yan, Y.;
+Yang, G.; Yang, H.; Yang, J.; Yang, K.; Yang, N.; Yang, R.;
+Yang, X.; Yang, X.; Yang, Y.; Yang, Y.; Yang, Y.; Yang, Z.;
+Yang, Z.; Yang, Z.; Yao, H.; Ye, D.; Ye, W.; Ye, Z.; Yin, B.;
+Yu, C.; Yu, L.; Yu, T.; Yu, T.; Yuan, E.; Yuan, M.; Yuan, X.;
+Yue,Y.;Zeng,W.;Zha,D.;Zhan,H.;Zhang,D.;Zhang,H.;
+Zhang,J.;Zhang,P.;Zhang,Q.;Zhang,R.;Zhang,X.;Zhang,
+Y.; Zhang, Y.; Zhang, Y.; Zhang, Y.; Zhang, Y.; Zhang, Y.;
+Zhang,Y.;Zhang,Y.;Zhang,Y.;Zhang,Y.;Zhang,Z.;Zhao,
+C.; Zhao, F.; Zhao, J.; Zhao, S.; Zhao, X.; Zhao, Y.; Zhao,
+Z.; Zheng, H.; Zheng, R.; Zheng, S.; Zheng, T.; Zhong, J.;
+Zhong, L.; Zhong, W.; Zhou, M.; Zhou, R.; Zhou, X.; Zhou,
+Z.; Zhu, J.; Zhu, L.; Zhu, X.; Zhu, Y.; Zhu, Z.; Zhuang, J.;
+Zhuang, W.; Zou, Y.; and Zu, X. 2026a. Kimi K2.5: Visual
+Agentic Intelligence. arXiv:2602.02276.
+Team, T. D.; Li, B.; Zhang, B.; Zhang, D.; Huang, F.; Li,
+G.; Chen, G.; Yin, H.; Wu, J.; Zhou, J.; Li, K.; Su, L.; Ou,
+L.; Zhang, L.; Xie, P.; Ye, R.; Yin, W.; Yu, X.; Wang, X.;
+Wu, X.; Chen, X.; Zhao, Y.; Zhang, Z.; Tao, Z.; Zhang, Z.;
+Qiao, Z.; Wang, C.; Yu, D.; Fu, G.; Shen, H.; Yang, J.; Lin,
+J.; Zhang, J.; Zeng, K.; Yang, L.; Yin, H.; Song, M.; Yan,
+M.; Liao, M.; Xia, P.; Xiao, Q.; Min, R.; Ding, R.; Fang, R.;
+Chen, S.; Huang, S.; Wang, S.; Cai, S.; Shen, W.; Wang, X.;
+Guan, X.; Geng, X.; Shi, Y.; Wu, Y.; Chen, Z.; Li, Z.; and
+Jiang, Y. 2026b. Tongyi DeepResearch Technical Report.
+arXiv:2510.24701.
+Wang, H.; Lan, Y.; Cao, B.; Lin, L.; and Chen, J. 2026a.
+SkillGrad: Optimizing Agent Skills Like Gradient Descent.
+Wang, H.; Lan, Y.; Cao, B.; Lin, L.; and Chen, J. 2026b.
+SkillGrad: Optimizing Agent Skills Like Gradient Descent.
+arXiv:2605.27760.
+Xia,P.;Chen,J.;Wang,H.;Liu,J.;Zeng,K.;Wang,Y.;Han,
+S.; Zhou, Y.; Zhao, X.; Chen, H.; Zheng, Z.; Xie, C.; and
+Yao,H.2026. SkillRL:EvolvingAgentsviaRecursiveSkill-
+Augmented Reinforcement Learning. arXiv:2602.08234.
+Xu, R.; and Yan, Y. 2026a. Agent skills for large language
+models: Architecture, acquisition, security, and the path for-
+ward.
+Xu,R.;andYan,Y.2026b. AgentSkillsforLargeLanguage
+Models: Architecture, Acquisition, Security, and the Path
+Forward. arXiv:2602.12430.
+Yang,C.;Wu,X.;Liu,H.;Lin,X.;Xu,C.;Jiang,X.;Sun,Y.;
+Zhang, W.; Shi, Z.; Xu, Y.; et al. 2026a. A Survey of Agent
+Skills: Toward Procedural Infrastructure for LLM Agents.
+Yang, Y.; Gong, Z.; Huang, W.; Yang, Q.; Zhou, Z.; Huang,
+Z.; Li, Y.; Gao, X.; Dai, Q.; Liu, B.; Qiu, K.; Yang, Y.;
+Chen,D.;Yang,X.;andLuo,C.2026b. SkillOpt:Executive
+Strategy for Self-Evolving Agent Skills. arXiv:2605.23904.
+Yao, S.; Zhao, J.; Yu, D.; Du, N.; Shafran, I.; Narasimhan,
+K.; and Cao, Y. 2023. ReAct: Synergizing Reasoning and
+ActinginLanguageModels. InInternationalConferenceon
+Learning Representations (ICLR).
+Yu, J.; Zhu, J.; Lin, B.; Cui, Q.; Ding, Z.; and Li, X. 2026.
+Skill is Not One-Size-Fits-All: Model-Aware Skill Align-
+ment for LLM Agents. arXiv:2605.30723.
+Yuan, S.; Song, K.; Chen, J.; Tan, X.; Shen, Y.; Kan, R.; Li,
+D.;andYang,D.2024.EASYTOOL:EnhancingLLM-based
+Agents with Concise Tool Instruction. arXiv:2401.06201.
+Yuksekgonul, M.; Bianchi, F.; Boen, J.; Liu, S.; Huang, Z.;
+Guestrin, C.; and Zou, J. 2024. TextGrad: Automatic "Dif-
+ferentiation" via Text. arXiv:2406.07496.
+Zhang, H.; Fan, S.; Zou, H. P.; Chen, Y.; Wang, Z.; Zhou,
+J.; Li, C.; Huang, W.-C.; Yao, Y.; Zheng, K.; Liu, X.; Li,
+X.; and Yu, P. S. 2026a. CoEvoSkills: Self-Evolving Agent
+Skills via Co-Evolutionary Verification. arXiv:2604.01687.
+Zhang, Q.; Feng, Z.; Shi, X.; Hu, X.; Liu, C.; Xie, P.; Wang,
+X.; Ye, J.; Hooi, B.; Wang, H.; and Zhao, J. 2026b. Skill-
+Composer:LearningtoEvolveAgentSkillsforSpecification
+and Generalization. arXiv:2606.06079.
+Zhou, C.; Chai, H.; Chen, W.; Guo, Z.; Shan, R.; Song, Y.;
+Xu, T.; Yang, Y.; Yu, A.; Zhang, W.; Zheng, C.; Zhu, J.;
+Zheng, Z.; Zhang, Z.; Lou, X.; Zhang, C.; Fu, Z.; Wang, J.;
+Liu, W.; Lin, J.; and Zhang, W. 2026a. Externalization in
+LLMAgents:AUnifiedReviewofMemory,Skills,Protocols
+and Harness Engineering. arXiv:2604.08224.
+Zhou, Y.; Cao, C.; Yang, J.; Wu, L.; He, C.; Han, S.; and
+Guo,Y.2026b. Lras:Advancedlegalreasoningwithagentic
+search.arXiv preprint arXiv:2601.07296.
+Appendix
+A Case Study for Motivation
+A.1 Case Study: Removing Negative-Utility Redundancy
+Our method addresses two distinct failure modes in iterative skill evolution. The forward stage must determine whether a
+proposed update actually improves behavior, while the backward stage must remove redundant or harmful content that remains
+after repeated accumulation. These two problems require different forms of feedback.
+A.1.0.0.1 Forward Motivation: Outcome-Blind Skill UpdatesStandard forward skill evolution follows an execute–
+diagnose–patch procedure but does not re-execute the patched skill before committing the update. Consequently, a plausible
+diagnosis may be converted into a permanent rule without evidence that it improves task outcomes. We observe this failure
+in a Qwen3.6-27B run involving sequential scans with a dynamically changing reference value. Open-loop evolution converts
+the failure into the meta-instruction “trace a concrete example before coding” and includes a task-specific template with the
+hard-codedconditionvalue >= reference * 1.10.Leave-outauditingassignsnegativeestimatedutilitytothissection:
+ucell
+open =−0.0337, u hard
+open =−0.0556.(12)
+Closed-loopevolutionencountersthesameunderlyingfailurepatternbutre-executeseachproposedupdateonthecurrentbatch.
+Regressive candidates are rolled back, and their observed hard/cell changes are returned to the next diagnostic attempt. The
+resulting skill instead learns an actionable decision rule: after each qualifying event, update the reference to the current value
+before continuing the scan. This formulation has positive estimated utility:
+ucell
+closed = +0.0495, u hard
+closed = +0.0474.(13)
+The contrast motivates an outcome-gated forward process. Semantic plausibility alone cannot distinguish a reusable rule from
+an over-specific template; same-batch re-execution provides a measurable signal for accepting, rejecting, or revising an update.
+A.1.0.0.2 BackwardMotivation:ResidualRedundancyandNegativeUtilityOutcomegatingdoesnoteliminatetheneed
+forpost-hocrefinement.Itevaluatesanupdateonlyonthebatchthatproduceditandthereforecannotreliablydetectcontentthat
+is harmless locally but redundant or harmful across a broader validation distribution. Indeed, the closed-loop skill in the same
+runstillcontainstwonegative-utilityandfourteenzero-utilityunits.Notably,themainSequentialScanwithDynamicReference
+sectionisuseful,whileitssupportingreferencefileisassignednegativeutility.Usefulandharmfulcontentmaythereforecoexist
+withinthesameknowledgegroup.Forwardevolutionalsoaccumulatesrepeatedformulationsacrossiterations.Intheopen-loop
+skill,theinstruction“traceaconcreteexamplebeforecoding”appearsinfoursections,withcellutilitiesrangingfrom+0.1038
+to−0.0337.Thelowest-utilityoccurrencecontainsthehard-codedtask-specifictemplatedescribedabove.Afrozenutilityaudit
+identifies five candidate units in this run, but only one candidate survives re-evaluation against the active skill. The accepted
+editconsolidatesthetransferablestate-tracingprincipleintoapositive-utilityinterpretationsectionwhileremovingtherepeated
+template. It reduces the complete skill from 29,129 to 28,219 characters, corresponding to
+ρ= 29,129−28,219
+29,129 = 3.12%.(14)
+The edit preserves validation hard accuracy at94.74%and increases validation cell accuracy from96.05%to99.73%. This
+motivates a validation-gated backward Prox stage: the frozen audit identifies and orders potentially redundant units, while
+sequential validation determines whether each realized edit can be safely committed.
+A.1.0.0.3 Complementary RolesThe two stages address complementary timescales. Closed-loop forward evolution pro-
+videsonline interception: it measures the immediate effect of a proposed update and blocks same-batch regressions. Backward
+Prox providesretrospective refinement: it reassesses the accumulated skill on a frozen validation set and removes redundancy
+that was not detectable from the originating batch. Their respective roles can be summarized as
+Closed-loop forward=online update verification,(15)
+Backward Prox=post-training utility refinement.(16)
+Closed-loopfeedbackimproveshowknowledgeisintroduced,whereasProxcontrolswhatremainsafteraccumulation.Fullcase
+studies, candidate-level validation decisions, and OJ results are provided in Appendix D.2 and Appendix D.1.
+B Additional Method Details
+B.1 Algorithmic Properties and Complexity
+Thecandidatesetisfinite,andeachcandidateisprocessedatmostonce,sothemainloopterminates.Everyacceptedtrialmust
+bestrictlysmallerthantheactiveskill,whilearejectedtrialleavestheactivestateunchanged.Eachacceptededitalsopreserves
+recorded validation hard accuracy up toδh = 0and may reduce recorded cell accuracy by at mostδc.
+If the method acceptsRshrinkage edits, the recorded validation metrics satisfy
+G(X ⋆)≤G(X f ),
+G(X ⋆)< G(Xf )ifR >0,
+HV (X ⋆)≥H V (Xf ),
+CV (X ⋆)≥C V (Xf )−Rδ c.
+(17)
+The complete audit requires one baseline evaluation andnleave-one-out evaluations. Prox makes at mostMShrinker calls
+andMtrial evaluations. If each evaluation executes all|V|validation tasks, the number of task executions is
+O((n+M)|V|), M≤n.(18)
+Equation (17) concerns the recorded validation scores. Accounting for stochastic evaluation and adaptive reuse of the same
+validation split requires a confidence bound that holds jointly over all queries; such a statistical analysis can be placed in the
+appendix.
+B.2 Empirical Compression–Performance Trade-off
+The implementation has no explicitλ, so we do not interpret its experimental curve as an exactλ-regularization path. Let
+θ= (τ, δh, δc, ρ)denote a shrinkage configuration. Each configuration produces a compression–held-out-performance point
+Comp(X ⋆
+θ ) = 1− G(X ⋆
+θ )
+G(Xf ) ,
+p(θ) = (Comp(X ⋆
+θ ), Atest(X ⋆
+θ )),
+(19)
+whereA test is the final performance on a fixed held-out test or OJ set. Aggregating points across skill seeds and repeated
+inference runs, followed by non-dominance filtering, yields an empirical Pareto approximation.
+Toisolatehowthecandidaterangeaffectscompressionandperformance,weperformaτ-sweepusingthesameforwardskill
+and frozen utility audit:
+τ∈ {−0.05,−0.001,0.025,0.10}.(20)
+Asτincreases, the frozen-utility candidate set expands monotonically. Negative thresholds include only clearly negative-
+utility units, whereas positive thresholds also admit zero-utility and weakly positive-utility units. Each threshold is evaluated
+independentlyonthesameheld-outOJset,andtheuncompressedX f servesasthezero-compressionanchor.Numericalresults,
+cross-seed variability, dominated points, and knee points are analyzed in the experiments.
+The thresholdτis not identical to the regularization weightλ. Letc i >0denote the complexity reduction produced by
+candidate operationi. An ideal single-candidate decision under explicit regularization would satisfy
+ui ≤λc i.(21)
+Ifcandidatecomplexityreductionsareapproximatelyequaltoarepresentativevalue¯c,theraw-utilitythresholdu i ≤τadmits
+the approximation
+λeff ≈ τ
+¯c.(22)
+In the general case, the raw-τrule corresponds to candidate-specific implicit weights
+λi = τ
+ci
+.(23)
+Thus,τisamonotoneproxyforregularizationpressureratherthanasharedLagrangemultiplier.Theregimeτ <0performs
+safety-margined negative-utility screening, whileτ >0approximately permits performance–complexity exchange.
+To isolate the effect ofτon candidate coverage, the current diagnostic sweep sets both hard and cell tolerances to1.0and
+does not impose the10%compression cap. It therefore measures a threshold-induced compression–accuracy curve rather than
+the deployment behavior of full Prox or an explicitλ-regularization path.
+C Experimental Details
+ThissectionrecordsthecompletesetupfortheexperimentswithQwen3.5-4B,Qwen3.5-27B,andQwen3.6-27B,includingthe
+ten-run Qwen3.6-27B ablation and the two case studies below. Unless otherwise stated, conditions paired within a backbone
+use the same data split, training-task selection rule, initial skill, and evaluation protocol.
+C.1 Compared Conditions and Backbones
+The four evolved-skill conditions form a two-by-two component design, as summarized in Table 5. This design isolates the
+effects of closing the forward loop and applying backward Prox refinement.
+Table 5: Component design of the evolved-skill conditions.
+Forward evolution Without Prox With Prox
+Open-loop G1 G2D
+Closed-loop G3f G3D (SkillProx)
+Weadditionallyevaluatetwoexternalbaselines:noskill,inwhichtheexecutorreceivesonlyaminimalskillstub,andhuman
+skill, in which it receives a manually authored spreadsheet skill. The three backbones and their training-seed coverage are
+summarized in Table 6.
+Table 6: Backbone models and training-seed coverage in the recorded experiment artifacts.
+Backbone Training seeds Number of seeds
+Qwen3.5-4B 0–2 3
+Qwen3.5-27B 0–2 3
+Qwen3.6-27B 0–2 3
+Table 7: Core training, refinement, and evaluation parameters.
+Stage Parameter Setting
+Generation Temperature / thinking 0.7 / disabled
+Forward evolution Training tasks / batch size Up to 40 / 4
+Forward evolution Planned updates / early stopping 10 / four consecutive all-correct batches
+Agent runtime Maximum turns Executor 30; Diagnoser 15; Momentum 15; Patcher 20;
+Shrinker 20
+Closed-loop Attempts / hard tolerance / prior size 3 / 0 / 6 records
+Closed-loop Acceptance gate Non-decreasing hard-correct count and mean cell accuracy
+Utility audit Validation tasks / test cases 20 / 1
+Utility auditϵ cell 0.025 for most runs
+Prox Candidate thresholdτ=−0.001
+Prox Hard tolerance / cell toleranceδ h = 0/δ c = 0.02
+Prox Compression capρ= 0.10(soft cap)
+OJ evaluation Tasks/testcases/recalculationtimeout 100 / 3 / 180 seconds
+OOD evaluation Examples / test cases 200 per benchmark / 1
+C.2 Execution and Grading Infrastructure
+Model requests are dispatched to vLLM endpoints with round-robin selection and endpoint failover. Spreadsheet outputs are
+recalculatedwithLibreOfficebeforegrading,andconcurrentrecalculationisserializedthroughasharedofficelock.Evaluation
+tasksruninisolatedworkingdirectoriessothatmodel-generatedhelperfilesdonotmodifytherepositoryorothertaskinstances.
+Model inference is served on NVIDIA H800 GPUs with 80GB of memory per GPU. More details are provided in Table 7.
+D Additional Results and Analysis
+This appendix presents two complementary case studies on Qwen3.6-27B. The first examines closed-loop forward evolution as
+onlineinterceptionofregressiveupdates.ThesecondexaminesbackwardProxasretrospectiveremovalofresidualredundancy.
+Both studies reuse the same training seed in order to connect the two mechanisms; they should therefore not be treated as
+independent statistical evidence.
+Besides, we provide more details on the analysis of model size and skill length.
+D.1 Case Study: Why Closed-Loop Forward Evolution Helps
+D.1.0.0.1 Ten-Seed Aggregate ComparisonWe compare open-loop G1 and closed-loop G3f across ten Qwen3.6-27B
+training seeds. For each seed, the two conditions use exactly the same training IDs and batch partition. Evaluation uses the
+canonical OJ protocol: 100 fixed test tasks, three test cases per task, and hard success only when all three cases are cell-perfect.
+Table 8: Canonical same-batch OJ results across ten Qwen3.6-27B training seeds. G1 and G3f use identical training IDs and
+batch partitions. Seed 8, which attains the largest gain in both metrics, is highlighted.
+Seed G1 hard G3f hard∆hard G1 cell G3f cell∆cell
+0 47 51+472.33 75.60+3.27
+1 50 51+175.49 75.48−0.01
+2 49 49078.40 74.91−3.49
+3 52 53+177.36 80.26+2.90
+4 50 52+274.56 78.65+4.09
+5 53 53077.47 77.55+0.08
+6 51 52+177.96 78.22+0.26
+7 51 49−278.00 77.85−0.15
+8 46 51 +5 74.71 79.69 +4.98
+9 54 53−178.68 79.88+1.20
+Across the ten seeds, closed-loop evolution records six wins, two ties, and two losses in hard accuracy, with a mean
+hard improvement of 1.10 points (and a mean cell improvement of 1.31 points; Table 8). The cross-seed standard deviation
+decreases from 2.50 to 1.51, and the minimum increases from 46 to 49. The largest gain occurs at seed 8 (46%→51%hard;
+74.71%→79.69%cell). However, seed 8 is also the weakest open-loop run, and its closed-loop result (51%) is close to the
+G3fmeanratherthananunusuallystrongclosed-loopoutcome.Themoredefensibleinterpretationisthereforethatclosed-loop
+evolution stabilizes the lower tail rather than uniformly raising the upper bound.
+As a descriptive summary, the correlation between open-loop hard accuracy and the hard improvement is
+corr (HG1, HG3f −H G1) =−0.800.(24)
+This quantity is informative but should not be over-interpreted: because the baseline appears in both arguments, the negative
+sign is partly a consequence of mathematical coupling and regression to the mean.
+No measurement after an open-loop edit.The released run artifacts show that an open-loop iteration followsExecute→
+Classify→Diagnose→Momentum→Patch. It does not execute the updated skill again, and all ten open-loop patches for
+seed 8 are committed without an acceptance test. Closed-loop evolution instead re-executes the same four-task batch after each
+patch and applies
+accept =1
+
+Hpost ≥H pre −τ h ∧S post ≥S pre −10 −9
+, τ h = 0,(25)
+whereHis the number of completely correct tasks in the batch andSis mean cell accuracy. A failed edit is rolled back to the
+iteration-start snapshot and retried from the same state, for at most three attempts.
+No effectiveness signal in later open-loop diagnosis.Open-loop diagnosis receives neither a rejection context nor a prior
+record of whether earlier edits changed accuracy. Its momentum record states what the patcher changed, but the released open-
+loop artifacts contain no post-edit outcome that a subsequent diagnosis could use. Closed-loop evolution adds two channels:
+•Within-iterationrejectioncontext(F5):afterarejectedattempt,thenextdiagnosisreceivestheobservedhard-scorechange
+and the failed edit direction, and is instructed not to repeat it.
+•Cross-iterationdiagnosisprior(F6):themostrecentsixaccept/rejectrecords,includinghard-scorechangesanddiagnosis
+labels, are injected into later attempts.
+D.1.0.0.2 Gate Trace for Seed 8The seed 8 closed-loop run contains ten iterations and 22 attempted edits. Eight attempts
+reduce same-batch hard correctness and are blocked by the gate (Table 9). In iteration 2, all three attempts fail, so the entire
+iteration is reverted. By contrast, the ten patches generated during open-loop evolution are all committed without post-update
+verification.
+Table9:Closed-loopattempttraceforseed8.Eachbatchcontainsfourtasks.Anattemptwhosepost-updatehard-correctcount
+falls below the pre-update count is rejected.
+Iter. Pre Attempt post counts Result
+1 2 1, 2, 2 Accepted; attempt 1 regresses by 1 and is rejected.
+2 3 2, 2, 1 All three attempts rejected; entire iteration reverted.
+3 2 3 Accepted; strict gain and early termination.
+4 2 2, 2, 2 Accepted; tie resolved using the best soft score.
+5 1 1, 0, 1 Accepted; attempt 2 regresses by 1 and is rejected.
+6 0 0, 1 Accepted; attempt 2 yields a strict gain.
+7 3 3, 2, 2 Accepted; attempts 2 and 3 regress by 1 and are rejected.
+8 3 4 Accepted; strict gain.
+9 3 2, 4 Attempt 1 rejected; attempt 2 yields a strict gain.
+10 3 4 Accepted; strict gain.
+Across 10 iterations, the closed-loop procedure makes 22 attempts, blocks 8 hard regressions, and completely reverts one iteration.
+This trace provides direct evidence that the patch–re-execute–gate mechanism is active: regressive updates are intercepted
+online rather than permanently written into the skill.
+D.1.0.0.3 Utility-Sign Flip on the Same Failure PatternBoth runs encounter a failure pattern involving sequential scans
+whose reference value changes after each qualifying event. Both create a section for this pattern, but the resulting knowledge
+differs substantially.
+Table 10: The same failure pattern produces qualitatively different knowledge in the matched open- and closed-loop runs.
+Open-loop G1 Closed-loop G3f
+Trace Stateful Algorithms Before Coding Sequential Scan with Dynamic Reference
+Requires the agent to manually trace at least one example step by
+step before coding.
+States the operational semantics directly: maintain the reference
+as a variable that is updated during iteration.
+Encodes a task-specific 19-line template with the threshold1.10
+hard-coded:
+count = 0
+reference = data[0]
+for i, val in enumerate(data[1:], start=1):
+if val >= reference * 1.10:
+count += 1
+if i + 1 < len(data):
+reference = data[i + 1]
+Uses a short parameterized pattern:
+reference = first_value
+count = 0
+for value in remaining_values:
+if value >= reference * threshold:
+count += 1
+reference = value
+Its final rule is a difficult-to-falsify meta-instruction: if a small
+example cannot be manually verified, the logic is not ready to
+code.
+Its final decision rule is executable: update the reference to the
+current value after every qualifying event; do not compare all
+values against one static baseline.
+Negative:u cell =−0.0337,u hard =−0.0556 Positive and protected:ucell = +0.0495,u hard = +0.0474
+As shown in Table 10, the cell utility changes from−0.0337to+0.0495, a difference of0.0832.
+The difference is actionability rather than length. Advice such as “trace carefully” need not produce a measurable behavioral
+changeonsame-batchre-execution.Bycontrast,updatingthereferenceaftereacheventchangesthegeneratedprogramandcan
+therefore be tested by the gate. A rejected edit also supplies the next attempt with evidence that its direction was ineffective.
+In this sense, the gate selects forfalsifiable edits: their behavioral consequences can be observed immediately, accepted when
+useful, and rejected when regressive. This mechanism is consistent with the four repeated variants of the “trace an example”
+meta-instruction found in the open-loop skill (Section D.2.0.0.1).
+D.1.0.0.4 WhatClosed-LoopEvolutionDoesNotSolveClosed-loopevolutionisnotacompletenegative-utilityfilter.The
+leave-one-out audits are summarized in Table 11.
+Table 11: Utility composition and main-file length for the matched seed 8 skills. Lengths use the verified finalSKILL.md
+artifacts.
+Open-loop G1 Closed-loop G3f
+Knowledge units 16 22
+Positive 4 (25.0%) 6 (27.3%)
+Zero 10 14
+Negative 2 (12.5%) 2 (9.1%)
+SKILL.mdcharacters 21,191 23,748
+Two observations matter. First, the closed-loop skill is longer, not shorter (+2,557 characters, +12.1%); the mechanism
+performsqualitycontrolratherthancompression.Second,itstillcontainstwoestimated-negativeunits.Oneisthereferencefile
+sequential_scan.md(u cell =−0.0395)attachedtothepositive-utilitymainsectionanalyzedabove.Thebatch-levelgate
+can therefore miss content that is harmless on its originating training batch but harmful under broader validation. Backward
+Prox remains complementary (Section D.2): on this seed, G1 scores 46 OJ hard, G3f scores 51, and G3f followed by Prox-D
+scores 54 under the corresponding canonical evaluations.
+D.2 Case Study: Consolidating Negative-Utility Redundancy
+D.2.0.0.1 Negative-Utility RedundancyThe open-loop skill for seed 8 expresses the meta-instruction “trace a concrete
+examplebeforecoding”infourseparatesections.Leave-one-outauditingonthe20-taskvalidationsetwithϵ cell = 0.025assigns
+these sections substantially different cell utilities (Table 12).
+Table12: Fouroccurrences ofthe samemeta-instructionin theevolved open-loopskill.Utilities areestimated byleave-one-out
+evaluation on 20 validation tasks.
+Sectionu cell
+Ground Task Interpretation+0.1038
+Interpreting Aggregation Language+0.0119
+Verify Ambiguous Arithmetic Direction−0.0212
+Trace Stateful Algorithms Before Coding−0.0337
+The lowest-utility section,Trace Stateful Algorithms Before Coding, is the same negative-utility formulation identified in
+Section D.1.0.0.3 (Table 10). It does more than repeat the general advice: it presents a training-task-specific implementation
+as a reusable template, including the hard-coded conditionvalue >= reference* 1.10. Thus the section is estimated
+to be harmful on the validation audit, rather than merely dispensable. Because the audit uses only 20 validation tasks, we treat
+these scores as candidate evidence rather than as definitive causal effects.
+D.2.0.0.2 Frozen Audit versus Dynamic Validation GateThe audit evaluates 16 knowledge units and classifies two as
+negative,tenaszero-utility,andfouraspositive.Proxconsidersunitswithu cell <−0.001asshrinkagecandidates.Eachrealized
+removalisthenre-evaluatedagainstthecurrentactiveskillunderδ h = 0,δ c = 0.02,andasoftcompressioncapρ= 0.10.Any
+trial that violates the validation gate is rolled back.
+Table 13: Candidate-level audit scores and realized validation decisions. A negative audit score determines eligibility but does
+not by itself authorize deletion.
+Candidateu cell uhard Decision
+Trace Stateful Algorithms−0.0337−0.0556Accepted
+Error Handling in Aggregation−0.0337−0.0556Rolled back
+Verify Ambiguous Arithmetic−0.0212−0.0056Rolled back
+Reading Data with pandas−0.0067−0.0030Rolled back
+Inspect Before Operating−0.0017−0.0030Rolled back
+Hard / perfect tasks Mean cell accuracy
+0
+20
+40
+60
+80
+100
+46
+74.71
+54
+77.97
+Accuracy (%)
+Before (G1) After Prox
+Figure3:OJaccuracybeforeandaftervalidation-gatedProxconsolidation.Evaluationuses100fixedtaskswiththreetestcases
+per task; hard success requires all three cases to be cell-perfect. Values are not smoothed.
+Five candidates are attempted, but only one edit is accepted (Table 13). The four rejected edits are important: although their
+frozenauditscoresarenegativeornear-zero,deletingthemfromthecurrentactiveskillreducesvalidationhardorcellaccuracy.
+For example, removingVerify Ambiguous Arithmetic Directionlowers hard accuracy by 5.85 points. The frozen audit therefore
+identifies and orders candidates; an independent validation gate remains necessary before an edit is committed.
+D.2.0.0.3 StructuralConsolidationandOJOutcomeTheacceptededitisaconsolidationratherthanapuredeletion.Prox
+removesthetask-specifictemplatebutretainsthetransferableprincipleasaconcisesentenceinthepositive-utilityGroundTask
+Interpretation in Data Patternssection. All high-positive-utility units remain unchanged.
+Table14:StructuralandOJchangesproducedbytheacceptedProxedit.OJhardaccuracyusesthefixed100-taskdenominator.
+Measure Before After Change
+Complete skill characters 29,129 28,219−3.12%
+SKILL.mdcharacters 21,191 20,281−4.29%
+Second-level sections 14 13−1
+Validation hard94.74% 94.74% 0
+Validation cell96.05% 99.73% +3.68
+OJ hard46% 54% +8
+OJ mean cell74.71% 77.97% +3.26
+Fail-to-pass / pass-to-fail8/0
+Table 14 summarizes the outcome. The complete skill shrinks from 29,129 to 28,219 characters,
+D.3 Discussion
+Validationhardaccuracyremainsat94.74%,whilevalidationcellaccuracyincreasesfrom96.05%to99.73%.Ontheindepen-
+dent OJ evaluation, hard accuracy increases from46%to54%and mean cell accuracy from74.71%to77.97%(Figure 3). The
+task-level comparison contains eight fail-to-pass transitions and no pass-to-fail transition; one of the eight transitions is caused
+byaninferenceAPIerrorinthepre-Proxconditionandshouldnotbeinterpretedasaskilleffect.Conservativelyexcludingthis
+task leaves seven graded fail-to-pass improvements (Table 15).
+Table 15: Task-level fail-to-pass transitions after Prox consolidation. No task exhibits a pass-to-fail transition.
+Task Type Cell accuracy Behavioral difference
+469-9 Sheet0.100→1.000Correctly determines the debit/credit sign direction.
+230-16 Sheet0.222→1.000Scans upward to find the true final row instead of trustingmax_row.
+38537 Cell0.441→1.000Identifies the true data rangeB3:B36.
+35739 Cell0.475→1.000Correctly handles a cutoff time crossing midnight.
+38969 Cell0.526→1.000Corrects the nestedIFlogic and column scan range.
+51090 Cell0.818→1.000Completes multi-sheet filtered aggregation (18/22→22/22).
+16511 Cell0.889→1.000Assigns increasing track numbers within each album.
+The graded improvements concentrate on data-range identification and task semantics, which are precisely the roles of
+the retained inspection and interpretation sections. This correspondence is descriptive: because the two OJ conditions are
+independent generations, it does not identify the accepted edit as the unique cause of each transition. These OJ results should
+beinterpretedasanassociatedimprovementunderanindependentgenerationattemperature0.7,ratherthanasastrictlycausal
+effect of the single accepted edit. The stronger causal claim supported by this case is local: validation-gated Prox identifies a
+negative-utility formulation, removes its task-specific template, and consolidates the transferable principle without degrading
+the validation gate.
+The two case studies examine complementary treatments of related accumulation failures on the same seed. Closed-loop
+forward evolution provides online interception: it measures the immediate batch-level effect of a proposed update and blocks
+hardregressions.BackwardProxprovidesretrospectiverefinement:itreassessestheaccumulatedskillonafrozenvalidationset
+and consolidates redundant or estimated-negative content that was not detectable from the originating batch. Applying Prox-D
+to the closed-loop seed 8 skill yields an OJ hard accuracy of54%, consistent with the view that the two stages compose.
+These findings should be interpreted cautiously. First, both case studies reuse seed 8, which was selected because it exhibits
+the largest closed-loop gain and is also the weakest open-loop run; its+5gain must not be extrapolated as an average treatment
+effect. Second, the two skill trajectories diverge early, so the utility-sign flip is observational rather than a controlled A/B edit.
+Third, the OJ conditions are independent generations at temperature0.7, not paired rerolls with fixed sampling randomness.
+Fourth, the utility audit uses only 20 validation tasks. Finally, the released seed 8 closed-loop results do not recordpre_soft
+or attempt-level rejection labels; the attempt-level hard-regression annotations in Table 9 are reconstructed by comparing the
+recorded pre- and post-correct counts, while iteration-level labels are available. The value of the cases is therefore mechanistic:
+they show how online outcome gating and post-training Prox address different timescales of the same accumulation problem.
+D.4 Additional Analysis of Model Size and Skill Updates
+D.4.0.0.1 Final Skill Length and IID AccuracyWe examine whether a longer final skill is associated with stronger in-
+domainperformance.Here,thefinalskillreferstoG3D,i.e.,theskillobtainedafterclosed-looptrainingandProx-D.Skilllength
+is measured as the total number of Markdown characters in the mainSKILL.mdfile and its reference files; agent-generated
+scratch files are excluded. IID performance is measured using SpreadsheetBench OJ hard accuracy over the fixed 100-task
+test set, where one generated program is applied to all three test cases and a task is counted as correct only if all three cases
+pass. Figure 4 shows the nine Qwen3.5-27B training seeds. Final skill length is negatively associated with IID hard accuracy
+(r=−0.628,n= 9). In particular, the longest skills do not achieve the highest accuracy, suggesting that accumulating more
+textual guidance is not necessarily beneficial. The fitted line is intended as a descriptive summary, not a causal relationship.
+The estimate is also sensitive to seed 8; removing this seed reduces the correlation tor=−0.330. Therefore, the result should
+be interpreted as evidence that skill length alone is not a reliable proxy for skill quality, rather than as a statistically conclusive
+monotonic effect.
+10 20 30 40 50
+Final skill length (k Markdown characters)
+37.5
+40.0
+42.5
+45.0
+47.5
+50.0
+52.5
+55.0SpreadsheetBench OJ hard score (%)
+s0
+s1
+s2s3
+s4
+s5
+s6
+s7
+s8
+Pearson r = 0.628, n = 9
+Qwen3.5-27B seed Linear fit
+Figure 4: Final G3D skill length versus SpreadsheetBench IID OJ hard accuracy for nine Qwen3.5-27B training seeds. Length
+includes Markdown content in the main skill file and reference files. The dashed line is an ordinary least-squares fit.
+D.4.0.0.2 Closed-Loop Update DynamicsTo understand why model size affects the final skill representation, we analyze
+the inner closed-loop trajectories (Table 16). Since one diagnosis may trigger multiple writes, writes per diagnosis is an update
+intensity proxy rather than a literal probability.
+Table 16: Closed-loop update dynamics. Values are mean±sample standard deviation over three 4B runs and nine 27B runs.
+Metric Qwen3.5-4B Qwen3.5-27B
+Attempts / iteration2.57±0.15 2.13±0.36
+Diagnoses / run102.7±6.1 85.3±14.6
+Characters / diagnosis1355±75 1474±129
+Write calls / run57.3±9.9 35.6±8.2
+Accepted iterations66.7%±15.3% 85.6%±10.1%
+G1 writes / diagnosis0.96 0.40
+G3f writes / diagnosis0.56 0.42
+Realized Prox compression29.4%±17.9% 19.0%±18.1%
+The4Bmodelrequiresmoreinner-loopattempts,generatesmorediagnoses,andperformssubstantiallymorewritecallsthan
+the 27B model. More importantly, the number of writes per diagnosis decreases from 0.96 under open-loop G1 training to
+0.56 under closed-loop G3f training for the 4B model. In contrast, the corresponding value for the 27B model remains nearly
+unchanged (0.40→0.42). The gate also rejects more final updates from the 4B model: only66.7%of its iterations retain the
+proposedupdate,comparedwith85.6%for27B.Theseobservationssuggestthatthelargermodelisalreadyrelativelyselective
+about whether a diagnosis should modify the skill, whereas the smaller model tends to translate diagnoses into edits more
+aggressively under open-loop training. The patch–re-execute–gate mechanism therefore acts as an external update filter that
+disproportionately regularizes the smaller model. Prox-D reinforces the same effect by applying stronger realized compression
+to the 4B skills than to the 27B skills (29.4%versus19.0%). Together, closed-loop validation and proximal shrinkage move the
+smaller model toward a more selective and compact update regime.
+E Prompts and Algorithm
+ThisappendixgivessomerepresentativepromptsinSkillProx,SomeotherpromptsfollowthesettingofSkillGrad(Wangetal.
+2026a). In the end, we provide the overall algorithm in SkillProx.
+E.1 Momentum Prompt
+The momentum agent converts per-task diagnoses into a persistent pattern record and a current-iteration overlay. The former
+carries recurrence and remedy history; the latter gives the patcher one actionable entry per task.
+Pattern-record writer (momentum) prompt
+1[SYSTEM]
+2You are PatternRecordWriter.
+3
+4Read:
+51. batch_diagnoses.md;
+62. the previous momentum_memory.md (empty at iteration 1); and
+73. the current SKILL.md and references.
+8
+9Write:
+101. an updated cross-iteration pattern record; and
+112. a per-task overlay in the same order as the diagnoses.
+12
+13A pattern is a class of mistake or success, not a task instance. Default to
+14merging evidence into an existing pattern. Split only when the required
+15operations or corrective actions genuinely differ. Preserve remedy_log as
+16append-only history.
+17
+18Pattern record entry:
+19### {pattern-id} | {operation|workflow|mixed} | {description}
+20- anchor: {L2 section slug | L3 filename | (none yet)}
+21- appeared_in: {iterations}
+22- description: {accumulated evidence}
+23- latest_executor_action: {current actionable rule}
+24- remedy_log:
+25- iter_{k} | diagnosis: {summary} | patch: {action}
+26
+27Overlay entry:
+28### [{task_id}] {signal description}
+29- signal: failure | success
+30- pattern: {pattern-id | new | no-actionable-signal}
+31- anchor: {anchor}
+32- gap: {missing or misfiring behavior}
+33- proposed_change: {targeted edit direction}
+34
+35If the diagnosis is too vague, use "no-actionable-signal" and omit gap and
+36proposed_change. End with at most three recurrent WORKFLOW-THEMES.
+37
+38[USER]
+39This is iteration {k}.
+40
+41Inputs:
+42Current iteration diagnoses: {batch_diagnoses_path}
+43Previous pattern record: {previous_memory_path}
+44Current guidance files:
+45- {skill_md_path}
+46- {reference_paths}
+47
+48Outputs:
+49Updated pattern record: {memory_output_path}
+50Per-task overlay: {overlay_output_path}
+E.2 Patcher Prompt
+The patcher applies one layer-aware update to the skill. It reads both the raw diagnoses and the momentum outputs so that
+compression by the momentum agent cannot erase task-level evidence.
+Skill patcher prompt
+1[SYSTEM]
+2You are Patcher. Edit the existing skill in place; never redraft it wholesale.
+3
+4The skill has three layers:
+5- L1 metadata routes skill selection.
+6- L2 SKILL.md is always loaded and must remain general and skimmable.
+7- L3 references are loaded conditionally and hold specific operations,
+8runtime branches, worked examples, and verification procedures.
+9
+10Iterate by pattern, not by task:
+111. Group overlay entries sharing a pattern.
+122. Read their pattern history and raw diagnoses.
+133. Brainstorm 2--3 candidate remedies.
+144. Apply the simplest edit that generalizes.
+15
+16Use YAGNI. Prefer extending or merging an existing section over creating a
+17new one. Never place task-specific columns, rows, filenames, or constants in
+18L2. Every L3 file must have exactly one L2 pointer and must contain runnable
+19code, a runtime branch, and a verification step with a corrective action.
+20
+21After editing, read back all changed files and repair broken pointers,
+22orphaned references, duplicate sections, and workflow-checklist growth.
+23
+24[USER]
+25Evolve the skill based on the analysis below.
+26
+27Original diagnoses: {batch_diagnoses_path}
+28Per-attempt overlay: {momentum_overlay_path}
+29Cross-iteration pattern record: {momentum_memory_path}
+30
+31Skill files:
+32- {skill_md_path}
+33- {reference_paths}
+34
+35Reference directory for new L3 files: {references_directory}
+E.3 Shrinker Prompt
+The utility audit itself has no generative prompt: it repeatedly calls the executor on the full and leave-out skills. Once the
+deterministic audit selects a candidate, the Shrinker receives exactly one target unit.
+Prox shrinker prompt
+1[SYSTEM]
+2You are Shrinker. The forward optimizer only added content; make the skill
+3smaller and cleaner without losing what works.
+4
+5The target is an L2 section or L3 reference whose measured marginal utility
+6is low or negative. Diagnose it as:
+7(a) redundant, (b) contradictory or misleading,
+8(c) over-specific or verbose, or (d) genuinely load-bearing.
+9
+10Apply the lightest valid operation:
+111. Consolidate (preferred): salvage unique generalizable content into the
+12most-overlapping retained section, then remove the target.
+132. Demote: move excessive L2 detail into a concise L3 procedure.
+143. Remove: delete content that is fully redundant or misleading.
+15
+16Touch only the target and, when needed, one receiving section. Preserve all
+17L2--L3 pointer invariants. A downstream validation gate will reject the edit
+18if accuracy drops. The resulting skill must be strictly smaller.
+19
+20[USER]
+21Shrink the skill by processing exactly one target unit.
+22
+23Target unit (flagged low/negative marginal value):
+24{target_L2_section_or_L3_reference}
+25
+26Skill files:
+27- {skill_md_path}
+28- {reference_paths}
+29
+30Salvage genuinely useful, generalizable content from the target into the
+31most-overlapping retained section. Remove the redundant, contradictory, or
+32verbose remainder. Leave all other sections unchanged.
+E.4 End-to-End SkillProx
+Algorithm1coversdataconstruction,open-orclosed-loopforwardevolution,leave-one-oututilityestimation,andthevalidation-
+gatedProxbackwardpass.Theclosed-loopbranchdescribesthemulti-attemptbehaviorrepresentedbythereleasedrunartifacts:
+rejected edits are rolled back and retried up to three times, with feedback injected into the next diagnosis.
+Algorithm 1: SkillProx: closed-loop forward evolution and Prox consolidation
+Require:InitialskillS 0;modelM;evolutionpoolD e;validationsetV;modem∈ {open,closed};batchsizeb;iterationsK;attempts
+A; utility thresholdτ; compression capρ; validation tolerances(δh, δc)
+Ensure:Forward skillS fwd and consolidated skillSprox
+1:Phase I: Construct failure-driven update batches
+2:R 0 ←ExecuteAndAssess(M, S0,D e)
+3:F ← {x∈ De : Cell(R0[x])<1}
+4:T ←SampleUpTo40(F,training seed)
+5:(B 1, . . . , BK )←Chunk(T, b)
+6:S←Copy(S 0);P← ∅;Q← ∅;call ←0
+7:Phase II: Forward skill evolution
+8:fork= 1, . . . , Kdo
+9:S (0) ←Copy(S){iteration snapshot}
+10:R pre ←ExecuteAndAssess(M, S, Bk)
+11:h pre ←Hard(R pre);s pre ←Cell(R pre)
+12:(F k,C k)←Classify(R pre)
+13:ifF k =∅then
+14:c all ←c all + 1
+15:ifc all = 4then
+16:break
+17:end if
+18:else
+19:c all ←0
+20:end if
+21:a max ←Aifm= closed, else1
+22:C← ∅{gate-eligible candidate skills}
+23:r← ∅{within-iteration rejection context}
+24:fora= 1, . . . , amax do
+25:ifa >1then
+26:S←Restore
+
+S(0)
+
+27:end if
+28:q←FormatPrior(Q,last = 6)
+29:D k ←Diagnose(M,F k,C k, R0, Rpre, q, r)
+30:ifk= 1then
+31:O k ← ∅{bootstrap has no prior momentum}
+32:else
+33:(P, O k)←Momentum(M, D k, P, S)
+34:end if
+35: eS←Patch(M, S, Dk, P, Ok)
+36:ifm= openthen
+37:S← eS{open-loop patch is committed}
+38:break
+39:else
+40:R post ←ExecuteAndAssess
+
+M, eS, Bk
+
+41:h post ←Hard(R post);s post ←Cell(R post)
+42:g←[h post ≥h pre]∧[s post ≥s pre −10 −9]
+43:ifgthen
+44:C←C∪ {(h post, spost,Copy
+
+eS
+
+, Dk)}
+45:ifh post > hpre then
+46:break{strict hard improvement}
+47:end if
+48:else
+49:S←Restore
+
+S(0)
+
+50:r←RejectContext
+
+hpre, spre, hpost, spost, eS
+
+51:end if
+52:end if
+53:end for
+54:ifm= closedthen
+55:ifC̸=∅then
+56:(h ∗, s∗, S, Dk)←arg max (h,s,·,·)∈C (h, s)
+57:Q←Q∪ {(k,accepted, h pre, h∗)}
+58:else
+59:S←Restore
+
+S(0)
+
+60:Q←Q∪ {(k,rejected, h pre, hpre)}
+61:end if
+62:end if
+63:ifk= 1then
+64:(P,_)←Momentum(M, D k,∅, S){bootstrap persistent pattern record}
+65:end if
+66:end for
+67:S fwd ←Copy(S)
+68:Phase III: Leave-one-out utility audit
+69:U←ParseUnits(S fwd)
+70:v 0 ←Evaluate(M, Sfwd,V)
+71:for allu i ∈Udo
+72:S −i ←MaterializeWithout(S fwd, ui)
+73:v −i ←Evaluate(M, S−i,V)
+74:u cell
+i ←v cell
+0 −v cell
+−i
+75:u hard
+i ←v hard
+0 −v hard
+−i
+76:end for
+77:L←SortAscending
+ 
+{ui :u cell
+i < τ},(ucell
+i , uhard
+i )
+
+78:Phase IV: Validation-gated Prox consolidation
+79:S prox ←Copy(S fwd)
+80:v←Evaluate(M, S prox,V);n 0 ← |Sprox|
+81:for allu i ∈Ldo
+82:if(n 0 − |Sprox|)/n0 ≥ρthen
+83:break
+84:end if
+85:T←Copy(S prox)
+86:T←Shrink(M, T, u i){consolidate, demote, or remove}
+87:T←GarbageCollectOrphanReferences(T)
+88:if¬StructurallyValid(T)∨ |T| ≥ |S prox|then
+89:continue
+90:end if
+91:ev←Evaluate(M, T,V)
+92:ifev hard ≥v hard −δ h andevcell ≥v cell −δ c then
+93:S prox ←T;v←ev{otherwise the trial is discarded}
+94:end if
+95:end for
+96:returnS fwd, Sprox

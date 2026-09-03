@@ -1,0 +1,837 @@
+SkillCommit: Evolving Agent Skills through Behaviorally Validated Scope
+Expansion
+Yu He1, Weikai Yang2∗
+1Nanjing University
+2The Hong Kong University of Science and Technology (Guangzhou)
+yu_he@smail.nju.edu.cn, weikaiyang@hkust-gz.edu.cn
+Abstract
+Largelanguagemodel(LLM)agentscancontinuallyimprove
+withoutparameterupdatesbyconvertinghistoricalexperience
+into reusable procedural knowledge. However, existing meth-
+odsoftenconsolidateexperiencebasedonsemanticsimilarity
+orLLMjudgments,whichmaymergesuperficiallyrelatedbut
+behaviorallyincompatiblestrategiesandtherebydegradeper-
+formance. To address the issue, we proposeSkillCommit,
+an online skill evolution framework that continuously trans-
+formsexperienceintoahierarchicallibraryofreusableskills.
+Each new experience is initially preserved as an instance-
+specific patch, retaining the behavior validated in its local
+context.Asrelatedskillsaccumulate,SkillCommitabstracts
+those sharing a common behavioral mechanism into higher-
+level skills. Specifically, for each incoming skill, embedding-
+based retrieval first identifies candidate related skills. Cross-
+instance replay and an LLM-based mechanism check deter-
+mine whether these skills transfer across cases and share a
+common underlying mechanism. Candidates that pass both
+checks are abstracted into a higher-level skill and commit-
+ted only if it preserves the validated behavior of all con-
+stituent skills. Experiments on RuleArena, OpenExempt and
+KOR-Bench demonstrate thatSkillCommitconsistently im-
+proves agent performance across diverse domains. Moreover,
+the learned skills transfer across model scales and families,
+enabling cross-model experience transfer.
+Introduction
+Large language model (LLM) agents can use external tools
+and interact with their environments with increasing auton-
+omy (Yao et al. 2023; Schick et al. 2023; Yang et al. 2023;
+Deng et al. 2023; Zhou et al. 2024). Yet reliable deployment
+in specialized domains often requires domain knowledge,
+proceduralconventions,andoperationalconstraintsthatbase
+modelsdonotacquireduringpretraining.Reusableskillpro-
+videamodularwaytoexternalizesuchproceduresandguide
+agents without modifying model parameters (Wang et al.
+2025; Ni et al. 2026; Ma et al. 2026; Shinn et al. 2023;
+Zhao et al. 2024; Ouyang et al. 2026). In practice, however,
+such knowledge is rarely available as a complete instruction
+documentandinsteadremainsscatteredacrosspractitioners’
+experience,executionhistories,andtaskfeedback.Manually
+eliciting and formalizing such knowledge is costly and may
+∗Corresponding author.
+still omit rare but critical boundary cases. This gap moti-
+vatesskill evolution, in which agents automatically extract,
+consolidate,andrefinereusableskillsfromaccumulatedtra-
+jectories and feedback (Ouyang et al. 2026; Zhang et al.
+2026a,b; Chen et al. 2026; Suzgun et al. 2026).
+Existing methods typically use LLM-based abstraction
+to distill individual trajectories and feedback into instance-
+specificpatchesthatagentscanretrieveandreusewhensolv-
+ingsimilartasks(Shinnetal.2023;Zhaoetal.2024;Ouyang
+et al. 2026). However, since these patches are narrow in
+scope,retainingthemindividuallyleadstogrowingmemory
+and retrieval costs as experience accumulates (Chen et al.
+2026; Ni et al. 2026; Zhang et al. 2026b). To build a more
+compact and general skill library, subsequent methods con-
+solidate related instance-specific patches into higher-level
+skills based on semantic similarity (Xu et al. 2025; Ma etal.
+2026)ormodeljudgments(Xuetal.2025;Wangetal.2025;
+Ni et al. 2026; Ma et al. 2026; Chen et al. 2026). However,
+they do not guarantee behavioral compatibility, because se-
+manticallysimilarpatchesmayencodeconflictingstrategies,
+whereas dissimilar patches may share a common underlying
+mechanism. Figure 1 illustrates this mismatch between se-
+mantic similarity and behavioral compatibility.
+Reliable skill evolution therefore requires criteria that go
+beyondsurfacesimilarity.Researchincognitivesciencesug-
+gests that concrete experience must first be transformed into
+procedural knowledge that can guide future action (Kolb
+2014). Such knowledge transfers beyond its original con-
+text only when learners identify the relational structure
+shared across experiences rather than relying on surface re-
+semblance (Gentner 1983; Gick and Holyoak 1983; Chi,
+Feltovich, and Glaser 1981). Moreover, newly formed ab-
+stractions must be integrated without interfering with pre-
+viously validated competence (McClelland, McNaughton,
+and O’Reilly 1995). Together, these principles suggest that
+skill evolution should establish the local validity, justify its
+broaderreusethroughevidenceofasharedunderlyingmech-
+anism, and preserve validated behavior as that knowledge is
+consolidated at higher levels of abstraction.
+To meet these requirements, we proposeSkillCommit,
+an online skill evolution framework that organizes skill evo-
+lution into three stages. First, when the agent fail to com-
+plete a task,Feedback-Guided Patch Inductionderives an
+instance-specific patch based on the failed trajectory and
+arXiv:2608.15165v1  [cs.AI]  15 Aug 2026
+Figure 1: Semantic similarity may retrieve behaviorally in-
+compatiblepatcheswhileoverlookingthosethatshareacom-
+mon behavioral mechanism.
+feedback and locally validates it by replaying this task in-
+stance. As patches accumulate,Behavioral Compatibility
+Groupingevaluates whether multiple patches exhibit trans-
+ferablebehaviorandshareacommonunderlyingmechanism,
+thereby determining the appropriate scope of a candidate
+higher-level skill. Finally,Source-Preserving Consolida-
+tionabstractsbehaviorallycompatiblepatchesintoahigher-
+level skill and commits it when it preserves the validated
+behavior of every constituent skill. This process allows the
+skill library to expand, reorganize, and compress over time
+while retaining empirically validated behavior.
+WeevaluatedSkillCommitacrossRuleArena(Zhouetal.
+2025),OpenExempt(Servantezetal.2026)andKOR-Bench
+(Ma et al. 2025), where it consistently outperforms no-skill
+settings and strong baselines across all evaluated subsets.
+Further experiments show that the induced skills transfer
+effectively across model scales and retain utility even when
+transferred across model families. Our contributions are:
+•We formulate reliable skill evolution as behaviorally val-
+idated scope expansion across skill admission, compat-
+ibility grouping, and higher-level abstraction, requiring
+replay evidence for every broader behavioral claim.
+•WeproposeSkillCommit,anonlineframeworktobuild
+compact skill libraries while retaining previously vali-
+dated behavior.
+•We evaluateSkillCommitacross RuleArena, OpenEx-
+empt,andKOR-Bench,showingconsistentgainsoverno-
+skillandstrongbaselines,andexaminethetransferability
+of the induced skills across model scales and families.
+Related Work
+LLM Agents and Skill Systems.Agent skills have
+emerged as reusable procedural artifacts that extend LLM
+agents with task instructions, operational knowledge, and
+executable workflows beyond one-off prompting and atomic
+tool use (Wang et al. 2023, 2025; Li et al. 2026; Ni et al.
+2026; Ma et al. 2026). Prior work has studied how such ex-
+ternal knowledge is organized and associated, with A-MEM
+(Xu et al. 2025) dynamically linking accumulated memory
+notesandCA3Mem(Zhangetal.2026b)recombiningrelated
+experiencethroughastructuredmemorygraph.AgentWork-
+flow Memory (Wang et al. 2025) instead induces recurring
+workflows from agent trajectories and selectively retrieves
+themforsubsequenttasks.Meanwhile,SkillsBench(Lietal.
+2026)evaluateswhethercuratedskillsimproveagentperfor-
+mance,whereasSkillLearnBench(Zhongetal.2026)exam-
+ines whether agents can continually acquire reusable skills
+from task experience. These studies establish how skills can
+be organized, retrieved, and evaluated, but leave open what
+behavioral evidence should justify the broader applicability
+claimed by an evolving skill.
+Skill Acquisition and Self-Evolution.Early experience-
+based(Zhangetal.2024;Guptaetal.2024)transformexecu-
+tionfeedbackintoreusabletextualknowledge,includingver-
+bal reflections in Reflexion (Shinn et al. 2023), transferable
+insightsinExpeL(Zhaoetal.2024),andreasoningstrategies
+distilledfromsuccessfulandfailedexperienceinReasoning-
+Bank (Ouyang et al. 2026). More recent systems move be-
+yond retaining individual memories by continually refining
+anevolvingplaybookinACE(Zhangetal.2026a)orhierar-
+chicallyconsolidatingtrajectory-locallessonsinTrace2Skill
+(Nietal.2026).SkillGen(Maetal.2026)evaluatesthenetin-
+terventioneffectofasynthesizedskill,whileSkillCAT(Chen
+etal.2026)replayscandidatepatchesontheirsourcetasksbe-
+forehierarchicalmerging.Althoughthesemethodsintroduce
+validation at particular stages, they do not uniformly govern
+the successive scope expansions from a textual candidate to
+a validated patch, from individual patches to a behaviorally
+compatible group, and from a group abstraction to an active
+pattern.Incontrast,SkillCommitseparatelyvalidatesthese
+decisions through teacher-referenced source replay, directed
+cross-instance replay, and source-retention replay.
+SkillCommit
+Reliable skill evolution requires not only extracting proce-
+duralknowledgefromindividualexperiences,butalsodeter-
+mininghowbroadlythatknowledgecanbegeneralizedwith-
+outcompromisingpreviouslyvalidatedbehavior.SkillCom-
+mitaddresses this challenge by treating skill-library con-
+struction as a sequence of behaviorally validated scope ex-
+pansions.AsillustratedinFigure2,Feedback-GuidedPatch
+Inductionderivesaninstance-specificpatchandverifiesthat
+the frozen executor can use it to solve the source instance.
+Behavioral Compatibility Groupinguses cross-instance
+replay and mechanism assessment to identify patches that
+can support a shared higher-level skill.Source-Preserving
+Consolidationcommits the induced skill only when source
+replay confirms its validity across all instances within its
+claimed scope.
+Feedback-Guided Patch Induction
+This stage aims to transform feedback from a failed task
+executionintoaproceduralpatchthatthefrozenexecutorcan
+use to improve its behavior. It follows an iterative two-step
+process: generating a candidate patch from teacher feedback
+and validating the patch through source replay.
+Patch Generation.The core idea is to contrast the ex-
+ecutor’s failed behavior with a teacher-generated reference
+for the same task. Specifically, when the executor fails on a
+source instancex i and produces a trajectoryτ−
+i , a teacher
+model is provided withxi, the verified ground-truth answer,
+andτ −
+i . Conditioned on this information, the teacher pro-
+duces a reference trajectoryτ+
+i that reaches the correct an-
+swer and diagnoses the discrepancy between the failed and
+successfulbehaviors.Basedonthiscontrast,theteachergen-
+erates a candidate patchc i containing concise procedural
+guidance, such as behavioral constraints, decision rules, or
+checkable intermediate steps intended to address the failure
+observed inτ −
+i . Note that the teacher may use the same
+underlyingmodelastheexecutor,butoperatesunderasepa-
+rateteacherpromptwithaccesstoprivilegedfeedbackthatis
+neverexposedduringexecution.Topreventsolutionleakage,
+candidatescontainingthefinalansweroraninstance-specific
+solution toxi are discarded before validation.
+Source-replayValidation.Eachcandidatepatchc i isval-
+idatedbyreplayingthesourceinstancewiththesamefrozen
+executor. During replay, the executor receives only the orig-
+inaltaskcontextx i andthecandidatepatchc i.Theresulting
+answer is evaluated by the task verifier, which retains ac-
+cess to the ground truth. If the executor successfully solves
+xi, the candidate is admitted as a source-validated instance-
+specific patch. Otherwise, the rejected patch, the new replay
+trajectory, and the verifier feedback are returned to the skill
+author to guide the next generation attempt. This generate-
+and-replay cycle is repeated for at mostK= 3attempts,
+terminating as soon as a patch enables the frozen executor
+to solve the source instance. In practice,88.0%of failed in-
+stancesyieldavalidatedpatchwithin3attempts,with91.8%
+successful patches obtained within the first2trials.
+Behavioral Compatibility Grouping
+This stage determines how a locally-validated patch can
+be reused beyond its original instance. Given an incoming
+patchq t anditssourceinstancex t,SkillCommitfirstexam-
+ines whetherq t is behaviorally compatible with an existing
+higher-level skill. If a compatible skill is found, the frame-
+work attempts to expand that skill to cover the new patch.
+Otherwise, it searches for a group of compatible residual
+patches and uses them to induce a new higher-level skill.
+In both cases, semantic similarity is used only to retrieve a
+bounded set of plausible candidates. The actual decision is
+basedonbehavioralreplayandmechanismassessment,since
+semantically similar patches may implement incompatible
+strategies, while patches expressed differently may follow
+thesameunderlyingprocedure.Notethatthedetailedprompt
+templates used for behavioral compatibility assessment and
+higher-level skill induction are provided in Appendix A.
+ExpandinganExistingSkill.SkillCommitfirstretrieves
+the active higher-level skills whose descriptions are most
+similar to the incoming patchqt. We embed the repair text
+ofq t andthestructureddescriptionofeachactiveskillusing
+the same encoder, rank the active skill versions by cosine
+similarity, and retain the topRcandidates, withR= 4in
+our experiments. For each retrieved skillp, the framework
+collects behavioral evidence by applying the two memories
+beyond their currently validated scopes. Specifically, the ex-
+isting skillpis replayed on the incoming source instancext,
+whileq t is replayed on a set of task instancesW(p)cover
+byp. Letρ(m, x)∈0,1indicate whether the frozen execu-
+tor solves instancexwhen guided only by memorym. We
+compute the behavioral compatibility betweenpandqt as:
+C(p, qt) =
+ρ(p, xt) + P
+xj ∈W(p) ρ(qt, xj)
+1 +|W(p)| .(1)
+The pair passes the behavioral compatibility screen when
+C(p, qt)≥γ,whereγ∈[0,1]isapredefinedthreshold.This
+cross-replayprovidesgradedevidencethatthetwomemories
+operate over related behavioral contexts.
+Because partial behavioral transfer may still arise from
+different strategies, a pattern author subsequently assesses
+whetherpandq t can be explained by a shared procedural
+mechanism. If the compatibility score and mechanism as-
+sessmentbothsupportconsolidation,theauthorproposesan
+expanded version ofpwhose scope includes the incoming
+source. The proposal remains a candidate until full source
+replay in the next stage confirms that the expanded skill pre-
+serves the behavior validated across its claimed scope.
+FormingaNewSkill.Ifnoexistingskillpassestheprevi-
+ouschecks,SkillCommitproceedstoformanewskillfrom
+residualpatches,i.e,thosesource-validatedpatchesthathave
+not yet been incorporated into any higher-level skill. Simi-
+larly,SkillCommitretrieves a set of semantically related
+residual patchesC t and evaluates their behavioral compati-
+bility through cross-instance replay.
+Based on these replay outcomes,SkillCommitsearches
+for an anchor patch whose procedure transfers to the source
+instances of all other patches in a candidate group. An eli-
+gible group must include the incoming patchqt and contain
+at leastmmembers. By default, the anchor is required to
+transfer to every member, while reverse transfer may be im-
+posedasastricteroptionalcriterion.Amongeligiblegroups,
+SkillCommitselects the one with the broadest behavioral
+coverage, using semantic similarity and a deterministic or-
+dering only to resolve ties. If no eligible group is found,qt
+remains residual and no new skill is created.
+Figure 2:SkillCommitoverview. Feedback-Guided Patch Induction derives and source-validates instance patches; Behavioral
+Compatibility Grouping uses cross-instance replay to expand an existing skill or form a new one; and Source-Preserving
+Consolidation commits a candidate only after full-scope source replay.
+Source-Preserving Consolidation
+After identifying either a behaviorally coherent group of
+patchesoracompatibleexistingskill,SkillCommitinduces
+a candidate skill over the proposed scope. Because abstrac-
+tion may omit constraints essential to individual source in-
+stances, consolidation is governed by full source replay. A
+candidateiscommittedoveritsproposedscopeonlyifitpre-
+serves all previously validated behavior within that scope;
+otherwise, its scope may be narrowed to a replay-supported
+subset or the candidate is rejected.
+Candidate Skill Induction.A candidate skill can arise in
+twoways.Ifthepreviousstageidentifiesacompatiblegroup
+of residual patches, the pattern author attempts to induce a
+newhigher-levelskillfromthatgroup.Iftheincomingpatch
+is compatible with an existing skill, the pattern author pro-
+duces an expanded version of that skill. In both cases, the
+inducedskillspecifies anapplicabilitycondition,executable
+proceduralguidance,andanexclusioncondition,represented
+bywhen,repair, andavoid_when, respectively. To
+encourage mechanism-level abstraction rather than instance
+memorization, the pattern author is not given source ques-
+tions, answers, teacher trajectories, or provenance informa-
+tion.Forforminganewskill,itreceivesonlytheanonymized
+patch texts in the proposed group. For an expansion, it addi-
+tionally receives the current skill description.
+Full-Scope Source Replay.LetSdenote the proposed
+source set of a candidate. To verify that the abstraction pre-
+serves previously validated behavior,SkillCommitreplays
+the candidate on every source instance inSusing the frozen
+executor. If replay succeeds on every source, the candidate
+is regarded as fully supported. Otherwise, the pattern author
+incrementally refines the current candidate using its previ-
+ous version together with the replay trajectories and verifier
+feedback,whileground-truthanswersandinstanceidentities
+remain hidden. Each refinement produces a new candidate
+version, which is replayed on the same source set before
+further refinement. This process continues for at mostLat-
+tempts, and all candidate versions together with their replay
+outcomes are retained for auditing.
+Source-PreservingCommitandSplit.Toensurethatev-
+erycommittedskillpreservesthevalidatedbehaviorofevery
+sourceinstancewithinitsdeclaredscope,SkillCommituses
+sourcereplayasthesolecriterionforconsolidation.Depend-
+ing on the replay outcome, each candidate skill follows one
+of three transitions.
+Commit.If a candidate successfully replays on every
+source instance within its proposed scope, it is committed
+as a higher-level skill. When the candidate expands an exist-
+ing skill, the new version replaces the active version while
+preserving previous versions for traceability. When the can-
+didateisinducedfromagroupofresidualpatches,itbecomes
+a new active skill.
+Split.If replay succeeds on only a subset of the proposed
+sources,SkillCommitselectsthecandidateversionwiththe
+strongest replay support. If the supported source set of this
+version contains at leastminstances, it will be split by re-
+strictingitsscopetothesupportedsourcesandreplayedonce
+more on this reduced scope. A successfully revalidated split
+is committed as an independent higher-level skill. Typically,
+wesetmtoeither2or3dependingonthedataset,asdetailed
+in the Appendix B.
+Reject.If no candidate the candidate is discarded. The
+existing skill hierarchy remains unchanged, and the corre-
+spondingpatchescontinuetoberetainedasinstance-specific
+skills.Ifnocandidateversionyieldsareplay-supportedsub-
+set of at leastmsource instances, or if the narrowed candi-
+datefailsrevalidation,thecandidateisrejected.Theexisting
+skill hierarchy remains unchanged, while the corresponding
+patches remain available as instance-specific skills.
+Together, these transitions ensure that higher-level skills
+are expanded only when their broader applicability is sup-
+ported byreplay, while unsupportedabstractions areconser-
+vatively narrowed or rejected.
+Experiments
+We evaluate whetherSkillCommitimproves frozen execu-
+tors across heterogeneous reasoning domains, yields consis-
+tent task-level positive transfer, and produces skills that re-
+main effective across model scales and families. We further
+examine how its three stages contribute to the performance.
+Experimental Setup
+Datasets and Metrics.We evaluateSkillCommitas an
+online skill evolution framework on three complementary
+reasoning benchmarks. To examine skill evolution in com-
+plex rule-based reasoning, we use the Airline and NBA sub-
+setsfromRuleArena(Zhouetal.2025).Specifically,wesplit
+200 Airline cases into 100 induction cases and 100 held-out
+testcases,whileassigning215NBAcasesinto170induction
+cases and 45 testing cases. To evaluate generalization in the
+legal domain, we select Exemption Classification (EC) and
+Exemption Valuation (EV) from the Advanced Competency
+suiteofOpenExempt(Servantezetal.2026),with210induc-
+tion cases and 105 held-out test cases for each task. Finally,
+weincludetheLogicandCiphertasksfromKOR-Bench(Ma
+etal.2025)toassessgeneralizationinknowledge-orthogonal
+abstractreasoning,using175casesforinductionand75cases
+for held-out testing in each task.
+Theevaluationmetricsreflecttheoutputstructureofeach
+benchmark. RuleArena and KOR-Bench require verifiable
+final answers, so we report strict accuracy, counting an in-
+stance as correct only when its parsed answer passes the
+corresponding benchmark verifier. OpenExempt instead re-
+quires structured predictions of exemption citations or val-
+uation claims; we therefore follow the official evaluator and
+report macro-F1, which reflects both coverage of applicable
+items and avoidance of unsupported predictions.
+Baselines.We compareSkillCommitwith No Skill and
+four representative experience-learning methods. ExpeL
+(Zhao et al. 2024) extracts reusable insights from accu-
+mulated experiences, while ReasoningBank (Ouyang et al.
+2026)stores andretrievesreasoning memoriesderivedfrom
+previous executions. ACE (Zhang et al. 2026a) iteratively
+evolvesanexternalplaybookthroughreflectionandcuration.
+Trace2Skill (Ni et al. 2026) hierarchically distills trajectory-
+level lessons into a reusable skill document. We adapt each
+method to the same benchmark interface and induction data
+while preserving its original skill-construction mechanism.
+Within each model configuration, all methods use the same
+frozenexecutor,basetaskprompt,outputparser,verifier,and
+per-instance generation limit.
+ModelConfigurationsandImplementationDetails.Our
+model configurations separate matched-model effectiveness
+fromtransferacrossmodelscalesandfamilies.Wefirstcon-
+sidertwomatched-modelsettings,usingDeepSeek-V4-Flash
+andQwen3.6-35B-A3B,respectively,forbothskillconstruc-
+tion and task execution. These settings establish the effec-
+tiveness ofSkillCommitwhen the skill author and user are
+ExpeL
+ReasoningBank
+ACE
+T race2Skill
+SkillCommit
+0
+10
+20
+30Cases
+Airline
++16
+-6
+-21 -22 +24
+ExpeL
+ReasoningBank
+ACE
+T race2Skill
+SkillCommit
+NBA
++11
++1
+-10
+0
++19
+Help Hurt
+Figure 3: Instance-level effects relative to No Skill on
+matched DeepSeek-V4-Flash RuleArena runs. Help counts
+cases that No Skill misses but the corresponding method
+solves, while Hurt counts cases that No Skill solves but the
+method breaks.
+identical, across models with different capacity levels. We
+then use the smaller Qwen3.5-9B model as the skill user,
+reflectingapracticaldeploymentscenarioinwhichskillsare
+constructedbyamorecapablemodelbutrepeatedlyexecuted
+by a less costly model. Skills authored by Qwen3.6-35B-
+A3B evaluate in-family, cross-scale transfer, and skills au-
+thoredbyGPT-5.4evaluatetransferacrossbothmodelfamily
+and scale. All model parameters remain frozen throughout
+skill construction and evaluation, with generation settings
+and method-specific budgets provided in the Appendix B.
+Main Results
+SkillCommitconsistentlyimproveseveryevaluatedset-
+ting over no-skill execution and other baseline methods.
+Table 1 summarizes evaluation results of the experiments
+on the three complementary reasoning benchmarks. Across
+all 18 task configuration pairs in Table 1,SkillCommitim-
+proves over No Skill and achieves the best result on every
+task, raising the unweighted mean of the reported task met-
+ricsfrom50.80%to78.15%.WhenDeepSeek-V4-Flashand
+Qwen3.6-35B-A3B are both skill author and skill user, the
+six-taskaverageincreasesby19.33and30.02points,respec-
+tively.Bycontrast,31ofthe72task-levelresultsfromthefour
+competing skill methods fall below No Skill and another six
+merely match it.SkillCommitexceeds the strongest com-
+peting method in average score by 14.48, 28.08, and 28.01
+points in the three configurations, respectively.
+Experience-derived memories are not reliably bene-
+ficial without behavioral validation and may introduce
+more errors than they correct.The instance-level decom-
+position in Figure 3 shows that modest or even negative
+aggregate changes do not imply that these methods fail to
+learn from experience; rather, their gains are frequently off-
+setbynewlyintroducederrors.ExpeLrepairs24Airlineand
+14 NBA failures—matchingSkillCommit’s 24 repairs on
+Airline—but also overturns eight and three baseline-correct
+predictions, respectively, reducing its net gains to 16 and
+Skill Author Skill User Method RuleArena OpenExempt KOR-Bench Avg.↑
+Air.↑NBA↑EV↑EC↑Logic↑Cipher↑
+DeepSeek
+V4-Flash
+DeepSeek
+V4-Flash
+No Skill 72.00 28.89 76.86 86.33 72.00 73.33 68.24
+ExpeL 88.00 53.33 50.17 88.36 80.00 78.67 73.09
+ReasoningBank 66.00 31.11 65.54 74.25 68.00 72.00 62.82
+ACE 51.00 6.67 87.32 95.65 72.00 70.67 63.89
+Trace2Skill 50.00 28.89 84.30 75.50 70.67 70.67 63.34
+SkillCommit(Ours) 96.00 71.11 94.28 96.01 82.67 85.33 87.57
+Qwen3.6
+35B-A3B
+Qwen3.6
+35B-A3B
+No Skill 51.00 26.67 29.02 47.46 53.33 76.00 47.25
+ExpeL 54.00 31.11 7.76 21.53 65.33 78.67 43.07
+ReasoningBank 44.00 26.67 22.37 27.64 58.67 74.67 42.34
+ACE 32.00 11.11 38.42 45.71 73.33 77.33 46.32
+Trace2Skill 55.00 31.11 35.68 29.34 61.33 82.67 49.19
+SkillCommit(Ours) 85.00 66.67 72.46 79.46 74.67 85.33 77.27
+Qwen3.6
+35B-A3B
+Qwen3.5
+9B
+No Skill 55.00 15.56 9.97 15.61 60.00 65.33 36.91
+ExpeL 54.00 26.67 4.18 10.73 62.67 70.67 38.15
+ReasoningBank 53.00 22.22 16.42 22.68 52.00 65.33 38.61
+ACE 14.00 15.56 26.31 34.57 41.33 74.67 34.41
+Trace2Skill 35.00 31.11 24.76 25.43 60.00 73.33 41.61
+SkillCommit(Ours) 81.00 60.00 54.28 62.41 76.00 84.00 69.62
+Table 1: Main results across three skill-author/skill-user configurations.RuleArenaandKOR-Benchreport strict accuracy,
+whileOpenExemptreportsmacro-F1.Avg.istheunweightedmeanofthesixtaskscores.Thebestresultineachconfiguration
+is shown in bold, and the second-best result is underlined. Arrow subscripts show changes over matched baselines.
+11 cases. This pattern is consistent with extracting useful
+insights without execution-grounded admission and replay-
+validated scope control, allowing a valid lesson to be reused
+outsidethecontextinwhichitapplies.ReasoningBankhelp-
+s/hurts 3/9 Airline cases and 2/1 NBA cases, suggesting that
+retrieving a relevant reasoning memory without behavioral
+compatibilityevidencecanproducenegativetransferdespite
+a slight gain on NBA. ACE helps/hurts 3/24 and 3/13 cases
+on Airline and NBA, respectively, indicating that globally
+evolving a playbook without regression-testing its updates
+can overwrite substantially more correct behavior than it
+corrects. Trace2Skill helps/hurts 2/24 Airline cases and 7/7
+NBA cases, consistent with trajectory-level lessons being
+generalized beyond their behaviorally supported scope. By
+comparison,SkillCommitrepairs 24 Airline and 21 NBA
+failureswhileregressingononlyzeroandtwocases,yielding
+net gains of 24 and 19. The central distinction is therefore
+not merely whether a method can extract a useful mem-
+ory, but whether each expansion of that memory’s scope is
+supported by replay evidence.SkillCommitprovides these
+safeguards through source-replay patch admission, directed
+cross-instance compatibility checks, and full-scope source
+replay before commit; the component ablation below exam-
+ines their respective contributions.
+Analysis of Skill Transferability
+In-family cross-scale transfer.To test whether skills au-
+thoredbyalargermodelremainusablebyasmallerexecutor
+from the same family, we deploy the library authored by
+Qwen3.6-35B-A3B with a frozen Qwen3.5-9B skill user.
+Across the four tasks in Figure 4, the transferred skills raise
+the Qwen3.5-9B average from 48.97 without skills to 75.25
+0
+20
+40
+60
+80
+100
+55
+81
+85
+67
+Airline
+15.56
+60
+66.67
+60
+NBA
+60
+76
+74.67
+70.67
+Logic
+65.33
+84
+85.33
+81.33
+Cipher
+No Skill (Qwen-9B)
+Qwen-35B → Qwen-9B
+Qwen-35B → Qwen-35B
+GPT-5.4 → Qwen-9B
+Figure 4: Matched-model and cross-model skill reuse. Leg-
+end arrows denote skill author→frozen skill user. No Skill
+barsshowthematchedbaselinefortheQwen-9Buser;Qwen-
+35B→Qwen-35B is the matched-model refference. Bars
+report strict accuracy.
+andimproveperformanceoneverytask.Transferissubstan-
+tial but not lossless: matched Qwen3.6-35B-A3B execution
+remains higher on Airline (85.00 vs. 81.00), NBA (66.67
+vs. 60.00), and Cipher (85.33 vs. 84.00), while the smaller
+userperformsslightlybetteronLogic(76.00vs.74.67).This
+pattern indicates that the learned skills preserve a reusable
+proceduralcoreacrossmodelscales,whilepartoftheireffec-
+tivenessstilldependsonexecutor-specificinterpretationand
+prompting conventions. At the same time, consistent gains
+over No Skill and the reversal on Logic argue against the
+Condition Success∆(pp)
+SkillCommit(Full) 71.110.00
+No Skill 28.89↓42.22
+w/oFeedback-Guided Patch Induction 53.33↓17.78
+w/oBehavioral Compatibility Grouping 66.67↓4.44
+w/oSource-Preserving Consolidation 66.67↓4.44
+Feedback-Guided Patch Inductiononly64.44↓6.67
+Behavioral Compatibility Groupingonly60.00↓11.11
+Source-Preserving Consolidationonly57.78↓13.33
+Table 2: Ablationresults on RuleArena NBA.∆denotes the
+absolute percentage-point drop from no ablation.
+library merely encoding instructions tailored to the author
+model.Theseresultsareconsistentwithfeedback-guidedin-
+duction and source-preserving consolidation converting lo-
+cal experience into explicit, replay-supported procedures.
+Cross-family and cross-scale transfer.To examine
+whetherskillsremainreusablewhentheauthoranduserdif-
+fer in both model family and scale, we further use GPT-5.4
+as the skill author and Qwen3.5-9B as the skill user. Across
+the four tasks in Figure 4, GPT-5.4-authored skills raise the
+Qwen3.5-9B average from 48.97 without skills to 69.75 and
+improve performance on every task, demonstrating transfer
+acrossbothmodel-familyandscaleboundaries.Thetransfer
+remains weaker than in-family cross-scale reuse on Airline
+(67.00vs.81.00),Logic(70.67vs.76.00),andCipher(81.33
+vs. 84.00), resulting in a 5.50-point average gap. This task-
+dependent degradation is consistent with residual mismatch
+between how different model families express and execute
+procedural guidance, even when the underlying mechanism
+is reusable. Nevertheless, the two author models reach the
+sameaccuracyonNBA(60.00),andGPT-5.4-authoredskills
+remain within four points of matched Qwen3.6-35B-A3B
+performance on both Logic and Cipher. The NBA tie does
+not establish equivalent skill quality, since both libraries are
+ultimately executed by the same smaller user and may en-
+counter a common user-side ceiling; however, it rules out a
+uniform cross-family penalty and suggests that sufficiently
+explicit decision procedures can survive changes in author
+family.Overall,theresultsindicatethatbehavioralinduction
+and consolidation provide a portable interface between het-
+erogeneousmodels,whilenotcompletelyeliminatingfamily-
+and executor-specific conventions.
+Component Ablations
+To distinguish whether each stage is necessary within the
+complete pipeline from whether it is sufficient on its own,
+Table 2 pairs everyw/ocondition with a corresponding
+component-isolation condition. Thew/ovariants measure
+the marginal contribution of a stage given the remaining
+pipeline, whereas theonlyvariants execute the named stage
+using the upstream inputs required by its actual interface.
+Source-replayed patch induction supplies the dominant
+performancegain.RemovingFeedback-GuidedPatchIn-
+duction reduces performance from 71.11% to 53.33%, the
+largestdropamongthethreeleave-one-stage-outconditions.
+By contrast, deploying source-validated instance patches di-
+rectly reaches 64.44%. Since the former condition still re-
+ceives a parseable first-pass teacher patch, this contrast at-
+tributesthegaintovalidatingandrefiningtheproposedpatch
+rather than merely generating additional memory text. The
+high Patch Induction-only score therefore shows that most
+immediate accuracy improvement comes from converting a
+plausibleproposalintoguidancethatthefrozenexecutorhas
+demonstrated it can enact. It does not, however, measure the
+broader scope control provided by the evolving skill library.
+Compatibility grouping improves transfer by screening
+whereapatchcanbereused.RemovingBehavioralCom-
+patibility Grouping lowers performance from 71.11% to
+66.67%, showing that semantic retrieval alone does not re-
+cover all of the benefit obtained from cross-instance behav-
+ioral evidence. Compatibility Grouping in isolation reaches
+60.00% when operating on first-pass patches without source
+validation or subsequent consolidation. The gap between
+theseconditionsindicatesthatcompatibilityscreeningisuse-
+fulwhensuppliedwithreliablelocalrepairs,butcannotcom-
+pensate for unsupported upstream patches or independently
+preserve the resulting abstraction. Its role is therefore not to
+createtheoriginalcorrection,buttodeterminethebehavioral
+contexts in which that correction can be safely reused.
+Consolidation acts as a preservation gate rather than
+a standalone repair mechanism.Removing Source-
+Preserving Consolidation similarly reduces performance to
+66.67%, showing that full-scope replay helps prevent an au-
+thored abstraction from discarding validated behavior. The
+smaller drop relative to Patch Induction reflects a distinct
+role: compatibility evidence can support a group without
+guaranteeing that one abstraction preserves every source.
+Full-scopereplayteststhatabstractionandnarrowsorrejects
+candidates with incomplete support. Consolidation alone
+reaches57.78%,theweakestcomponent-isolationresult,be-
+cause applying a replay gate to semantic groups of unvali-
+dated patches cannot replace source-validated repairs or be-
+havioral evidence for group formation.
+Conclusion
+WepresentedSkillCommit,anonlineskillevolutionframe-
+work that transforms accumulated agent experience into
+a compact, hierarchical skill library without sacrificing
+previously validated behavior. Rather than relying solely
+on semantic similarity or model judgment,SkillCommit
+grounds consolidation in behavioral evidence, admitting ev-
+ery broader behavioral claim only after it survives replay.
+Experiments on RuleArena, OpenExempt, and KOR-Bench
+demonstrate consistent improvements over no-skill settings
+andstrongskill-evolutionbaselines.Theresultingskillsalso
+transferacrossmodelscalesandfamilies,suggestingthatpro-
+cedural knowledge can be authored by more capable models
+andreusedbysmaller,moreeconomicalagents.Weviewthis
+as a practical step toward agents that keep improving from
+experiencewhiletheiraccumulatedknowledgeremainscom-
+pact, reusable, and behaviorally reliable.
+References
+Chen, K.; Zhong, Q.; Liu, J.; and Du, B. 2026. Skill-
+CAT: Contrastive Assessment and Topology-Aware Skill
+Self-Evolution for LLM Agents. arXiv:2606.13317.
+Chi, M. T. H.; Feltovich, P. J.; and Glaser, R. 1981. Catego-
+rization and representation of physics problems by experts
+and novices.Cognitive Science, 5(2): 121–152.
+Deng, X.; Gu, Y.; Zheng, B.; Chen, S.; Stevens, S.; Wang,
+B.; Sun, H.; and Su, Y. 2023. Mind2Web: Towards a Gener-
+alist Agent for the Web. InAdvances in Neural Information
+Processing Systems, volume 36, 28091–28114. Curran As-
+sociates, Inc.
+Gentner, D. 1983. Structure-mapping: A theoretical frame-
+work for analogy.Cognitive Science, 7(2): 155–170.
+Gick,M.L.;andHolyoak,K.J.1983. Schemainductionand
+analogical transfer.Cognitive Psychology, 15(1): 1–38.
+Gupta, P.; Kirtania, S.; Singha, A.; Gulwani, S.; Radhakr-
+ishna, A.; Soares, G.; and Shi, S. 2024. MetaReflection:
+Learning Instructions for Language Agents using Past Re-
+flections. InProceedings of the 2024 Conference on Empir-
+ical Methods in Natural Language Processing, 8369–8385.
+Association for Computational Linguistics.
+Kolb, D. A. 2014.Experiential learning: Experience as the
+source of learning and development. FT press.
+Li, X.; Liu, Y.; Chen, W.; You, B.; Di, Z.; He, Y.; Zheng,
+S.;etal.2026. SkillsBench:BenchmarkingHowWellAgent
+Skills Work Across Diverse Tasks. arXiv:2602.12670.
+Ma, K.; Du, X.; Wang, Y.; Zhang, H.; Wen, Z.; Qu, X.;
+Yang, J.; Liu, J.; Liu, M.; Yue, X.; Huang, W.; and Zhang,
+G. 2025. KOR-Bench: Benchmarking Language Models on
+Knowledge-Orthogonal Reasoning Tasks. InThe Thirteenth
+International Conference on Learning Representations.
+Ma, Y.; Huang, Y.; Bao, H.; Zhuang, H.; Shukla, S.; Galley,
+M.; Zhang, X.; and Feuerriegel, S. 2026. SkillGen: Verified
+Inference-Time Agent Skill Synthesis. arXiv:2605.10999.
+McClelland, J. L.; McNaughton, B. L.; and O’Reilly, R. C.
+1995. Why there are complementary learning systems in
+thehippocampusandneocortex:Insightsfromthesuccesses
+andfailuresofconnectionistmodelsoflearningandmemory.
+Psychological Review, 102(3): 419–457.
+Ni, J.; Liu, Y.; Liu, X.; Sun, Y.; Zhou, M.; Cheng, P.; Wang,
+D.;Zhao,E.;Jiang,X.;andJiang,G.2026. Trace2Skill:Dis-
+till Trajectory-Local Lessons into Transferable Agent Skills.
+arXiv:2603.25158.
+Ouyang,S.;Yan,J.;Hsu,I.-H.;Chen,Y.;Jiang,K.;Wang,Z.;
+Han, R.; Le, L. T.; Daruki, S.; Tang, X.; Tirumalashetty, V.;
+Lee, G.; Rofouei, M.; Lin, H.; Han, J.; Lee, C.-Y.; and Pfis-
+ter, T. 2026. ReasoningBank: Scaling Agent Self-Evolving
+with Reasoning Memory. InThe Fourteenth International
+Conference on Learning Representations.
+Schick, T.; Dwivedi-Yu, J.; Dessi, R.; Raileanu, R.; Lomeli,
+M.;Hambro,E.;Zettlemoyer,L.;Cancedda,N.;andScialom,
+T. 2023. Toolformer: Language Models Can Teach Them-
+selves to Use Tools. InAdvances in Neural Information
+Processing Systems, volume 36, 68539–68551. Curran As-
+sociates, Inc.
+Servantez, S.; Lawsky, S. B.; Jain, R.; Linna, D. W.; and
+Hammond,K.2026.OpenExempt:ADiagnosticBenchmark
+for Legal Reasoning and a Framework for Creating Custom
+Benchmarks on Demand. arXiv:2601.13183.
+Shinn, N.; Cassano, F.; Gopinath, A.; Narasimhan, K.; and
+Yao, S. 2023. Reflexion: Language Agents with Verbal Re-
+inforcement Learning. InAdvances in Neural Information
+Processing Systems, volume 36.
+Suzgun,M.;Yuksekgonul,M.;Bianchi,F.;Jurafsky,D.;and
+Zou,J.2026. DynamicCheatsheet:Test-TimeLearningwith
+AdaptiveMemory. InProceedingsofthe19thConferenceof
+the European Chapter of the Association for Computational
+Linguistics (Volume 1: Long Papers), 7080–7106. Associa-
+tion for Computational Linguistics.
+Wang, G.; Xie, Y.; Jiang, Y.; Mandlekar, A.; Xiao, C.; Zhu,
+Y.; Fan, L.; and Anandkumar, A. 2023. Voyager: An Open-
+EndedEmbodiedAgentwithLargeLanguageModels.arXiv
+preprint arXiv:2305.16291.
+Wang,Z.Z.;Mao,J.;Fried,D.;andNeubig,G.2025. Agent
+WorkflowMemory.InProceedingsofthe42ndInternational
+Conference on Machine Learning, volume 267 ofProceed-
+ings of Machine Learning Research, 63897–63911. PMLR.
+Xu, W.; Liang, Z.; Mei, K.; Gao, H.; Tan, J.; and Zhang,
+Y. 2025. A-MEM: Agentic Memory for LLM Agents. In
+Advances in Neural Information Processing Systems, vol-
+ume 38.
+Yang, R.; Song, L.; Li, Y.; Zhao, S.; Ge, Y.; Li, X.; and
+Shan,Y.2023.GPT4Tools:TeachingLargeLanguageModel
+to Use Tools via Self-Instruction. InAdvances in Neural
+Information Processing Systems, volume 36, 71995–72007.
+Curran Associates, Inc.
+Yao, S.; Zhao, J.; Yu, D.; Du, N.; Shafran, I.; Narasimhan,
+K.R.;andCao,Y.2023. ReAct:SynergizingReasoningand
+Acting in Language Models. InThe Eleventh International
+Conference on Learning Representations.
+Zhang, Q.; Hu, C.; Upasani, S.; Ma, B.; Hong, F.; Kama-
+nuru, V.; Rainton, J.; Wu, C.; Ji, M.; Li, H.; Thakker, U.;
+Zou,J.;andOlukotun,K.2026a. AgenticContextEngineer-
+ing: Evolving Contexts for Self-Improving Language Mod-
+els. InTheFourteenthInternationalConferenceonLearning
+Representations.
+Zhang, W.; Tang, K.; Wu, H.; Wang, M.; Shen, Y.; Hou, G.;
+Tan, Z.; Li, P.; Zhuang, Y.; and Lu, W. 2024. Agent-Pro:
+Learning to Evolve via Policy-Level Reflection and Opti-
+mization. InProceedings of the 62nd Annual Meeting of
+the Association for Computational Linguistics (Volume 1:
+Long Papers), 5348–5375. Association for Computational
+Linguistics.
+Zhang, Z.; Bu, W.; Pan, K.; Miao, B.; Zhang, W.; Wang,
+G.; Ji, W.; Tang, R.; Li, J.; and Tang, S. 2026b. Evolving
+Generalist Virtual Agents with Generative and Associative
+Memory.Proceedings of the AAAI Conference on Artificial
+Intelligence, 40(15): 13006–13014.
+Zhao,A.;Huang,D.;Xu,Q.;Lin,M.;Liu,Y.-J.;andHuang,
+G. 2024. ExpeL: LLM Agents Are Experiential Learners.
+Proceedings of the AAAI Conference on Artificial Intelli-
+gence, 38(17): 19632–19642.
+Zhong, S.; Lu, Y.; Ning, J.; Wan, Y.; Feng, L.; Ao, Y.;
+Ribeiro, L. F. R.; Dreyer, M.; Ammirati, S.; and Xiong, C.
+2026. SkillLearnBench: Benchmarking Continual Learning
+Methods for Agent Skill Generation on Real-World Tasks.
+arXiv:2604.20087.
+Zhou, R.; Hua, W.; Pan, L.; Cheng, S.; Wu, X.; Yu, E.; and
+Wang, W. Y. 2025. RuleArena: A Benchmark for Rule-
+Guided Reasoning with LLMs in Real-World Scenarios. In
+Proceedings of the 63rd Annual Meeting of the Associa-
+tionforComputationalLinguistics(Volume1:LongPapers),
+550–572.
+Zhou, S.; Xu, F. F.; Zhu, H.; Zhou, X.; Lo, R.; Sridhar, A.;
+Cheng, X.; Ou, T.; Bisk, Y.; Fried, D.; Alon, U.; and Neu-
+big, G. 2024. WebArena: A Realistic Web Environment for
+Building Autonomous Agents. InThe Twelfth International
+Conference on Learning Representations.
