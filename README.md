@@ -4,13 +4,22 @@
 ![papers](https://img.shields.io/badge/papers-61%2B6_classics-blue)
 ![reports](https://img.shields.io/badge/reports-29-red)
 ![zh-PDF](https://img.shields.io/badge/zh--PDF-29-green)
-![slides](https://img.shields.io/badge/slides-32p-orange)
+![slides](https://img.shields.io/badge/slides-34p-orange)
+![full report](https://img.shields.io/badge/full_report-97p-8a2be2)
+
+![Figure 1 · Timeline](assets/fig1_timeline.svg)
+
+*图 1 · 71 项工作的时间线：按十个家族分泳道、按 arXiv 首版年月定位（非 arXiv 材料取发布月近似），★ 为核心精读材料；1965-2014 思想史与 2023-2026 工程爆发之间断轴，2026-08 一个月集中了 21 项。*
+
+![Figure 2 · Taxonomy](assets/fig2_taxonomy.svg)
+
+*图 2 · 递归自改进的分类体系：七个一级维度（思想史与判据 / 改哪层 / 锚在哪 / 时间模式 / 知识侧 / 安全治理 / 测量与宏观）、37 个子类；"锚在哪"是本仓库独有的主轴，三份公开综述都没有这一列。两图由 `scripts/make_figures.py` 生成，深色版用于 PPT。*
 
 围绕 **Recursive Self-Improvement（递归自改进）** 的论文与资源列表 + 系统性调研仓库（2026-08-31 完成）。与一般 awesome 列表不同，本仓库同时提供：
 
 - **29 份中文精读报告**（`reports/`，逐篇拆方法、数字、局限与谱系定位，含 00 起源前史、23 桥接史与 26/27 两份合评）
 - **61 篇论文英文原版 PDF + 6 篇起源经典（1965-2013）+ 29 篇保版式中文翻译 PDF**（`papers/`，翻译由 [super_translate](https://github.com/asimfish/super_translate) 生成）
-- **32 页汇总报告**（`awesome_rsi_slides.html` 方向键翻页 / `awesome_rsi_slides.pdf`）
+- **34 页汇总 PPT**（`report/awesome_rsi_slides.html` 方向键翻页 / `.pdf`）+ **97 页全文报告**（`report/awesome_rsi_full_report.pdf`，29 份报告合订 + 两张纵览图）
 
 一句话结论：**执行已经自动化，品味正在被编译，锚是最后的手工业**——所有能跑的自进化系统都保留一个不参与进化的 ground-truth 锚；谁能工业化地生产不可 game 的锚，谁就握住了 RSI 的节流阀。
 
@@ -37,7 +46,8 @@
 
 | 时间预算 | 路线 |
 |---|---|
-| 15 分钟 | 打开 [`awesome_rsi_slides.html`](awesome_rsi_slides.html)（浏览器方向键翻页，P 键打印）或 [`awesome_rsi_slides.pdf`](awesome_rsi_slides.pdf) |
+| 15 分钟 | 打开 [`report/awesome_rsi_slides.html`](report/awesome_rsi_slides.html)（浏览器方向键翻页，P 键打印）或 [PDF 版](report/awesome_rsi_slides.pdf)（34 页） |
+| 通读 | [`report/awesome_rsi_full_report.pdf`](report/awesome_rsi_full_report.pdf)（97 页，29 份精读报告合订 + 图 1 时间线 / 图 2 分类树）· [HTML 版](report/awesome_rsi_full_report.html) |
 | 2 小时 | [汇总报告](reports/10_synthesis_insights.md) → [总纲解读](reports/01_lilian_weng_harness_engineering.md) → [Who Grades the Grader 解读](reports/05_who_grades_the_grader.md)（全谱系最重要的否定性结论） |
 | 系统研读 | `reports/` 按 00→23→01→02→07→03→04→05→06→08→11→09→10 顺序（谱系扩编 12-18、iCoder 19、前沿 20-22、评估器两极 24-25 按需精读），配 `papers/zh/` 中文 PDF 对照原文 |
 
@@ -272,7 +282,7 @@ _Thomas Kwa, Ben West, Joel Becker, et al. (METR)_ — "50% 任务时长地平�
 
 按目的选路线（materials 均在本仓库内）：
 
-- **想快速建立全景**：slides 32 页（15 分钟）→ [报告 10](reports/10_synthesis_insights.md)（叙事弧线 + 两轴地图 + 十条 insight）→ 三份综述解读 [12](reports/12_self_evolving_agents_survey.md) / [22](reports/22_coevolution_survey.md) / [28](reports/28_self_evolving_coding_agents_survey.md)
+- **想快速建立全景**：slides 34 页（15 分钟）→ [报告 10](reports/10_synthesis_insights.md)（叙事弧线 + 两轴地图 + 十条 insight）→ 三份综述解读 [12](reports/12_self_evolving_agents_survey.md) / [22](reports/22_coevolution_survey.md) / [28](reports/28_self_evolving_coding_agents_survey.md)
 - **想理解 harness 工程**：[报告 01](reports/01_lilian_weng_harness_engineering.md)（Weng 总纲）→ [报告 07](reports/07_darwin_godel_machine.md)（DGM 基线）→ [报告 11](reports/11_continual_harness.md)（免重置 + 共学习）
 - **想理解评估器战争**：[报告 03](reports/03_evolm.md)（reward overoptimization 悖论）→ [报告 04](reports/04_red_queen_godel_machine.md)（epoch 冻结）→ [报告 05](reports/05_who_grades_the_grader.md)（观测等价 + 锚定纪律）→ [报告 06](reports/06_echo.md)（权重层双路 GRPO）→ [报告 24](reports/24_evalcegar.md) vs [报告 25](reports/25_rho.md)（锚驱动进化 vs 完全无锚自偏好，两个极端）
 - **想看生产落地**：[报告 02](reports/02_anthropic_when_ai_builds_itself.md)（Anthropic 内部证据）→ [报告 08](reports/08_moss.md)（MOSS 门控回滚）→ [报告 19](reports/19_icoder.md)（iCoder 五层门控）→ [报告 27](reports/27_safety_governance.md)（SESG / OLE / HarnessFix / 发布门 / HVTB 部署纪律合评）
@@ -285,8 +295,15 @@ _Thomas Kwa, Ben West, Joel Becker, et al. (METR)_ — "50% 任务时长地平�
 ```
 awesome_rsi/
 ├── README.md                        # 本文件
-├── awesome_rsi_slides.html          # 32 页汇总 HTML PPT（方向键翻页，P 键打印）
-├── awesome_rsi_slides.pdf           # 同内容 32 页 PDF 版（1280x720 逐页）
+├── CONTRIBUTING.md                  # 贡献规范
+├── report/
+│   ├── awesome_rsi_slides.html      # 34 页汇总 HTML PPT（方向键翻页，P 键打印）
+│   ├── awesome_rsi_slides.pdf       # 同内容 34 页 PDF 版（1280x720 逐页）
+│   ├── awesome_rsi_full_report.html # 全文报告（29 份报告合订 + 封面 + 目录 + 两图）
+│   └── awesome_rsi_full_report.pdf  # 同内容 97 页 A4 PDF
+├── scripts/
+│   ├── make_figures.py              # 生成图 1 时间线 / 图 2 分类树（明暗两版 + PPT 分页版）
+│   └── build_full_report.py         # pandoc 合订 reports/*.md → HTML → Chrome PDF
 ├── reports/                         # 29 份精读报告（Markdown，中文）
 │   ├── 00_origins_1965_2014.md                 # 前史：Good → Yudkowsky → Schmidhuber → Bostrom
 │   ├── 01_lilian_weng_harness_engineering.md   # 总纲：harness 工程 → RSI
@@ -322,7 +339,9 @@ awesome_rsi/
 │   ├── en/                          # 61 篇英文原版 PDF（arXiv + iCoder 技术报告）
 │   └── zh/                          # 27 篇中文翻译 PDF（super_translate，保版式）
 └── assets/
-    ├── fulltext/                    # 核心论文提取全文（报告撰写底稿）
+    ├── fig1_timeline.svg            # 图 1 时间线（+ _dark / _dark_a / _dark_b 变体）
+    ├── fig2_taxonomy.svg            # 图 2 分类树（+ _dark / _dark_a / _dark_b 变体）
+    ├── fulltext/                    # 论文提取全文（报告撰写底稿）
     └── trends_research_raw.md       # 2026H2 趋势扫描原始笔记
 ```
 
@@ -398,7 +417,7 @@ awesome_rsi/
 - **基座**：以 [iCoder](https://github.com/bingreeky/iCoder) 代码库为后续开发基础，复用其 Research Skills 表示、治理四件套（任务队列 / 实验日志 / 决策记录 / 审批门）与 Data→SFT→OPSD→RLVR 可回退状态机（评估见[报告 19](reports/19_icoder.md)）
 - **待验证的设计选择**：harness 改写走 Meta-Harness 式全轨迹自由改写（报告 13）还是 AutoSaddler 式归因约束局部 diff（报告 16）；权重环走 Co-Harness 离线批次（报告 21）还是 Continual Harness 在线共学习（报告 11）
 - **不可妥协项**：进化外的独立锚（报告 05）、回归门（报告 14）、版本化回滚（报告 08 / 21）、过程级测试三件套（报告 22）
-- **持续维护**：新论文按 §4 格式追加，配 PDF-en 入库；重点论文补 PDF-zh 与精读报告；slides 与本 README 计数同步
+- **持续维护**：新论文按 §4 格式追加，配 PDF-en 入库；重点论文补 PDF-zh 与精读报告；新增报告后运行 `scripts/build_full_report.py --pdf` 重建全文报告、按需更新 `scripts/make_figures.py` 的 WORKS/TAXONOMY 重出两图；slides 与本 README 计数同步
 
 ## 14. System Comparison Matrix
 

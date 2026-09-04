@@ -30,7 +30,7 @@
 
 ## 更新计数与 slides
 
-新增报告或 PDF 后，同步更新：README 顶部徽章、§7 目录树、§14 对照矩阵（如适用）、`awesome_rsi_slides.html` 的封面/材料地图/导览页计数，并重新生成 `awesome_rsi_slides.pdf`（Chrome headless `--print-to-pdf`）。
+新增报告或 PDF 后，同步更新：README 顶部徽章、§7 目录树、§14 对照矩阵（如适用）、`report/awesome_rsi_slides.html` 的封面/材料地图/导览页计数并重新生成 `report/awesome_rsi_slides.pdf`（Chrome headless `--print-to-pdf`）；运行 `python3 scripts/build_full_report.py --pdf` 重建全文报告；若新增论文属于新家族或新子类，同步更新 `scripts/make_figures.py` 的 `WORKS` / `TAXONOMY` 并重新生成两图。
 
 ## 提交信息
 
