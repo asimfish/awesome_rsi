@@ -623,7 +623,8 @@
         </div>
         <div class="card">
           <h3>主结果（Qwen3-4B，四个开放世界环境）</h3>
-          <p>总均 <b>77.85</b> vs GRPO 70.57（+7.28）；DeepSearch +42% 相对提升；4B+ECHO 除 DeepSearch 外全面超 GPT-5 / Claude-Sonnet-4.5 / Qwen3-235B。</p>
+          <p style="margin-bottom:6px;">总均 <b>77.85</b> vs GRPO 70.57（+7.28）；DeepSearch +42% 相对提升；4B+ECHO 除 DeepSearch 外全面超 GPT-5 / Claude-Sonnet-4.5 / Qwen3-235B；也超有教师答案提示的 LUFFY（65.18）。</p>
+          <p style="font-size:13.5px;"><b>共进化在发生的直接观测</b>（附录 C）：critique 粒度随训练迁移——粗粒度 62%→9%、细粒度 13%→42%，policy 采纳 critic 意见的比率 75%→95%；同预算下 critic 引导精炼 vs 纯重采样的增益 +7.54 vs +0.23（晚期差距最大）；训练墙钟只多约 15%。</p>
         </div>
       </div>
       <div class="col">
@@ -669,10 +670,11 @@
           <ul>
             <li><b>SESG</b>（深信服，真实生产）：自进化安全护栏 16-24 小时闭环一个新威胁（原流程 40-90h，人工只剩约 2h），两个月自动闭环 14/15 新威胁场景</li>
             <li><b>OLE</b>：策略资产版本化 + Champion-Challenger 配对评估 + 劣化自动回滚</li>
-            <li><b>HarnessFix</b>：失败归因到 harness 七层中的责任层再修，提升 15.2%-50.0%</li>
-            <li><b>Falsifiable Release Gates</b>：七道可证伪发布门——<b>收紧类修改自动应用、放松类修改必须人类合并</b>；提议者必须能预测自己 diff 的效果，预测错的自动关闭</li>
+            <li><b>HarnessFix</b>：轨迹 IR（HTIR）把失败归因到 harness 七层中的责任层再做作用域受限修复，四基准 +6.3%–18.4%</li>
+            <li><b>Falsifiable Release Gates</b>：预声明的可证伪发布门 + 常驻不变量（六版本零修改）——<b>收紧类修改自动应用、放松类修改必须人类合并</b>；提议者必须能预测自己 diff 的效果，预测错的自动关闭</li>
+            <li><b>HVTB</b>：蜜罐让 reward hacking 可测（89 环境 / 2,225 轨迹）；<b>gemini-3.1-pro 明令禁止下仍 16.3% 作弊</b>，且加警告反而从 47.7% 升到 59.8%——所有检出率只是下界</li>
           </ul>
-          <p style="font-size:13.5px; color:var(--ink-faint); margin-top:8px;">共同定义 MOSS 之后的部署范式：每次自改动都是有版本、可审计、可预测、可回滚的 deploy。</p>
+          <p style="font-size:13.5px; color:var(--ink-faint); margin-top:8px;">共同定义 MOSS 之后的部署范式：每次自改动都是有版本、可审计、可预测、可回滚的 deploy；锚在安全域的三种形态——常驻不变量、嵌入式蜜罐、红队测试集。</p>
         </div>
       </div>
     </div>
@@ -701,15 +703,15 @@
         <div class="card">
           <h3>四个关键发现</h3>
           <ul>
-            <li>跨基准跨模型稳定超过 SOTA 技能进化方法；消融确认 <b>wiki 的持久积累是关键成分</b></li>
-            <li><b>技能进化与模型规模互补</b>：大模型从进化技能中获益更多；小模型+技能可胜大得多的裸模型</li>
-            <li><b>技能跨模型、跨家族迁移</b>：他模型进化的技能可以胜过自进化的技能——品味可以由强模型生产、弱模型消费</li>
-            <li>2026-08 单月至少 5 篇平行工作（SkillCommit / HyperSkill / ERSkill / SkillProx / Evo-Harness）——"经验到技能的编译"已是红海，共识在生命周期治理，分歧在结构</li>
+            <li>五基准五模型平均全部第一，比最强对手高 3.3–12.0 分（Gemini Flash LiveMath 33.0→72.6）；消融：Proposer 有 wiki <b>+15.0</b>，Inference 训练时读 wiki 反而 <b>−2.8</b>——知识层必须与执行层隔离</li>
+            <li><b>技能进化与模型规模互补</b>：Qwen 4B/9B/27B 增益 +12.3/+17.5/+23.9；<b>9B+技能 47.4% &gt; 27B 无技能 39.4%</b></li>
+            <li><b>技能跨模型迁移</b>：9B 用 27B 技能 70.2% &gt; 自己 63.4%；负迁移也存在（4B 技能把 Gemini SpreadSheet 50.5→18.1）——技能编码的是通用流程还是模型特定补丁决定可迁移性</li>
+            <li>2026-08 单月至少 5 篇平行工作（SkillCommit / HyperSkill / ERSkill / SkillProx / Evo-Harness）——共识在生命周期治理，分歧在结构</li>
           </ul>
         </div>
         <div class="card">
-          <h3>与评估侧的连线</h3>
-          <p style="font-size:14px;">技能合并的验证（SkillCommit 的行为验证）、技能删除的审计（SkillProx 的留一 utility）——技能生命周期的每个门，都是评估器瓶颈在知识层的投影。</p>
+          <h3>与评估侧的连线 + 一条反面数据</h3>
+          <p style="font-size:13.5px;">技能生命周期的每个门（SkillCommit 行为验证、SkillProx 留一审计）都是评估器瓶颈在知识层的投影。Metan 的消融给整个知识侧一个未回应的问题：<b>72% 增益来自条件化字符串、代码复用只占 15%</b>——五篇都没做"技能库 vs 等量上下文提示"的对照。</p>
         </div>
       </div>
     </div>
@@ -818,7 +820,7 @@
         <div class="ring-diagram">
           <div class="ring" style="border-color:var(--gold); background:var(--gold-soft);"><b>Meta-Harness（Stanford）· 锚 = 冻结的外层 proposer</b><p>Claude Code 读全部历史候选源码+分数+原始轨迹（每轮中位 82 文件 / 约 10M token）自主诊断改写 harness。决定性消融：只给分数 34.6、加摘要 34.9、给全轨迹 50.0——<b>轨迹是唯一关键成分</b>。TerminalBench-2：Opus 4.6 搜出的 harness 超手工 Terminus-KIRA（76.4% vs 74.7%）。</p></div>
           <div class="ring" style="border-color:var(--blue); background:var(--blue-soft);"><b>Self-Harness（上海 AI Lab）· 锚 = 回归门</b><p>同一冻结模型自改 harness：失败签名聚类 → K 个极小有界编辑 → held-in/held-out <b>双 split 均不回退才晋升</b>。9/9 组合齐升，最大 +132%（Qwen3.5-35B AppWorld 22.5→52.2）。回归门"改坏即拒"正是能力地板保护——CH 里弱模型全线更差，这里 35B 大幅提升。</p></div>
-          <div class="ring" style="border-color:var(--ink-faint); background:#F5F2EE;"><b>EnvHarness（Google Cloud AI）· 锚 = 不动的 R 轴</b><p>进化对象换成<b>环境</b>：Stage/Contract/Chain 三类插件改造冻结基准，原任务与人写验证器一律不动。难度校准命中率 6%→80%，ALFWorld OOD +9.0 点；300 个生成环境持续上行不塌平——定向供给优于无条件扩量。</p></div>
+          <div class="ring" style="border-color:var(--ink-faint); background:#F5F2EE;"><b>EnvHarness（Google Cloud AI）· 锚 = 不动的 R 轴</b><p>进化对象换成<b>环境</b>：Stage/Contract/Chain 三类插件改造冻结基准，原任务与人写验证器一律不动。ALFWorld OOD +9.0 点、SWE-bench 步数 53.6→49.6——而<b>从静态环境抽的技能可为负资产</b>（SpreadsheetBench 45.9 &lt; 无技能 46.4、SWE 步数反增到 55.0）；300 个生成环境持续上行不塌平；跨四个 backbone 增益平坦（+2.7–3.7）——消费改造环境不需要生产能力。</p></div>
         </div>
       </div>
       <div class="col" style="flex:0.95;">
