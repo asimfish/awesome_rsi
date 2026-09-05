@@ -4,11 +4,13 @@
 
 ## 添加论文
 
-1. 在 `README.md` 对应分节（§3 按五侧分类，§4 前沿追踪按主题分组）追加条目，格式与 [awesome-ml4co](https://github.com/Thinklab-SJTU/awesome-ml4co) 一致：
+1. 在 `README.md` §4 的对应小节（4.1 起源 / 4.2 桥接 / 4.3 综述 / 4.4–4.8 五侧 / 4.9 harness 工程 / 4.10 自动研究 / 4.11 安全治理 / 4.12 程序进化谱系 / 4.13 宏观测量）追加条目，并在 §5 报告索引、§7.3 对照矩阵（如适用）中同步，格式与 [awesome-ml4co](https://github.com/Thinklab-SJTU/awesome-ml4co) 一致：
 
    ```
-   N. **标题.** 来源, 年份\. [paper](arXiv 链接), [code](可选), [PDF-en](papers/en/<id>_<Short>.pdf), [PDF-zh](可选), [解读](可选)
-   _作者_ — 一句话定位（含最关键的一个数字）
+   N. **标题.** 来源, 年份\. [paper](arXiv 链接), [code](可选), [PDF-en](papers/en/<id>_<Short>.pdf), [PDF-zh](papers/zh/<id>_<Short>_zh.pdf), [解读](可选)
+   _作者 (机构)_ — 一句话定位（含最关键的一个数字）
+
+   ⭐ 只用于调研发起时的十份核心精读对象，新条目不加。
    ```
 
 2. 英文 PDF 放入 `papers/en/`，命名 `<arXiv id>_<ShortName>.pdf`；起源类经典放 `papers/classics/`，命名 `<年份>_<作者>_<Short>.pdf`。
@@ -44,7 +46,7 @@
 
 ## 更新计数与 slides
 
-新增报告或 PDF 后，同步更新：README 顶部徽章、§7 目录树、§14 对照矩阵（如适用）、`report/awesome_rsi_slides.html` 的封面/材料地图/导览页计数并重新生成 `report/awesome_rsi_slides.pdf`（Chrome headless `--print-to-pdf`）；运行 `python3 scripts/build_full_report.py --pdf` 重建全文报告；若新增论文属于新家族或新子类，同步更新 `scripts/make_figures.py` 的 `WORKS` / `TAXONOMY` 并重新生成两图。
+新增报告或 PDF 后，同步更新：README 顶部徽章与"内容一览"表、§5 报告索引、§7.3 对照矩阵（如适用）、§9 目录树、`report/awesome_rsi_slides.html` 的封面/材料地图/导览页计数并重新生成 `report/awesome_rsi_slides.pdf`（Chrome headless `--print-to-pdf`）；运行 `python3 scripts/build_full_report.py --pdf` 重建全文报告；若新增论文属于新家族或新子类，同步更新 `scripts/make_figures.py` 的 `WORKS` / `TAXONOMY` 并重新生成两图。
 
 ## 提交信息
 
