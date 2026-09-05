@@ -2209,7 +2209,7 @@ where 𝑂𝑐,𝑖is the 𝑖-th outcome observed from cell 𝑐. This conditio
 cell-level outcomes are independent Bernoulli trials with fixed success probability 𝑝𝑐,𝒋(𝑎), or
 under any stationary martingale-difference model satisfying the strong law.
 Define the HGM-compatible working posterior
-𝑄𝑛(𝑎) = Beta 1 + 𝑆𝑎(𝑛), 1 + 𝑛−𝑆𝑎(𝑛).
+𝑄𝑛(𝑎) = Beta 1 + 𝑆𝑎(𝑛), 1 + 𝑛−𝑆𝑎(𝑛).
 Its mean is
 𝑀𝑛(𝑎) = 1 + 𝑆𝑎(𝑛)
 2 + 𝑛
@@ -2258,7 +2258,7 @@ Taking limits and using the finiteness of C𝒋(𝑎),
 𝑤𝑐𝑝𝑐= 𝑈𝒋(𝑎)
 a.s.
 The HGM working posterior is
-𝑄𝑛(𝑎) = Beta 1 + 𝑆𝑎(𝑛), 1 + 𝑛−𝑆𝑎(𝑛),
+𝑄𝑛(𝑎) = Beta 1 + 𝑆𝑎(𝑛), 1 + 𝑛−𝑆𝑎(𝑛),
 with mean
 𝑀𝑛(𝑎) = 1 + 𝑆𝑎(𝑛)
 2 + 𝑛
@@ -2301,7 +2301,7 @@ denote the slot-local
 utility criterion active at epoch index 𝑗𝑚. A slot criterion includes all slot-local objects that can affect
 the distribution of utility evidence for records depending on that slot. It does not include derived
 search statistics, which are recomputed from retained utility evidence after transitions. Let
-𝜿𝒋=  𝜅( 𝑗1)
+𝜿𝒋=  𝜅( 𝑗1)
 1
 , . . . , 𝜅( 𝑗𝑀)
 𝑀
@@ -2335,7 +2335,7 @@ transitions, but they contribute to node-level or clade-level utility statistics
 valid records. A replayed or re-scored artifact yields a new record for the task actually used, tagged
 with the current criterion.
 A utility evidence record is written as
-𝑧=  𝑎(𝑧), 𝑟(𝑧), 𝑑(𝑧), 𝑜(𝑧), dep(𝑧), 𝜅(𝑧), 𝒋(𝑧),
+𝑧=  𝑎(𝑧), 𝑟(𝑧), 𝑑(𝑧), 𝑜(𝑧), dep(𝑧), 𝜅(𝑧), 𝒋(𝑧),
 where 𝑎(𝑧) is the node, 𝑟(𝑧) the role, 𝑑(𝑧) the task, and 𝑜(𝑧) ∈{0, 1} the binary outcome. The set
 dep(𝑧) ⊆{1, . . . , 𝑀}
 contains every evaluator slot whose criterion affected the record, either through artifact generation,
@@ -2522,7 +2522,7 @@ and define
 𝐵𝐵𝜖(𝑎) = 𝐼−1
 𝜖(1 + 𝑆𝑎, 1 + 𝐹𝑎).
 If 𝑎★∈arg max𝑎∈A 𝐵𝐵𝜖(𝑎), then, under the working posterior for 𝑎★,
-Pr 𝑈(𝑎★) ≥𝐵𝐵𝜖(𝑎★) | 𝑄𝑎★ = 1 −𝜖.
+Pr 𝑈(𝑎★) ≥𝐵𝐵𝜖(𝑎★) | 𝑄𝑎★ = 1 −𝜖.
 More generally, for any sequence of 𝐿reported selections 𝑎★
 1, . . . , 𝑎★
 𝐿, if the corresponding work-

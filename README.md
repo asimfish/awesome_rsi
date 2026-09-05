@@ -17,9 +17,9 @@
 
 围绕 **Recursive Self-Improvement（递归自改进）** 的论文与资源列表 + 系统性调研仓库（2026-08-31 完成）。与一般 awesome 列表不同，本仓库同时提供：
 
-- **29 份中文精读报告**（`reports/`，逐篇拆方法、数字、局限与谱系定位，含 00 起源前史、23 桥接史与 26/27 两份合评）
+- **29 份中文深度解读**（`reports/`，约 8.3 万字；统一七节结构——一句话定位 / 要解决的问题 / 为什么此前做不通 / 方法机制 / 实验结果全景 / 局限 / 意义与位置——每篇 2000–5200 字，逐篇拆方法、数字、消融、局限与谱系定位；含 00 起源前史、23 桥接史与 26/27 两份合评）
 - **61 篇论文英文原版 PDF + 6 篇起源经典（1965-2013）+ 29 篇保版式中文翻译 PDF**（`papers/`，翻译由 [super_translate](https://github.com/asimfish/super_translate) 生成）
-- **34 页汇总 PPT**（`report/awesome_rsi_slides.html` 方向键翻页 / `.pdf`）+ **97 页全文报告**（`report/awesome_rsi_full_report.pdf`，29 份报告合订 + 两张纵览图）
+- **34 页汇总 PPT**（`report/awesome_rsi_slides.html` 方向键翻页 / `.pdf`）+ **149 页全文报告**（`report/awesome_rsi_full_report.pdf`，29 份报告合订 + 两张纵览图）
 
 一句话结论：**执行已经自动化，品味正在被编译，锚是最后的手工业**——所有能跑的自进化系统都保留一个不参与进化的 ground-truth 锚；谁能工业化地生产不可 game 的锚，谁就握住了 RSI 的节流阀。
 
@@ -47,7 +47,7 @@
 | 时间预算 | 路线 |
 |---|---|
 | 15 分钟 | 打开 [`report/awesome_rsi_slides.html`](report/awesome_rsi_slides.html)（浏览器方向键翻页，P 键打印）或 [PDF 版](report/awesome_rsi_slides.pdf)（34 页） |
-| 通读 | [`report/awesome_rsi_full_report.pdf`](report/awesome_rsi_full_report.pdf)（97 页，29 份精读报告合订 + 图 1 时间线 / 图 2 分类树）· [HTML 版](report/awesome_rsi_full_report.html) |
+| 通读 | [`report/awesome_rsi_full_report.pdf`](report/awesome_rsi_full_report.pdf)（149 页，29 份精读报告合订 + 图 1 时间线 / 图 2 分类树）· [HTML 版](report/awesome_rsi_full_report.html) |
 | 2 小时 | [汇总报告](reports/10_synthesis_insights.md) → [总纲解读](reports/01_lilian_weng_harness_engineering.md) → [Who Grades the Grader 解读](reports/05_who_grades_the_grader.md)（全谱系最重要的否定性结论） |
 | 系统研读 | `reports/` 按 00→23→01→02→07→03→04→05→06→08→11→09→10 顺序（谱系扩编 12-18、iCoder 19、前沿 20-22、评估器两极 24-25 按需精读），配 `papers/zh/` 中文 PDF 对照原文 |
 
@@ -300,7 +300,7 @@ awesome_rsi/
 │   ├── awesome_rsi_slides.html      # 34 页汇总 HTML PPT（方向键翻页，P 键打印）
 │   ├── awesome_rsi_slides.pdf       # 同内容 34 页 PDF 版（1280x720 逐页）
 │   ├── awesome_rsi_full_report.html # 全文报告（29 份报告合订 + 封面 + 目录 + 两图）
-│   └── awesome_rsi_full_report.pdf  # 同内容 97 页 A4 PDF
+│   └── awesome_rsi_full_report.pdf  # 同内容 149 页 A4 PDF
 ├── scripts/
 │   ├── make_figures.py              # 生成图 1 时间线 / 图 2 分类树（明暗两版 + PPT 分页版）
 │   └── build_full_report.py         # pandoc 合订 reports/*.md → HTML → Chrome PDF
