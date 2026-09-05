@@ -113,7 +113,7 @@ Qwen-3.6-27B 在各基准上的增益为：SpreadSheet **+40.9**、LiveMath **+2
 
 **与六篇核心材料的关系**：六篇主要研究评估器进化，WikiSkill 关注知识保存与复用。本文仍用静态评估器判断技能，持久 wiki 层则补充了 ECHO/RQGM 缺少的知识管理机制。
 
-**与技能进化红海五篇（报告 26）**：WikiSkill 发布前后两周内，SkillCommit / HyperSkill / ERSkill / SkillProx / Evo-Harness 相继出现。它们选择了不同的技能组织方式：层级、超图、检索原语、近端形式化或单次编译。这五篇都没有采用 WikiSkill 的分层规则，即知识层永不回滚、技能层经过严格验证。SkillCommit 的跨实例重放可以补充 WikiSkill 的一处验证缺口：从 wiki 抽象为 skill 的过程缺少行为验证。
+**与技能进化五篇合评（报告 26）**：WikiSkill 发布前后两周内，SkillCommit / HyperSkill / ERSkill / SkillProx / Evo-Harness 相继出现。它们选择了不同的技能组织方式：层级、超图、检索原语、近端形式化或单次编译。这五篇都没有采用 WikiSkill 的分层规则，即知识层永不回滚、技能层经过严格验证。SkillCommit 的跨实例重放可以补充 WikiSkill 的一处验证缺口：从 wiki 抽象为 skill 的过程缺少行为验证。
 
 **与 Metan（报告 20）的反面数据**：Metan 消融中，层间条件化字符串贡献 72%，可调用代码库贡献 15%。WikiSkill 用文本（SKILL.md）表示技能，因此收益可能主要来自改进 prompt 前缀，尚不能归因于执行程序。论文没有做"技能 vs 等量上下文提示"的对照，知识侧研究普遍缺少这项验证。
 
