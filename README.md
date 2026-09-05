@@ -18,7 +18,7 @@
 围绕 **Recursive Self-Improvement（递归自改进）** 的论文与资源列表 + 系统性调研仓库（2026-08-31 完成）。与一般 awesome 列表不同，本仓库同时提供：
 
 - **29 份中文深度解读**（`reports/`，约 8.3 万字；统一七节结构——一句话定位 / 要解决的问题 / 为什么此前做不通 / 方法机制 / 实验结果全景 / 局限 / 意义与位置——每篇 2000–5200 字，逐篇拆方法、数字、消融、局限与谱系定位；含 00 起源前史、23 桥接史与 26/27 两份合评）
-- **61 篇论文英文原版 PDF + 6 篇起源经典（1965-2013）+ 29 篇保版式中文翻译 PDF**（`papers/`，翻译由 [super_translate](https://github.com/asimfish/super_translate) 生成）
+- **61 篇论文英文原版 PDF + 6 篇起源经典（1965-2013）+ 66 篇保版式中文翻译 PDF**（`papers/`，翻译由 [super_translate](https://github.com/asimfish/super_translate) 生成）
 - **34 页汇总 PPT**（`report/awesome_rsi_slides.html` 方向键翻页 / `.pdf`）+ **149 页全文报告**（`report/awesome_rsi_full_report.pdf`，29 份报告合订 + 两张纵览图）
 
 一句话结论：**执行已经自动化，品味正在被编译，锚是最后的手工业**——所有能跑的自进化系统都保留一个不参与进化的 ground-truth 锚；谁能工业化地生产不可 game 的锚，谁就握住了 RSI 的节流阀。
@@ -85,20 +85,20 @@ _Nick Bostrom_ — 把 RSI 放入 optimization power / recalcitrance 动力学�
 
 5. **The Coming Technological Singularity: How to Survive in the Post-Human Era.** VISION-21 Symposium, 1993\. [essay](https://edoras.sdsu.edu/~vinge/misc/singularity.html)
 _Vernor Vinge_ — 把 Good 的智能爆炸命名为"奇点"并给出四条路径，第一条即"足够觉醒的超人智能计算机"。
-6. **The Basic AI Drives.** AGI-08, 2008\. [paper](https://selfawaresystems.com/wp-content/uploads/2008/01/ai_drives_final.pdf), [PDF](papers/classics/2008_Omohundro_BasicAIDrives.pdf)
+6. **The Basic AI Drives.** AGI-08, 2008\. [paper](https://selfawaresystems.com/wp-content/uploads/2008/01/ai_drives_final.pdf), [PDF](papers/classics/2008_Omohundro_BasicAIDrives.pdf), [PDF-zh](papers/classics/2008_Omohundro_BasicAIDrives_zh.pdf)
 _Stephen M. Omohundro_ — 论证任何足够强的目标驱动系统都会自发产生自改进、自保护、资源获取等工具性驱力——RSI 安全讨论的起点。
-7. **The Singularity: A Philosophical Analysis.** Journal of Consciousness Studies, 2010\. [paper](http://consc.net/papers/singularity.pdf), [PDF](papers/classics/2010_Chalmers_Singularity.pdf)
+7. **The Singularity: A Philosophical Analysis.** Journal of Consciousness Studies, 2010\. [paper](http://consc.net/papers/singularity.pdf), [PDF](papers/classics/2010_Chalmers_Singularity.pdf), [PDF-zh](papers/classics/2010_Chalmers_Singularity_zh.pdf)
 _David J. Chalmers_ — 把智能爆炸论证形式化为"比例论题 + 扩展论题"，并系统讨论结构性障碍与动机性障碍。
-8. **Intelligence Explosion Microeconomics.** MIRI Technical Report, 2013\. [paper](https://intelligence.org/files/IEM.pdf), [PDF](papers/classics/2013_Yudkowsky_IEM.pdf)
+8. **Intelligence Explosion Microeconomics.** MIRI Technical Report, 2013\. [paper](https://intelligence.org/files/IEM.pdf), [PDF](papers/classics/2013_Yudkowsky_IEM.pdf), [PDF-zh](papers/classics/2013_Yudkowsky_IEM_zh.pdf)
 _Eliezer Yudkowsky_ — 把"认知再投资的回报率"作为核心变量，讨论 recalcitrance 曲线形状；Bostrom 2014 动力学框架的直接前身，也是报告 10 insight 9（σ 替代弹性）宏观争论的源头。
 
 ## 2.6 Bridge (2023-2025)
 
 从思想史到 2025 年工程爆发之间的四块踏脚石（逐篇拆解见[解读报告 23](reports/23_godel_agent_to_sica.md)，其中 Gödel Agent 与 SICA 为精读对象）：
 
-1. **Voyager: An Open-Ended Embodied Agent with Large Language Models.** arXiv, 2023\. [paper](https://arxiv.org/abs/2305.16291), [code](https://github.com/MineDojo/Voyager), [PDF-en](papers/en/2305.16291_Voyager.pdf)
+1. **Voyager: An Open-Ended Embodied Agent with Large Language Models.** arXiv, 2023\. [paper](https://arxiv.org/abs/2305.16291), [code](https://github.com/MineDojo/Voyager), [PDF-en](papers/en/2305.16291_Voyager.pdf), [PDF-zh](papers/zh/2305.16291_Voyager_zh.pdf)
 _Guanzhi Wang, Yuqi Xie, Yunfan Jiang, Ajay Mandlekar, et al. (NVIDIA/Caltech/Stanford)_ — 第一个"可执行技能库随交互增长"的 LLM agent，WikiSkill / SkillRL 等知识侧工作的共同祖先。
-2. **The AI Scientist: Towards Fully Automated Open-Ended Scientific Discovery.** arXiv, 2024\. [paper](https://arxiv.org/abs/2408.06292), [code](https://github.com/SakanaAI/AI-Scientist), [PDF-en](papers/en/2408.06292_AIScientist.pdf)
+2. **The AI Scientist: Towards Fully Automated Open-Ended Scientific Discovery.** arXiv, 2024\. [paper](https://arxiv.org/abs/2408.06292), [code](https://github.com/SakanaAI/AI-Scientist), [PDF-en](papers/en/2408.06292_AIScientist.pdf), [PDF-zh](papers/zh/2408.06292_AIScientist_zh.pdf)
 _Chris Lu, Cong Lu, Robert Tjarko Lange, Jakob Foerster, Jeff Clune, David Ha (Sakana AI)_ — Weng 博文"auto-research"线的起点：端到端自动生成 ML 论文，也暴露了 Why LLMs Aren't Scientists Yet 后来系统化的失败模式。
 3. ⭐ **Gödel Agent: A Self-Referential Agent Framework for Recursively Self-Improvement.** arXiv, 2024\. [paper](https://arxiv.org/abs/2410.04444), [code](https://github.com/Arvid-pku/Godel_Agent), [PDF-en](papers/en/2410.04444_GodelAgent.pdf), [PDF-zh](papers/zh/2410.04444_GodelAgent_zh.pdf), [解读](reports/23_godel_agent_to_sica.md)
 _Xunjian Yin, Xinyi Wang, Liangming Pan, Li Lin, Xiaojun Wan, William Yang Wang (PKU/UCSB)_ — Gödel Machine 的第一个 LLM 实现：monkey patching 运行时改写自身逻辑，只靠高层目标提示驱动。
@@ -154,9 +154,9 @@ _Zhicong Li, Lingjie Jiang, Yulan Hu, Xingchen Zeng, Yixia Li, Xiangwen Zhang, G
 
 1. ⭐ **WikiSkill: Compiling Agent Experience into Persistent Knowledge for Skill Evolution.** arXiv, 2026\. [paper](https://arxiv.org/abs/2608.27454), [PDF-en](papers/en/2608.27454_WikiSkill.pdf), [PDF-zh](papers/zh/2608.27454_WikiSkill_zh.pdf), [解读](reports/09_wikiskill.md)
 _Liyan Tang, Cyrus Rashtchian, Chun-Sung Ferng, Andrew Tomkins, Da-Cheng Juan, Tu Vu_
-2. **SkillRL: Evolving Agents via Recursive Skill-Augmented Reinforcement Learning.** arXiv, 2026\. [paper](https://arxiv.org/abs/2602.08234), [code](https://github.com/aiming-lab/SkillRL), [PDF-en](papers/en/2602.08234_SkillRL.pdf), [中文解读](https://mp.weixin.qq.com/s/wqMM1D4NZQmRtWOcebuhTA)
+2. **SkillRL: Evolving Agents via Recursive Skill-Augmented Reinforcement Learning.** arXiv, 2026\. [paper](https://arxiv.org/abs/2602.08234), [code](https://github.com/aiming-lab/SkillRL), [PDF-en](papers/en/2602.08234_SkillRL.pdf), [PDF-zh](papers/zh/2602.08234_SkillRL_zh.pdf), [中文解读](https://mp.weixin.qq.com/s/wqMM1D4NZQmRtWOcebuhTA)
 _Peng Xia, Jianwen Chen, Hanyang Wang, Jiaqi Liu, et al. (UNC/aiming-lab)_ — 轨迹蒸馏为分层 SkillBank，技能库在 RL 中按验证失败递归进化，ALFWorld/WebShop 超基线 15.3%。
-3. **Evolving-RL: End-to-End Optimization of Experience-Driven Self-Evolving Capability within Agents.** arXiv, 2026\. [paper](https://arxiv.org/abs/2605.10663), [code](https://github.com/Fanzy27/Evolving-RL), [PDF-en](papers/en/2605.10663_EvolvingRL.pdf), [中文解读](https://mp.weixin.qq.com/s/bu3-RyqaYPdA1mH79oF39g)
+3. **Evolving-RL: End-to-End Optimization of Experience-Driven Self-Evolving Capability within Agents.** arXiv, 2026\. [paper](https://arxiv.org/abs/2605.10663), [code](https://github.com/Fanzy27/Evolving-RL), [PDF-en](papers/en/2605.10663_EvolvingRL.pdf), [PDF-zh](papers/zh/2605.10663_EvolvingRL_zh.pdf), [中文解读](https://mp.weixin.qq.com/s/bu3-RyqaYPdA1mH79oF39g)
 _Xiaohongshu Inc. + Peking University_ — 同一共享策略同时当 extractor 与 solver，用下游迁移收益做 GRPO 奖励联合优化经验提取与利用；ALFWorld 未见任务相对 GRPO 基线 +98.7%。
 
 ### 3.5 Online Side
@@ -172,39 +172,39 @@ _Seth Karten, Joel Zhang, Tersoo Upaa Jr, Ruirong Feng, Wenzhe Li, Chengshuai Sh
 
 1. **Self-Taught Optimizer (STOP): Recursively Self-Improving Code Generation.** COLM, 2024\. [paper](https://arxiv.org/abs/2310.02304), [PDF-en](papers/en/2310.02304_STOP.pdf), [PDF-zh](papers/zh/2310.02304_STOP_zh.pdf)
 _Eric Zelikman, Eliana Lorch, Lester Mackey, Adam Tauman Kalai_
-2. **Automated Design of Agentic Systems (ADAS).** ICLR, 2025\. [paper](https://arxiv.org/abs/2408.08435), [code](https://github.com/ShengranHu/ADAS), [PDF-en](papers/en/2408.08435_ADAS.pdf)
+2. **Automated Design of Agentic Systems (ADAS).** ICLR, 2025\. [paper](https://arxiv.org/abs/2408.08435), [code](https://github.com/ShengranHu/ADAS), [PDF-en](papers/en/2408.08435_ADAS.pdf), [PDF-zh](papers/zh/2408.08435_ADAS_zh.pdf)
 _Shengran Hu, Cong Lu, Jeff Clune_
-3. **AFlow: Automating Agentic Workflow Generation.** ICLR, 2025\. [paper](https://arxiv.org/abs/2410.10762), [code](https://github.com/FoundationAgents/AFlow), [PDF-en](papers/en/2410.10762_AFlow.pdf)
+3. **AFlow: Automating Agentic Workflow Generation.** ICLR, 2025\. [paper](https://arxiv.org/abs/2410.10762), [code](https://github.com/FoundationAgents/AFlow), [PDF-en](papers/en/2410.10762_AFlow.pdf), [PDF-zh](papers/zh/2410.10762_AFlow_zh.pdf)
 _Jiayi Zhang, Jinyu Xiang, Zhaoyang Yu, Fengwei Teng, Xiong-Hui Chen, et al._
-4. **AlphaEvolve: A Coding Agent for Scientific and Algorithmic Discovery.** arXiv, 2025\. [paper](https://arxiv.org/abs/2506.13131), [PDF-en](papers/en/2506.13131_AlphaEvolve.pdf)
+4. **AlphaEvolve: A Coding Agent for Scientific and Algorithmic Discovery.** arXiv, 2025\. [paper](https://arxiv.org/abs/2506.13131), [PDF-en](papers/en/2506.13131_AlphaEvolve.pdf), [PDF-zh](papers/zh/2506.13131_AlphaEvolve_zh.pdf)
 _Alexander Novikov, Ngân Vũ, Marvin Eisenberger, Emilien Dupont, Po-Sen Huang, et al. (Google DeepMind)_
-5. **GEPA: Reflective Prompt Evolution Can Outperform Reinforcement Learning.** ICLR (Oral), 2026\. [paper](https://arxiv.org/abs/2507.19457), [code](https://github.com/gepa-ai/gepa), [PDF-en](papers/en/2507.19457_GEPA.pdf)
+5. **GEPA: Reflective Prompt Evolution Can Outperform Reinforcement Learning.** ICLR (Oral), 2026\. [paper](https://arxiv.org/abs/2507.19457), [code](https://github.com/gepa-ai/gepa), [PDF-en](papers/en/2507.19457_GEPA.pdf), [PDF-zh](papers/zh/2507.19457_GEPA_zh.pdf)
 _Lakshya A Agrawal, Shangyin Tan, Dilara Soylu, Noah Ziems, et al._
-6. **ShinkaEvolve: Towards Open-Ended and Sample-Efficient Program Evolution.** arXiv, 2025\. [paper](https://arxiv.org/abs/2509.19349), [code](https://github.com/SakanaAI/ShinkaEvolve), [PDF-en](papers/en/2509.19349_ShinkaEvolve.pdf)
+6. **ShinkaEvolve: Towards Open-Ended and Sample-Efficient Program Evolution.** arXiv, 2025\. [paper](https://arxiv.org/abs/2509.19349), [code](https://github.com/SakanaAI/ShinkaEvolve), [PDF-en](papers/en/2509.19349_ShinkaEvolve.pdf), [PDF-zh](papers/zh/2509.19349_ShinkaEvolve_zh.pdf)
 _Robert Tjarko Lange, Yuki Imajuku, Edoardo Cetin (Sakana AI)_
 7. **Agentic Context Engineering (ACE): Evolving Contexts for Self-Improving Language Models.** ICLR, 2026\. [paper](https://arxiv.org/abs/2510.04618), [PDF-en](papers/en/2510.04618_ACE.pdf), [PDF-zh](papers/zh/2510.04618_ACE_zh.pdf)
 _Qizheng Zhang, Changran Hu, Shubhangi Upasani, Boyuan Ma, et al._
-8. **Why LLMs Aren't Scientists Yet: Lessons from Four Autonomous Research Attempts.** arXiv, 2026\. [paper](https://arxiv.org/abs/2601.03315), [PDF-en](papers/en/2601.03315_WhyLLMsArentScientistsYet.pdf)
+8. **Why LLMs Aren't Scientists Yet: Lessons from Four Autonomous Research Attempts.** arXiv, 2026\. [paper](https://arxiv.org/abs/2601.03315), [PDF-en](papers/en/2601.03315_WhyLLMsArentScientistsYet.pdf), [PDF-zh](papers/zh/2601.03315_WhyLLMsArentScientistsYet_zh.pdf)
 _Dhruv Trehan, Paras Chopra_
 9. **Meta Context Engineering via Agentic Skill Evolution (MCE).** arXiv, 2026\. [paper](https://arxiv.org/abs/2601.21557), [PDF-en](papers/en/2601.21557_MCE.pdf), [PDF-zh](papers/zh/2601.21557_MCE_zh.pdf)
 _Haoran Ye, Xuning He, Vincent Arak, Haonan Dong, Guojie Song_
-10. **HyperAgents.** arXiv, 2026\. [paper](https://arxiv.org/abs/2603.19461), [PDF-en](papers/en/2603.19461_Hyperagents.pdf)
+10. **HyperAgents.** arXiv, 2026\. [paper](https://arxiv.org/abs/2603.19461), [PDF-en](papers/en/2603.19461_Hyperagents.pdf), [PDF-zh](papers/zh/2603.19461_Hyperagents_zh.pdf)
 _Jenny Zhang, Bingchen Zhao, Wannan Yang, Jakob Foerster, Jeff Clune, Minqi Jiang, Sam Devlin, Tatiana Shavrina_
 11. **Meta-Harness: End-to-End Optimization of Model Harnesses.** arXiv, 2026\. [paper](https://arxiv.org/abs/2603.28052), [code](https://github.com/stanford-iris-lab/meta-harness-tbench2-artifact), [PDF-en](papers/en/2603.28052_MetaHarness.pdf), [PDF-zh](papers/zh/2603.28052_MetaHarness_zh.pdf), [解读](reports/13_meta_harness.md)
 _Yoonho Lee, Roshen Nair, Qizheng Zhang, Kangwook Lee, et al._
 12. **Agentic Harness Engineering: Observability-Driven Automatic Evolution of Coding-Agent Harnesses (AHE).** arXiv, 2026\. [paper](https://arxiv.org/abs/2604.25850), [code](https://github.com/china-qijizhifeng/agentic-harness-engineering), [PDF-en](papers/en/2604.25850_AHE.pdf), [PDF-zh](papers/zh/2604.25850_AHE_zh.pdf)
 _Jiahang Lin, Shichun Liu, Chengjun Pan, Lizhi Lin, Shihan Dou, et al._
-13. **DemoEvolve: Overcoming Sparse Feedback in Agentic Harness Evolution with Demonstrations.** arXiv, 2026\. [paper](https://arxiv.org/abs/2605.24539), [PDF-en](papers/en/2605.24539_DemoEvolve.pdf)
+13. **DemoEvolve: Overcoming Sparse Feedback in Agentic Harness Evolution with Demonstrations.** arXiv, 2026\. [paper](https://arxiv.org/abs/2605.24539), [PDF-en](papers/en/2605.24539_DemoEvolve.pdf), [PDF-zh](papers/zh/2605.24539_DemoEvolve_zh.pdf)
 _Lirong Che, Yuzhe Yang, Peiwen Lin, Chuang Wang, Xueqian Wang, Jian Su_
-14. **ScientistOne: Towards Human-Level Autonomous Research via Chain-of-Evidence.** arXiv, 2026\. [paper](https://arxiv.org/abs/2605.26340), [PDF-en](papers/en/2605.26340_ScientistOne.pdf)
+14. **ScientistOne: Towards Human-Level Autonomous Research via Chain-of-Evidence.** arXiv, 2026\. [paper](https://arxiv.org/abs/2605.26340), [PDF-en](papers/en/2605.26340_ScientistOne.pdf), [PDF-zh](papers/zh/2605.26340_ScientistOne_zh.pdf)
 _Rui Meng, Bhavana Dalvi Mishra, Jiefeng Chen, Chun-Liang Li, et al. (Google Cloud AI Research)_
-15. **SIA: Self Improving AI with Harness & Weight Updates.** arXiv, 2026\. [paper](https://arxiv.org/abs/2605.27276), [PDF-en](papers/en/2605.27276_SIA.pdf)
+15. **SIA: Self Improving AI with Harness & Weight Updates.** arXiv, 2026\. [paper](https://arxiv.org/abs/2605.27276), [PDF-en](papers/en/2605.27276_SIA.pdf), [PDF-zh](papers/zh/2605.27276_SIA_zh.pdf)
 _Prannay Hebbar, Yogendra Manawat, Samuel Verboomen, et al. (Hexo Labs)_
-16. **Harness Updating Is Not Harness Benefit: Disentangling Evolution Capabilities in Self-Evolving LLM Agents.** arXiv, 2026\. [paper](https://arxiv.org/abs/2605.30621), [PDF-en](papers/en/2605.30621_HarnessUpdatingNotBenefit.pdf)
+16. **Harness Updating Is Not Harness Benefit: Disentangling Evolution Capabilities in Self-Evolving LLM Agents.** arXiv, 2026\. [paper](https://arxiv.org/abs/2605.30621), [PDF-en](papers/en/2605.30621_HarnessUpdatingNotBenefit.pdf), [PDF-zh](papers/zh/2605.30621_HarnessUpdatingNotBenefit_zh.pdf)
 _Minhua Lin, Juncheng Wu, Zijun Wang, Zhan Shi, Yisi Sang, et al._
 17. **Self-Harness: Harnesses That Improve Themselves.** arXiv, 2026\. [paper](https://arxiv.org/abs/2606.09498), [PDF-en](papers/en/2606.09498_SelfHarness.pdf), [PDF-zh](papers/zh/2606.09498_SelfHarness_zh.pdf), [解读](reports/14_self_harness.md)
 _Hangfan Zhang, Shao Zhang, Kangcong Li, Chen Zhang, Yang Chen, Yiqun Zhang, Lei Bai, Shuyue Hu_
-18. **Autodata: An Agentic Data Scientist to Create High Quality Synthetic Data.** arXiv, 2026\. [paper](https://arxiv.org/abs/2606.25996), [PDF-en](papers/en/2606.25996_Autodata.pdf)
+18. **Autodata: An Agentic Data Scientist to Create High Quality Synthetic Data.** arXiv, 2026\. [paper](https://arxiv.org/abs/2606.25996), [PDF-en](papers/en/2606.25996_Autodata.pdf), [PDF-zh](papers/zh/2606.25996_Autodata_zh.pdf)
 _Ilia Kulikov, Chenxi Whitehouse, Tianhao Wu, Yixin Nie, et al. (FAIR at Meta)_
 23. ⭐ **iCoder: Recursive AI-Led Development of Frontier Industrial Coding Model.** Tech Report, 2026\. [report](https://huggingface.co/i-Coder/iCoder-27B/blob/main/Coder_Tech_Report.pdf), [code](https://github.com/bingreeky/iCoder), [model](https://huggingface.co/i-Coder/iCoder-27B), [PDF-en](papers/en/iCoder27B_TechReport.pdf), [PDF-zh](papers/zh/iCoder27B_TechReport_zh.pdf), [解读](reports/19_icoder.md)
 _Cheng Yang, Jiayang Lyu, Shangyuan Liu, Guibin Zhang, et al. (SJTU, NUS, DP Technology)_ — AI 主导交付 release-ready 27B 工业编码模型（RTLLM 68.0 超 GPT-5.5/Opus 4.8），人类介入压缩为"高密度 prior、低频门控"五层接口。**本仓库计划以其代码库为后续开发基础。**
@@ -219,48 +219,48 @@ _Seth Karten, Alex L. Zhang, Kevin Thomas, Sebastian Müller, et al. (Princeton,
 
 ## 4. Frontier Tracking (2026 H2)
 
-2026 年 6-8 月扫描结果（完整笔记见 [`assets/trends_research_raw.md`](assets/trends_research_raw.md)：19 篇新论文 + 9 项工业动态 + 7 项基准动态 + 8 项安全治理）。全部 20 篇英文 PDF 已入库；Metan / Co-Harness / 共进化综述 / EvalCEGAR 四篇附中文翻译；Metan / Co-Harness / 共进化综述 / EvalCEGAR / RHO 有精读报告（20 / 21 / 22 / 24 / 25，其中 24-25 构成"锚 vs 无锚"对照组）；技能红海五篇与安全治理五篇各有一份合评（26 / 27）。
+2026 年 6-8 月扫描结果（完整笔记见 [`assets/trends_research_raw.md`](assets/trends_research_raw.md)：19 篇新论文 + 9 项工业动态 + 7 项基准动态 + 8 项安全治理）。全部 20 篇英文 PDF 已入库并全部附中文翻译；Metan / Co-Harness / 共进化综述 / EvalCEGAR / RHO 有精读报告（20 / 21 / 22 / 24 / 25，其中 24-25 构成"锚 vs 无锚"对照组）；技能红海五篇与安全治理五篇各有一份合评（26 / 27）。
 
 **评估器军备赛**
 
 1. **EvalCEGAR: Metrics That Write Themselves.** [arXiv:2608.18744](https://arxiv.org/abs/2608.18744), [PDF-en](papers/en/2608.18744_EvalCEGAR.pdf), [PDF-zh](papers/zh/2608.18744_EvalCEGAR_zh.pdf), [解读](reports/24_evalcegar.md) — 用反例（而非 prompt）驱动评估器算子进化，延续 Who Grades the Grader 路线。
-2. **SCORE: Self-Evolving Deep Research via Joint Generation and Evaluation.** [arXiv:2606.04507](https://arxiv.org/abs/2606.04507), [PDF-en](papers/en/2606.04507_SCORE.pdf) — 评估器与求解器共享参数联合训练，推进到权重层。
+2. **SCORE: Self-Evolving Deep Research via Joint Generation and Evaluation.** [arXiv:2606.04507](https://arxiv.org/abs/2606.04507), [PDF-en](papers/en/2606.04507_SCORE.pdf), [PDF-zh](papers/zh/2606.04507_SCORE_zh.pdf) — 评估器与求解器共享参数联合训练，推进到权重层。
 3. **Co-Evolution in Agentic Systems (Survey).** [arXiv:2608.10299](https://arxiv.org/abs/2608.10299), [PDF-en](papers/en/2608.10299_CoEvolutionSurvey.pdf), [PDF-zh](papers/zh/2608.10299_CoEvolutionSurvey_zh.pdf), [解读](reports/22_coevolution_survey.md) — 首个以共进化为中心轴的综述：Agent-Agent / Agent-Environment / Meta 三层。
 
 **技能进化红海（WikiSkill 同月平行工作）**
 
-4. **SkillCommit.** [arXiv:2608.15165](https://arxiv.org/abs/2608.15165), [PDF-en](papers/en/2608.15165_SkillCommit.pdf), [合评](reports/26_skill_evolution_wave.md) — 反对语义相似度合并，用行为验证的层级抽象提交。
-5. **HyperSkill.** [arXiv:2608.16114](https://arxiv.org/abs/2608.16114), [PDF-en](papers/en/2608.16114_HyperSkill.pdf), [合评](reports/26_skill_evolution_wave.md) — 超图结构技能记忆，GAIA +11.5。
-6. **ERSkill.** [arXiv:2608.12720](https://arxiv.org/abs/2608.12720), [PDF-en](papers/en/2608.12720_ERSkill.pdf), [合评](reports/26_skill_evolution_wave.md) — 检索行为本身技能化，双 frontier 解耦扩张与部署。
-7. **SkillProx.** [arXiv:2608.07449](https://arxiv.org/abs/2608.07449), [PDF-en](papers/en/2608.07449_SkillProx.pdf), [合评](reports/26_skill_evolution_wave.md) — 近端梯度下降形式化搬到文本技能空间，删除是一等公民。
-8. **Evo-Harness.** [arXiv:2608.15071](https://arxiv.org/abs/2608.15071), [PDF-en](papers/en/2608.15071_EvoHarness.pdf), [合评](reports/26_skill_evolution_wave.md) — 反思编译为技能 harness，五基准系统性隔离变量。
+4. **SkillCommit.** [arXiv:2608.15165](https://arxiv.org/abs/2608.15165), [PDF-en](papers/en/2608.15165_SkillCommit.pdf), [PDF-zh](papers/zh/2608.15165_SkillCommit_zh.pdf), [合评](reports/26_skill_evolution_wave.md) — 反对语义相似度合并，用行为验证的层级抽象提交。
+5. **HyperSkill.** [arXiv:2608.16114](https://arxiv.org/abs/2608.16114), [PDF-en](papers/en/2608.16114_HyperSkill.pdf), [PDF-zh](papers/zh/2608.16114_HyperSkill_zh.pdf), [合评](reports/26_skill_evolution_wave.md) — 超图结构技能记忆，GAIA +11.5。
+6. **ERSkill.** [arXiv:2608.12720](https://arxiv.org/abs/2608.12720), [PDF-en](papers/en/2608.12720_ERSkill.pdf), [PDF-zh](papers/zh/2608.12720_ERSkill_zh.pdf), [合评](reports/26_skill_evolution_wave.md) — 检索行为本身技能化，双 frontier 解耦扩张与部署。
+7. **SkillProx.** [arXiv:2608.07449](https://arxiv.org/abs/2608.07449), [PDF-en](papers/en/2608.07449_SkillProx.pdf), [PDF-zh](papers/zh/2608.07449_SkillProx_zh.pdf), [合评](reports/26_skill_evolution_wave.md) — 近端梯度下降形式化搬到文本技能空间，删除是一等公民。
+8. **Evo-Harness.** [arXiv:2608.15071](https://arxiv.org/abs/2608.15071), [PDF-en](papers/en/2608.15071_EvoHarness.pdf), [PDF-zh](papers/zh/2608.15071_EvoHarness_zh.pdf), [合评](reports/26_skill_evolution_wave.md) — 反思编译为技能 harness，五基准系统性隔离变量。
 
 **Harness 工程化与共学习**
 
 9. **Co-Harness: Co-Evolving Harnesses and Model Weights.** [arXiv:2607.22688](https://arxiv.org/abs/2607.22688), [PDF-en](papers/en/2607.22688_CoHarness.pdf), [PDF-zh](papers/zh/2607.22688_CoHarness_zh.pdf), [解读](reports/21_co_harness.md) — harness 优化产生轨迹再蒸馏进权重，双环交替。
-10. **RHO: Retrospective Harness Optimization via Self-Preference.** [arXiv:2606.05922](https://arxiv.org/abs/2606.05922), [PDF-en](papers/en/2606.05922_RHO.pdf), [解读](reports/25_rho.md) — 完全无标签自优化，SWE-Bench Pro 59%→78%。
-11. **Adaptive Auto-Harness.** [arXiv:2606.01770](https://arxiv.org/abs/2606.01770), [PDF-en](papers/en/2606.01770_AdaptiveAutoHarness.pdf) — 密集自改进在开放任务流上早峰后衰减的负结果实证。
-12. **HarnessFix.** [arXiv:2606.06324](https://arxiv.org/abs/2606.06324), [PDF-en](papers/en/2606.06324_HarnessFix.pdf), [合评](reports/27_safety_governance.md) — 轨迹+harness 编译为 IR，失败归因到 ETCLOVG 七层。
+10. **RHO: Retrospective Harness Optimization via Self-Preference.** [arXiv:2606.05922](https://arxiv.org/abs/2606.05922), [PDF-en](papers/en/2606.05922_RHO.pdf), [PDF-zh](papers/zh/2606.05922_RHO_zh.pdf), [解读](reports/25_rho.md) — 完全无标签自优化，SWE-Bench Pro 59%→78%。
+11. **Adaptive Auto-Harness.** [arXiv:2606.01770](https://arxiv.org/abs/2606.01770), [PDF-en](papers/en/2606.01770_AdaptiveAutoHarness.pdf), [PDF-zh](papers/zh/2606.01770_AdaptiveAutoHarness_zh.pdf) — 密集自改进在开放任务流上早峰后衰减的负结果实证。
+12. **HarnessFix.** [arXiv:2606.06324](https://arxiv.org/abs/2606.06324), [PDF-en](papers/en/2606.06324_HarnessFix.pdf), [PDF-zh](papers/zh/2606.06324_HarnessFix_zh.pdf), [合评](reports/27_safety_governance.md) — 轨迹+harness 编译为 IR，失败归因到 ETCLOVG 七层。
 13. **Metan (Meta^n): RSI through Emergent Depth.** [arXiv:2608.24735](https://arxiv.org/abs/2608.24735), [PDF-en](papers/en/2608.24735_Metan.pdf), [PDF-zh](papers/zh/2608.24735_Metan_zh.pdf), [解读](reports/20_metan.md) — 论证自改写 meta 深度上限约 2.5，改输入不改机器绕开权衡。
-14. **HSI: Hierarchical Self-Improvement.** [arXiv:2608.08466](https://arxiv.org/abs/2608.08466), [PDF-en](papers/en/2608.08466_HSI.pdf) — 三层作用域进化，冻结 meta-evolver 为外层锚。
+14. **HSI: Hierarchical Self-Improvement.** [arXiv:2608.08466](https://arxiv.org/abs/2608.08466), [PDF-en](papers/en/2608.08466_HSI.pdf), [PDF-zh](papers/zh/2608.08466_HSI_zh.pdf) — 三层作用域进化，冻结 meta-evolver 为外层锚。
 
 **安全、治理与基准**
 
-15. **SESG: A Self-Evolving Safety Guardrail in Production.** [arXiv:2608.08471](https://arxiv.org/abs/2608.08471), [PDF-en](papers/en/2608.08471_SESG.pdf), [合评](reports/27_safety_governance.md) — 深信服生产系统，16-24h 自动闭环新威胁（原 40-90h）。
-16. **OpenLoopEvolve (OLE).** [arXiv:2608.09380](https://arxiv.org/abs/2608.09380), [PDF-en](papers/en/2608.09380_OpenLoopEvolve.pdf), [合评](reports/27_safety_governance.md) — 策略资产版本化+血统追踪+劣化自动回滚，补 MOSS 的部署纪律。
-17. **Falsifiable Release Gates for Self-Improving Systems.** [arXiv:2607.13070](https://arxiv.org/abs/2607.13070), [PDF-en](papers/en/2607.13070_FalsifiableReleaseGates.pdf), [合评](reports/27_safety_governance.md) — 七道可证伪发布门：收紧类自动应用、放松类必须人类合并。
-18. **HVTB: Hack-Verifiable Terminal Bench.** [arXiv:2608.22103](https://arxiv.org/abs/2608.22103), [PDF-en](papers/en/2608.22103_HVTB.pdf), [合评](reports/27_safety_governance.md) — 蜜罐嵌入真实编码任务，测前沿模型 reward hacking 率下界。
-19. **ASG-SI / ARA（安全谱系背景）.** [arXiv:2512.23760](https://arxiv.org/abs/2512.23760), [PDF-en](papers/en/2512.23760_ASG-SI.pdf), [arXiv:2602.01750](https://arxiv.org/abs/2602.01750), [PDF-en](papers/en/2602.01750_ARA.pdf) — verifier-auditor 密码学溯源与对抗性奖励审计。
+15. **SESG: A Self-Evolving Safety Guardrail in Production.** [arXiv:2608.08471](https://arxiv.org/abs/2608.08471), [PDF-en](papers/en/2608.08471_SESG.pdf), [PDF-zh](papers/zh/2608.08471_SESG_zh.pdf), [合评](reports/27_safety_governance.md) — 深信服生产系统，16-24h 自动闭环新威胁（原 40-90h）。
+16. **OpenLoopEvolve (OLE).** [arXiv:2608.09380](https://arxiv.org/abs/2608.09380), [PDF-en](papers/en/2608.09380_OpenLoopEvolve.pdf), [PDF-zh](papers/zh/2608.09380_OpenLoopEvolve_zh.pdf), [合评](reports/27_safety_governance.md) — 策略资产版本化+血统追踪+劣化自动回滚，补 MOSS 的部署纪律。
+17. **Falsifiable Release Gates for Self-Improving Systems.** [arXiv:2607.13070](https://arxiv.org/abs/2607.13070), [PDF-en](papers/en/2607.13070_FalsifiableReleaseGates.pdf), [PDF-zh](papers/zh/2607.13070_FalsifiableReleaseGates_zh.pdf), [合评](reports/27_safety_governance.md) — 七道可证伪发布门：收紧类自动应用、放松类必须人类合并。
+18. **HVTB: Hack-Verifiable Terminal Bench.** [arXiv:2608.22103](https://arxiv.org/abs/2608.22103), [PDF-en](papers/en/2608.22103_HVTB.pdf), [PDF-zh](papers/zh/2608.22103_HVTB_zh.pdf), [合评](reports/27_safety_governance.md) — 蜜罐嵌入真实编码任务，测前沿模型 reward hacking 率下界。
+19. **ASG-SI / ARA（安全谱系背景）.** [arXiv:2512.23760](https://arxiv.org/abs/2512.23760), [PDF-en](papers/en/2512.23760_ASG-SI.pdf), [PDF-zh](papers/zh/2512.23760_ASG-SI_zh.pdf), [arXiv:2602.01750](https://arxiv.org/abs/2602.01750), [PDF-en](papers/en/2602.01750_ARA.pdf), [PDF-zh](papers/zh/2602.01750_ARA_zh.pdf) — verifier-auditor 密码学溯源与对抗性奖励审计。
 
 ## 4.5 Macro Debate & Measurement
 
 报告 10 insight 8（微观加速 vs 宏观节奏的实证鸿沟）与 insight 9（算力-认知劳动替代弹性 σ）的证据源：
 
-1. **Explosive Growth from AI Automation: A Review of the Arguments.** arXiv, 2023\. [paper](https://arxiv.org/abs/2309.11690), [PDF-en](papers/en/2309.11690_ExplosiveGrowthReview.pdf)
+1. **Explosive Growth from AI Automation: A Review of the Arguments.** arXiv, 2023\. [paper](https://arxiv.org/abs/2309.11690), [PDF-en](papers/en/2309.11690_ExplosiveGrowthReview.pdf), [PDF-zh](papers/zh/2309.11690_ExplosiveGrowthReview_zh.pdf)
 _Ege Erdil, Tamay Besiroglu (Epoch AI)_ — 系统梳理"AI 自动化能否导致 >30%/年经济增长"正反论证；σ 是否大于 1 被识别为关键参数。
 2. **Will AI R&D Automation Cause a Software Intelligence Explosion?** Forethought Research, 2025\. [report](https://www.forethought.org/research/will-ai-r-and-d-automation-cause-a-software-intelligence-explosion)
 _Daniel Eth, Tom Davidson_ — 把 Bostrom 的 recalcitrance 具体化为"软件研发回报率 r"，论证 r > 1 时算力不增也可爆炸。
-3. **Measuring AI Ability to Complete Long Software Tasks.** arXiv, 2025\. [paper](https://arxiv.org/abs/2503.14499), [PDF-en](papers/en/2503.14499_METR_LongTasks.pdf)
+3. **Measuring AI Ability to Complete Long Software Tasks.** arXiv, 2025\. [paper](https://arxiv.org/abs/2503.14499), [PDF-en](papers/en/2503.14499_METR_LongTasks.pdf), [PDF-zh](papers/zh/2503.14499_METR_LongTasks_zh.pdf)
 _Thomas Kwa, Ben West, Joel Becker, et al. (METR)_ — "50% 任务时长地平线每约 7 个月翻倍"：宏观节奏的唯一公开连续测量，报告 10 §5 开放问题 6 的裁决工具。
 
 ## 5. Ten Insights
@@ -335,9 +335,9 @@ awesome_rsi/
 │   ├── 27_safety_governance.md                 # 合评：安全治理五篇（生产闭环 / 资产版本化 / 归因 / 发布门 / hack 测量）
 │   └── 28_self_evolving_coding_agents_survey.md # 综述：编码域对象-时间-证据三维（配套 iSEngLab awesome 列表）
 ├── papers/
-│   ├── classics/                    # 起源经典 6 篇（1965 Good / 2001 GISAI / 2003 Gödel Machine / 2008 Omohundro / 2010 Chalmers / 2013 IEM，GISAI 与 Gödel Machine 含中译）
+│   ├── classics/                    # 起源经典 6 篇（1965 Good / 2001 GISAI / 2003 Gödel Machine / 2008 Omohundro / 2010 Chalmers / 2013 IEM，Good 1965 为扫描件无文本层，其余 5 篇含中译）
 │   ├── en/                          # 61 篇英文原版 PDF（arXiv + iCoder 技术报告）
-│   └── zh/                          # 27 篇中文翻译 PDF（super_translate，保版式）
+│   └── zh/                          # 61 篇中文翻译 PDF（super_translate，保版式，与 en/ 一一对应）
 └── assets/
     ├── fig1_timeline.svg            # 图 1 时间线（+ _dark / _dark_a / _dark_b 变体）
     ├── fig2_taxonomy.svg            # 图 2 分类树（+ _dark / _dark_a / _dark_b 变体）
