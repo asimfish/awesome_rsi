@@ -1,42 +1,116 @@
-# 解读报告 26 · 技能进化红海五篇合评：WikiSkill 同月的平行答案
+# 技能进化红海五篇深度合评：抽象优于存储是共识，编译成什么结构是开放的
 
-| 论文 | arXiv | 机构 | 归档 |
-|---|---|---|---|
-| SkillCommit: Evolving Agent Skills through Behaviorally Validated Scope Expansion | 2608.15165 | Yu He, Weikai Yang 等 | `papers/en/2608.15165_SkillCommit.pdf` |
-| HyperSkill: Self-Evolving LLM Agents via Hypergraph-Structured Skill Memory | 2608.16114 | Ruiyao Xu, Tiankai Yang, Wei-Chieh Huang 等 | `papers/en/2608.16114_HyperSkill.pdf` |
-| ERSkill: Evolving for Skill-Guided Adaptive Memory Retrieval | 2608.12720 | Haolong Chen, Liang Zhang, Guangxu Zhu 等 | `papers/en/2608.12720_ERSkill.pdf` |
-| SkillProx: Self-Evolving Agent Skills via Proximal Textual Gradient Descent | 2608.07449 | Mingxuan Zheng, Yujin Zhou, Chuxue Cao 等 | `papers/en/2608.07449_SkillProx.pdf` |
-| Evo-Harness: Context-to-Harness Skill Compilation for Self-Evolving Agents | 2608.15071 | Tianxin Wei, Zhan Shi, Minhua Lin, Bing He 等（Amazon 系） | `papers/en/2608.15071_EvoHarness.pdf` |
-| 在调研中的位置 | 2026 年 8 月 WikiSkill（报告 09）发布前后两周内密集出现的五篇平行工作——知识侧从"一个方法"变成"一个方向"的证据；本报告不逐篇精读，按**共同问题 → 五种分歧 → 共识与反面数据**组织 | | |
+> **SkillCommit** arXiv 2608.15165（Yu He、Weikai Yang 等）· **HyperSkill** arXiv 2608.16114（Ruiyao Xu、Tiankai Yang、Wei-Chieh Huang 等）· **ERSkill** arXiv 2608.12720（Haolong Chen、Liang Zhang、Guangxu Zhu 等）· **SkillProx** arXiv 2608.07449（Mingxuan Zheng、Yujin Zhou、Chuxue Cao 等）· **Evo-Harness** arXiv 2608.15071（Tianxin Wei、Zhan Shi、Minhua Lin、Bing He 等，Amazon 系）
+> 归档：`papers/en/2608.15165_SkillCommit.pdf` · `2608.16114_HyperSkill.pdf` · `2608.12720_ERSkill.pdf` · `2608.07449_SkillProx.pdf` · `2608.15071_EvoHarness.pdf`
+> 本报告不逐篇精读，按**共同问题 → 五种分歧 → 共识与反面数据**组织
 
-## 一句话核心主张
+---
 
-五篇论文回答同一个问题——**冻结模型的 agent 如何把交互经验变成不占权重的可复用能力**——并在两件事上达成共识：(1) 存原始轨迹是错的，必须抽象成技能；(2) 技能库需要生命周期管理（验证门禁、效用审计、合并与退役）。分歧全在**抽象的结构**上：行为验证的层级（SkillCommit）、超图（HyperSkill）、可执行检索原语（ERSkill）、近端梯度形式化（SkillProx）、单次执行编译为 harness（Evo-Harness）。
+## 1. 一句话定位
 
-## 五种分歧
+2026 年 8 月 WikiSkill（报告 09）发布前后两周内密集出现五篇平行工作，回答同一个问题——**冻结模型的 agent 如何把交互经验变成不占权重的可复用能力**——并在两件事上达成共识：(1) **存原始轨迹是错的，必须抽象成技能**；(2) **技能库需要生命周期管理**（验证门禁、效用审计、合并与退役）。分歧全在**抽象的结构**上：行为验证的层级（SkillCommit，反对按语义相似度合并）、超图（HyperSkill，保留组合关系，GAIA +11.51）、可执行检索原语（ERSkill，把检索行为本身技能化，+31.3%）、近端梯度形式化（SkillProx，删除作为一等公民，+3.0 pp）、单次执行编译为 harness（Evo-Harness，TerminalBench-2 62.92→73.03）。这是知识侧从"一个方法"变成"一个方向"的证据。但一条重要的反面数据来自谱系之外：Metan（报告 20）实测**代码/技能转移只贡献 15% 的增益，72% 来自层间条件化字符串**——五篇论文都没有做"技能库 vs 等量上下文提示"的对照，这是整个方向的共同盲点。
 
-**SkillCommit · 反对按语义相似度合并。** 核心批评：现有方法按 embedding 相似度或 LLM 判断合并经验，会把表面相似但**行为不兼容**的策略合并坏。它的流水线：每条新经验先保留为实例级补丁（保住在局部上下文里验证过的行为）→ embedding 检索候选相关技能 → **跨实例重放**（技能在彼此的案例上是否仍然有效）+ LLM 机制检查（是否共享同一底层机制）→ 双检通过才抽象为高层技能，且只有在保持全部成员技能已验证行为的前提下才提交（commit）。RuleArena / OpenExempt / KOR-Bench 上持续提升，学到的技能可跨模型规模与家族迁移。它对 WikiSkill 的意义：直接点中"经验 → wiki → skill"三层里最脆弱的抽象一步。
+## 2. 五篇共同要解决的问题
 
-**HyperSkill · 记忆与技能合成一张超图。** 两类节点（子任务步骤、可复用技能），每条超边 = 一条轨迹里的子任务与技能的 n 元关联，从而保留了扁平存储丢掉的**组合关系**。双路检索（子任务级 + 轨迹级）按跨检索轨迹的共现排名技能；周期性结构感知维护——按质量加权传播修剪低效用节点、合并冗余技能。xBench / GAIA / WebWalkerQA 上超过十个记忆基线，GAIA **+11.51**、WebWalkerQA **+11.18**（GPT-4o 与 Qwen3-30B-A3B）。它把 WikiSkill 的三层分离改造成图结构上的连续谱。
+冻结模型（API 调用、无法微调）的 agent 每次任务结束就忘掉一切——同样的错误反复犯、同样的解法反复重新发现。已有的"记忆"方案是存原始轨迹再检索，问题是：
 
-**ERSkill · 把"检索行为"本身技能化。** 长期记忆的检索机制很少被当作可进化组件，但异构查询需要不同的证据构造策略。ERSkill 把检索行为表示为由基本原语组合成的可执行技能，训练一个路由器把查询匹配到最优技能；技能集与路由器共进化，用**经验 trie** 记录已探索的检索路径，用**双 frontier** 把"新技能扩张"与"面向路由器的稳定部署"安全解耦。F1 / BLEU-1 / LLM-judge 平均提升 **31.3%**（Qwen3-Next-80B-A3B）与 **28.1%**（GPT-5.4-nano）。双 frontier 与 RQGM（报告 04）的 epoch 冻结同构——都是用"冻结一侧"换稳定性。
+1. **轨迹太长、太具体**——检索到的是"上次在任务 X 上做了 Y"，不是"这类任务该怎么做"；
+2. **相似度检索会把行为不兼容的经验混在一起**——表面相似的两条轨迹可能用了互相冲突的策略；
+3. **没有遗忘机制**——错误经验永久留存，库越大噪声越多；
+4. **组合关系丢失**——扁平存储不记录"技能 A 与 B 在同一任务里一起用"。
 
-**SkillProx · 近端梯度下降搬进文本技能空间。** 批评现有框架缺少显式的"诊断-结果"反馈，且把删除当作普通编辑而非专门的知识固化机制。目标函数 = 任务损失 + 技能复杂度；**前向阶段**在同批任务上重放诊断驱动的编辑、回滚回归、把测量到的结果喂回后续诊断；**后向阶段**把技能分解为可审计知识单元，用冻结的留一（leave-one-out）效用审计估计每个单元的贡献，做验证门控的固化 / 降级 / 删除。多骨干、ID 与 OOD 基准上比最强文本梯度基线 **+3.0 pp**。"删除作为一等公民"回应 Weng（报告 01）的负结果处理挑战。
+五篇的共同回答是"抽象成技能"，但**抽象成什么结构、如何验证抽象是对的、如何管理技能生命周期**，五篇给出五个答案。
 
-**Evo-Harness · 单次执行编译成结构化 harness。** 提出"在线 harness 学习"形式化：冻结 agent 在顺序任务流上持续更新一个结构化 harness，而真实环境里每个新任务往往只给**一次**改进机会，执行上下文噪声极大。核心机制"context-to-harness skill compilation"把单次执行蒸馏为通用技能 + 主题技能。Claude Opus 4.6 为求解器时五基准全胜（Table 1）：CL-Bench 29.54→**34.02**、TerminalBench-2 62.92→**73.03**、SWE-bench Lite 63.67→67.00、τ-bench 72.73→76.97、WebArena-Infinity 72.50→76.25，超过 AWM / Dynamic Cheatsheet / Evo-Memory / ACE / XSkill 全部基线。它的方法论贡献大于分数：系统性隔离 evolver 设计、反馈类型、迁移设置各自的贡献，明确把 skill harness 当作"研究自改进机制的可解释介质"。
+## 3. 为什么此前做不通：既有记忆/技能方案的缺口
 
-## 共识、反面数据与批评
+| 已有路线 | 有什么 | 缺什么 |
+|---|---|---|
+| Voyager 技能库（2023） | 可执行技能 + 检索 | 无验证门、无退役、Minecraft 单域 |
+| Reflexion / 反思式记忆 | 从失败学 | 存文本反思，不抽象、不组合 |
+| Dynamic Cheatsheet / ReasoningBank | 跨任务累积 | 只积累不优化；增益 ≤ +0.05（RHO 报告 25 Table 1） |
+| ACE / GEPA（上下文进化） | 进化 prompt | 单一 prompt 而非技能库；无结构 |
+| WikiSkill（报告 09） | raw / wiki / skill 三层 | 技能层严格门控但抽象步骤（wiki → skill）无行为验证 |
+| AWM / XSkill | 工作流记忆 | 无生命周期管理 |
 
-**三条共识**：抽象优于存储（五篇一致）；生命周期管理是必需品（SkillCommit 的提交门、HyperSkill 的修剪合并、SkillProx 的审计删除、ERSkill 的双 frontier）；技能可迁移（SkillCommit 跨规模家族、Evo-Harness 跨域）。
+关键缺口：**没有人把"抽象是否正确"当作可验证的问题**——WikiSkill 用验证集分数门控技能，但不验证"这个技能是否真的抽象了那些经验"。SkillCommit 的跨实例重放、SkillProx 的留一效用审计是对这个缺口的直接回应。
 
-**一条重要的反面数据来自谱系之外**：Metan（报告 20）实测代码/技能转移只贡献 15% 的增益，72% 来自层间条件化字符串——至少在那个设置里，**好的条件化比好的技能库值钱得多**。五篇论文都没有做"技能库 vs 等量上下文提示"的对照，这是整个方向的共同盲点。
+## 4. 五种分歧的机制拆解
 
-**两条批评**：(1) 五篇几乎全部用任务成功率做效用信号，技能库的"锚"就是基准分——Who Grades the Grader（报告 05）的观测等价问题原样存在，只有 SkillProx 的冻结留一审计和 SkillCommit 的跨实例重放算是在效用估计上多加了一层纪律；(2) 分歧点（层级 / 超图 / 检索原语 / 近端形式化）缺少横向对比——五篇互不引用（发布间隔太短），谁的结构更好目前无法判断，Evo-Harness 的隔离变量方法论是唯一可以拿来做裁决的框架。
+### 4.1 SkillCommit · 反对按语义相似度合并
 
-## 与本调研的连线
+**核心批评**：现有方法按 embedding 相似度或 LLM 判断合并经验，会把表面相似但**行为不兼容**的策略合并坏。
 
-1. **对报告 09 WikiSkill 的定位修正**：WikiSkill 不是孤立方法，而是一波浪潮中"经验先编译为知识再蒸馏为技能"这一支；SkillCommit 的行为验证、HyperSkill 的组合关系保留，都可以看作对 WikiSkill 三层分离的两种替代实现。
-2. **与报告 10 insight 6（经验必须先编译成知识才能复利）的关系**：五篇全部支持"编译"这一步，但对"编译成什么结构"给出五个答案——insight 6 应细化为"编译是必要的，结构是开放的"。
-3. **与报告 04 RQGM / 报告 14 Self-Harness 的机制同构**：ERSkill 双 frontier、SkillCommit 提交门、SkillProx 验证门控与 RQGM epoch 冻结、Self-Harness 回归门是同一防御哲学在技能层的投影——**改坏即拒，是所有能跑的自进化系统的公共部件**。
-4. **对报告 20 Metan 的悬而未决**：技能资产化叙事（报告 10 insight 5）与 Metan 的 15% 数据直接冲突，需要一个"技能库 vs 条件化提示"的受控实验来裁决——这是本方向最值得做的下一个实验。
+**流水线**：每条新经验先保留为**实例级补丁**（保住在局部上下文里验证过的行为）→ embedding 检索候选相关技能 → **跨实例重放**（技能在彼此的案例上是否仍然有效）+ LLM 机制检查（是否共享同一底层机制）→ 双检通过才抽象为高层技能，且只有在保持全部成员技能已验证行为的前提下才 **commit**。
 
+**结果**：RuleArena / OpenExempt / KOR-Bench 上持续提升，学到的技能可跨模型规模与家族迁移。对 WikiSkill 的意义：直接点中"经验 → wiki → skill"三层里最脆弱的抽象一步。
+
+### 4.2 HyperSkill · 记忆与技能合成一张超图
+
+两类节点（子任务步骤、可复用技能），每条**超边** = 一条轨迹里的子任务与技能的 n 元关联，从而保留了扁平存储丢掉的**组合关系**。双路检索（子任务级 + 轨迹级）按跨检索轨迹的共现排名技能；周期性结构感知维护——按质量加权传播修剪低效用节点、合并冗余技能。
+
+**结果**：xBench / GAIA / WebWalkerQA 上超过十个记忆基线，GAIA **+11.51**、WebWalkerQA **+11.18**（GPT-4o 与 Qwen3-30B-A3B）。它把 WikiSkill 的三层分离改造成图结构上的连续谱。
+
+### 4.3 ERSkill · 把"检索行为"本身技能化
+
+长期记忆的检索机制很少被当作可进化组件，但异构查询需要不同的证据构造策略。ERSkill 把检索行为表示为由基本原语组合成的**可执行技能**，训练一个路由器把查询匹配到最优技能；技能集与路由器共进化，用**经验 trie** 记录已探索的检索路径，用**双 frontier** 把"新技能扩张"与"面向路由器的稳定部署"安全解耦。
+
+**结果**：F1 / BLEU-1 / LLM-judge 平均提升 **31.3%**（Qwen3-Next-80B-A3B）与 **28.1%**（GPT-5.4-nano）。双 frontier 与 RQGM（报告 04）的 epoch 冻结同构——都是用"冻结一侧"换稳定性。
+
+### 4.4 SkillProx · 近端梯度下降搬进文本技能空间
+
+**批评**：现有框架缺少显式的"诊断-结果"反馈，且把删除当作普通编辑而非专门的知识固化机制。
+
+**目标函数** = 任务损失 + 技能复杂度（近端项）。**前向阶段**在同批任务上重放诊断驱动的编辑、回滚回归、把测量到的结果喂回后续诊断；**后向阶段**把技能分解为可审计知识单元，用**冻结的留一（leave-one-out）效用审计**估计每个单元的贡献，做验证门控的固化 / 降级 / 删除。
+
+**结果**：多骨干、ID 与 OOD 基准上比最强文本梯度基线 **+3.0 pp**。"删除作为一等公民"回应 Weng（报告 01）的负结果处理挑战——也是 EvalCEGAR（报告 24）"15 个手写算子合用反而下降"现象的预防方案。
+
+### 4.5 Evo-Harness · 单次执行编译成结构化 harness
+
+提出"**在线 harness 学习**"形式化：冻结 agent 在顺序任务流上持续更新一个结构化 harness，而真实环境里每个新任务往往只给**一次**改进机会，执行上下文噪声极大。核心机制"context-to-harness skill compilation"把单次执行蒸馏为通用技能 + 主题技能。
+
+**结果**（Claude Opus 4.6 为求解器，Table 1 五基准全胜）：CL-Bench 29.54→**34.02**、TerminalBench-2 62.92→**73.03**、SWE-bench Lite 63.67→67.00、τ-bench 72.73→76.97、WebArena-Infinity 72.50→76.25，超过 AWM / Dynamic Cheatsheet / Evo-Memory / ACE / XSkill 全部基线。
+
+**方法论贡献大于分数**：系统性隔离 evolver 设计、反馈类型、迁移设置各自的贡献，明确把 skill harness 当作"研究自改进机制的可解释介质"——这是五篇里唯一可以拿来做横向裁决的实验框架。
+
+## 5. 共识、反面数据与横向对比
+
+### 5.1 三条共识
+
+| 共识 | 五篇的实现 |
+|---|---|
+| **抽象优于存储** | 五篇一致；对照 Dynamic Cheatsheet / ReasoningBank 的 ≤ +0.05 |
+| **生命周期管理是必需品** | SkillCommit 提交门 · HyperSkill 修剪合并 · SkillProx 审计删除 · ERSkill 双 frontier · Evo-Harness 通用/主题分层 |
+| **技能可迁移** | SkillCommit 跨规模家族 · Evo-Harness 跨域 · WikiSkill 跨模型（报告 09） |
+
+### 5.2 一条重要的反面数据
+
+Metan（报告 20）Table 3 消融：去掉层间上下文字符串 −0.094，去掉可调用代码库 −0.020——**条件化解释 ~72% 的递归增益，代码复用只解释 ~15%**。至少在那个设置里，**好的条件化比好的技能库值钱得多**。五篇论文都没有做"技能库 vs 等量上下文提示"的对照。如果 Metan 的比例在技能进化场景也成立，五篇的大部分收益可能来自"检索到的技能作为 prompt 前缀"而非"技能作为可执行程序"——这会改变整个方向的设计重心。
+
+### 5.3 横向对比的困难
+
+五篇互不引用（发布间隔太短），基准各异（RuleArena / GAIA / 检索 QA / 多骨干 / 五 agent 基准），无法直接比较谁的结构更好。唯一的共同点是 TerminalBench-2（Evo-Harness 73.03 vs Meta-Harness 76.4 vs Self-Harness 各模型 36.7–57.0 vs AutoSaddler 50.0）——但模型不同（Opus 4.6 vs Opus 4.6 vs MiniMax/Qwen/GLM vs 未明）、子集不同，仍不可比。
+
+## 6. 局限
+
+1. **锚就是基准分**：五篇几乎全部用任务成功率做效用信号——Who Grades the Grader（报告 05）的观测等价问题原样存在。只有 SkillProx 的冻结留一审计和 SkillCommit 的跨实例重放算是在效用估计上多加了一层纪律。
+2. **分歧点缺少横向对比**：层级 / 超图 / 检索原语 / 近端形式化 / 单次编译——谁的结构更好目前无法判断。
+3. **"技能库 vs 条件化提示"的对照全部缺席**（见 5.2）。
+4. **全文注入或检索的实验室设定**：WikiSkill 全文注入回避检索问题；HyperSkill / ERSkill 做检索但库规模有限——生产技能库增长到数千条后的检索失败率没有数据。
+5. **Evo-Harness 的"单次机会"设定最接近真实但基线最强**（Opus 4.6）——弱模型上单次编译是否可行未测；对照 Continual Harness 的能力地板（报告 11）。
+6. **技能污染**：五篇都有退役机制，但都是基于效用；一个"有用但错误"的技能（在基准上涨分但编码了错误世界观——对照 EnvHarness 报告 15 的"环境会说谎"）不会被效用审计抓到。
+
+## 7. 意义与位置
+
+**对报告 09 WikiSkill 的定位修正**：WikiSkill 不是孤立方法，而是一波浪潮中"经验先编译为知识再蒸馏为技能"这一支；SkillCommit 的行为验证、HyperSkill 的组合关系保留，都可以看作对 WikiSkill 三层分离的两种替代实现。WikiSkill 的独特贡献是"知识层永不回滚"的不对称设计，五篇里没有对应物。
+
+**与报告 10 insight 6（经验必须先编译成知识才能复利）的关系**：五篇全部支持"编译"这一步，但对"编译成什么结构"给出五个答案——insight 6 应细化为"**编译是必要的，结构是开放的**"。
+
+**与报告 04 RQGM / 报告 14 Self-Harness 的机制同构**：ERSkill 双 frontier、SkillCommit 提交门、SkillProx 验证门控与 RQGM epoch 冻结、Self-Harness 回归门是同一防御哲学在技能层的投影——**改坏即拒，是所有能跑的自进化系统的公共部件**。
+
+**对报告 20 Metan 的悬而未决**：技能资产化叙事（报告 10 insight 5）与 Metan 的 15% 数据直接冲突，需要一个"技能库 vs 条件化提示"的受控实验来裁决——这是本方向最值得做的下一个实验。Evo-Harness 的隔离变量框架是做这个实验的现成工具。
+
+**对报告 15 EnvHarness**：五篇都默认训练环境给定；EnvHarness 说环境本身是可优化变量——从针对弱点定制的环境里抽的技能系统性更好，从静态环境抽的甚至可为负资产。技能质量的上界不只由抽取算法决定，更由"练什么"决定。
+
+**对报告 24 EvalCEGAR**：SkillProx 的"删除一等公民"与 EvalCEGAR 的"准入必须改善决策"是同一纪律在不同对象上的实例——技能库与算子池都会因为无门槛累积而互相抵消。
+
+**对报告 28 Coding 综述**："错误会被存进记忆、蒸馏成技能"——五篇的生命周期管理是对这个风险的工程回应，但都基于效用，不基于正确性。
