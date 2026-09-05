@@ -1,75 +1,96 @@
-# 解读报告 11 · Continual Harness: Online Adaptation for Self-Improving Foundation Agents
+# Continual Harness 深度解读：不重置的 harness 自精炼，以及第一个模型-harness 共学习闭环
 
-| 项目 | 内容 |
-|---|---|
-| arXiv | 2605.09998 v1（2026-05-11） |
-| 作者 | Seth Karten*, Joel Zhang* 等（普林斯顿 + ARISE Foundation + Google DeepMind；Chi Jin 组） |
-| 项目页 | sethkarten.ai/continual-harness |
-| 中文解读 | 微信公众号「X0后的回忆」：mp.weixin.qq.com/s/xMuLJvX3kwRUUw5WQ7R3ww |
-| 在调研中的位置 | harness 谱系的具身分支 + 全谱系唯一**免重置（reset-free）**在线自改进框架：GEPA 式提示优化的根本对立面，也是 Weng"harness 是可执行搜索空间"论点在具身域的落地 |
+> **Continual Harness: Online Adaptation for Self-Improving Foundation Agents**
+> arXiv 2605.09998v1（2026-05-11）· 普林斯顿大学 + ARISE Foundation + Google DeepMind
+> 作者：Seth Karten*、Joel Zhang*、Tersoo Upaa Jr、Ruirong Feng、Wenzhe Li、Chengshuai Shi、Chi Jin、Kiran Vodrahalli（* 同等贡献）
+> 项目页：sethkarten.ai/continual-harness · 归档：`papers/en/2605.09998_ContinualHarness.pdf` · 中译 `papers/zh/2605.09998_ContinualHarness_zh.pdf`
+> 中文解读：微信公众号「X0后的回忆」· 一作续作：Prime Agent（arXiv 2608.23552，报告 18）
 
-## 一句话核心主张
+---
 
-Claude Code / OpenHands 这类编码 harness 已是标配，但具身 agent 的长时程、部分可观测决策**没有对应物**（PokeAgent 挑战赛实测：无领域脚手架时前沿视觉模型在 RPG 里几乎走不动）；本文先用几千小时人在环的 GPP（Gemini Plays Pokémon）证明 harness 迭代能解决这个问题，然后用 Continual Harness **把人从环里完全拿掉**——agent 在单场不重置的连续 episode 内交替"行动"与"精炼自己的系统提示 / 子代理 / 技能库 / 记忆"，进一步把同一条轨迹喂给 RL trainer 实现模型权重与 harness 状态的**共学习**。
+## 1. 一句话定位
 
-## 一张三格图讲完全文
+Claude Code、OpenHands 这类编码 harness 已是标配，但具身 agent 没有对应物——PokeAgent 挑战赛实测：没有领域脚手架，前沿视觉语言模型在 RPG 里几乎走不动。本文分三步回答：先用几千小时人在环的 **Gemini Plays Pokémon（GPP）** 证明 harness 迭代能解决这个问题（首个通关多款宝可梦 RPG 的 AI）；再用 **Continual Harness** 把人从环里完全拿掉——agent 在**单场不重置的连续 episode** 内交替"行动"与"精炼自己的系统提示 / 子代理 / 技能库 / 记忆"；最后把同一条轨迹同时喂给 harness 精炼器和权重训练器，完成第一个**模型-harness 共学习**闭环。
 
-三格拓扑完全相同（Environment / Agent / Harness / Refiner 四角色 + 同样的箭头闭环），唯一变化是 Refiner 位置上站着谁：
+关键数字：Gemini 3.1 Pro 上从零起步的 Continual Harness 达到 **100% 里程碑 / 中位成本 130 美元**，极简基线 98% / 215 美元——更好且省约 40%，严格 Pareto 占优；但 Flash-Lite 上**每个 CH 变体都比极简基线更差**（3-13% vs 20%）——给弱模型更强的脚手架只会让它更迷茫，作者称之为**能力地板**。
 
-| 格 | Refiner | 对应章节 | 一句话 |
-|---|---|---|---|
-| (1) 人在环 | 人盯直播改 harness | GPP 项目（§4.2） | 首个通关多款宝可梦 RPG 的 AI 系统 |
-| (2) 自改进 harness | 与 Agent **共用同一模型 M** 的自动 Refiner | Continual Harness 本体（§3） | 从极简接口自建 harness，追回专家 harness 大部分差距 |
-| (3) 模型+harness 共学习 | Refiner + RL trainer 双消费者 | 共学习循环（§3.3/§4.5） | 同一份轨迹同时改 harness（episode 内）和权重（迭代间） |
+## 2. 要解决的问题：具身 agent 没有 harness，且现有 harness 优化必须重置
 
-两个容易滑过去的结构细节：harness 影响世界的唯一途径是改变"agent 看到什么"（context 单向箭头）；trajectory 是整个闭环的引信——agent 走过的路成为改造它自己那层壳的原料。**全图没有任何一根 reset 箭头，这个缺席是刻意主张。**
+1. **脚手架缺位**。编码 harness 让模型能导航代码库、运行命令、跨长交互保持状态；具身 agent 的长时程、部分可观测决策没有等价物。PokeAgent 挑战赛的结论是：无脚手架的前沿 VLM 在 RPG 里几乎零进展。
+2. **人在环不可扩展**。GPP 靠人盯直播改 harness 打通了 Blue（2025-05）、Yellow Legacy 困难模式（2025-08）、Crystal 终局零败绩（2025-11），但那是几千小时的人力。
+3. **现有自动化方法是重置式的**。GEPA 一类提示优化（报告 01 提及）必须**整局重跑**才能评估新提示，每次更新后从初始状态重来；这在构造上永远碰不到只在 episode 深处出现的失败模式——终局战斗、多步谜题、长对话链。而且免重置才是长时运行编码 agent、具身 agent、运维任务的现实主导场景：环境重置要么昂贵要么不可得。
+4. **模型与 harness 分开训**。已有后训练把 harness 当固定物，harness 优化又把模型当冻结物；两者互相塑造轨迹分布这件事没人闭环。
 
-## 前传：GPP，人在环的上限与涌现
+## 3. 为什么此前做不通：重置式方法的结构性盲区
 
-- 战绩：Pokémon Blue（2025-05）、Yellow Legacy 困难模式四天王（2025-08）、Crystal（2025-11，终局零败绩）——首个通关多款宝可梦 RPG 的 AI 系统。
-- 关键转折：Blue 时代靠人手写专家模块（Pathfinder Agent、Boulder Puzzle Strategist）；**Yellow Legacy 起全部撤掉**，只留通用元工具（define_agent、run_code、记事本编辑、自定义工具创建），让模型自建 harness。
-- 三件没人要求它做的事（论文原文记录）：把 autopress_buttons 的沙箱漏洞**封装成通用原语 press_sequence**（而不是偷偷滥用）；给 Crystal 终局 Red 战开发命名多阶段战术"Operation Zombie Phoenix"；在记事本里给满金市地下通道开关谜题写出**显式真值表**。
-- 定量增长（图 3/4，Yellow Legacy 全程 20 万回合）：CRUD 操作贯穿整局**从不收敛定型**；更新集中在少数导航/战斗组件（top-5：pathfinder、gem_pathfinder_v2、battle_strategist_agent、find_path、boulder_puzzle_solver）被反复重写；battle_strategist_agent 提示词结构复杂度**膨胀↔简化循环**，中途发生一次结构性重构——散落的逐条判断被收进 master_battle_agent 统一分派给命名子检查。**一个 AI 在几千回合里对自己的策略提示词做了重构（refactoring）**，这正是人类 Refiner 原本在做的事。
+论文把"harness"按 Karten 等（PokeAgent）的分解定义为四个组件：**系统提示 p**（每步推理的指令与策略指导）、**子代理 G**（可被编排器调用的专用模块：战斗策略、解谜、自反思）、**技能 K**（可复用例程，既包括推理中引用的文本级启发式，也包括可执行程序如寻路器、工具封装；`press_buttons`、`get_game_state` 这类预置原语也是技能）、**记忆 M**（跨轨迹积累事实、策略、观察的持久存储）。此外 harness 暴露一组固定的**元工具**（`define_agent`、`run_code`、`process_memory` 等），agent 通过它们原地编辑 p、G、K、M。
 
-## 机制：两环架构 + 四类 CRUD
+三种 harness 条件：**H_min** 只有环境接口 + 通用提示，无子代理/记忆/技能；**H_expert** 是 PokeAgent 与 GPP 手工打造的完整 harness（内置子代理、A* 寻路、属性表、伤害计算器、精选目标）；**meta-harness** 给模型元工具让它自己在游戏中构造子代理、技能、记忆——这是 GPP 后期的运行点，模型未经要求就自建了寻路器、战斗策略师和可复用脚本。
 
-harness 状态 H = (p, G, K, M)：系统提示 p、子代理集 G、技能库 K（文字经验 + 可执行代码）、持久记忆 M。
+重置式方法做不通的根因在第 2 节第 3 条：它们的效用信号来自**完整评测**，每次更新都回到起点。GPP 几千小时里最有价值的 harness 改动（Elite Four 阶段的战斗策略重写、Goldenrod 地下开关谜题的真值表）全发生在 episode 深处——重置式方法在结构上到不了那里。
 
-- **内环**（每步）：模型 M 在当前 harness H_t 包裹下产生动作。
-- **外环**（每 F 步，热身 W 步后）：Refiner 读最近轨迹窗 τ(t−F:t)，识别失败特征——导航绕圈、工具调用失败、目标卡死、错过探索——然后跑四遍针对性编辑 Δ=(Δp, ΔG, ΔK, ΔM)：改提示（以失败为条件重写）；子代理（重复多步模式→新建，检出失败→修改，无产出调用→删除）；技能（成功序列→固化，抛异常代码→修复）；记忆（补缺口、更新过期项、给已通过区域降权）。H(t+1)=H_t⊕Δ，**agent 不重启**，新 harness 直接进下一步上下文。
-- Agent 与 Refiner 共用同一模型、同一套元工具 API，只在"何时被调用、读哪段轨迹"上不同。
+## 4. 方法机制
 
-**免重置的两个论证**：(1) 失败特征单调累积——早期观察对所有后续精炼可用，精炼质量随 episode 长度复利，而重置式方法每次更新后从零重攒；(2) 只在 episode 深处出现的失败模式（终局战斗、多步谜题、长对话链），重置式方法**在构造上永远碰不到**。作者补充：对长时程编码 agent、具身 agent、运维任务，免重置本来就是现实主导域——环境重置昂贵或不可得。
+### 4.1 两环架构：行动是内环，精炼是外环
 
-## 结果：追回差距、能力地板、Dijkstra 尺子
+Continual Harness 对 harness 状态 H 做**在线上下文学习**。写 s_t = (o_t, m_t) 为第 t 步观察（渲染帧 + 描述可见格子与可走位置的 ASCII 文本地图，地图不含攻略、目标列表或寻路）。**内环**是标准 agent 步：模型 M 被当前 harness H_t 包裹，从 s_t 与迄今轨迹产生动作 a_t。**外环**是 harness 精炼：预热 W 步后每 F 步，Refiner 读最近的轨迹窗口 τ_{t−F:t} 找失败特征，发出逐组件编辑 Δ = (Δp, ΔG, ΔK, ΔM)。**agent 不重置**：更新后的 H_{t+1} = H_t ⊕ Δ 在下一步直接进入 agent 上下文——p 被 Δp 替换，G、K、M 接受 CRUD 操作。Agent 与 Refiner **共用同一个模型 M**（Gemini 3.1 Pro / Flash / Flash-Lite 三档消融）；两者通过同一套元工具 API 发出编辑，区别只在何时被调用、看哪段轨迹。GPP 里 Refiner 角色由看直播的人担任，CH 把它自动化。
 
-三个 harness 条件：H_min（画面+局部文字地图+按键+通用提示，无子代理/记忆/技能）、H_expert（PokeAgent 手工 harness + 固化 GPP harness：内置子代理、A* 寻路、属性表、伤害计算器、策展目标清单）、H_CH（从 H_min 起步边玩边精炼；三变体：从零 / bootstrap 冻结 / bootstrap 继续精炼）。主指标：**到每个里程碑的累计按键次数**（PokeAgent 标准化评测）。
+### 4.2 精炼环的四道处理
 
-- **追差距**（Red 11 里程碑 / Emerald 前 9 里程碑）：H_CH 在两款游戏所有受监控里程碑上的按键成本都大幅低于 H_min，并追回 H_min→H_expert 效率差距的大部分——没有游戏反编译、没有里程碑清单、没有任何手写子代理。剩余差距集中在**对话密集的道馆内部与多回合战斗策略**——CH 还合成不出可靠组件的两块。
-- **Emerald 成本-完成度 Pareto 面**（31 里程碑，API 花费对数轴）：Pro 上 CH 从零达 **100% / $130**（中位）vs H_min 98% / $215——**更好且省约 40%**，严格 Pareto 占优；bootstrap 变体 96-100% / $110-140。Flash 上勉强：bootstrap 继续精炼 80% / $42 vs H_min 77% / $30，方差极大。Flash-Lite：H_min 20% / $11，**每一个 CH 变体都更差**（3-13%）。
-- **能力地板（capability floor）**：存在一个能力下限，之下精炼循环无法自举——机制前提是模型能用好自己造的东西（写对代码、正确调用自建子代理、判断哪条记忆该取）；能力不够时造出来的东西自己用不利索，反而成负担。**给弱模型更强的脚手架不会让它变强，只会让它更迷茫。**
-- **Dijkstra 尺子**（寻路有唯一最优解，agent 自建寻路技能的路径成本对比 oracle，不掺主观判断）：24 小时单局内从接近多走一半路降到**个位数百分比超额**；数百次技能调用全在同一局累积（H_min 曲线贴零——它从来没有寻路技能可调）。失败调用→Refiner 诊断→修好该技能→后续调用变准，**全部发生在故障现场**。
-- **harness 是可迁移单位**：bootstrap 继续精炼在 Red 每个里程碑都快于从零，且全程 ≥ bootstrap 冻结——继承之上继续精炼仍有增值；冻结曲线的平坦度给出"只继承不精炼"的上界。
+Refiner 在窗口上识别四类失败特征：导航循环、工具调用失败、目标停滞、错过的探索机会。然后跑四道，一道一个组件：(i) 依识别出的失败与轨迹窗口重写提示 p；(ii) 为反复出现的多步模式创建子代理条目、编辑现有条目修复失败、删除未被有效调用的条目；(iii) 从成功序列中固化技能、修复抛出异常的可执行代码；(iv) 添加记忆条目填补缺口、更新过时条目、降低已经走过的区域的重要性。
 
-## 共学习：把开源模型接进正在精炼的 harness
+两条性质是全文的杠杆：**精炼信息在 episode 内单调累积**——早期观察到的失败特征对后续所有精炼都可用，精炼质量随 episode 长度复利，而重置式方法每次更新都重启这个累积；**可以针对只在 episode 深处出现的失败模式**——终局战斗、多步谜题、对话链，重置式方法在构造上到不了。
 
-每轮迭代：开源模型 πθ 在活跃精炼的 harness 里跑 K=256 步 → 成对过程奖励模型 PRM R(s,a,τ)∈[0,1] 给滑动窗口逐 transition 打分 → 低分窗口由前沿教师（Gemini-3.1-pro）重标注 → soft SFT 更新出 θ(k+1) → **加载上轮存档继续**（游戏内位置跨训练迭代累积，不重置）。θ 在迭代间更新、H_t 在迭代内更新——快慢两个时间尺度套在一起。
+### 4.3 模型-harness 共学习环
 
-- 结果：Gemma-4 在 Red 上**持续阶梯式里程碑推进**（judge 校验），未训练基线零推进；从开头出发与从中途存档出发曲线形状类似——训练信号不只对游戏早期有效。
-- 反向对照：换模型家族 Qwen3.5（27B/35B）不做监督热身直接上，能产出格式正确的工具调用但走不出出生区域——**排除"成绩只是流程假象"**；且两个热身阶段（前沿 CH 轨迹监督 + 逐步过程奖励离线 GRPO）单独都不产生有意义推进，联合才有效。
-- 边界：作者明说测过的开源模型（Gemma-4 至 31B）**还不足以胜任 Refiner 角色**——共学习闭环里"改 harness"仍靠前沿模型；循环未饱和，里程碑仍在涨。
+把 CH 实例化为开源模型的训练循环（Figure 2b）：预热阶段后（先在前沿模型的 CH 轨迹上 SFT，再做一段按步过程奖励的离线 GRPO——两段预热**单独都不产生有意义的里程碑推进**），每个在线迭代让策略 π_θk 在一个**实时精炼中的 harness H_t** 里跑 K = 256 步（DAgger 式 rollout）。一个成对过程奖励模型 R(s_t, a_t, τ) ∈ [0, 1] 在最近转移的滑动窗口上给每个转移打分；**低奖励窗口由前沿教师（Gemini-3.1-pro）重标注**；在重标注分片上做 soft SFT（LoRA，3 epoch，学习率 5×10⁻⁶）产生 θ_{k+1}。**训练环免重置**：迭代 k 结束时保存的模拟器状态作为 k+1 的起点，模型的游戏内位置跨训练累积而非重启。
 
-## 局限与批判性阅读
+轨迹分布 D_θ 通过 harness 依赖 θ：模型动作诱导 τ，Refiner 读 τ 更新 H_t，H_t 又塑造下一步观察分布。**θ 跨迭代更新（SFT），H_t 迭代内更新（Refiner）**——这就是"共学习"的精确含义。注意两个不动点：PRM 是冻结的，教师是前沿模型——锚仍在进化之外。
 
-- **锚仍是外部的**：共学习的监督信号 = 冻结 PRM + 前沿教师重标注。CH 解决了"harness 陈旧"，把评估器问题原封不动留给了 PRM 与教师——与 ECHO 把问题留给外部奖励 R 同构。WGtG 的批判在此完全适用：如果 PRM 可被 game，任务里程碑分数无法告诉你。
-- **单域验证**：两款宝可梦 RPG 同属一个 genre；对话密集与多回合战斗恰好是它做不好的两块，这两块也最接近开放语义任务——泛化到非游戏具身域是外推。
-- **能力地板的另一面**：地板之上收益随能力放大（Pro 严格占优），意味着这套方法**天然偏向强模型**——它扩大而非缩小模型间差距，与 WikiSkill"小模型+技能可胜大模型"的民主化叙事形成张力（消费进化资产便宜，生产进化资产贵）。
-- 微信解读作者的收尾问题值得保留：自我改进的系统不会长成你期望的样子，**它会长成你度量标准的样子**——F 步一次的失败特征识别本身就是一个度量选择。
+### 4.4 三档 CH 变体
 
-## 在调研图景中的位置
+**from scratch**：从 H_min 起步在游戏中精炼；**bootstrap frozen**：加载一次成功的 from-scratch 运行的 harness，关闭精炼；**bootstrap updating**：同样的 bootstrap，精炼继续。三者对比回答"harness 是否是可迁移资产"以及"继承之后继续精炼还有没有价值"。
 
-- **对 Weng 总纲**：把"harness 是可执行搜索空间"从编码域搬进具身域，并加上第四级阶梯没有的新轴——**在线/免重置**。Weng 分类里 ACE 改上下文、DGM 改代码、AlphaEvolve 种群搜索，全部依赖重置式评估；CH 证明 harness 精炼可以在单场连续 episode 内完成。
-- **对 DGM/RQGM**：DGM 的效用信号来自固定基准的完整评测（必须重置），RQGM 的 epoch 边界同样以重跑为前提；CH 的"在故障现场修"是另一种效用获取方式——代价是失去种群多样性与档案回溯。
-- **对 MOSS**：同一约束的研究级版本——生产环境没有免费 reset。MOSS 用失败重放+门控解决"改坏怎么办"，CH 用"改完直接进下一步上下文"换取速度，安全面明显更薄（无批准门控、无回滚故事），生产化需要把两者拼起来。
-- **对 WikiSkill / 技能红海**：bootstrap 实验证明 harness 整体（含技能库）是可迁移资产，与 WikiSkill 的技能跨模型迁移互证；但能力地板给"资产市场"叙事加了一条边界条件——**资产的消费也有门槛**。
-- **对评估器战争**：PRM + 前沿教师 = 又一个不参与进化的锚。三格图第三格看似"全都在学"，深处仍钉着两个不动点——与本调研核心论点（进化可以外包，锚必须钉在进化之外）完全一致。
+## 5. 实验结果全景
+
+**设置**：Pokémon Red 与 Emerald（同类型 RPG，地图/机制/难度不同），PokeAgent 挑战赛的标准化里程碑评估，主指标是**到达里程碑的累计按键次数**。模型：Gemini 3 三档（Pro / Flash / Flash-Lite）覆盖全部 harness 条件；开源迁移用 Gemma-4（E2B、E4B、26B MoE、31B dense）。每个实验至少三个 seed，报 seed 中位数并淡色画出各 seed。
+
+**GPP 的定性证据（§4.2）**：Blue 时代靠手写专家（Pathfinder Agent、Boulder Puzzle Strategist）；Yellow Legacy 起换成通用技能（`define_agent`、`run_code`、记事本编辑）让模型自建 harness。未经提示的涌现行为：把 `autopress_buttons` 的沙箱漏洞封装成通用的 `press_sequence` 原语；给多阶段战斗策略命名（Crystal 终局对 Red 的"Operation Zombie Phoenix"）；在记事本里为 Goldenrod 地下开关谜题写出显式真值表。Figure 3 的定量图：Yellow Legacy 全程 20 万回合里 CRUD 操作**持续发生而非收敛到固定脚手架**，且集中在一小撮导航与战斗组件（pathfinder、gem_pathfinder_v2、battle_strategist_agent、find_path、boulder_puzzle_solver）；Figure 4 跟踪 battle_strategist_agent 提示在 Elite Four 阶段 14 个结构检查点的节点数/决策门/深度/扇出——在生长与简化之间循环，并经历一次结构性重写（逐决策逻辑被吸收进一个分派到具名子检查的 master_battle_agent）。
+
+**CH 缩小到手工 harness 的差距（§4.3，Figure 5）**：Red 上 11 个里程碑到 Thunder Badge，Emerald 上 9 个到 Knuckle Badge。两款游戏上 CH 相对 H_min 大幅降低每个监测里程碑的按键成本，**回收了 H_min 到 H_expert 效率差距的大半**——而它没有游戏反编译、没有里程碑时间表、没有任何构成 H_expert 的手写子代理。残余差距集中在对话密集的道馆内部与多回合战斗策略——CH 尚不能可靠合成的组件。Red 上 bootstrap-updating 在**每个**里程碑都比 from-scratch 高效：先前运行精炼出的 harness 加速下一次运行，即便游戏状态重置——精炼信号在 episode 内复利，也可跨运行迁移。
+
+**能力地板（§4.4，Figure 6，Emerald 31 里程碑 × 24 小时 × 成本）**
+
+| 模型（输入/输出价 USD/M） | H_min | CH from scratch | CH bootstrap | 判断 |
+|---|---|---|---|---|
+| Pro（1.25 / 10.00） | 98% / $215 | **100% / $130** | 96-100% / $110-140 | 严格 Pareto 占优，省约 40% |
+| Flash（0.30 / 2.50） | 77% / $30 | 高方差 | updating 80% / $42 | 边际收益、方差极大 |
+| Flash-Lite（0.10 / 0.40） | **20% / $11** | 3-13% | 3-13% | **每个 CH 变体都更差**，成本相当或更高 |
+
+作者的结论只有一句："harness 收益需要一个能正确利用 harness 组件的模型"。这是全谱系第一次把"脚手架不是免费午餐"量化到具体模型档位。
+
+**开源模型共学习（§4.5，Figure 7，Pokémon Red）**：五条推进的运行中，Gemma-4 的游戏内位置在每次训练迭代后都前进——从游戏开头起步的和从中期检查点起步的曲线呈同样的阶梯形状，说明训练信号不专属于早期游戏分布。未训练的 Gemma-4 基线在起始里程碑之外零推进。**负对照**：跨家族的 Qwen3.5（27B、35B）不做监督预热，能产出可解析的工具调用，却在实时 rollout 里走不出起始区域——排除了"是 rollout 协议本身在推动进展"这一假象。共学习环在实验范围内**未饱和**：报告了持续的里程碑进展，但没有建立收敛点。
+
+**技能向 oracle 可测地自改进（§4.6，Figure 8）**：用 Dijkstra oracle 的路径成本作尺子，评估进化出的导航技能在 warp-to-warp 避障导航（贪心开放场跳跃会失败）上的表现——这是**独立于终任务效率的技能自改进直接测量**。H_min 从不调用导航技能；每个 CH 条件 24 小时内累积数百次调用。from-scratch 运行的路径成本超额从起初的**接近一半**降到**个位数**并保持——修复全在环内、免重置：早先调用的失败被 Refiner 诊断、受影响的技能在同一 episode 的后续调用前被修好。bootstrap-updating 继承精炼过的技能集并全程持平或优于 bootstrap-frozen——继承之上继续精炼仍有价值；bootstrap-frozen 的平坦曲线则给出"只继承不精炼"的上界。
+
+## 6. 局限（作者自认 + 延伸批判）
+
+作者自认（§6）：能力地板之下精炼环无法自举；共学习实验把前沿教师耦合到开源学生，框架理论上支持同一模型兼任两角，但评估过的开源模型（Gemma-4 至 31B）还不够强；共学习环未饱和也未建立收敛点；只做了免重置训练，**免重置 vs 重置式在同一任务上的正面对比仍开放**；残余差距在对话密集区与多回合战斗。
+
+延伸几条：
+
+1. **"免重置"的代价没有被正面计价**。放弃重置意味着放弃种群多样性与档案回溯（DGM 报告 07 的核心资产）：一个坏的精炼在 CH 里没有"回到上一个好版本"的机制，只能靠后续精炼再修——论文的 Figure 3 显示更新持续发生，但没有报告有多少更新是在撤销前一次更新。这是免重置范式最需要被测量的一件事。
+2. **能力地板的机制未被解释**。Flash-Lite 上更强脚手架反而更差——是 Refiner 太弱写出了坏 harness，还是 Agent 太弱用不好好 harness？Agent 与 Refiner 共用模型让两者无法区分；Self-Harness（报告 14）后来用回归门（改坏即拒）让 35B 弱模型大幅提升，暗示地板至少部分来自"没有拒绝坏改动的门"，而非模型本身。
+3. **锚全在进化之外但没被讨论**。共学习环的两个不动点——冻结 PRM 与前沿教师——是系统不塌缩的原因，论文把它们当作实现细节而非设计原则；按 Who Grades the Grader（报告 05）的框架，它们正是承重部件，且 PRM 的构成（Appendix D 的分量权重）应当被当作一等实验对象。
+4. **评估域单一**。全部结果在两款宝可梦 RPG 上，里程碑评估来自同一作者组的挑战赛；"free-reset 是长时运行编码 agent 与运维任务的现实主导场景"这一动机没有在这些域上验证——Prime Agent（报告 18，同一一作）后来把 CH 作为子系统搬到 nanoGPT speedrun 与 Factorio，算是部分回应。
+
+## 7. 意义与位置
+
+2026-05 的 Continual Harness 在谱系里开了一条前人没有的轴：**重置式 vs 免重置**。DGM、RQGM、GEPA、Meta-Harness 的效用信号都来自完整评测，CH 证明 harness 精炼可以全部发生在故障现场——代价是失去种群多样性与档案回溯，换来对"只在 episode 深处出现的失败模式"的可达性。这条轴后来被 Prime Agent（报告 18）落成 daemon/恢复/分叉的工程事实，也被自进化综述（报告 12）从评估侧镜像为"Retention 是最缺服务的维度：episodic 基准从构造上测不到知识积累"。
+
+它同时是**第一个模型-harness 共学习闭环**：同一份轨迹双消费——Refiner 改 harness（episode 内），PRM 打分 + 教师重标注 + soft SFT 改权重（每 256 步）。Co-Harness（报告 21）两个月后把同一双环推广到通用 LLM agent 并自称"首个"，本仓库按时间线把首发权记给 CH、把通用化记给 Co-Harness。报告 10 §2 的"分层分工"共识——文本层快环、权重层慢环——第一个完整实现就是这里。
+
+三条与全谱系的硬连线：① **bootstrap 继承实验证明 harness 是可迁移资产**（与 WikiSkill 报告 09、Meta-Harness 报告 13 的跨模型迁移互证），但能力地板给这个资产市场加了消费门槛——不是所有模型都消费得起；② **共学习深处仍钉着两个不动点**（冻结 PRM + 前沿教师）——锚必须在进化之外，与报告 05 的结论同构；③ **Dijkstra 尺子**是全谱系少见的"技能层独立真值"——大多数工作只报终任务分，CH 单独测了技能本身向 oracle 收敛的曲线，这是评估器战争（报告 03-06、24-25）里最容易被忽略的一种锚：**为中间产物找一个可计算的 oracle**。
+
+方法论上最值得借鉴的两点：**把 harness 拆成四个可 CRUD 的组件并给出统一的元工具 API**（Refiner 与 Agent 用同一套工具、只在调用时机与轨迹上下文上不同——这让"人在环"到"程序在环"的替换成为一次配置变更而非架构重写）；**用同一条轨迹同时驱动快环与慢环**（harness 与权重各取所需，避免了为两个环分别采样的算力浪费）。
+

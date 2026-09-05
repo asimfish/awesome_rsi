@@ -268,7 +268,7 @@ For each observed preference pair, we introduce a latent variable r ∼ρref(r |
 the prior over rubrics from the base model. The likelihood of the observed preference given
 a latent rubric is:
 p(a+ ≻a−| q, r) = σ
- J(q, r, a+) −J(q, r, a−)
+ J(q, r, a+) −J(q, r, a−)
 
 ,
 (3)
@@ -291,7 +291,7 @@ log p(a+, a−| q) ≥L = Er∼ρϕ(r|q)
 
 log p(a+ ≻a−| q, r)
  −KL
- ρϕ(r | q)∥ρref(r | q)
+ ρϕ(r | q)∥ρref(r | q)
 
 ,
 (5)
@@ -303,12 +303,12 @@ Lrubric(ϕ) = Er∼ρϕ(r|q)
 
 R(r; q, a+, a−)
  −KL
- ρϕ(r | q)∥ρref(r | q)
+ ρϕ(r | q)∥ρref(r | q)
 
 ,
 (6)
 where R(r; q, a+, a−) = log σ
- J(q, r, a+) −J(q, r, a−)
+ J(q, r, a+) −J(q, r, a−)
 
 encourages rubrics that, under a fixed
 judge, assign higher scores to preferred responses.
@@ -317,7 +317,7 @@ The log-sigmoid reward in Equation (6) provides a principled
 starting point. In practice, we replace it with a margin-based reward combined with a
 format reward:
 R(r; q, a+, a−) = α ·
- J(q, r, a+) −J(q, r, a−)
+ J(q, r, a+) −J(q, r, a−)
  + (1 −α) · Rformat(r)
 (7)
 where α = 0.7. The margin provides continuous signal proportional to the score gap. The
