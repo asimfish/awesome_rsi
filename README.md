@@ -5,7 +5,7 @@
 ![reports](https://img.shields.io/badge/deep--dives-29-red)
 ![zh-PDF](https://img.shields.io/badge/zh--PDF-66-green)
 ![slides](https://img.shields.io/badge/slides-34p-orange)
-![full report](https://img.shields.io/badge/full_report-149p-8a2be2)
+![full report](https://img.shields.io/badge/full_report-150p-8a2be2)
 
 这是一个关于 Recursive Self-Improvement（递归自改进）的论文列表和调研仓库，覆盖从 1965 年 Good 的智能爆炸猜想到 2026 年的自进化 agent 研究。每篇核心论文都附有原文链接、中文解读和保留原版式的中文翻译 PDF。
 
@@ -23,7 +23,7 @@
 | 英文论文 PDF | 61 篇 + 6 篇起源经典 | [`papers/en/`](papers/en/)，[`papers/classics/`](papers/classics/) |
 | 中文翻译 PDF（[super_translate](https://github.com/asimfish/super_translate) 生成，保留原版式） | 66 篇，全部英文 PDF 均有对应中译 | [`papers/zh/`](papers/zh/) |
 | 汇总 PPT | 34 页 HTML / PDF | [`report/awesome_rsi_slides.html`](report/awesome_rsi_slides.html)，[PDF](report/awesome_rsi_slides.pdf) |
-| 全文合订报告（29 份解读 + 两张图） | 149 页 | [`report/awesome_rsi_full_report.pdf`](report/awesome_rsi_full_report.pdf)，[HTML](report/awesome_rsi_full_report.html) |
+| 全文合订报告（29 份解读 + 两张图） | 150 页 | [`report/awesome_rsi_full_report.pdf`](report/awesome_rsi_full_report.pdf)，[HTML](report/awesome_rsi_full_report.html) |
 
 ## Contents
 
@@ -54,7 +54,7 @@
 |---|---|
 | 15 分钟 | [汇总 PPT](report/awesome_rsi_slides.html)（浏览器中用方向键翻页，P 键打印）或 [PDF 版](report/awesome_rsi_slides.pdf) |
 | 2 小时 | [报告 10 汇总](reports/10_synthesis_insights.md) → [报告 01 Weng](reports/01_lilian_weng_harness_engineering.md) → [报告 05 Who Grades the Grader](reports/05_who_grades_the_grader.md)（说明为什么评估器需要循环外的锚） |
-| 通读 | [全文合订报告](report/awesome_rsi_full_report.pdf)（149 页，29 份解读按编号排列） |
+| 通读 | [全文合订报告](report/awesome_rsi_full_report.pdf)（150 页，29 份解读按编号排列） |
 | 系统研读 | `reports/` 按 00 → 23 → 01 → 02 → 07 → 03 → 04 → 05 → 06 → 08 → 11 → 09 → 10 的顺序读，其余按需；对照 `papers/zh/` 的中文 PDF |
 
 按目的：
@@ -295,7 +295,7 @@ _Thomas Kwa, Ben West, Joel Becker, et al. (METR)_ — 测量 AI 能可靠完成
 
 ## 5. Deep-Dive Reports
 
-29 份中文解读（[`reports/`](reports/)），统一七节结构：一句话定位、要解决的问题、为什么此前做不通、方法机制、实验结果、局限、与其他报告的关系。每篇 2000 到 5200 字，数字标注到论文表号。全部合订为 [149 页 PDF](report/awesome_rsi_full_report.pdf)。
+29 份中文解读（[`reports/`](reports/)），统一七节结构：一句话定位、要解决的问题、为什么此前做不通、方法机制、实验结果、局限、与其他报告的关系。每篇 2000 到 5200 字，数字标注到论文表号。全部合订为 [150 页 PDF](report/awesome_rsi_full_report.pdf)。
 
 | # | 报告 | 对象 | 主要内容 |
 |---|---|---|---|
@@ -446,7 +446,7 @@ awesome_rsi/
 ├── README.md · CONTRIBUTING.md
 ├── report/
 │   ├── awesome_rsi_slides.html / .pdf        # 34 页汇总 PPT（方向键翻页，P 键打印）
-│   └── awesome_rsi_full_report.html / .pdf   # 149 页全文合订（29 份解读 + 封面 + 目录 + 两图）
+│   └── awesome_rsi_full_report.html / .pdf   # 150 页全文合订（29 份解读 + 封面 + 目录 + 两图）
 ├── reports/                                  # 29 份解读 00–28（索引见 §5）
 ├── papers/
 │   ├── en/                                   # 61 篇英文原版 PDF（arXiv + iCoder 技术报告）
