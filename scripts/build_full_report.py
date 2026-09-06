@@ -60,13 +60,13 @@ def _svg(path):
 
 n_en = len(glob.glob(str(REPO/"papers/en/*.pdf"))); n_zh = len(glob.glob(str(REPO/"papers/zh/*.pdf"))); n_cl = len([f for f in glob.glob(str(REPO/"papers/classics/*.pdf")) if not f.endswith("_zh.pdf")]); n_clzh = len(glob.glob(str(REPO/"papers/classics/*_zh.pdf")))
 fig_html = f"""<div class="figpage1">{_svg('assets/fig1_timeline.svg')}<div class="figcap">图 1 · 71 项工作的时间线：按十个家族分泳道、按 arXiv 首版年月定位（非 arXiv 材料取发布月近似），★ 为核心精读材料；1965-2014 思想史与 2023-2026 工程爆发之间断轴。</div></div>
-<div class="figpage2">{_svg('assets/fig2_taxonomy.svg')}<div class="figcap">图 2 · 递归自改进的分类体系：七个一级维度、37 个子类；"锚在哪"是本仓库独有的主轴。同一工作可出现在多个维度。</div></div>"""
+<div class="figpage2">{_svg('assets/fig2_taxonomy.svg')}<div class="figcap">图 2 · 递归自改进的分类体系：七个一级维度、37 个子类；"锚在哪"（进化循环外的固定评估依据是什么）是本仓库增加的维度，三份已发表综述都没有按它分类。同一工作可出现在多个维度。</div></div>"""
 
 today = datetime.date.today().isoformat()
 doc = f"""<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>递归自改进（RSI）调研全文报告</title><style>{CSS}</style></head><body>
 <div class="cover">
   <div class="t1">递归自改进（Recursive Self-Improvement）<br>调研全文报告</div>
-  <div class="t2">从 Good 1965 的智能爆炸猜想到 2026 年的评估器战争与 harness 工业化：{len(files)} 份精读报告合订<br>核心论点——执行已经自动化，品味正在被编译，锚是最后的手工业</div>
+  <div class="t2">从 Good 1965 的智能爆炸猜想到 2026 年的评估器共进化与 harness 优化：{len(files)} 份解读报告合订<br>主要结论：能稳定运行的自进化系统都在进化循环之外保留了一个不参与进化的评估依据；写代码和跑实验已基本自动化，决定做什么实验仍由人主导</div>
   <div class="meta">构建日期：{today}（首版 2026-08-31）<br>材料范围：Lilian Weng《Harness Engineering for Self-Improvement》· Anthropic《When AI builds itself》· EvoLM · Red Queen Gödel Machine · Who Grades the Grader · ECHO · Darwin Gödel Machine · MOSS · WikiSkill · Continual Harness · A Survey of Self-Evolving Agents（TMLR）· Meta-Harness · Self-Harness · EnvHarness · AutoSaddler · MetaCaster · Prime Agent · iCoder · Metan · Co-Harness · Co-Evolution in Agentic Systems · Gödel Agent · SICA · EvalCEGAR · RHO · 技能进化红海五篇 · 安全治理五篇 · Self-Evolving Coding Agents 综述；前史：Good 1965 · Vinge 1993 · GISAI 2001 · Gödel Machine 2003 · Omohundro 2008 · Chalmers 2010 · IEM 2013 · Superintelligence 2014<br>配套材料：{n_en} 篇英文 PDF + {n_cl} 篇起源经典 · {n_zh + n_clzh} 篇中译 PDF（全部英文 PDF 均有中译，仅 Good 1965 扫描件除外） · 汇总 PPT（report/awesome_rsi_slides.html / .pdf）· 图 1 时间线 / 图 2 分类树（assets/）<br>仓库：github.com/asimfish/awesome_rsi</div>
 </div>
 <div class="toc"><h1 class="first" style="page-break-before:avoid">目录</h1><ol>{toc_html}</ol></div>
