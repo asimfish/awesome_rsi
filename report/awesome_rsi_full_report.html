@@ -32,10 +32,10 @@ a{color:#c2410c;text-decoration:none}
 </style></head><body>
 <div class="cover">
   <div class="t1">递归自改进（Recursive Self-Improvement）<br>调研全文报告</div>
-  <div class="t2">从 Good 1965 的智能爆炸猜想到 2026 年的评估器共进化与 harness 优化：29 份解读报告合订<br>主要结论：能稳定运行的自进化系统都在进化循环之外保留了一个不参与进化的评估依据；写代码和跑实验已基本自动化，决定做什么实验仍由人主导</div>
-  <div class="meta">构建日期：2026-09-08（首版 2026-08-31）<br>材料范围：Lilian Weng《Harness Engineering for Self-Improvement》· Anthropic《When AI builds itself》· EvoLM · Red Queen Gödel Machine · Who Grades the Grader · ECHO · Darwin Gödel Machine · MOSS · WikiSkill · Continual Harness · A Survey of Self-Evolving Agents（TMLR）· Meta-Harness · Self-Harness · EnvHarness · AutoSaddler · MetaCaster · Prime Agent · iCoder · Metan · Co-Harness · Co-Evolution in Agentic Systems · Gödel Agent · SICA · EvalCEGAR · RHO · 技能进化红海五篇 · 安全治理五篇 · Self-Evolving Coding Agents 综述；前史：Good 1965 · Vinge 1993 · GISAI 2001 · Gödel Machine 2003 · Omohundro 2008 · Chalmers 2010 · IEM 2013 · Superintelligence 2014<br>配套材料：61 篇英文 PDF + 6 篇起源经典 · 66 篇中译 PDF（全部英文 PDF 均有中译，仅 Good 1965 扫描件除外） · 汇总 PPT（report/awesome_rsi_slides.html / .pdf）· 图 1 时间线 / 图 2 分类树（assets/）<br>仓库：github.com/asimfish/awesome_rsi</div>
+  <div class="t2">从 Good 1965 的智能爆炸猜想到 2026 年的评估器共进化与 harness 优化：32 份解读报告合订<br>主要结论：能稳定运行的自进化系统都在进化循环之外保留了一个不参与进化的评估依据；写代码和跑实验已基本自动化，决定做什么实验仍由人主导</div>
+  <div class="meta">构建日期：2026-09-08（首版 2026-08-31）<br>材料范围：Lilian Weng《Harness Engineering for Self-Improvement》· Anthropic《When AI builds itself》· EvoLM · Red Queen Gödel Machine · Who Grades the Grader · ECHO · Darwin Gödel Machine · MOSS · WikiSkill · Continual Harness · A Survey of Self-Evolving Agents（TMLR）· Meta-Harness · Self-Harness · EnvHarness · AutoSaddler · MetaCaster · Prime Agent · iCoder · Metan · Co-Harness · Co-Evolution in Agentic Systems · Gödel Agent · SICA · EvalCEGAR · RHO · 技能进化五篇 · 安全治理五篇 · Self-Evolving Coding Agents 综述 · Prism-Shadow/awesome-rsi 清单与《读懂 RSI》长文 · Reef 基础设施；前史：Good 1965 · Vinge 1993 · GISAI 2001 · Gödel Machine 2003 · Omohundro 2008 · Chalmers 2010 · IEM 2013 · Superintelligence 2014<br>配套材料：61 篇英文 PDF + 6 篇起源经典 · 66 篇中译 PDF（全部英文 PDF 均有中译，仅 Good 1965 扫描件除外） · 汇总 PPT（report/awesome_rsi_slides.html / .pdf）· 图 1 时间线 / 图 2 分类树（assets/）<br>仓库：github.com/asimfish/awesome_rsi</div>
 </div>
-<div class="toc"><h1 class="first" style="page-break-before:avoid">目录</h1><ol><li>RSI 起源深度解读：从 Good 到 Bostrom（1965–2014）</li><li>Lilian Weng《Harness Engineering for Self-Improvement》深度解读：编码 agent 可以搜索和优化 harness 代码</li><li>Anthropic《When AI builds itself》深度解读：研发执行逐步自动化，研究方向仍由人类主导</li><li>EvoLM 深度解读：用判别效用训练 rubric 生成器，并与策略交替更新</li><li>Red Queen Gödel Machine 深度解读：按阶段更新评估器，用固定锚数据验证改进</li><li>Who Grades the Grader 深度解读：任务分数无法验证自进化评估器是否有效</li><li>ECHO 深度解读：让 critic 与 policy 同步更新，适应变化的失败模式</li><li>DGM 深度解读：让编码 agent 修改自身代码，用基准评估修改效果</li><li>MOSS 深度解读：在生产系统中通过源码自改写修复 harness 故障</li><li>WikiSkill 深度解读：在 raw 与 skill 之间保留不随技能回滚的 wiki 知识层</li><li>汇总洞察 · RSI 全景：递归自改进研究的发展与评估问题（1965–2026）</li><li>Continual Harness 深度解读：在连续任务中精炼 harness，并联合更新模型与 harness</li><li>TMLR 自进化 Agent 综述深度解读：按 What / When / How / Where 分类自进化研究</li><li>Meta-Harness 深度解读：让 coding agent 根据完整执行轨迹修改 harness</li><li>Self-Harness 深度解读：用回归验证筛选弱模型对自身 harness 的修改</li><li>EnvHarness 深度解读：固定验证器，针对 agent 的弱点调整环境</li><li>AutoSaddler 深度解读：用 mini-batch 学习优化 harness，并检查补丁的泛化效果</li><li>MetaCaster 深度解读：用 meta-harness 优化少样本时间序列预测</li><li>Prime Agent 深度解读：用可恢复的 harness 支持长时程任务</li><li>iCoder 深度解读：AI 主导模型开发，人类规定目标、权限与验证要求</li><li>Metan（Metaⁿ）深度解读：固定元操作，通过递归扩展输入增加改进深度</li><li>Co-Harness 深度解读：交替改进 harness，并用生成的轨迹训练模型</li><li>Co-Evolution 综述深度解读：三阶段分类中，只有 RQGM 满足 Meta 共进化判据</li><li>桥接 2024–2025 深度解读：Gödel Agent 与 SICA 用经验评估验证自改写</li><li>EvalCEGAR 深度解读：用当前评估器无法区分的样本对生成新算子</li><li>RHO 深度解读：从未标注轨迹优化 harness，单轮 SWE-Bench Pro 59%→78%</li><li>技能进化五篇合评：用不同结构将交互经验整理为可复用技能</li><li>安全与治理五篇深度合评：用版本管理、验收和测量检验 README 中的安全承诺</li><li>Self-Evolving Coding Agents 综述深度解读：编码反馈如何支持自进化，错误又如何被长期保留</li></ol></div>
+<div class="toc"><h1 class="first" style="page-break-before:avoid">目录</h1><ol><li>RSI 起源深度解读：从 Good 到 Bostrom（1965–2014）</li><li>Lilian Weng《Harness Engineering for Self-Improvement》深度解读：编码 agent 可以搜索和优化 harness 代码</li><li>Anthropic《When AI builds itself》深度解读：研发执行逐步自动化，研究方向仍由人类主导</li><li>EvoLM 深度解读：用判别效用训练 rubric 生成器，并与策略交替更新</li><li>Red Queen Gödel Machine 深度解读：按阶段更新评估器，用固定锚数据验证改进</li><li>Who Grades the Grader 深度解读：任务分数无法验证自进化评估器是否有效</li><li>ECHO 深度解读：让 critic 与 policy 同步更新，适应变化的失败模式</li><li>DGM 深度解读：让编码 agent 修改自身代码，用基准评估修改效果</li><li>MOSS 深度解读：在生产系统中通过源码自改写修复 harness 故障</li><li>WikiSkill 深度解读：在 raw 与 skill 之间保留不随技能回滚的 wiki 知识层</li><li>汇总洞察 · RSI 全景：递归自改进研究的发展与评估问题（1965–2026）</li><li>Continual Harness 深度解读：在连续任务中精炼 harness，并联合更新模型与 harness</li><li>TMLR 自进化 Agent 综述深度解读：按 What / When / How / Where 分类自进化研究</li><li>Meta-Harness 深度解读：让 coding agent 根据完整执行轨迹修改 harness</li><li>Self-Harness 深度解读：用回归验证筛选弱模型对自身 harness 的修改</li><li>EnvHarness 深度解读：固定验证器，针对 agent 的弱点调整环境</li><li>AutoSaddler 深度解读：用 mini-batch 学习优化 harness，并检查补丁的泛化效果</li><li>MetaCaster 深度解读：用 meta-harness 优化少样本时间序列预测</li><li>Prime Agent 深度解读：用可恢复的 harness 支持长时程任务</li><li>iCoder 深度解读：AI 主导模型开发，人类规定目标、权限与验证要求</li><li>Metan（Metaⁿ）深度解读：固定元操作，通过递归扩展输入增加改进深度</li><li>Co-Harness 深度解读：交替改进 harness，并用生成的轨迹训练模型</li><li>Co-Evolution 综述深度解读：三阶段分类中，只有 RQGM 满足 Meta 共进化判据</li><li>桥接 2024–2025 深度解读：Gödel Agent 与 SICA 用经验评估验证自改写</li><li>EvalCEGAR 深度解读：用当前评估器无法区分的样本对生成新算子</li><li>RHO 深度解读：从未标注轨迹优化 harness，单轮 SWE-Bench Pro 59%→78%</li><li>技能进化五篇合评：用不同结构将交互经验整理为可复用技能</li><li>安全与治理五篇深度合评：用版本管理、验收和测量检验 README 中的安全承诺</li><li>Self-Evolving Coding Agents 综述深度解读：编码反馈如何支持自进化，错误又如何被长期保留</li><li>Prism-Shadow/awesome-rsi 深度解读：用九个维度的元数据整理 RSI 基准与方法</li><li>《万字长文带你读懂 RSI》深度解读：用一个更新公式和五组维度给自进化研究建坐标系</li><li>Reef 深度解读：把"服务、反馈、更新、版本发布"做成一个可复用的循环</li></ol></div>
 <div class="figpage1"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3540 1168" font-family="-apple-system,Helvetica,Arial,'PingFang SC','Noto Sans CJK SC',sans-serif">
 <rect width="3540" height="1168" fill="#ffffff"/>
 <text x="36" y="42" font-size="24" font-weight="700" fill="#111827">Figure 1 · Recursive Self-Improvement：71 项工作的时间线（1965–2026）</text>
@@ -9045,5 +9045,957 @@ AutoSaddler 都属于"框架自进化 + 阶段式 +
 <p><strong>配套 awesome 列表是本仓库的近邻</strong>：iSEngLab
 按进化对象组织论文，主要覆盖编码域。本仓库按锚的位置组织 RSI
 研究，还包括前史、评估侧和宏观争论。两者覆盖范围互补，已互相收录。</p>
+</article><article id="ch30"><h1
+id="prism-shadowawesome-rsi-深度解读用九个维度的元数据整理-rsi-基准与方法">Prism-Shadow/awesome-rsi
+深度解读：用九个维度的元数据整理 RSI 基准与方法</h1>
+<blockquote>
+<p><strong>Awesome RSI: A Curated Collection of Recursive
+Self-Improvement Benchmarks and Methods</strong>
+GitHub：github.com/Prism-Shadow/awesome-rsi ·
+网站：prism-shadow.github.io/awesome-rsi ·
+中英双语，2026（网站数据快照取自 2026-08-13 的 Semantic Scholar 引用数）
+内容：27 个基准、31 个方法、1 个开源系统（Proteus）、3 本书与若干课程、1
+篇长文（另见报告 30） 本报告依据：仓库
+README、网站数据文件（<code>papers.js</code>、<code>methods.js</code>、<code>paperTaxonomy.js</code>、<code>methodTaxonomy.js</code>、<code>systems.js</code>、<code>resources.js</code>），读取时间
+2026-09-08</p>
+</blockquote>
+<hr />
+<h2 id="1-一句话定位">1. 一句话定位</h2>
+<p>Prism-Shadow/awesome-rsi 是目前公开的 RSI
+资源里唯一把<strong>基准</strong>和<strong>方法</strong>分开编目、并给每条都打上多维度元数据的清单：27
+个基准按来源、模式、进化对象、构造标准、指标、创建方式、评分方式七个维度标注，31
+个方法按进化对象、模式、拓扑、验收标准、更新者、反馈来源、反馈类型、更新频率、经验范围九个维度标注。网站把同一批数据做成筛选面板、按日期或引用数排序的列表、引用图和"书籍与课程"页。它与本仓库的重叠只有
+12 篇方法论文；它收录了 19 篇本仓库没有的方法（以记忆和技能类为主，如
+SEAL、ReasoningBank、A-MEM、SkillSmith、Mendel Gödel
+Machine、Recuris、TRACE），本仓库有 48
+篇它没有收录的论文（评估器共进化、harness
+工业化、安全治理和思想史几乎全部）。两个仓库对 RSI
+的组织方式不同：它按"改了什么、何时改、谁改、凭什么留下"给每篇论文贴标签，本仓库按"进化循环外的固定评估依据在哪"排一条主线。它的"验收标准"维度是两者最接近的地方。</p>
+<h2 id="2-这个资源要解决的问题">2. 这个资源要解决的问题</h2>
+<p>RSI
+领域没有统一的技术范式：有的工作改模型参数，有的改上下文、记忆、技能，有的改工具和
+harness
+代码；评测方式也各不相同，有的用固定基准，有的用任务流，有的只看单题结果。读者面对一篇新论文，很难快速判断它和已有工作的关系。</p>
+<p>已有的 awesome 列表（包括本仓库 §4.3
+的三份综述配套清单）大多是按主题分节的链接列表，条目没有结构化标签，无法按"只看在线模式、改技能、用可执行验证器验收的方法"这类条件筛选。Prism-Shadow
+的做法是把每条论文的分类判断写成数据文件，再由网站渲染成可筛选的视图。</p>
+<p>它同时把<strong>基准</strong>单独列为一类。RSI
+方法论文通常在自己选的任务上报告提升，而"怎样测量自改进是否真的发生"是另一个问题：需要任务流、需要区分训练与测试、需要有对照组。截至
+2026 年 9 月，该清单收录了 27
+个专门为此设计的基准，本仓库在这一块基本空白（只有 METR
+的任务时长测量）。</p>
+<h2 id="3-与已有资源的关系">3. 与已有资源的关系</h2>
+<table>
+<thead>
+<tr>
+<th>资源</th>
+<th>组织方式</th>
+<th>规模</th>
+<th>与 Prism-Shadow 的差别</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Prism-Shadow/awesome-rsi</td>
+<td>基准 + 方法两张表，每条带多维标签，网站可筛选</td>
+<td>27 基准 + 31 方法 + 1 系统</td>
+<td>—</td>
+</tr>
+<tr>
+<td>本仓库 asimfish/awesome_rsi</td>
+<td>按"锚在哪"排主线，13 个小节，每篇有深度解读和中译</td>
+<td>61 篇论文 + 6 篇经典 + 29 份解读</td>
+<td>重叠 12
+篇方法；本仓库没有基准表，它没有评估器共进化、安全治理、思想史</td>
+</tr>
+<tr>
+<td>iSEngLab/Awesome-Self-Evolving-Coding-Agents</td>
+<td>按进化对象六类，限编码域</td>
+<td>综述配套</td>
+<td>只有编码域；无基准表、无元数据</td>
+</tr>
+<tr>
+<td>CharlesQ9/Self-Evolving-Agents</td>
+<td>TMLR 综述配套</td>
+<td>上百篇</td>
+<td>按 What/When/How/Where 分节，无筛选</td>
+</tr>
+<tr>
+<td>Lil'Log Harness Engineering 博文</td>
+<td>叙述式综述</td>
+<td>约 30 篇引用</td>
+<td>有观点无编目</td>
+</tr>
+</tbody>
+</table>
+<p>Prism-Shadow
+的增量是<strong>元数据</strong>：它把综述里的分类维度变成每条论文上的标签，让分类可以被检索和统计。代价是只做标签不做解读——每条只有一句"是什么、为什么重要"。</p>
+<h2 id="4-内容与机制拆解">4. 内容与机制拆解</h2>
+<h3 id="41-方法表的九个维度methodtaxonomyjs">4.1
+方法表的九个维度（methodTaxonomy.js）</h3>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>取值</th>
+<th>与本仓库概念的对应</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>artifact（进化对象）</td>
+<td>Parametric；Non-parametric 下分 Harness code / Context / Memory /
+Skill</td>
+<td>本仓库的"改哪层"（权重 / 源码 /
+文本），它把文本层再拆成上下文、记忆、技能三类</td>
+</tr>
+<tr>
+<td>mode（模式）</td>
+<td>Online / Offline / Offline → Online</td>
+<td>本仓库的重置式 /
+免重置之分近似但不相同；它按"更新发生在最终评测之前还是之中"划分</td>
+</tr>
+<tr>
+<td>topology（拓扑）</td>
+<td>Sequential / Tree / Graph</td>
+<td>本仓库没有单列此维度；DGM 是 Tree，Metan 的档案是 Tree，Mendel GM 是
+Graph</td>
+</tr>
+<tr>
+<td>selection（验收标准）</td>
+<td>Artifact validation / Instance result / Benchmark score / Combined
+metrics / No validation</td>
+<td><strong>最接近本仓库的"锚"</strong>：它记录留下更新的证据是什么；"No
+validation"对应本仓库说的无锚</td>
+</tr>
+<tr>
+<td>updater（更新者）</td>
+<td>Self / Teacher / Joint</td>
+<td>本仓库的 Self-Harness（Self）与 Meta-Harness（Teacher）之分</td>
+</tr>
+<tr>
+<td>source（反馈来源）</td>
+<td>Benchmark / Train-dev set / Environment / Executable verifier / LLM
+feedback / Human</td>
+<td>本仓库的锚形态：人工标注集（Human）、冻结验证器（Executable
+verifier）、dev 集（Train/dev set）</td>
+</tr>
+<tr>
+<td>feedback（反馈类型）</td>
+<td>Score（Binary / Non-binary）/ Non-score（Ground truth /
+LLM-as-a-judge / Other）</td>
+<td>本仓库未单列</td>
+</tr>
+<tr>
+<td>frequency（更新频率）</td>
+<td>Step / Event / Trajectory / Batch</td>
+<td>本仓库的"快环 / 慢环"近似</td>
+</tr>
+<tr>
+<td>scope（经验范围）</td>
+<td>General / Specialized</td>
+<td>本仓库未单列</td>
+</tr>
+</tbody>
+</table>
+<p>维度设计有几处值得注意的规则：多个取值用"或"，多个维度用"与"；Offline
+→ Online
+只给"先离线建立再在线更新"的单一流水线，同时有离线和在线变体的方法给两个标签；反馈类型只记录用于更新学生的反馈，只用于进化教师的反馈不计；LLM
+给出的标量算分数，只有文字判断才算 LLM-as-a-judge。</p>
+<h3 id="42-基准表的七个维度papertaxonomyjs">4.2
+基准表的七个维度（paperTaxonomy.js）</h3>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>取值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>origin（来源）</td>
+<td>Composite（由已有基准拼装）/ Original（自建任务）</td>
+</tr>
+<tr>
+<td>mode（模式）</td>
+<td>Online 下分 Random order / Curriculum / Streaming /
+Repeated-iterative；Offline；Offline → Online</td>
+</tr>
+<tr>
+<td>artifact（进化对象）</td>
+<td>Parametric / Non-parametric（Skill / Memory / Harness code）/
+Other</td>
+</tr>
+<tr>
+<td>construction（构造标准）</td>
+<td>Headroom（留有提升空间）/ Diversity / Generalization / Other</td>
+</tr>
+<tr>
+<td>metric（指标）</td>
+<td>Accuracy / Gain（提升量）/ Cost / Latency</td>
+</tr>
+<tr>
+<td>creation（创建方式）</td>
+<td>Fully automated / Human-in-the-loop / Manual</td>
+</tr>
+<tr>
+<td>evaluation（评分方式）</td>
+<td>Rule-based / LLM-as-a-judge</td>
+</tr>
+</tbody>
+</table>
+<p>其中 <strong>Gain</strong> 作为独立指标值得单独说：一个 RSI
+基准应该报告的是"更新前后的差"而不只是最终准确率，否则测的是模型能力而不是自改进能力。FinEvo-Bench（见报告
+30）用状态重置的对照组算这个差，是这一维度的典型实现。</p>
+<h3 id="43-收录内容">4.3 收录内容</h3>
+<p><strong>31 个方法</strong>（按首版日期）：Cradle 2024-03、AWM
+2024-09、Gödel Agent 2024-10、A-MEM 2025-02、DGM 2025-05、SEAL
+2025-06、Memp 2025-08、ReasoningBank 2025-09、Meta-Harness
+2026-03、Mem²Evolve 2026-04、HeLa-Mem 2026-04、Escher-Loop 2026-04、AHE
+2026-04、Continual Harness 2026-05、DemoEvolve 2026-05、SkillSmith
+2026-05、SePO 2026-06、HarnessFix 2026-06、Self-Harness
+2026-06、HarnessX 2026-06、When Rules Learn 2026-06、RQGM
+2026-06、HarnessBank 2026-07、RHI 2026-07、Mendel Gödel Machine
+2026-08、Evo-Harness 2026-08、HyperSkill 2026-08、TRACE
+2026-08、MediSkill-Evo 2026-08、Prime Agent 2026-08、Recuris
+2026-08。</p>
+<p>与本仓库的重叠 12 篇：DemoEvolve、Gödel
+Agent、DGM、Meta-Harness、AHE、Continual
+Harness、HarnessFix、Self-Harness、RQGM、Evo-Harness、HyperSkill、Prime
+Agent。</p>
+<p>它有本仓库没有的 19 篇，可以分三组：</p>
+<ul>
+<li>记忆类：AWM、A-MEM、Cradle、ReasoningBank、Mem²Evolve、HeLa-Mem、Memp、Recuris——本仓库把记忆归入知识侧，只收了
+WikiSkill 和五篇技能进化论文，没有单独追记忆进化这条线。</li>
+<li>参数类：SEAL（模型自己生成训练数据和超参的 self-edit，用 RL
+学什么样的 self-edit 有效）——本仓库权重侧只有
+ECHO、Co-Harness、SkillRL、Evolving-RL、SIA。</li>
+<li>harness
+与技能类：HarnessX、HarnessBank、RHI、Escher-Loop、SkillSmith、SePO、Mendel
+Gödel Machine、TRACE、MediSkill-Evo、When Rules Learn。其中 Mendel Gödel
+Machine 是 DGM
+的直接后续（用跨任务、跨分支的轨迹对照决定怎么改，Polyglot 50.8% →
+93.2%，单轨迹树形基线 77.9%），本仓库的框架侧应该补上。</li>
+</ul>
+<p>本仓库有它没有的 48
+篇，集中在四块：评估器共进化（EvoLM、WGtG、ECHO、EvalCEGAR、RHO、SCORE）、harness
+工业化的另一半（AutoSaddler、EnvHarness、MetaCaster、Co-Harness、Metan、HSI、Adaptive
+Auto-Harness、Harness
+Updating≠Benefit）、安全治理（SESG、OLE、Falsifiable
+Gates、HVTB、ASG-SI、ARA）、思想史与程序进化谱系（Good 到
+Bostrom、STOP、ADAS、AFlow、AlphaEvolve、GEPA、ShinkaEvolve）。MOSS 和
+WikiSkill 也不在它的表里。</p>
+<p><strong>27 个基准</strong>（2025-05 至
+2026-09）：LifelongAgentBench、MemoryAgentBench、StuLife、MemoryBench、Evo-Memory、PostTrainBench、Agent²
+RL-Bench、SkillFlow、SkillLearnBench、EvoMemBench、Curation-Bench、Meta-Agent
+Challenge、AutoLab、CL-Bench、EdgeBench、EvoAgentBench、RSIBench-Data、AgentStream、PATH-Bench、ContinualSkillBench、PAST-Bench、GDPevo、HarnessOpt-Bench、FinEvo-Bench、Evo-Bench、HarnessDev、VeRO。其中
+2026 年 8 月一个月发布了 9 个。这些基准回答的是本仓库报告 10 insight
+10（测量基础设施是瓶颈）提出的问题，但本仓库一篇都没收。</p>
+<p><strong>1 个开源系统</strong>：Proteus v0.3.0（2026-08-24），与具体
+harness 解耦的自进化框架，每个 episode 用新的模型上下文，agent
+只能修改预先声明的 harness
+区域，代码改动通过验证后才启用，版本化快照保留历史。标签：Non-parametric（Harness
+code / Context / Memory / Skill）、Offline、Sequential、验收为 Artifact
+validation + Instance result。</p>
+<p><strong>书与课程</strong>：李博杰《AI Agents in
+Depth》（开源技术书）、Lanham《AI Agents in Action, 2nd
+ed.》、Alesso《AI Builds Itself: Recursive Self-Improvement in
+2026》，以及几门课程。</p>
+<h3 id="44-网站功能">4.4 网站功能</h3>
+<p>同一份数据渲染成四个视图：基准列表（多维筛选面板，可按日期或引用数排序）、引用图、方法与系统列表、书籍与课程页。中英文切换和明暗主题由本地存储记住。贡献指南要求新条目必须带全部维度的标签，否则不能进入筛选视图。</p>
+<h2 id="5-与本仓库对照的几个具体差别">5. 与本仓库对照的几个具体差别</h2>
+<p><strong>对同一篇论文的分类可以互相校验。</strong> 以 Continual
+Harness 为例，本仓库的判断是"文本四组件 + 权重共学习，免重置，锚为冻结
+PRM 和教师模型"；Prism-Shadow 的标签应为 Parametric +
+Non-parametric、Online、Sequential、更新者 Joint、反馈来源 Environment +
+LLM
+feedback。两套标签描述的是同一件事的不同侧面：本仓库回答"什么部件不参与进化"，它回答"参与进化的部件是哪些、按什么节奏改"。</p>
+<p><strong>"验收标准"维度里的 No validation
+是本仓库最关心的一格。</strong>
+本仓库的结论是去掉锚以后评估器会偏离而任务分数看不出来（报告
+05、16）；Prism-Shadow
+把"生成后直接写入、不设验收"作为一个正常取值列出，没有给出这类方法的风险判断。两边合起来读，可以把该清单里标为
+No validation 的方法作为检验"无锚是否退化"的候选样本。</p>
+<p><strong>基准表填补了本仓库的空白，但基准本身也需要被审视。</strong>
+27 个基准里以 LLM-as-a-judge 评分的那部分，会遇到本仓库报告 03、05
+讨论的问题：评估器可以被优化压力带偏。Prism-Shadow 的 evaluation
+维度区分了 Rule-based 和
+LLM-as-a-judge，这已经是必要的第一步，但没有进一步标注 judge
+是否冻结、是否有人工锚定样本。</p>
+<p><strong>引用数排序的局限。</strong> 数据快照取自 2026-08-13 的
+Semantic
+Scholar，收录的多数论文发表不到三个月，引用数接近零，按引用排序在当前阶段没有区分度。</p>
+<h2 id="6-局限">6. 局限</h2>
+<ol type="1">
+<li><strong>只有标签，没有解读。</strong>
+每条一句话，读者无法从清单本身判断一篇论文的证据强度、消融是否充分、局限在哪。这是它与本仓库的根本分工。</li>
+<li><strong>标签是人工判断，无出处。</strong>
+数据文件里的分类没有标注依据论文的哪一节，读者无法核对；本仓库解读中的数字则要求标注到表号。</li>
+<li><strong>方法覆盖偏向记忆与技能，缺评估器一侧。</strong> 31
+个方法里没有任何一篇以评估器共进化为主题，而这是 2026 年 RSI
+研究里增长最快的方向之一。</li>
+<li><strong>基准表未评估基准质量。</strong> 收录标准是"专门为 RSI
+设计"，没有区分哪些基准有状态重置对照组、哪些只报告最终准确率。</li>
+<li><strong>网站是 JS 单页应用，数据不易被机器读取。</strong>
+论文列表存在 <code>site/src/data/*.js</code> 里，不是 CSV 或
+JSON，二次使用需要自己解析。</li>
+<li><strong>收录截止约
+2026-09-01</strong>（HarnessDev），更新频率未知。</li>
+</ol>
+<h2 id="7-意义与位置">7. 意义与位置</h2>
+<p><strong>对本仓库的直接补充</strong>：三件事可以照着做——(1)
+增加基准一节，至少收录
+GDPevo、FinEvo-Bench、SkillFlow、VeRO、HarnessOpt-Bench
+这几个与本仓库主题直接相关的；(2) 框架侧补 Mendel Gödel
+Machine，知识侧补 ReasoningBank 和 SEAL；(3) 在 §7.3
+对照矩阵里为每个系统加"验收标准"和"更新者"两列，与它的元数据对齐，方便两个仓库互相引用。</p>
+<p><strong>对报告 10 insight 10
+的实证</strong>：本仓库说测量基础设施是下一个瓶颈，Prism-Shadow
+的基准表显示 2026 年 8 月一个月出了 9 个 RSI
+基准，说明这个判断已经被社区行动验证，但这些基准彼此的任务流设计、对照组设置和评分方式尚无统一标准。</p>
+<p><strong>对报告 12、22、28
+三份综述的补充</strong>：三份综述都给了分类框架但没有把框架应用到每篇论文上；Prism-Shadow
+做了这一步。它的九个维度与 TMLR 综述的 What / When / How
+高度对应，多出的 selection、updater、frequency、scope 四个维度正是 TMLR
+缺少的操作层面。</p>
+<p><strong>与报告 30（Prism-Shadow
+长文）的关系</strong>：长文是对这套元数据的叙述式解释，每个维度配一篇代表论文；本报告看数据，报告
+30 看论述。</p>
+</article><article id="ch31"><h1
+id="万字长文带你读懂-rsi深度解读用一个更新公式和五组维度给自进化研究建坐标系">《万字长文带你读懂
+RSI》深度解读：用一个更新公式和五组维度给自进化研究建坐标系</h1>
+<blockquote>
+<p><strong>万字长文带你读懂 RSI（自进化，Self-Evolving）</strong> /
+<em>Understanding RSI</em> Prism-Shadow，2026 ·
+中英双语博客：prism-shadow.github.io/awesome-rsi/#blog/understanding-rsi
+· 源文件 <code>site/src/data/blog/rsi-guide.zh.md</code>（约 8600 字）与
+<code>rsi-guide.en.md</code> 配图 14 张论文图 + 10
+张自绘示意图（分类总览、进化对象矩阵、更新循环、agent
+结构、链树图拓扑、自身/教师/联合更新、更新时机） 引用 13
+篇代表论文：SEAL、Prime
+Agent、ReasoningBank、TRACE、SkillSmith、SkillFlow、DGM、Mendel Gödel
+Machine、Recuris、Evo-Harness、GDPevo、FinEvo-Bench、Mem²Evolve</p>
+</blockquote>
+<hr />
+<h2 id="1-一句话定位">1. 一句话定位</h2>
+<p>这篇长文是 Prism-Shadow/awesome-rsi 清单（报告
+29）元数据的叙述版：先给 RSI 一个统一定义 A(t+1) = U(A(t), τ(t),
+f(t))——agent 用第 t 轮的轨迹 τ 和反馈 f，经更新机制 U
+得到下一轮的自己——再沿五组维度展开：<strong>进化对象</strong>（参数 /
+上下文 / 记忆 / 技能 / harness 代码）、<strong>进化结构</strong>（链 /
+树 / 图）、<strong>更新者</strong>（自身 / 教师 /
+联合）、<strong>更新时机</strong>（离线 / 在线 /
+混合）、<strong>其他五维</strong>（验收标准、反馈来源、反馈类型、更新频率、经验范围）。每个类别配一篇代表论文，用两到四段说明它属于该类的原因和主要数字。文章的目标是让读者拿到一篇新论文时能迅速定位它与已有工作的关系，它做到了这一点；它没有做的是判断哪种选择更好，也没有讨论评估器本身会被优化压力带偏这一问题。与本仓库的关系：它的"进化对象"对应本仓库的"改哪层"，它的"验收标准"对应本仓库的"锚在哪"，它多出"进化结构"和"更新者"两个本仓库没有单列的维度。</p>
+<h2 id="2-文章要解决的问题">2. 文章要解决的问题</h2>
+<p>作者的出发点与本仓库相同：RSI
+领域没有统一范式，不同工作改的东西、改的方式差别很大，"自进化""Self-Evolving""Self-Improving"几个词混用，读者难以比较。作者的回答不是给出一条主线，而是给出一套坐标：先把
+agent 拆成 Model + Harness，把 harness
+拆成上下文、记忆、技能、工具、代码，再问每篇论文改了哪一块、新版本怎样继承旧版本、谁来改、何时改、凭什么留下。</p>
+<p>这套坐标的价值在于可操作：每个维度的取值是有限的、互斥或可多选的，所以可以直接变成清单上的标签（报告
+29 的 methodTaxonomy.js 就是这篇文章的数据化）。</p>
+<h2 id="3-与已有综述的关系">3. 与已有综述的关系</h2>
+<table>
+<thead>
+<tr>
+<th>文献</th>
+<th>分类轴</th>
+<th>与本文的差别</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TMLR 综述（报告 12）</td>
+<td>What / When / How / Where</td>
+<td>本文的进化对象 ≈ What，更新时机 ≈
+When；本文多出进化结构、更新者、验收标准，少了 Where（领域）</td>
+</tr>
+<tr>
+<td>Co-Evolution 综述（报告 22）</td>
+<td>Agent-Agent / Agent-Environment / Meta 三阶段</td>
+<td>本文的"教师更新""联合更新"覆盖了 Agent-Agent
+的一部分，但不处理评估器共进化</td>
+</tr>
+<tr>
+<td>Coding Agents 综述（报告 28）</td>
+<td>对象 × 时间 × 证据</td>
+<td>本文的进化对象 ≈ 对象，更新时机 ≈ 时间，反馈来源 + 反馈类型 ≈
+证据；本文不限编码域</td>
+</tr>
+<tr>
+<td>本仓库报告 10</td>
+<td>改哪层 × 锚在哪</td>
+<td>本文的验收标准 ≈
+锚在哪，但本文把"无独立验证"列为一个正常取值，不讨论其后果</td>
+</tr>
+<tr>
+<td>Weng 博文（报告 01）</td>
+<td>prompt → 上下文 → 工作流 → harness 代码 → 优化器代码</td>
+<td>本文的进化对象五类与 Weng 的递进线基本对应，但本文不排优先级</td>
+</tr>
+</tbody>
+</table>
+<p>本文与三份综述相比篇幅小得多（约 8600 字对 77 页），代表论文只有 13
+篇，但每个维度的定义比综述更精确（例如明确规定"只提供分数的模块不算教师"、"LLM
+给的标量算分数不算 LLM 评审"）。</p>
+<h2 id="4-内容拆解">4. 内容拆解</h2>
+<h3 id="41-定义与更新公式">4.1 定义与更新公式</h3>
+<p>A(t+1) = U(A(t), τ(t), f(t))。A 包含模型与
+harness；更新可以落在模型参数，也可以落在 harness
+的上下文、记忆、技能、工具或代码；U 不一定由 agent
+自己执行，也可以由教师、meta-agent
+或外部训练程序完成。这个定义比本仓库报告 00 引用的 Bostrom
+判据宽：Bostrom
+要求"一次改进提升了做下一次改进的能力"，本文只要求"更新后的状态参与后续任务并提升表现"。按本文定义，任何带记忆的
+agent 都算 RSI；按 Bostrom
+定义，多数记忆方法不算。文章没有讨论这个差别。</p>
+<h3 id="42-进化对象五类各一篇代表">4.2 进化对象：五类各一篇代表</h3>
+<table>
+<thead>
+<tr>
+<th>类别</th>
+<th>代表论文</th>
+<th>文章给出的要点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>参数进化</td>
+<td>SEAL（Self-Adapting Language Models，2025-06）</td>
+<td>模型面对新输入时不只生成答案，还生成
+self-edit（重组信息、生成训练样本、指定超参、调用工具做增强），系统按
+self-edit 做 SFT；外层用 RL 训练"什么样的 self-edit
+有效"，奖励是更新后模型的下游表现。代价是候选 self-edit
+的微调和评测开销大</td>
+</tr>
+<tr>
+<td>上下文进化</td>
+<td>Prime Agent（2026-08）</td>
+<td>持久 IPython REPL 保存代码、变量、文件和计算结果；Continual Harness
+记录历史、记忆、技能、prompt 和子 agent
+配置；任务中断后从现场恢复。不更新参数，模型再次运行时由 harness
+取出所需内容组成上下文</td>
+</tr>
+<tr>
+<td>记忆进化</td>
+<td>ReasoningBank（2025-09）</td>
+<td>把成功和失败轨迹整理成简短可复用的经验，新任务先检索再执行，结束后判断是否完成并写回；MaTTS
+让 agent 对同一任务多次尝试以提炼更高质量的记忆。WebArena 成功率 +3.7 到
++6.2，SWE-Bench Verified 解决率 +3.4 到 +4.0</td>
+</tr>
+<tr>
+<td>技能进化</td>
+<td>TRACE（2026-08）</td>
+<td>车载助手场景（CAR-bench），Skill Bank
+中每个技能负责一类情况；每轮收集用过同一技能的成功和失败轨迹，比较行为后修改该技能。GPT-5.5
+上"同一任务连续三次全部成功"的比例从 59.9% 提到 94.5%</td>
+</tr>
+<tr>
+<td>harness 代码进化</td>
+<td>SkillSmith（2026-05）</td>
+<td>同时修改技能和工具：发现能力缺口后生成配套修改（调整技能、编辑/组合/拆分/停用工具）；记录技能之间的合作与干扰关系决定优先调用或淘汰；保存失败模式避免重复试错。五个规模的
+Qwen3.5 上，任务越复杂优势越明显</td>
+</tr>
+</tbody>
+</table>
+<p>文章对上下文与记忆的区分是：记忆存在外部等待检索，取出放入模型输入后才成为上下文。对技能与记忆的区分是：记忆记录某次发生了什么，技能总结以后遇到同类问题怎么做。</p>
+<h3 id="43-进化结构链树图">4.3 进化结构：链、树、图</h3>
+<table>
+<thead>
+<tr>
+<th>结构</th>
+<th>定义</th>
+<th>代表</th>
+<th>数字</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>链</td>
+<td>始终只有一个当前版本，A0 → A1 → A2
+…；实现简单，前一轮的错误直接被继承</td>
+<td>SkillFlow（基准，2026-04）</td>
+<td>20 个任务族、166 个可执行任务；Claude Opus 4.6 成功率 62.65% →
+71.08%，部分配置持平或下降；表现好的配置反复修订少量通用技能，差的不断新增相似技能</td>
+</tr>
+<tr>
+<td>树</td>
+<td>保留多个版本，一个版本可生成多个子版本，后续可从任意历史版本继续；暂时表现差的版本也保留</td>
+<td>DGM（2025-05）</td>
+<td>SWE-bench 20.0% → 50.0%，Polyglot 14.2% →
+30.7%；一次完整实验约两周；选父代和管理版本集合的规则预先设定、不随
+agent 更新</td>
+</tr>
+<tr>
+<td>图</td>
+<td>一次修改同时参考多个来源（同一 agent
+在不同任务的轨迹、另一分支的执行结果）</td>
+<td>Mendel Gödel Machine（2026-08）</td>
+<td>在 DGM 的单轨迹 clonal mutation 之外加 reaction-norm
+mutation（比较同一 agent 跨任务的轨迹）和 cross-lineage
+hybridization（比较不同分支在同一任务上的表现）；Polyglot 50.8% →
+93.2%，单轨迹树形基线 77.9%；进化出的 harness
+换基准或换模型后仍有效</td>
+</tr>
+</tbody>
+</table>
+<p>这个维度是本仓库没有单列的。本仓库在报告 07 讨论了 DGM 的档案，在报告
+20 讨论了 Metan 的档案与单链之差（archive-best 与 best chain 差
+0.06–0.07），但没有把"拓扑"作为独立轴。Mendel Gödel Machine 的 93.2% 对
+77.9%
+是这个维度最直接的证据：修改依据来自多个来源时，同样的评估预算下效果更好。</p>
+<h3 id="44-更新者自身教师联合">4.4 更新者：自身、教师、联合</h3>
+<p>文章把执行任务的 agent 称为 Student，分析轨迹并参与修改的另一个 agent
+称为 Teacher，并给出三条判定规则：Student
+自己总结并修改是自身更新；Student 只执行、Teacher
+决定写回什么是教师更新；两者都影响最终写回内容才是联合更新。<strong>只提供分数或验收结果的模块不算
+Teacher</strong>——这条规则把评估器排除在更新者之外，与本仓库把评估器单独作为"锚"讨论是一致的。</p>
+<p>代表论文：Recuris（教师更新，固定的 Meta-Agent
+汇总多任务失败记录并局部修改 Skill Memory；四个长程基准、十种模型、37
+个组合中 35 个提升，最长任务最多 +32.2）；Evo-Harness（联合更新，Solver
+总结候选经验、Evolver 筛选整理写入；去掉 Solver
+的候选生成后效果下降）。</p>
+<p>本仓库对应的对照是 Meta-Harness（教师更新，外部 coding agent 改
+harness）与 Self-Harness（自身更新）。文章对自身更新的风险判断是"Student
+理解错误时，错误也会写入长期产物"，这与本仓库报告 14
+讨论的回归门必要性是同一件事，但文章没有给出解决办法。</p>
+<h3 id="45-更新时机离线在线混合">4.5 更新时机：离线、在线、混合</h3>
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>定义</th>
+<th>代表</th>
+<th>数字</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>离线</td>
+<td>训练任务中更新，测试阶段不再更新；训练题与测试题不能重复也不能分布完全不同</td>
+<td>GDPevo（基准，2026-08）</td>
+<td>用 Rule Hybridization 构造任务：同一批基础规则以不同组合出现在 5
+个训练任务，重新组合成 5 个测试任务；12 组共 120 个任务，两天可再生成 12
+组。最好配置 50.63% → 67.07%；直接给出全部规则时 91.6%，说明 agent
+只学到了部分规则</td>
+</tr>
+<tr>
+<td>在线</td>
+<td>任务排成序列，边执行边更新，无独立训练阶段</td>
+<td>FinEvo-Bench（基准，2026-08）</td>
+<td>120 个金融任务、6 个领域、20 个场景各 6
+个任务交错排列，顺序随机打乱三次；<strong>每次实验配一个状态重置的对照组</strong>，两组分数之差即保留经验的提升。四种
+Qwen3.7-Max agent 平均 +9.33 到
++19.37；同一场景后三个任务的提升比前三个高 6.10 到 8.70</td>
+</tr>
+<tr>
+<td>混合</td>
+<td>先离线建立初始经验，上线后继续更新</td>
+<td>Mem²Evolve（2026-04）</td>
+<td>Experience Memory 存经验，Asset Memory 存工具和专家
+agent；新工具先过自动生成的单元测试。六类任务八个基准，比只积累经验高
+11.80%，比只创建工具高 6.46%</td>
+</tr>
+</tbody>
+</table>
+<p>FinEvo-Bench
+的状态重置对照组是文章里对评测方法学最有用的一点：它把"提升来自积累的经验"与"提升来自模型本身"分开测量。这正是
+Prism-Shadow 基准表里 Gain 指标的实现方式，也是本仓库报告 12 批评 TMLR
+综述"现有基准测不到知识积累"时缺少的正面例子。</p>
+<h3 id="46-其他五个维度">4.6 其他五个维度</h3>
+<p>验收标准（产物验证 / 单题结果 / 基准得分 / 组合指标 /
+无独立验证）、反馈来源（基准 / 训练验证集 / 环境 / 可执行验证器 / LLM
+反馈 / 人工）、反馈类型（分数：二值或非二值；非分数：标准答案、LLM
+评审、其他）、更新频率（单步 / 事件触发 / 完整轨迹 /
+批次）、经验范围（通用 / 专用）。这一节只给定义不给代表论文，对应报告 29
+里 methodTaxonomy.js 的后五个维度。</p>
+<h2 id="5-与本仓库主线的对照">5. 与本仓库主线的对照</h2>
+<p><strong>验收标准就是锚，但文章不讨论没有锚会怎样。</strong>
+文章把"无独立验证：生成后直接写入"列为五种验收标准之一，语气中立。本仓库的证据（报告
+05：去掉锚定守卫后评估指标退化，任务分数看不出来；报告 16：去掉 dev
+集检查后自动优化低于未优化基线）说明这一格不是一种设计选择，而是一个已知会失败的配置。两边合起来读，文章的分类给出了"锚在哪"的取值空间，本仓库给出了每个取值的后果。</p>
+<p><strong>文章的 RSI 定义比 Bostrom 宽。</strong> 按 A(t+1) = U(A(t),
+τ, f)，ReasoningBank 这类记忆方法是 RSI；按本仓库报告 00
+采用的判据（一次改进是否提升了做下一次改进的能力），它们是经验积累而不是递归改进。这不是谁对谁错的问题，而是两个仓库选了不同的边界：Prism-Shadow
+收录范围更宽，本仓库更窄。读者引用"RSI"一词时需要知道说的是哪个定义。</p>
+<p><strong>文章没有覆盖的部分</strong>：评估器共进化（EvoLM、RQGM、WGtG、ECHO）、模型与
+harness 共同训练（Continual Harness
+的共学习环、Co-Harness）、安全治理、能力地板、思想史。这些正是本仓库的主要内容。反过来，文章的进化结构维度和
+Mendel Gödel Machine、Recuris、SEAL、ReasoningBank
+几篇代表论文是本仓库应该补的。</p>
+<p><strong>两个可以直接对照的例子</strong>：</p>
+<ul>
+<li>Prime Agent：文章把它归为上下文进化的代表，强调持久 REPL
+和现场恢复；本仓库报告 18 强调的是它的 refinement 把 RCON
+作弊固化成技能这一安全事故。同一篇论文，一边看能力，一边看风险。</li>
+<li>DGM：文章把它归为树形结构的代表并指出"选父代和管理版本集合的规则不随
+agent 更新"；本仓库报告 07、20
+把同一事实解释为自改写系统必须冻结一部分，并由 Metan 量化为 meta 深度约
+2.5。</li>
+</ul>
+<h2 id="6-局限">6. 局限</h2>
+<ol type="1">
+<li><strong>只分类不评价。</strong>
+文章说明每种选择的优缺点（例如参数进化"难以定位和撤销"、链式进化"错误直接被继承"），但不比较哪种选择在什么条件下更好，也不引用消融证据。</li>
+<li><strong>代表论文 13 篇，每类一篇。</strong>
+读者从一篇代表论文推断整个类别的特征，样本太少；例如"图式进化"只有
+Mendel Gödel Machine 一个例子。</li>
+<li><strong>不讨论评估器可靠性。</strong> 全文默认反馈 f
+是可信的。反馈来源里列了 LLM 反馈，但没有提 LLM
+评审可能被优化压力带偏（报告 03）或与被评模型合谋（报告 05）。</li>
+<li><strong>数字未标出处。</strong> 文章引用的数字（如 TRACE 59.9% →
+94.5%、MGM 50.8% → 93.2%）没有标注论文表号，读者需要回原文核对。</li>
+<li><strong>定义过宽带来的后果未讨论</strong>（见 §5）。</li>
+<li><strong>中英双语但以中文为主写成</strong>，英文版为翻译；个别术语（如"验收标准"对应
+Acceptance criterion）在两版间需要对照。</li>
+</ol>
+<h2 id="7-意义与位置">7. 意义与位置</h2>
+<p><strong>对本仓库分类图（§3）的补充</strong>：本仓库的七个一级维度里没有"进化结构"和"更新者"。前者有直接的实验证据支持其重要性（MGM
+对 DGM 的 +15.3 个百分点），后者与本仓库反复讨论的 Meta-Harness /
+Self-Harness 对照直接相关。下一版分类图可以把这两个维度加进去。</p>
+<p><strong>对报告 10 insight
+6（经验必须先整理成知识再变成技能）的补充</strong>：文章对上下文、记忆、技能三者给出了清楚的操作定义，本仓库此前在知识侧混用这三个词。采用文章的定义：记忆是外部存储、检索后才进入上下文；技能是跨任务的做法；上下文是本次推理直接看到的材料。</p>
+<p><strong>对报告 12 的呼应</strong>：本仓库批评 TMLR
+综述"现有基准从构造上测不到知识积累"，文章用 FinEvo-Bench
+的状态重置对照组给出了怎样测的实例；GDPevo 的 Rule Hybridization
+给出了怎样构造"不重复但相关"的训练与测试任务。</p>
+<p><strong>对报告 29 的关系</strong>：报告 29
+分析清单的数据结构，本报告分析支撑该结构的论述。清单里每篇论文的标签，就是按本文的定义打的。</p>
+<p><strong>应补入本仓库的论文</strong>（按优先级）：Mendel Gödel
+Machine（框架侧，DGM
+直接后续，有强数字）、ReasoningBank（知识侧记忆线的起点）、SEAL（权重侧，模型自己决定怎么训练自己）、FinEvo-Bench
+与 GDPevo（基准，对照组设计）、Recuris（教师更新的长程记忆实现）。</p>
+</article><article id="ch32"><h1 id="reef-深度解读把服务反馈更新版本发布做成一个可复用的循环">Reef
+深度解读：把"服务、反馈、更新、版本发布"做成一个可复用的循环</h1>
+<blockquote>
+<p><strong>Reef: Continual learning infra for self-improving
+agents</strong> Human-Agent-Society，2026-08-31 建库，Apache-2.0，PyPI
+包 <code>reef-infra</code> · GitHub：github.com/Human-Agent-Society/reef
+· 文档：reefinfra.ai/docs · 读取时间 2026-09-08（689 star，47 fork，50
+个开放 issue，234 个 Python 文件） 团队：Wenhao Chai、Paul Liang、Ao
+Qu、Zhenting Qi、Bo Liu、Jiacheng Zhu 等 25 人（按 README 列表）
+依赖：SGLang（推理）、slime（权重训练）、cordis（harness
+进化）；配套项目 reef-eval、reef-client、Harbor 任务标准</p>
+</blockquote>
+<hr />
+<h2 id="1-一句话定位">1. 一句话定位</h2>
+<p>Reef 是一个开源基础设施，把自改进 agent
+需要的四件事接成一个循环：<strong>Serve</strong>（代理模型请求并记录每次交互，返回一个
+receipt）→ <strong>Observe</strong>（外部反馈按 receipt
+匹配到交互记录）→ <strong>Grow</strong>（recipe
+从合格记录里产出候选更新）→
+<strong>Commit</strong>（候选经评估器和选择策略判定后发布为新版本，旧版本继续服务直到切换）。它支持两条学习面：用
+slime + SGLang 更新模型权重，或修改 harness 的
+prompt、规则、技能和代码；两条面共用同一套记录、版本链和候选评估机制。仓库内置六个
+recipe（SAO、OpenClaw-RL、TTT-Discover、Guidance-TTT、SkillClaw、GEPA）和一个
+Meta-Harness 实现，每个都附复现结果：SAO 在 48 个 rollout 的预算下 0.479
+高于基线 0.458 和 GRPO 0.417；GEPA 在 AIME 2025 上 26.67% → 46.67%（种子
+0）；TTT-Discover 在 Erdős 最小重叠、26 圆和 32
+圆装填上复现到与原论文相差不超过
+8e-7。它没有解决锚从哪来的问题——候选评估器由使用者提供——但把本仓库反复讨论的"评估门
++ 版本化回滚"从每篇论文各自实现变成了一个通用组件。</p>
+<h2 id="2-要解决的问题">2. 要解决的问题</h2>
+<p>本仓库收录的自进化系统几乎每一个都自己搭了一套基础设施：DGM
+有档案和沙箱，MOSS 有失败重放和批准队列，AutoSaddler 有
+EvoDAG，Self-Harness 有双 split 回归门，Prime Agent 有 daemon 和版本化
+refinement。这些系统的核心机制彼此不同，但外围的工程需求高度重复：记录每次模型调用、把事后反馈对应到具体调用、决定一个候选更新是否上线、保留版本以便回滚、更新时不中断服务。</p>
+<p>Reef 的 README
+用一张表说明它填的位置：推理引擎（vLLM、SGLang）能服务流量但不训练；RL
+框架（slime、veRL、AReaL）能训练但不服务；两者都不管版本、不保证更新期间在线、不支持权重以外的进化对象。Reef
+声称同时覆盖这五项。</p>
+<p>第二个问题是<strong>反馈与调用的对应</strong>。生产环境里反馈往往是事后的、稀疏的、可能重试或迟到的；Reef
+用 receipt（每次推理记录的
+id，同时标识产生它的版本）解决对应问题，报告只引用
+receipt，每份报告最多消费一次。</p>
+<h2 id="3-与已有工具的关系">3. 与已有工具的关系</h2>
+<table>
+<thead>
+<tr>
+<th>工具</th>
+<th>服务流量</th>
+<th>训练权重</th>
+<th>版本管理</th>
+<th>更新不中断</th>
+<th>进化 harness</th>
+<th>评估门</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>vLLM / SGLang</td>
+<td>是</td>
+<td>否</td>
+<td>否</td>
+<td>否</td>
+<td>否</td>
+<td>否</td>
+</tr>
+<tr>
+<td>slime / veRL / AReaL</td>
+<td>否</td>
+<td>是</td>
+<td>否</td>
+<td>否</td>
+<td>否</td>
+<td>否</td>
+</tr>
+<tr>
+<td>Proteus（报告 29）</td>
+<td>否</td>
+<td>否</td>
+<td>是（快照）</td>
+<td>否</td>
+<td>是（声明区域）</td>
+<td>是（产物验证）</td>
+</tr>
+<tr>
+<td>Prime Agent（报告 18）</td>
+<td>是（daemon）</td>
+<td>否</td>
+<td>是（refinement 版本）</td>
+<td>是</td>
+<td>是</td>
+<td>弱（无独立锚）</td>
+</tr>
+<tr>
+<td>MOSS（报告 08）</td>
+<td>是（生产 agent）</td>
+<td>否</td>
+<td>是（镜像）</td>
+<td>是（换装探测）</td>
+<td>是（源码）</td>
+<td>是（失败重放 + 人工批准）</td>
+</tr>
+<tr>
+<td><strong>Reef</strong></td>
+<td>是</td>
+<td>是</td>
+<td>是（release chain）</td>
+<td>是</td>
+<td>是（harness tree）</td>
+<td>是（CandidateEvaluator + Selector）</td>
+</tr>
+</tbody>
+</table>
+<p>Reef 与 MOSS、Prime Agent 的差别在于它不是一个 agent，而是 agent
+外面的一层：任何通过 OpenAI 或 Anthropic 兼容接口调用模型的 harness
+都可以接进来，训练与推理后端可以替换。与 Proteus 的差别是 Reef
+同时覆盖权重训练，Proteus 只做 harness。</p>
+<h2 id="4-机制拆解">4. 机制拆解</h2>
+<h3 id="41-核心对象据-glossary">4.1 核心对象（据 glossary）</h3>
+<ul>
+<li><strong>Scenario</strong>：一个工作负载，独立拥有记录、训练状态和版本链；第一个带新
+<code>x-reef-scenario</code> 头的请求创建它并永久绑定一个 recipe。</li>
+<li><strong>Agent record /
+Receipt</strong>：每次推理或报告存为一条记录；推理的 receipt 在响应头
+<code>x-reef-agent-record-id</code> 返回，同时记录服务它的版本。</li>
+<li><strong>Report</strong>：<code>POST /reef/report</code>，带数值
+<code>score</code> 和文本或结构化 <code>feedback</code>，引用一个或多个
+receipt；核心只存不解释，由 recipe 决定含义。</li>
+<li><strong>Recipe</strong>：绑定处理器（判定每条记录 TRAIN / WAIT /
+NEVER 并组批）、step
+preparer（把批次变成损失族和优势）、损失族（<code>sao</code>、<code>tttd</code>、<code>openclawrl</code>）、运行时和
+surface。</li>
+<li><strong>Artifact / Release / Content ID</strong>：artifact
+是被选中的内容（检查点、在线权重或 harness tree）；release
+是一次发布决定，带父 release；content_id
+标识内容本身。回滚是创建一个指向旧 content_id 的新
+release，历史只追加不回退。</li>
+<li><strong>Candidate
+selection</strong>：<code>CandidateEvaluator</code>
+测量候选，<code>CandidateSelector</code> 决定选或拒，二者合为
+<code>CandidateEvaluationPlugin</code>，每个 recipe 都必须带。文档称之为
+gate。</li>
+<li><strong>Harness tree</strong>：harness
+中可变文件的版本化表示——配置、规则、prompt 模板、技能、扩展代码，native
+适配器下还包括工具、hook 和控制流图；通过 <code>GET /reef/harness</code>
+下发。</li>
+<li><strong>Mutation</strong>：对 harness tree 一个根级节点的 create /
+update / remove；一个序列作为一个复合提案、一个判定。</li>
+<li><strong>Staleness</strong>：训练样本所用权重与当前服务权重之间允许的滞后，<code>max_staleness=0</code>
+要求样本对着生成它的权重训练。</li>
+</ul>
+<h3 id="42-权重训练面">4.2 权重训练面</h3>
+<p>以 SAO recipe 为例：harness 把模型调用发到 Reef，拿到
+receipt；任务结束后评估器算出奖励，harness 报告分数并引用该
+receipt；处理器把合格记录送入训练步；slime 更新权重后同步到 SGLang
+服务运行时，后续请求使用新版本而不重启。SAO（arXiv
+2607.07508）的特点是一条打分的 rollout
+驱动一次训练步，没有比较组，也没有等最慢样本的屏障。</p>
+<h3 id="43-harness-进化面">4.3 harness 进化面</h3>
+<p>以 harness-evolve 快速入门为例：harness
+配置是一棵节点树，提案是一次门控的树变更，通过的变更发布为版本化产物供客户端拉取。提案者是被服务的模型本身：读当前技能节点和自己失败的请求，输出一个
+JSON 格式的技能变更。评估在固定的小任务集上跑真实的无头
+episode，按最终答案精确匹配打分，<strong>每个任务当前树和候选树各跑一次</strong>（paired
+gate），只有让原来失败的任务通过的提案才发布。</p>
+<p>快速入门的记录表（2026-08-17 至 09-06，13
+次运行）说明了这个机制的实际行为：Qwen3-8B 在三个任务上 1.0 / 0.0 /
+1.0，提案"create direct-answer"技能，候选树 1.0 / 1.0 / 1.0，胜负平 1 /
+0 / 2，发布；qwen2.5:7b 的多次运行中，提案在 gate 上 0 胜 1 负 2 平或 0
+/ 0 / 3 时被拒绝。作者标明每行是单次运行，没有重复，gate episode
+本身有随机性（同一种子树在 sieve 任务上记录时 1.0、gate 里五次中四次
+0.0）。</p>
+<h3 id="44-内置-recipe-与复现结果">4.4 内置 recipe 与复现结果</h3>
+<table>
+<thead>
+<tr>
+<th>Recipe</th>
+<th>更新对象</th>
+<th>来源论文</th>
+<th>Reef 上的复现结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SAO</td>
+<td>权重</td>
+<td>arXiv 2607.07508</td>
+<td>Qwen3-30B-A3B、IMOAnswerBench 三题、每臂 48 个 rollout：SAO 0.479
+&gt; 基线 0.458 &gt; GRPO(+DIS) 0.417；GRPO 48 个 rollout 只填满 12
+组且多数组内全对或全错、无梯度。作者说明这是预算受限的对比，只回答"论文的排序在此预算下是否成立"</td>
+</tr>
+<tr>
+<td>TTT-Discover</td>
+<td>权重（LoRA r=32）</td>
+<td>arXiv 2601.16175</td>
+<td>Qwen3-8B、两块 B200、每步 8 组 × 64 rollout：Erdős 最小重叠 25 步
+0.38094（论文 0.38093，目标 0.38080，越低越好）；26 圆装填 50 步
+2.635983（与论文相同）；32 圆装填 2.939573（与论文差 &lt;
+8e-7）。每个任务一条轨迹，无种子方差</td>
+</tr>
+<tr>
+<td>Guidance-TTT</td>
+<td>引导模型权重</td>
+<td>同上</td>
+<td>训练只输出摘要的 Qwen 引导策略，冻结的外部执行模型写程序</td>
+</tr>
+<tr>
+<td>OpenClaw-RL</td>
+<td>权重</td>
+<td>arXiv 2603.10165</td>
+<td>72 个 GSM8K 作业会话的模拟学生流，next-state
+二值奖励、无外部评分器；一次记录的运行在第 14
+个会话达到"连续三次通过"的适应标准；作者标明这是单人格单任务族的适应结果</td>
+</tr>
+<tr>
+<td>SkillClaw</td>
+<td>harness 技能池</td>
+<td>arXiv 2608.08377</td>
+<td>白天跑冻结的 60 任务
+WildClawBench，晚上每组技能一个决定合成一次复合变更；<code>selection: always</code>，即按原论文的无门控方式每晚都发布，探针
+episode 的分数只记录不决定</td>
+</tr>
+<tr>
+<td>GEPA</td>
+<td>harness（prompt）</td>
+<td>arXiv 2507.19457</td>
+<td>AIME 2025 150 题测试集：种子 0 上游 GEPA 31.33% →
+42.67%（+11.33），Reef 实现 26.67% → 46.67%（+20.00）；种子 1 上游
++14.00，Reef +12.00；两种子均值上游 +12.67、Reef +16.00。作者说明 GEPA
+是随机优化，单次运行没有稳定数字</td>
+</tr>
+<tr>
+<td>Meta-Harness</td>
+<td>harness 组合</td>
+<td>arXiv 2603.28052</td>
+<td>每个候选是完整的 Reef 组合，proposer
+看全部保留候选及分数；选择标准为验证集均分严格高于在位者入选时的分；Reef
+的 paired gate 让它每次迭代花两倍评估。Terminal-Bench 结果另见
+RESULTS.md</td>
+</tr>
+</tbody>
+</table>
+<p>recipe 不随 <code>reef-infra</code> 的 wheel 发布，放在仓库
+<code>recipes/</code> 目录按 dotted 路径选择；Reef 没有全局的 recipe
+注册表。</p>
+<h3 id="45-代码结构">4.5 代码结构</h3>
+<p>234 个 Python 文件：<code>train/</code> 90
+个（处理器、评估、更新任务）、<code>harness/</code> 47
+个（适配器、树、变更）、<code>service/</code> 24
+个（请求与记录）、<code>runtime/</code> 23 个（推理与产物更新）、其余为
+<code>artifact/</code>、<code>scenario/</code>、<code>surface/</code>、<code>core/</code>、<code>recipe/</code>、<code>observability/</code>。产物和检查点依赖
+git-lfs。</p>
+<h2 id="5-与本仓库主线的对照">5. 与本仓库主线的对照</h2>
+<p><strong>评估门是一等公民，但门里放什么由用户决定。</strong> 每个
+recipe 必须带 <code>candidate_evaluation</code>
+插件，这与本仓库"每个能运行的系统都有一个不参与进化的检查环节"的观察一致。但
+Reef 只提供接口：harness-evolve 用固定任务集的精确匹配，GEPA
+用验证集均分，SkillClaw 干脆
+<code>selection: always</code>。锚是否独立于训练循环、是否会被优化压力带偏，由使用者的
+evaluator 决定。本仓库报告 05 和 16 的结论在这里表现为一个配置问题：把
+<code>selection</code> 设成 always 就是无锚运行。</p>
+<p><strong>receipt 机制解决了本仓库多篇论文各自处理的归因问题。</strong>
+Self-Harness 的失败签名、AutoSaddler 的反思会话、HarnessFix 的轨迹 IR
+都需要先把失败对应到具体的执行记录；Reef
+在服务层就把每次调用和产生它的版本绑定，报告只能引用
+receipt。这是基础设施层的解法，不替代方法层的归因，但让归因有了稳定的原始数据。</p>
+<p><strong>版本链的设计与 MOSS、OLE 一致。</strong>
+回滚不是回退历史而是追加一个指向旧内容的新 release；content_id 与
+release_id 分离，使"同样的内容被重新发布"可以被识别。这和 OLE（报告
+27）的"策略资产带版本和血统"、MOSS 的 last-known-good
+镜像是同一思路，Reef 把它做成了默认行为。</p>
+<p><strong>staleness 参数对应本仓库的"优化期间尺子必须冻结"。</strong>
+<code>max_staleness=0</code>
+要求训练样本对着生成它的权重训练，这是在线权重更新里保持 on-policy
+的工程手段，与 RQGM 的 epoch 内冻结（报告
+04）解决的是同一类不一致问题，只是对象从评估器换成了策略。</p>
+<p><strong>Meta-Harness 的 Reef
+实现给出了一个可核对的细节</strong>：Reef 的 paired gate
+每次迭代评估候选和在位者各一次，原论文只评估候选，所以按 episode
+计的预算与原论文的迭代数不可直接比较。这类实现差异正是复现工作的价值所在。</p>
+<p><strong>能力地板在 Reef 的记录里再次出现。</strong> harness-evolve
+快速入门里，qwen2.5:7b 作为提案者的多次运行大多被 gate
+拒绝或打平，Qwen3-8B 和 DeepSeek-V4-Flash 的运行才有发布；这与 Continual
+Harness（报告 11）"弱模型自建脚手架反而更差"和 Self-Harness（报告
+14）"回归门保护地板"的观察一致——Reef 的 gate
+在这里起的正是保护作用。</p>
+<h2 id="6-局限">6. 局限</h2>
+<ol type="1">
+<li><strong>锚由用户提供，Reef 不保证其独立性。</strong>
+<code>selection: always</code> 是合法配置；文档没有讨论 evaluator
+被优化压力带偏的风险。</li>
+<li><strong>复现结果规模小、多为单次运行。</strong> SAO 每臂 48 个
+rollout；TTT-Discover 每任务一条轨迹；harness-evolve
+每行一次运行；作者在每处都标明了这一点，但这意味着结果只能说明"机制能跑通、排序与论文一致"，不能说明效果大小。</li>
+<li><strong>SFT 复现失败被如实记录</strong>：SAO 示例里两种 SFT
+变体（3.5k TIR、30k 混合）都低于基座（44.69 → 9.75 /
+5.44），未能复现论文的 SFT 结果。</li>
+<li><strong>项目很新。</strong> 2026-08-31 建库，读取时 50 个开放
+issue，接口（如 <code>episode_workers</code>
+等字段）在文档中已标为弃用并替换，API 稳定性未知。</li>
+<li><strong>部署门槛。</strong> 权重面需要 slime + SGLang + GPU
+集群（SAO 示例用两台 8 卡节点）；harness 面可以只用模型 API，但 native
+适配器和沙箱（bubblewrap、E2B）有平台限制（Linux、Python 3.12+）。</li>
+<li><strong>与 iCoder 式多阶段研究流水线的适配未验证。</strong> Reef 的
+recipe 是"一种方法绑定一个 scenario"，iCoder 的 Data → SFT → OPSD → RLVR
+是多阶段、可回退的流程，能否表示为 recipe 序列需要实际尝试。</li>
+<li><strong>无独立的安全层。</strong> 没有 Falsifiable Release
+Gates（报告
+27）式的常驻不变量或"收紧自动、放松人审"规则；人工批准需要用户在
+selector 里自己实现。</li>
+</ol>
+<h2 id="7-意义与位置">7. 意义与位置</h2>
+<p><strong>对报告 10 insight 7
+的实证</strong>：本仓库说进入生产的系统都有版本、审计、预测、回滚四项机制，Reef
+把其中版本和回滚做成了默认行为，审计有记录层支撑，预测（提议者预测自己改动的效果）没有。它是第一个把这些机制从单篇论文的实现变成通用组件的开源项目。</p>
+<p><strong>对 §10 路线图的意义</strong>：本仓库计划以 iCoder
+为研究流水线基座，Reef
+可以承担运行时的服务、记录、候选评估和版本发布层。两者的接缝在
+recipe：iCoder 的阶段控制器是否能表示为 Reef 的一组 recipe 与
+scenario，是下一步要核实的事。另一个要核实的是 Reef 的
+<code>CandidateEvaluator</code>
+能否接入独立于训练循环的锚集（本仓库的不可妥协项）。</p>
+<p><strong>对报告 13、16、21 三种 harness 修改哲学的意义</strong>：Reef
+已经实现了 Meta-Harness 风格的全历史搜索；AutoSaddler 的 mini-batch
+诊断和 Co-Harness 的双环在它上面都可以表示为
+recipe，这使三种哲学的对照实验第一次可以在同一套基础设施上做。</p>
+<p><strong>对报告 18 Prime Agent
+的对照</strong>：两者都在做"免重置、版本化 refinement"，Prime Agent
+是一个完整的 agent 产品，Reef 是 agent 外面的一层；Prime Agent 的 RCON
+作弊事故在 Reef 里对应的是 <code>selection</code> 配置——如果 evaluator
+只看被测目标，同样的事会发生。</p>
+<p><strong>对报告 29、30 的关系</strong>：Prism-Shadow 的清单收录
+Proteus 而未收 Reef（Reef 建库晚于其数据快照）；按其九维标签，Reef 应为
+Parametric + Non-parametric、Online、Sequential、验收标准由 recipe
+决定、更新者 Self 或 Teacher 均可。</p>
 </article>
 </body></html>

@@ -2,13 +2,13 @@
 
 [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
 ![papers](https://img.shields.io/badge/papers-61%2B6_classics-blue)
-![reports](https://img.shields.io/badge/deep--dives-29-red)
+![reports](https://img.shields.io/badge/deep--dives-32-red)
 ![zh-PDF](https://img.shields.io/badge/zh--PDF-66-green)
 ![slides](https://img.shields.io/badge/slides-34p-orange)
-![full report](https://img.shields.io/badge/full_report-150p-8a2be2)
+![full report](https://img.shields.io/badge/full_report-167p-8a2be2)
 [![License: CC BY 4.0](https://img.shields.io/badge/license-CC_BY_4.0-lightgrey)](LICENSE)
 
-> **English summary.** A curated list and survey repository on Recursive Self-Improvement (RSI), from Good's 1965 intelligence-explosion argument to the 2026 wave of self-evolving agents (harness optimization, evaluator co-evolution, skill evolution, safety gates). Every paper links to the original, a layout-preserving Chinese translation (`papers/zh/`), and, for 29 of them, a structured Chinese deep-dive (`reports/`). Main finding: every self-evolving system that works keeps a fixed evaluation reference outside the evolution loop (a human-labeled anchor set, a frozen verifier, a regression test); remove it and the evaluator drifts in ways task scores cannot reveal. Papers are grouped in §4; the report index is in §5; a 20-system comparison matrix is in §7.3. Prose is in Chinese.
+> **English summary.** A curated list and survey repository on Recursive Self-Improvement (RSI), from Good's 1965 intelligence-explosion argument to the 2026 wave of self-evolving agents (harness optimization, evaluator co-evolution, skill evolution, safety gates). Every paper links to the original, a layout-preserving Chinese translation (`papers/zh/`), and, for the core ones, a structured Chinese deep-dive (`reports/`, 32 reports covering 29 papers/surveys plus three resources: the Prism-Shadow list, its RSI guide, and the Reef infrastructure). Main finding: every self-evolving system that works keeps a fixed evaluation reference outside the evolution loop (a human-labeled anchor set, a frozen verifier, a regression test); remove it and the evaluator drifts in ways task scores cannot reveal. Papers are grouped in §4; the report index is in §5; a 20-system comparison matrix is in §7.3. Prose is in Chinese.
 
 这是一个关于 Recursive Self-Improvement（递归自改进）的论文列表和调研仓库，覆盖从 1965 年 Good 的智能爆炸猜想到 2026 年的自进化 agent 研究。每篇核心论文都附有原文链接、中文解读和保留原版式的中文翻译 PDF。
 
@@ -22,11 +22,11 @@
 
 | 类型 | 数量 | 位置 |
 |---|---|---|
-| 中文解读（统一七节结构，约 8.3 万字） | 29 份 | [`reports/`](reports/)，索引见 [§5](#5-deep-dive-reports) |
+| 中文解读（统一七节结构，约 9.8 万字） | 32 份（29 篇论文 / 综述 + 3 个资源与基础设施） | [`reports/`](reports/)，索引见 [§5](#5-deep-dive-reports) |
 | 英文论文 PDF | 61 篇 + 6 篇起源经典 | [`papers/en/`](papers/en/)，[`papers/classics/`](papers/classics/) |
 | 中文翻译 PDF（[super_translate](https://github.com/asimfish/super_translate) 生成，保留原版式） | 66 篇，全部英文 PDF 均有对应中译 | [`papers/zh/`](papers/zh/) |
 | 汇总 PPT | 34 页 HTML / PDF | [`report/awesome_rsi_slides.html`](report/awesome_rsi_slides.html)，[PDF](report/awesome_rsi_slides.pdf) |
-| 全文合订报告（29 份解读 + 两张图） | 150 页 | [`report/awesome_rsi_full_report.pdf`](report/awesome_rsi_full_report.pdf)，[HTML](report/awesome_rsi_full_report.html) |
+| 全文合订报告（32 份解读 + 两张图） | 167 页 | [`report/awesome_rsi_full_report.pdf`](report/awesome_rsi_full_report.pdf)，[HTML](report/awesome_rsi_full_report.html) |
 
 ## Contents
 
@@ -59,7 +59,7 @@
 |---|---|
 | 15 分钟 | [汇总 PPT](report/awesome_rsi_slides.html)（浏览器中用方向键翻页，P 键打印）或 [PDF 版](report/awesome_rsi_slides.pdf) |
 | 2 小时 | [报告 10 汇总](reports/10_synthesis_insights.md) → [报告 01 Weng](reports/01_lilian_weng_harness_engineering.md) → [报告 05 Who Grades the Grader](reports/05_who_grades_the_grader.md)（说明为什么评估器需要循环外的锚） |
-| 通读 | [全文合订报告](report/awesome_rsi_full_report.pdf)（150 页，29 份解读按编号排列） |
+| 通读 | [全文合订报告](report/awesome_rsi_full_report.pdf)（167 页，32 份解读按编号排列） |
 | 系统研读 | `reports/` 按 00 → 23 → 01 → 02 → 07 → 03 → 04 → 05 → 06 → 08 → 11 → 09 → 10 的顺序读，其余按需；对照 `papers/zh/` 的中文 PDF |
 
 按目的：
@@ -302,7 +302,7 @@ _Thomas Kwa, Ben West, Joel Becker, et al. (METR)_ — 测量 AI 能可靠完成
 
 > 可以直接运行的自进化系统和基础设施。论文配套代码已在各条目的 `[code]` 链接中，这里只列独立的工程项目，并汇总本仓库内带代码的系统，方便二次开发时选型。
 
-1. **Reef: Continual learning infra for self-improving agents.** Human-Agent-Society, 2026\. [code](https://github.com/Human-Agent-Society/reef), [docs](https://reefinfra.ai/docs/), [PyPI](https://pypi.org/project/reef-infra/)
+1. **Reef: Continual learning infra for self-improving agents.** Human-Agent-Society, 2026\. [code](https://github.com/Human-Agent-Society/reef), [docs](https://reefinfra.ai/docs/), [PyPI](https://pypi.org/project/reef-infra/), [解读](reports/31_reef.md)
 _Human-Agent-Society（Wenhao Chai, Paul Liang, Ao Qu, Zhenting Qi, et al.）_ — 开源的持续自改进基础设施，把服务、反馈、学习、版本化交付接成一个循环：Serve（服务请求并记录交互）→ Observe（把反馈匹配到交互记录）→ Grow（由 recipe 产出更新）→ Commit（按选择策略评估候选，发布通过的版本）。两条学习面：用 Slime + SGLang 训练模型权重，或改进 harness 的 prompt、规则与技能；更新期间服务不中断，全部版本可回滚。内置 recipe 覆盖 SAO、OpenClaw-RL、TTT-Discover、SkillClaw、GEPA。Apache-2.0。它把本仓库反复讨论的"评估门 + 版本化回滚"做成了通用组件，与 iCoder 的研究流水线互补，是 §10 路线图的候选底座。
 2. **Proteus: A Harness-Agnostic Self-Evolution Framework for AI Agents.** v0.3.0, 2026-08\. [code](https://github.com/proteus-evolve/Proteus)
 _Proteus Authors_ — 与具体 harness 解耦的自进化框架：每个 episode 用全新的模型上下文，agent 只能修改预先声明的 harness 区域，代码改动通过验证后才启用，版本化快照保留完整进化历史。收录自 Prism-Shadow/awesome-rsi 的开源系统表。
@@ -311,7 +311,7 @@ _Proteus Authors_ — 与具体 harness 解耦的自进化框架：每个 episod
 
 ## 5. Deep-Dive Reports
 
-29 份中文解读（[`reports/`](reports/)），统一七节结构：一句话定位、要解决的问题、为什么此前做不通、方法机制、实验结果、局限、与其他报告的关系。每篇 2000 到 5200 字，数字标注到论文表号。全部合订为 [150 页 PDF](report/awesome_rsi_full_report.pdf)。
+32 份中文解读（[`reports/`](reports/)），统一七节结构：一句话定位、要解决的问题、为什么此前做不通、方法机制、实验结果、局限、与其他报告的关系。每篇 2000 到 5200 字，数字标注到论文表号。全部合订为 [167 页 PDF](report/awesome_rsi_full_report.pdf)。
 
 | # | 报告 | 对象 | 主要内容 |
 |---|---|---|---|
@@ -344,6 +344,9 @@ _Proteus Authors_ — 与具体 harness 解耦的自进化框架：每个 episod
 | 26 | [技能进化五篇](reports/26_skill_evolution_wave.md) | SkillCommit / HyperSkill / ERSkill / SkillProx / Evo-Harness | 把经验抽象成技能优于存储原始轨迹；技能的组织结构尚无定论 |
 | 27 | [安全与治理五篇](reports/27_safety_governance.md) | SESG / OLE / HarnessFix / Gates / HVTB | 在进化循环外做三种检查：不变量、蜜罐、红队集 |
 | 28 | [Coding Agents 综述](reports/28_self_evolving_coding_agents_survey.md) | 对象 × 时间 × 证据 | 可执行反馈的优势和风险；错误会被保留 |
+| 29 | [Prism-Shadow/awesome-rsi 清单](reports/29_prism_awesome_rsi.md) | 27 个基准 + 31 个方法的九维元数据 | 与本仓库重叠 12 篇；它有基准表和记忆线，本仓库有评估器与安全治理线 |
+| 30 | [《读懂 RSI》长文](reports/30_prism_understanding_rsi.md) | A(t+1) = U(A(t), τ, f) 与五组分类维度 | 进化结构（链 / 树 / 图）和更新者是本仓库缺的两个维度；定义比 Bostrom 宽 |
+| 31 | [Reef](reports/31_reef.md) | 持续自改进 agent 的开源基础设施 | Serve → Observe → Grow → Commit；评估门是接口，锚由用户提供 |
 
 ## 6. Insights & Open Problems
 
@@ -453,7 +456,7 @@ _Proteus Authors_ — 与具体 harness 解耦的自进化框架：每个 episod
 - 微信：Agentic RL 系列（§4.6）— 上：环境、轨迹、Reward 与训练闭环 [article](https://mp.weixin.qq.com/s/Ly2BvP3y2bFB9czGqRguWQ)；中：SkillRL [article](https://mp.weixin.qq.com/s/wqMM1D4NZQmRtWOcebuhTA)；下：Evolving-RL [article](https://mp.weixin.qq.com/s/bu3-RyqaYPdA1mH79oF39g)
 - 微信：iCoder 中文解读（§4.10）— [article](https://mp.weixin.qq.com/s/28q7O59IzEXl_tiWulYbDA)
 - 微信：Self-Evolving Coding Agents 综述解读（§4.3）— [article](https://mp.weixin.qq.com/s/hSrJLcZN3j7J7X02N2HIMg)
-- Prism-Shadow：《万字长文带你读懂 RSI（自进化，Self-Evolving）》— [中英双语博客](https://prism-shadow.github.io/awesome-rsi/#blog/understanding-rsi)；用进化对象、链树图结构、更新者、更新时机、验收标准五组维度梳理 RSI，配 SEAL / Prime Agent / ReasoningBank / SkillSmith / DGM / Evo-Harness 等十余篇代表工作的图解。与本仓库的分类图（§3）可以对照着读
+- Prism-Shadow：《万字长文带你读懂 RSI（自进化，Self-Evolving）》— [中英双语博客](https://prism-shadow.github.io/awesome-rsi/#blog/understanding-rsi)，[解读](reports/30_prism_understanding_rsi.md)；用进化对象、链树图结构、更新者、更新时机、验收标准五组维度梳理 RSI，配 SEAL / Prime Agent / ReasoningBank / SkillSmith / DGM / Evo-Harness 等十余篇代表工作的图解。与本仓库的分类图（§3）可以对照着读
 - 2026 年 6–8 月趋势扫描笔记（19 篇新论文、9 项工业动态、7 项基准动态、8 项安全治理）— [`assets/trends_research_raw.md`](assets/trends_research_raw.md)
 
 ## 9. Repository Layout & Build
@@ -463,8 +466,8 @@ awesome_rsi/
 ├── README.md · CONTRIBUTING.md
 ├── report/
 │   ├── awesome_rsi_slides.html / .pdf        # 34 页汇总 PPT（方向键翻页，P 键打印）
-│   └── awesome_rsi_full_report.html / .pdf   # 150 页全文合订（29 份解读 + 封面 + 目录 + 两图）
-├── reports/                                  # 29 份解读 00–28（索引见 §5）
+│   └── awesome_rsi_full_report.html / .pdf   # 167 页全文合订（32 份解读 + 封面 + 目录 + 两图）
+├── reports/                                  # 32 份解读 00–31（索引见 §5）
 ├── papers/
 │   ├── en/                                   # 61 篇英文原版 PDF（arXiv + iCoder 技术报告）
 │   ├── zh/                                   # 61 篇中文翻译 PDF，与 en/ 一一对应
@@ -490,13 +493,14 @@ awesome_rsi/
 - 运行时基础设施：评估 [Reef](https://github.com/Human-Agent-Society/reef)（§4.14）能否承担服务、反馈记录、候选评估和版本化发布这一层——它已经实现了本仓库要求的评估门和回滚，权重训练（Slime + SGLang）与 harness 进化两条学习面都有 recipe；需要核实的是它的候选评估能否接入独立于训练循环的锚集，以及 recipe 机制能否容纳 iCoder 式的多阶段研究流水线。
 - 待定的设计选择：harness 修改用 Meta-Harness 式的全轨迹自由改写（[13](reports/13_meta_harness.md)）还是 AutoSaddler 式的归因约束局部 diff（[16](reports/16_autosaddler.md)）；权重更新用 Co-Harness 的离线批次（[21](reports/21_co_harness.md)）还是 Continual Harness 的在线共学习（[11](reports/11_continual_harness.md)）。
 - 必须保留的机制：进化循环外的独立锚（[05](reports/05_who_grades_the_grader.md)）、回归门（[14](reports/14_self_harness.md)）、版本化回滚（[08](reports/08_moss.md) / [21](reports/21_co_harness.md)）、过程级测试（[22](reports/22_coevolution_survey.md)）。
+- 待补论文（据解读 29、30 的对照）：Mendel Gödel Machine（框架侧，DGM 后续，Polyglot 50.8% → 93.2%）、ReasoningBank 与 SEAL（记忆线与参数线的起点）、FinEvo-Bench 与 GDPevo（带状态重置对照组的 RSI 基准）；并考虑增加"基准"一节与"进化结构""更新者"两个分类维度。
 - 维护：新论文按 §4 格式追加，入库 PDF-en / PDF-zh；重点论文补解读（模板见 [CONTRIBUTING](CONTRIBUTING.md)）；之后重建全文报告、按需更新两图，同步 slides 与本 README 的计数。
 
 ## 11. Related Resources
 
-- [Prism-Shadow/awesome-rsi](https://github.com/Prism-Shadow/awesome-rsi) · [网站](https://prism-shadow.github.io/awesome-rsi/) · [博客](https://prism-shadow.github.io/awesome-rsi/#blog/understanding-rsi) — 中英双语的 RSI 基准与方法清单：约 27 个基准、32 个方法、1 个开源系统（Proteus）和一组书籍课程，网站提供按 artifact / 模式 / 拓扑 / 验收标准等维度的筛选面板和引用图。配套长文《万字长文带你读懂 RSI》把 RSI 定义为 A(t+1) = U(A(t), τ(t), f(t))，按进化对象（参数 / 上下文 / 记忆 / 技能 / harness 代码）、进化结构（链 / 树 / 图）、更新者（自身 / 教师 / 联合）、更新时机（离线 / 在线 / 混合）和验收标准等维度分类。与本仓库的分工：它以基准和方法的可筛选元数据为主，本仓库以逐篇深度解读和"锚在哪"这条主轴为主；它的"验收标准"维度与本仓库的锚最接近。
+- [Prism-Shadow/awesome-rsi](https://github.com/Prism-Shadow/awesome-rsi) · [网站](https://prism-shadow.github.io/awesome-rsi/) · [博客](https://prism-shadow.github.io/awesome-rsi/#blog/understanding-rsi) · [解读 29](reports/29_prism_awesome_rsi.md) / [解读 30](reports/30_prism_understanding_rsi.md) — 中英双语的 RSI 基准与方法清单：约 27 个基准、32 个方法、1 个开源系统（Proteus）和一组书籍课程，网站提供按 artifact / 模式 / 拓扑 / 验收标准等维度的筛选面板和引用图。配套长文《万字长文带你读懂 RSI》把 RSI 定义为 A(t+1) = U(A(t), τ(t), f(t))，按进化对象（参数 / 上下文 / 记忆 / 技能 / harness 代码）、进化结构（链 / 树 / 图）、更新者（自身 / 教师 / 联合）、更新时机（离线 / 在线 / 混合）和验收标准等维度分类。与本仓库的分工：它以基准和方法的可筛选元数据为主，本仓库以逐篇深度解读和"锚在哪"这条主轴为主；它的"验收标准"维度与本仓库的锚最接近。
 - [iSEngLab/Awesome-Self-Evolving-Coding-Agents](https://github.com/iSEngLab/Awesome-Self-Evolving-Coding-Agents) — arXiv 2608.03392 综述的配套清单，按进化对象六类组织，收录编码领域的工作；与本仓库互补，已互相收录（解读见[报告 28](reports/28_self_evolving_coding_agents_survey.md)）
-- [Human-Agent-Society/reef](https://github.com/Human-Agent-Society/reef) — 持续自改进 agent 的开源基础设施，Serve → Observe → Grow → Commit 循环，支持权重训练和 harness 进化两条学习面，带版本管理与回滚；详见 [§4.14](#414-open-source-systems--infrastructure)
+- [Human-Agent-Society/reef](https://github.com/Human-Agent-Society/reef) — 持续自改进 agent 的开源基础设施，Serve → Observe → Grow → Commit 循环，支持权重训练和 harness 进化两条学习面，带版本管理与回滚；详见 [§4.14](#414-open-source-systems--infrastructure) 与[解读 31](reports/31_reef.md)
 - [CharlesQ9/Self-Evolving-Agents](https://github.com/CharlesQ9/Self-Evolving-Agents) — TMLR 综述的配套清单
 - [Thinklab-SJTU/awesome-ml4co](https://github.com/Thinklab-SJTU/awesome-ml4co) — 本仓库编目格式的参考
 - [asimfish/super_translate](https://github.com/asimfish/super_translate) — 本仓库中文 PDF 的翻译工具
@@ -510,7 +514,7 @@ awesome_rsi/
 | 2026-09-01 – 09-03 | 加入 Continual Harness、六个 harness 系统、iCoder、三份综述与起源经典；PPT 扩至 34 页；生成时间线与分类树两图；加入 149 页全文合订报告 |
 | 2026-09-05 | 29 份解读全部重写为七节结构（约 8.3 万字）；补齐全部 61 篇论文的中译 PDF（共 66 篇） |
 | 2026-09-06 | README 重排为 12 个章节并统一条目格式；README、29 份解读、34 页 PPT 的中文表达由本地 Codex（gpt-6-astra）逐篇打磨，改为平实陈述；全文报告重建为 150 页 |
-| 2026-09-08 | README 加英文摘要、Changelog、引用格式与许可证文件；新增 §4.14 开源系统与基础设施（Reef、Proteus）；相关资源加入 Prism-Shadow/awesome-rsi 及其《读懂 RSI》长文 |
+| 2026-09-08 | 全文报告重建为 167 页；README 加英文摘要、Changelog、引用格式与许可证文件；新增 §4.14 开源系统与基础设施（Reef、Proteus）；相关资源加入 Prism-Shadow/awesome-rsi 及其《读懂 RSI》长文；新增解读 29（Prism 清单）、30（《读懂 RSI》）、31（Reef） |
 
 ## 13. Citation
 
@@ -522,7 +526,7 @@ awesome_rsi/
   author       = {Li, Yufeng},
   year         = {2026},
   howpublished = {\url{https://github.com/asimfish/awesome_rsi}},
-  note         = {29 structured deep-dives, 66 layout-preserving Chinese translations, 34-slide summary}
+  note         = {32 structured deep-dives, 66 layout-preserving Chinese translations, 34-slide summary}
 }
 ```
 
