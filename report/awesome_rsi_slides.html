@@ -812,25 +812,25 @@
 <!-- S22 六系统上 -->
 <section class="slide" data-n="22">
   <div class="eyebrow">谱系扩编 · 六系统 1/2</div>
-  <h2>Harness 自进化六系统（上）<span class="en">锚在哪：三种答案</span></h2>
-  <p class="sub">同月出现的六个 harness 自进化系统，区别在哪个部件不参与进化：外部 proposer、回归门的 held-out 集、原环境的验证器。</p>
+  <h2>Harness 自进化六系统（上）<span class="en">三种锚</span></h2>
+  <p class="sub">同月出现的六个 harness 自进化系统，区别在于不参与进化的部件：外部 proposer、回归门的 held-out 集、原环境的验证器。</p>
   <div class="slide-body">
     <div class="cols">
       <div class="col" style="flex:1.05;">
         <div class="ring-diagram">
-          <div class="ring" style="border-color:var(--gold); background:var(--gold-soft);"><b>Meta-Harness（Stanford）· 锚 = 冻结的外层 proposer</b><p>Claude Code 读全部历史候选源码+分数+原始轨迹（每轮中位 82 文件 / 约 10M token）诊断并改写 harness。消融：只给分数 34.6、加摘要 34.9、给全轨迹 50.0，<b>完整轨迹是关键</b>。TerminalBench-2：Opus 4.6 搜出的 harness 超手工 Terminus-KIRA（76.4% vs 74.7%）。</p></div>
-          <div class="ring" style="border-color:var(--blue); background:var(--blue-soft);"><b>Self-Harness（上海 AI Lab）· 锚 = 回归门</b><p>同一冻结模型自改 harness：失败签名聚类 → K 个极小有界编辑 → held-in/held-out <b>双 split 均不回退才晋升</b>。9/9 组合均提升，最大 +132%（Qwen3.5-35B AppWorld 22.5→52.2）。回归门拒绝变差的编辑，因此 CH 里全线更差的弱模型，在这里 35B 也能提升。</p></div>
-          <div class="ring" style="border-color:var(--ink-faint); background:#F5F2EE;"><b>EnvHarness（Google Cloud AI）· 锚 = 不动的 R 轴</b><p>进化对象换成<b>环境</b>：Stage/Contract/Chain 三类插件改造冻结基准，原任务与人写验证器不动。ALFWorld OOD +9.0 点、SWE-bench 步数 53.6→49.6；<b>静态环境抽出的技能可能降低表现</b>（SpreadsheetBench 45.9 &lt; 无技能 46.4、SWE 步数反增到 55.0）；300 个生成环境仍在提升；四个 backbone 增益相近（+2.7–3.7），使用改造环境不要求生成环境的能力。</p></div>
+          <div class="ring" style="border-color:var(--gold); background:var(--gold-soft);"><b>Meta-Harness（Stanford）· 锚 = 冻结的外层 proposer</b><p>Claude Code 读全部历史候选源码+分数+原始轨迹（每轮中位 82 文件 / 约 10M token）诊断并改写 harness。消融：只给分数 34.6、加摘要 34.9、给全轨迹 50.0，<b>全轨迹得分最高</b>。TerminalBench-2：Opus 4.6 搜出的 harness 超手工 Terminus-KIRA（76.4% vs 74.7%）。</p></div>
+          <div class="ring" style="border-color:var(--blue); background:var(--blue-soft);"><b>Self-Harness（上海 AI Lab）· 锚 = 回归门</b><p>同一冻结模型自改 harness：失败签名聚类 → K 个极小有界编辑 → held-in/held-out <b>双 split 均不退步才晋升</b>。9/9 组合均提升，最大 +132%（Qwen3.5-35B AppWorld 22.5→52.2）。回归门拒绝退步的编辑，因此 CH 中全线退步的弱模型，在这里 35B 也能提升。</p></div>
+          <div class="ring" style="border-color:var(--ink-faint); background:#F5F2EE;"><b>EnvHarness（Google Cloud AI）· 锚 = 固定的 R 轴</b><p>进化对象是<b>环境</b>：Stage/Contract/Chain 三类插件改造冻结基准，原任务与人写验证器不动。ALFWorld OOD +9.0 点、SWE-bench 步数 53.6→49.6；<b>静态环境抽出的技能可能降低表现</b>（SpreadsheetBench 45.9 &lt; 无技能 46.4、SWE 步数反增到 55.0）；生成环境增至 300 个仍有提升；四个 backbone 增益相近（+2.7–3.7），使用环境不要求能生成环境。</p></div>
         </div>
       </div>
       <div class="col" style="flex:0.95;">
         <div class="card">
-          <h3>三种答案的共同点</h3>
-          <p style="font-size:14px;">进化的部件可以是 harness 代码、提示与技能库或环境本身，但<b>评分回路上始终有一个不参与进化的部件</b>：proposer 的判断力、回归门的 held-out 集、环境侧的原始验证器。与报告 05 的锚定要求、报告 11 的冻结 PRM 是同一做法。</p>
+          <h3>三种锚的共同点</h3>
+          <p style="font-size:14px;">harness 代码、提示与技能库、环境都可以进化，<b>评分回路始终保留一个不参与进化的部件</b>：proposer 的判断力、回归门的 held-out 集、环境侧的原始验证器。与报告 05 的锚定要求、报告 11 的冻结 PRM 做法相同。</p>
         </div>
         <div class="card" style="border-left:4px solid var(--accent);">
-          <h3>但锚的独立程度不同</h3>
-          <p style="font-size:14px;">Meta-Harness 的 proposer 既是锚也是上限（自动化工程，非严格 RSI）；Self-Harness 的 held-out 进了晋升规则，是<b>选择信号，并非独立终检</b>，"9/9 双升"部分由接受规则保证；EnvHarness 的裁判从头到尾没有被修改。</p>
+          <h3>锚的独立程度不同</h3>
+          <p style="font-size:14px;">Meta-Harness 的 proposer 是锚，也限定上限（自动化工程，非严格 RSI）；Self-Harness 的 held-out 用于晋升，<b>参与选择，无法独立终检</b>，"9/9 双升"部分由接受规则保证；EnvHarness 的验证器始终未改。</p>
         </div>
       </div>
     </div>
@@ -841,25 +841,25 @@
 <!-- S23 六系统下 -->
 <section class="slide" data-n="23">
   <div class="eyebrow">谱系扩编 · 六系统 2/2</div>
-  <h2>Harness 自进化六系统（下）<span class="en">去锚即负收益</span></h2>
-  <p class="sub">后三个系统给出两条证据：去掉泛化门后自动优化低于未优化基线；没有独立锚的 refinement 会把作弊固化成可复用技能。</p>
+  <h2>Harness 自进化六系统（下）<span class="en">去锚后退步</span></h2>
+  <p class="sub">后三个系统的两条证据：去掉泛化门后自动优化低于未优化基线；没有独立锚的 refinement 会把作弊存成可复用技能。</p>
   <div class="slide-body">
     <div class="cols">
       <div class="col" style="flex:1.05;">
         <div class="ring-diagram">
-          <div class="ring" style="border-color:var(--blue); background:var(--blue-soft);"><b>AutoSaddler（Microsoft 等）· harness 优化 = 离线 mini-batch 学习</b><p>诊断-补丁相当于反向传播、dev 集检查泛化、EvoDAG 保存历史。GAIA2 +9.0pp、Terminal-Bench 2.0 +10.0pp，超过人工调整；147 条轨迹达到 Meta-Harness 1400 条未达到的水平（约 10×）。<b>关键消融：去掉 dev 门 50.6，低于未优化基线 53.0，无锚时收益为负。</b></p></div>
-          <div class="ring" style="border-color:var(--gold); background:var(--gold-soft);"><b>MetaCaster（UH/NEC）· meta-harness 垂直落地</b><p>Agent-as-Engineer：agent 合成数据并训练小模型，自己不做预测，推理期只留 243 参数小模型（延迟约为 TSFM 千分之一）。优化信号是真实数据上的误差；30 格拿 19 格第一；同一 harness 挂四个骨干波动仅 0.267-0.366，<b>harness 比骨干重要</b>。</p></div>
-          <div class="ring" style="border-color:var(--ink-faint); background:#F5F2EE;"><b>Prime Agent（Prime Intellect）· 免重置落成工程事实</b><p>CH 一作 Karten 续作：daemon/恢复/分叉 + 持久 REPL。ARC-AGI-3 官方壳 30.2%→95.5%，超人类基线，<b>评测测的是模型还是壳</b>；nanoGPT speedrun 85.5 小时不间断；Factorio 七天 2340 万 token、633 个子代理。</p></div>
+          <div class="ring" style="border-color:var(--blue); background:var(--blue-soft);"><b>AutoSaddler（Microsoft 等）· harness 优化 = 离线 mini-batch 学习</b><p>诊断-补丁对应反向传播，dev 集检查泛化，EvoDAG 保存历史。GAIA2 +9.0pp、Terminal-Bench 2.0 +10.0pp，超过人工调整；147 条轨迹达到 Meta-Harness 1400 条未达到的水平（约 10×）。<b>消融：去掉 dev 门后为 50.6，低于未优化基线 53.0。</b></p></div>
+          <div class="ring" style="border-color:var(--gold); background:var(--gold-soft);"><b>MetaCaster（UH/NEC）· meta-harness 专域应用</b><p>Agent-as-Engineer：agent 合成数据并训练小模型，自己不做预测，推理期只留 243 参数小模型（延迟约为 TSFM 千分之一）。优化信号是真实数据上的误差；30 格中 19 格第一；同一 harness 换四个骨干波动仅 0.267-0.366，<b>harness 影响更大</b>。</p></div>
+          <div class="ring" style="border-color:var(--ink-faint); background:#F5F2EE;"><b>Prime Agent（Prime Intellect）· 实现免重置运行</b><p>CH 一作 Karten 续作：daemon/恢复/分叉 + 持久 REPL。ARC-AGI-3 官方壳 30.2%→95.5%，超人类基线，<b>需区分模型与壳的贡献</b>；nanoGPT speedrun 85.5 小时不间断；Factorio 七天 2340 万 token、633 个子代理。</p></div>
         </div>
       </div>
       <div class="col" style="flex:0.95;">
         <div class="card" style="border-left:4px solid var(--accent);">
-          <h3>一个重要的安全案例</h3>
-          <p style="font-size:14px;">Prime Agent 的 Factorio agent 发现 RCON 作弊捷径，无视反作弊 heartbeat 使用，并<b>把它固化成可复用技能</b>。没有独立锚的 refinement 会保存 spec-gaming。作者建议的最小权限/独立校验/可审计回滚，与报告 08 MOSS 的门控对应。</p>
+          <h3>一个作弊案例</h3>
+          <p style="font-size:14px;">Prime Agent 的 Factorio agent 发现并使用 RCON 作弊方法，无视反作弊 heartbeat，<b>将其存成可复用技能</b>。没有独立锚的 refinement 会保存 spec-gaming。作者建议的最小权限/独立校验/可审计回滚，与报告 08 MOSS 的门控对应。</p>
         </div>
         <div class="card">
           <h3>六系统小结</h3>
-          <p style="font-size:14px;">① 优化出的 harness 可跨模型迁移（Meta-Harness +4.7 分均值、MetaCaster 四骨干互换）；② 三种锚都能运行，独立程度决定可信度；③ 评测结果多少来自壳成为测量问题，对应报告 10 insight 10（测量基础设施是瓶颈）。</p>
+          <p style="font-size:14px;">① 优化出的 harness 可跨模型迁移（Meta-Harness +4.7 分均值、MetaCaster 四骨干互换）；② 三种锚都能运行，独立程度决定可信度；③ 需测量壳对结果的贡献，对应报告 10 insight 10（测量基础设施是瓶颈）。</p>
         </div>
       </div>
     </div>
@@ -871,30 +871,30 @@
 <!-- S24 iCoder -->
 <section class="slide" data-n="24">
   <div class="eyebrow">工业实证 · AI 造 AI</div>
-  <h2>iCoder：AI 主导开发 27B 前沿模型<span class="en">高密度 prior · 低频门控（SJTU/NUS/DP Tech）</span></h2>
-  <p class="sub">要回答的问题是<b>多少人类介入就够</b>。专家经验一次性写成 Research Skills，四阶段的具体决策全部交给 Codex GPT-5.6-Sol，最终配方由 agent 在失败中修订得到。<b>本仓库计划以其代码库为后续开发基础。</b></p>
+  <h2>iCoder：AI 主导开发 27B 模型<span class="en">高密度 prior · 低频门控（SJTU/NUS/DP Tech）</span></h2>
+  <p class="sub">关注<b>需要多少人类介入</b>。专家经验一次性写成 Research Skills，四阶段的具体决策全部交给 Codex GPT-5.6-Sol，agent 根据失败结果修订配方。<b>本仓库计划基于其代码继续开发。</b></p>
   <div class="slide-body">
     <div class="cols">
       <div class="col" style="flex:1.05;">
         <div class="ring-diagram">
-          <div class="ring" style="border-color:var(--gold); background:var(--gold-soft);"><b>五层 prior 接口：人类保留什么</b><p>交付物定义、权限门（新身份须人批）、正确性判据（verifier 不许 agent 削弱或替换）、证据规则（结论必须引注册证据）四项固定，其余交给 agent。invariants 明确列为不靠试错学的内容。</p></div>
-          <div class="ring" style="border-color:var(--blue); background:var(--blue-soft);"><b>四阶段·失败驱动配方</b><p>任务池 → SFT 冷启动 → OPSD（一次目标塌缩迫使 agent 围绕 verifier-anchored credit 重设计学习规则）→ RLVR（reward exploits / false verdicts / 长度退化相继改写 reward 资格、优化器、轨迹预算）。阶段可回退。</p></div>
-          <div class="ring" style="border-color:var(--ink-faint); background:#F5F2EE;"><b>可复用的三个部分</b><p>① Research Skills 表示（版本化 SOP+代码，可换领域）；② 治理组件（任务队列/实验日志/决策记录/审批门，比 MOSS 门控更轻）；③ Data→SFT→OPSD→RLVR 可回退状态机。</p></div>
+          <div class="ring" style="border-color:var(--gold); background:var(--gold-soft);"><b>五层 prior：人类保留的控制</b><p>交付物定义、权限门（新身份须人批）、正确性判据（verifier 不许 agent 削弱或替换）、证据规则（结论须引注册证据）四项固定，其余交给 agent。invariants 不通过试错学习。</p></div>
+          <div class="ring" style="border-color:var(--blue); background:var(--blue-soft);"><b>四阶段·修订配方</b><p>任务池 → SFT 冷启动 → OPSD（一次目标塌缩后，agent 按 verifier-anchored credit 重写学习规则）→ RLVR（因 reward exploits / false verdicts / 长度退化，依次修改 reward 资格、优化器、轨迹预算）。阶段可回退。</p></div>
+          <div class="ring" style="border-color:var(--ink-faint); background:#F5F2EE;"><b>可复用的三个部分</b><p>① Research Skills（版本化 SOP+代码，可换领域）；② 治理组件（任务队列/实验日志/决策记录/审批门，比 MOSS 门控更轻）；③ Data→SFT→OPSD→RLVR 可回退状态机。</p></div>
         </div>
       </div>
       <div class="col" style="flex:0.95;">
         <div class="card">
-          <h3>关键数字（27B 尺寸）</h3>
+          <h3>关键数字（27B 参数）</h3>
           <ul>
-            <li>RTLLM <b>68.0 全场第一</b>：超 GPT-5.5（66.0）/ Opus 4.8（64.7）/ 1.6T 参数 DeepSeek-V4-Pro（67.5）</li>
+            <li>RTLLM <b>68.0 第一</b>：超 GPT-5.5（66.0）/ Opus 4.8（64.7）/ 1.6T 参数 DeepSeek-V4-Pro（67.5）</li>
             <li>vs 同尺寸 Qwen3.6-27B：RTLLM <b>+18.4</b>、VerilogEval +16.2、KernelBench L2 correctness <b>2.64×</b></li>
             <li>KernelBench L1 61：近两倍于 DSv4-Pro（32）；CVDP 第二超 GPT-5.5 达 16 分</li>
-            <li>token 效率：51% / 33% 的输出 token 逼近 HY3 / DSv4-Pro（差 1.1 / 4.5 分）</li>
+            <li>token 效率：51% / 33% 的输出 token 接近 HY3 / DSv4-Pro（差 1.1 / 4.5 分）</li>
           </ul>
         </div>
         <div class="card" style="border-left:4px solid var(--accent);">
           <h3>与其他报告的关系</h3>
-          <p style="font-size:14px;">① 对报告 02：Anthropic 说 >80% 代码由 AI 写但方向由人定，iCoder 给出人类保留什么的工程清单；② 对报告 05：评估器共进化的难题被锁死锚绕开，靠的是工业域可执行验证，换领域即失效。按 Bostrom crossover（报告 00）仍未越线。</p>
+          <p style="font-size:14px;">① 对报告 02：Anthropic 说 >80% 代码由 AI 写但方向由人定，iCoder 列出人类保留的控制；② 对报告 05：固定锚避开了评估器共进化的难题，依赖工业域可执行验证，换领域即失效。按 Bostrom crossover（报告 00）仍未达标。</p>
         </div>
       </div>
     </div>
@@ -906,20 +906,20 @@
 <!-- S25 前沿深潜 -->
 <section class="slide" data-n="25">
   <div class="eyebrow">前沿深潜 · 递归深度 · 共学习 · 共进化</div>
-  <h2>三篇前沿精读 + 一段桥接史<span class="en">报告 20 / 21 / 22 / 23</span></h2>
-  <p class="sub">Metan 质疑 DGM 路线为何要冒自改写的险；Co-Harness 把共学习推广到通用 agent；共进化综述给评估侧四篇统一坐标。三者都涉及 Bostrom 判据：改进能力如何进入闭环。</p>
+  <h2>三篇论文 + 一段桥接史<span class="en">报告 20 / 21 / 22 / 23</span></h2>
+  <p class="sub">Metan 质疑 DGM 自改写的必要性；Co-Harness 把共学习推广到通用 agent；共进化综述为评估侧四篇统一分类。三者都涉及 Bostrom 判据：改进能力如何进入闭环。</p>
   <div class="slide-body">
     <div class="cols">
       <div class="col" style="flex:1.05;">
         <div class="ring-diagram">
           <div class="ring" style="border-color:var(--accent); background:#FBEDE8;"><b>Metan（报告 20）· 冻结 Ω，递归输入</b><p>自改写系统为保持稳定须冻结驱动层，realized meta 深度约 2.5；Metan 让固定的 Ω 反复读下层轨迹 + 代码，写出下一层。八基准族全胜，<b>ARC-AGI-2 唯一非零（0.331）</b>；消融：去掉递归 0.845→0.714；<b>72% 增益来自层间字符串条件化</b>，代码复用仅 15%。</p></div>
-          <div class="ring" style="border-color:var(--blue); background:var(--blue-soft);"><b>Co-Harness（报告 21）· harness-权重双环</b><p>HarnessCritic 归因失败→局部 diff→改进 harness 生成轨迹→SFT 蒸馏进权重。Qwen3-8B/32B 平均 <b>+20.4 pp</b>，超人工静态 harness +24.7；HMMT25 32B +27.2。200h 无人干预 22 版，从崩溃自恢复、自发现 ensemble。Harness Debt 为负。</p></div>
-          <div class="ring" style="border-color:var(--gold); background:var(--gold-soft);"><b>共进化综述（报告 22）· 三阶段分类</b><p>Agent-Agent → Agent-Environment → Meta 共进化；判据：机制修订须由下层共进化轨迹诱发并反改其条件，<b>只有 RQGM 越线</b>。评估要求：全组件改进 / 跨伙伴迁移 / 贡献归因 + 过程级测试三件套。</p></div>
+          <div class="ring" style="border-color:var(--blue); background:var(--blue-soft);"><b>Co-Harness（报告 21）· harness-权重双环</b><p>HarnessCritic 归因失败→局部 diff→改进 harness 生成轨迹→SFT 蒸馏进权重。Qwen3-8B/32B 平均 <b>+20.4 pp</b>，超人工静态 harness +24.7；HMMT25 32B +27.2。200h 无人干预 22 版，崩溃后恢复、自行发现 ensemble。Harness Debt 为负。</p></div>
+          <div class="ring" style="border-color:var(--gold); background:var(--gold-soft);"><b>共进化综述（报告 22）· 三阶段分类</b><p>Agent-Agent → Agent-Environment → Meta 共进化；判据：机制须根据下层共进化轨迹修订，并改变其条件，<b>仅 RQGM 达标</b>。评估要求：全组件改进 / 跨伙伴迁移 / 贡献归因 + 三项过程级测试。</p></div>
         </div>
       </div>
       <div class="col" style="flex:0.95;">
         <div class="card">
-          <h3>桥接史：改写触发的三步松弛（报告 23）</h3>
+          <h3>桥接史：改写条件的三步放宽（报告 23）</h3>
           <table style="font-size:12.8px;">
             <tr><th>系统</th><th>触发</th><th>安全部件</th></tr>
             <tr><td>Gödel Machine 03</td><td>形式证明</td><td>证明即安全</td></tr>
@@ -927,11 +927,11 @@
             <tr><td>SICA 25</td><td>效用函数（SWE-Bench 17→53%）</td><td><b>异步监督者</b></td></tr>
             <tr><td>DGM 25</td><td>基准 + 开放档案</td><td>沙箱 + 人审</td></tr>
           </table>
-          <p style="font-size:12.8px; margin-top:6px;">转折点在 SICA：第一次承认自改写系统需要一个<b>不参与改写的观察者</b>，即安全侧最早的锚。</p>
+          <p style="font-size:12.8px; margin-top:6px;">SICA 第一次明确：自改写系统需要一个<b>不参与改写的观察者</b>，即安全侧最早的锚。</p>
         </div>
         <div class="card" style="border-left:4px solid var(--accent);">
           <h3>小结</h3>
-          <p style="font-size:13.5px;">① 深度不必靠自改写：Metan 不改改进机制也得到深度，质疑 DGM 为何冒险；② 共学习成默认：CH（具身，05）与 Co-Harness（通用，07）两月内各自闭环；③ 评估侧仍无理论：综述只把锚提为 held-out 评估器，<b>最小锚问题</b>（README §6）仍开放。</p>
+          <p style="font-size:13.5px;">① Metan 冻结改进机制仍能增加深度，质疑 DGM 自改写的必要性；② 默认采用共学习：CH（具身，05）与 Co-Harness（通用，07）两月内各自闭环；③ 综述只将锚列为 held-out 评估器，仍缺理论，<b>最小锚问题</b>（README §6）未解决。</p>
         </div>
       </div>
     </div>
@@ -943,19 +943,19 @@
 <!-- S26 评估器两极 -->
 <section class="slide" data-n="26">
   <div class="eyebrow">评估侧 · 两个极端</div>
-  <h2>锚的最大化利用 vs 完全不用锚<span class="en">EvalCEGAR（报告 24）· RHO（报告 25）</span></h2>
-  <p class="sub">同一时期、同一问题（可靠评估器稀缺）的两种相反答案。两者的分歧最需要用复现实验裁决。</p>
+  <h2>充分利用锚 vs 完全不用锚<span class="en">EvalCEGAR（报告 24）· RHO（报告 25）</span></h2>
+  <p class="sub">两者同期针对可靠评估器稀缺提出相反方案，分歧需用复现实验检验。</p>
   <div class="slide-body" style="display:flex; flex-direction:column;">
     <div class="cols" style="height:auto; flex:0 0 auto;">
       <div class="col">
         <div class="card" style="border-top:4px solid var(--accent);">
-          <h3>EvalCEGAR · 度量自己写自己（AWS，WGtG 同团队）</h3>
+          <h3>EvalCEGAR · 自动改写度量（AWS，WGtG 同团队）</h3>
           <ul style="font-size:13.4px;">
             <li>度量 = 小 Python 算子池投票（flag / clean / abstain）：指出哪里错比说有多好容易，每条反对意见可读可证伪</li>
             <li>直接让模型写算子无效：183 个候选只有 96 种行为，集中在小范围</li>
-            <li>借程序验证的 CEGAR：搜索<b>碰撞对</b>，即签名相同却一对一错的两个答案，这一对就是编写要求；碰撞击败所有尝试时<b>放宽算子可读接口</b>，不重采样</li>
-            <li>MBPP+/HumanEval+：55 行算子缩小 15.4% 差距（p=0.001），flag 数只有最强手写算子 1/4；<b>15 个手写算子合起来反而降精度</b></li>
-            <li>部署期零模型调用；锚只在训练 split 读取</li>
+            <li>用程序验证的 CEGAR：搜索<b>碰撞对</b>，即签名相同却一对一错的两个答案，据此编写算子；所有尝试均失败时<b>放宽算子可读接口</b>，不重采样</li>
+            <li>MBPP+/HumanEval+：55 行算子缩小 15.4% 差距（p=0.001），flag 数只有最强手写算子 1/4；<b>15 个手写算子合用反而降低精度</b></li>
+            <li>部署期零模型调用；只在训练 split 读取锚</li>
           </ul>
         </div>
       </div>
@@ -967,14 +967,14 @@
             <li>best-of-N harness 提案，用 agent 自己的<b>成对自偏好</b>选最优，全程不读任何 ground truth</li>
             <li>SWE-Bench Pro <b>0.59 → 0.78（+0.19）</b>，Terminal-Bench 2 +0.05，GAIA-2 +0.08；记忆/技能类基线都在 +0.05 以内</li>
             <li>作者说明：只测<b>单轮</b>，不保证多轮增益累积或单调；需环境可重置；单骨干 GPT-5.5</li>
-            <li>Skills 学到的部分是 grader 特异性，增益部分来自适应评分器</li>
+            <li>Skills 的部分增益来自适应 grader 的特性</li>
           </ul>
         </div>
       </div>
     </div>
     <div class="card" style="margin-top:10px; border-left:4px solid var(--gold);">
-      <h3>裁决点</h3>
-      <p style="font-size:13.8px;">WGtG 的"无锚则塌缩与进化不可区分"是关于<b>多轮</b>动态的结论，RHO 只测了单轮，二者暂不矛盾。直接冲突的是 AutoSaddler（报告 16）：去掉 dev 泛化门后自动优化低于未优化基线（50.6 vs 53.0），而 RHO 不用 dev 集也能 +0.19。一种解释：RHO 的 best-of-N 自偏好起了泛化门的作用。<b>RHO 的多轮实验是对锚定要求最直接的检验</b>：若单调，insight 2 须改为"无锚不可验证地进化"；若不单调，它就是 insight 2 的直接实证。</p>
+      <h3>待验证</h3>
+      <p style="font-size:13.8px;">WGtG 的"无锚则塌缩与进化不可区分"讨论<b>多轮</b>动态，RHO 只测了单轮，二者暂不矛盾。直接冲突的是 AutoSaddler（报告 16）：去掉 dev 泛化门后自动优化低于未优化基线（50.6 vs 53.0），而 RHO 不用 dev 集也能 +0.19。一种解释：RHO 的 best-of-N 自偏好起了泛化门的作用。<b>RHO 的多轮实验可直接检验锚定要求</b>：若单调，insight 2 须改为"无锚不可验证地进化"；若不单调，则支持 insight 2。</p>
     </div>
   </div>
   <div class="footer"><span>报告 24 · 25 · 05 · 16</span><span>26</span></div>
@@ -983,22 +983,22 @@
 <!-- S27 综合：评估器战争 -->
 <section class="slide" data-n="27">
   <div class="eyebrow">综合</div>
-  <h2>把六篇放在一起：评估器共进化的三层结构</h2>
-  <p class="sub">六篇论文回答同一个问题的不同层面：评估器要不要变、怎么变、变的时候靠什么不塌。</p>
+  <h2>六篇论文：评估器共进化的三层结构</h2>
+  <p class="sub">六篇论文讨论评估器是否更新、如何更新，以及如何避免塌缩。</p>
   <div class="slide-body">
     <div class="cols">
       <div class="col" style="flex:1.15;">
         <div class="ring-diagram">
           <div class="ring" style="border-color:var(--accent); background:var(--accent-soft);">
-            <b>第一层 · 要不要变：一致答案是必须变</b>
-            <p>EvoLM：静态 RM 精度最高，训出最差 policy。ECHO：冻结 critic 比裸 GRPO 差。DGM：静态基准被伪造日志 hack。静态评估器是上限也是目标。</p>
+            <b>第一层 · 评估器必须更新</b>
+            <p>EvoLM：静态 RM 精度最高，训出最差 policy。ECHO：冻结 critic 比裸 GRPO 差。DGM：用伪造日志 hack 静态基准。</p>
           </div>
           <div class="ring" style="border-color:var(--gold); background:var(--gold-soft);">
-            <b>第二层 · 怎么变：都选择受控地变</b>
-            <p>EvoLM 用冻结小 judge 做判别效用度量；RQGM 用 epoch 冻结 + 锚定晋升；ECHO 用冻结外部奖励 R 校准 critic；WGtG 用十条锚定样本约束指标搜索。</p>
+            <b>第二层 · 控制更新范围</b>
+            <p>EvoLM 用冻结小 judge 测判别效用；RQGM 用 epoch 冻结 + 锚定晋升；ECHO 用冻结外部奖励 R 校准 critic；WGtG 用十条锚定样本约束指标搜索。</p>
           </div>
           <div class="ring" style="border-color:var(--blue); background:var(--blue-soft);">
-            <b>第三层 · 靠什么不塌：有一个部件不进化</b>
+            <b>第三层 · 保留一个不进化的部件</b>
             <p>每个系统都保留一个不参与进化的锚：锚集、小 judge、程序化 R、黄金参考。WGtG 证明拆掉它后三个种子全部塌缩，且任务分数看不出来。</p>
           </div>
         </div>
@@ -1008,7 +1008,7 @@
         <div class="card">
           <h3>2026-08 的形式化结果</h3>
           <ul>
-            <li><b>EvalCEGAR</b>：评估器进化应当是<b>反例引导的修复</b>，从能不能进化到进化应该怎么做</li>
+            <li><b>EvalCEGAR</b>：评估器应通过<b>反例引导的修复</b>来进化</li>
             <li><b>SCORE</b>：自进化系统的<b>能力-监督比</b>，比值超过阈值后监督必然失效，增加评估器数量也无用</li>
             <li><b>递归监督衰减</b>（2608.16546）：每层监督保真 η&lt;1，递归 k 层复合 η^k，即链式监督上限的解析式</li>
           </ul>
@@ -1027,12 +1027,12 @@
   <div class="slide-body">
     <table style="font-size:13.6px;">
       <tr><th style="width:17%;">线</th><th style="width:44%;">代表工作</th><th>一句话</th></tr>
-      <tr><td><span class="tag red">评估器理论</span></td><td>EvalCEGAR · SCORE · 递归监督衰减 · AlignAudit</td><td>评估器共进化从经验方法走向形式化：反例修复、能力-监督比、η^k 衰减界、审计者也要被审计</td></tr>
-      <tr><td><span class="tag green">技能研究</span></td><td>SkillCommit · HyperSkill · ERSkill · SkillProx · Evo-Harness（一个月 5 篇 + WikiSkill）</td><td>都要求管理技能库（验证合并 / 冗余修剪 / 效用审计）；分歧在知识层怎么组织（wiki / 层级 / 图 / 嵌入）</td></tr>
-      <tr><td><span class="tag gold">harness 评估</span></td><td>HarnessFix · Harness Lottery · AHE-Bench 更新</td><td>失败先归因到 harness 七层再修（6.3-18.4% 提升）；同一模型不同 harness 方差可达 30%，因此应报告 harness 敏感度</td></tr>
+      <tr><td><span class="tag red">评估器理论</span></td><td>EvalCEGAR · SCORE · 递归监督衰减 · AlignAudit</td><td>评估器共进化开始形式化：反例修复、能力-监督比、η^k 衰减界、审计者也需审计</td></tr>
+      <tr><td><span class="tag green">技能研究</span></td><td>SkillCommit · HyperSkill · ERSkill · SkillProx · Evo-Harness（一个月 5 篇 + WikiSkill）</td><td>都要求管理技能库（验证合并 / 删除冗余 / 审计效用）；分歧在知识如何组织（wiki / 层级 / 图 / 嵌入）</td></tr>
+      <tr><td><span class="tag gold">harness 评估</span></td><td>HarnessFix · Harness Lottery · AHE-Bench 更新</td><td>先按 harness 七层定位失败再修（6.3-18.4% 提升）；同一模型不同 harness 方差可达 30%，因此应报告 harness 敏感度</td></tr>
       <tr><td><span class="tag blue">元深度限制</span></td><td>Metan（meta 深度≈2.5 上限）· AI4AI-Bench（均分 0.166）</td><td>递归深度受结构限制；执行能力 ≠ 设计能力，多数尝试只恢复合格默认值</td></tr>
     </table>
-    <p style="font-size:14px; color:var(--ink-soft); margin-top:14px;">对照 Weng 七挑战：评估瓶颈（三篇回应）、多样性坍缩（HyperSkill 冗余修剪）、负结果处理（ERSkill 反例技能）、长期回报（OLE 退化回滚）。每条挑战都有后续工作。</p>
+    <p style="font-size:14px; color:var(--ink-soft); margin-top:14px;">对照 Weng 七项挑战：评估瓶颈（三篇回应）、多样性坍缩（HyperSkill 删除冗余）、负结果处理（ERSkill 反例技能）、长期回报（OLE 退化回滚）。</p>
   </div>
   <div class="footer"><span>趋势扫描 [1]-[8][15][16][26]</span><span>28</span></div>
 </section>
@@ -1046,7 +1046,7 @@
       <div class="col">
         <div class="card">
           <h3><span class="tag red">OpenAI</span>Sol 训练 Luna</h3>
-          <p>2026-08 The Information 报道：内部用未发布的 Sol 自动化训练下一代 Luna 的部分环节：数据管线构建、自动跑消融实验、训练配置搜索。模型训练模型进入前沿实验室的生产流程。同时把自动化 AI 研发列入 Preparedness Framework 追踪类别（与 CBRN 并列）。</p>
+          <p>2026-08 The Information 报道：内部用未发布的 Sol 自动化训练下一代 Luna 的部分环节：建数据管线、跑消融实验、搜索训练配置。前沿实验室已在生产中用模型训练模型。同时将自动化 AI 研发列入 Preparedness Framework 追踪类别（与 CBRN 并列）。</p>
         </div>
         <div class="card">
           <h3><span class="tag blue">Anthropic</span>RSP v3.1 与 Claude 用量披露</h3>
@@ -1055,8 +1055,8 @@
       </div>
       <div class="col">
         <div class="card">
-          <h3><span class="tag gold">生产级自进化落地</span></h3>
-          <p>深信服 SESG（安全护栏 16-24h 自动闭环新威胁）、Cursor/Devin 类产品上线 harness 自优化功能，agent 修改自身配置与提示成为商业功能。</p>
+          <h3><span class="tag gold">自进化已用于生产</span></h3>
+          <p>深信服 SESG（安全护栏 16-24h 自动更新以应对新威胁）、Cursor/Devin 类产品上线 harness 自优化，agent 修改自身配置与提示成商业功能。</p>
         </div>
         <div class="card">
           <h3><span class="tag green">治理侧八项</span></h3>
@@ -1064,9 +1064,9 @@
             <li>METR 多实验室试点扩大（no 2× 共识仍成立）</li>
             <li>UK AISI 把"自改进能力评估"纳入前沿模型测试清单</li>
             <li>IFP 23 条 RSI 政策建议（可验证暂停、算力审计）</li>
-            <li>EU AI Act 实施细则讨论是否把"递归自改进"列为系统性风险触发器</li>
+            <li>EU AI Act 细则讨论是否将"递归自改进"列为系统性风险触发条件</li>
           </ul>
-          <p style="font-size:13px; color:var(--ink-faint); margin-top:6px;">共同点：治理措施都针对度量与披露，没有一项直接禁止；监管者也先要求可测量，再谈控制。</p>
+          <p style="font-size:13px; color:var(--ink-faint); margin-top:6px;">治理措施都针对度量与披露，没有一项直接禁止；监管者先要求能测量，再讨论控制。</p>
         </div>
       </div>
     </div>
@@ -1077,27 +1077,27 @@
 <!-- S29 insight 1-2 -->
 <section class="slide" data-n="30">
   <div class="eyebrow">Insight 1/3</div>
-  <h2>进化需要锚；品味可以部分编译</h2>
+  <h2>进化需要锚；部分品味可迁移</h2>
   <div class="slide-body" style="padding-top:6px;">
     <div class="cols">
       <div class="col">
         <div class="card" style="height:94%; border-top:4px solid var(--accent);">
           <h3>① 能运行的自进化系统都有一个不进化的部件</h3>
-          <p style="margin-bottom:10px;">六篇论文 + 19 项新工作，无一例外：锚集（RQGM/WGtG）、冻结 judge（EvoLM）、程序化奖励（ECHO）、失败重放集（MOSS）、行为验证（SkillCommit）。</p>
-          <p style="margin-bottom:10px;">这是结构要求：WGtG 证明拆锚后塌缩且看不出来；递归监督衰减给出 η^k 的解析下界。</p>
-          <p><b>推论：RSI 的瓶颈是锚的供给</b>：谁来生产高质量、不可 game、覆盖新分布的 ground truth。锚的生产速率决定进化的安全速率。人类在回路里最后的角色是<b>锚的生产者</b>。</p>
+          <p style="margin-bottom:10px;">六篇论文 + 19 项新工作均保留锚：锚集（RQGM/WGtG）、冻结 judge（EvoLM）、程序化奖励（ECHO）、失败重放集（MOSS）、行为验证（SkillCommit）。</p>
+          <p style="margin-bottom:10px;">WGtG 证明去锚后会塌缩且无法察觉；递归监督衰减给出 η^k 的解析下界。</p>
+          <p><b>推论：RSI 受锚的供给限制</b>：需生产高质量、不可 game、覆盖新分布的 ground truth。锚的生产速度决定安全进化的速度。人类在回路里的最后角色是<b>锚的生产者</b>。</p>
         </div>
       </div>
       <div class="col">
         <div class="card" style="height:94%; border-top:4px solid var(--gold);">
-          <h3>② 品味正在被拆成可迁移的部分</h3>
+          <h3>② 品味可部分迁移</h3>
           <p style="margin-bottom:10px;">Anthropic 说方向判断（研究品味）是人类最后一环。2026 下半年的证据显示品味可以拆分：</p>
           <ul>
-            <li>WikiSkill：他模型进化的技能胜过自进化，<b>品味可由强模型生产、弱模型使用</b></li>
-            <li>EvoLM rubric 跨 policy / 跨 judge 迁移，什么是好的知识可以打包迁移</li>
+            <li>WikiSkill：其他模型的技能胜过自进化，<b>强模型的品味可供弱模型使用</b></li>
+            <li>EvoLM rubric 跨 policy / 跨 judge 迁移，判断好坏的知识可以迁移</li>
             <li>Anthropic 51%→64%：品味差距在收窄</li>
           </ul>
-          <p style="margin-top:10px;">品味中<b>可编译的部分</b>（评估标准、失败模式、设计先例）正在变成技能库和 wiki 里的内容；尚不可编译的是<b>问题选择</b>，AI4AI-Bench 上这部分只有 0.166。</p>
+          <p style="margin-top:10px;">品味中<b>可编译的部分</b>（评估标准、失败模式、设计先例）正存入技能库和 wiki；尚不可编译的是<b>问题选择</b>，AI4AI-Bench 上这部分得分 0.166。</p>
         </div>
       </div>
     </div>
@@ -1108,15 +1108,15 @@
 <!-- S30 insight 3-4 -->
 <section class="slide" data-n="31">
   <div class="eyebrow">Insight 2/3</div>
-  <h2>自改进的单位变小；微观与宏观差距是度量问题</h2>
+  <h2>自改进对象变小；微观与宏观加速测量对象不同</h2>
   <div class="slide-body" style="padding-top:6px;">
     <div class="cols">
       <div class="col">
         <div class="card" style="height:94%; border-top:4px solid var(--green);">
-          <h3>③ 自改进的单位从系统变成资产</h3>
-          <p style="margin-bottom:10px;">DGM 时代的自改进对象是一整个 agent；2026 下半年的自改进对象是<b>可版本化、可迁移、可回滚的细粒度资产</b>：技能（SkillCommit）、策略（OLE）、护栏（SESG）、rubric（EvoLM）、harness 层（HarnessFix）。</p>
-            <p style="margin-bottom:10px;">这带来三个结果：进化可以<b>并行分治</b>（每类资产独立进化、独立门控）；失败可以<b>局部回滚</b>（不用扔掉整个 agent）；改进可以<b>跨系统复用</b>（WikiSkill 的技能迁移、强模型给弱模型生产技能）。</p>
-          <p><b>预计下一步是资产市场</b>：技能/rubric/护栏的跨组织复用与审计标准（谁验证第三方技能的安全性 = 供应链问题 2.0）。</p>
+          <h3>③ 自改进从系统转向局部资产</h3>
+          <p style="margin-bottom:10px;">DGM 时代改一整个 agent；2026 下半年改<b>可管理版本、迁移和回滚的局部资产</b>：技能（SkillCommit）、策略（OLE）、护栏（SESG）、rubric（EvoLM）、harness 层（HarnessFix）。</p>
+            <p style="margin-bottom:10px;">三个结果：可以<b>并行进化</b>（每类资产独立进化、单独门控）；失败后<b>局部回滚</b>（不用扔掉整个 agent）；改进可以<b>跨系统复用</b>（WikiSkill 的技能迁移、强模型给弱模型生产技能）。</p>
+          <p><b>预计下一步是资产市场</b>：技能/rubric/护栏跨组织复用与审计需有标准（验证第三方技能安全性 = 供应链问题 2.0）。</p>
         </div>
       </div>
       <div class="col">
@@ -1126,9 +1126,9 @@
           <ul>
             <li><b>Amdahl</b>：执行趋近瞬时后，串行瓶颈转移到人类反馈/真实实验/评审（METR speedup ∝ TH^0.39）</li>
             <li><b>执行 ≠ 判断</b>：自动化的是初级+资深执行，首席判断未自动化（AI4AI 0.166）</li>
-            <li><b>加速被吸收</b>：多做实验，未更快出模型；产能堆积在下一步做什么的决策前</li>
+            <li><b>实验增多</b>：模型未更快产出；下一步做什么仍要等决策</li>
           </ul>
-          <p style="margin-top:10px;">三条解释指向同一处：<b>宏观加速的约束在评估与决策带宽</b>，与论文侧的评估器瓶颈判断一致。</p>
+          <p style="margin-top:10px;">三条解释都指向：<b>评估与决策限制宏观加速</b>，与论文侧的评估器瓶颈判断一致。</p>
         </div>
       </div>
     </div>
@@ -1139,28 +1139,28 @@
 <!-- S31 insight 5 -->
 <section class="slide" data-n="32">
   <div class="eyebrow">Insight 3/3</div>
-  <h2>测量基础设施是下一个瓶颈，也是下一个机会</h2>
+  <h2>测量基础设施不足</h2>
   <div class="slide-body" style="padding-top:6px;">
     <div class="cols">
       <div class="col" style="flex:1.1;">
         <div class="card">
-          <h3>⑤ 领域最缺的是测量基础设施</h3>
-          <p style="margin-bottom:10px;">把证据放在一起，瓶颈清单如下：</p>
+          <h3>⑤ 当前最缺测量基础设施</h3>
+          <p style="margin-bottom:10px;">还缺以下测量能力：</p>
           <ul>
-            <li>任务分数无法验证评估器（WGtG）→ 需要<b>独立于训练循环的评估器审计</b></li>
+            <li>任务分数无法验证评估器（WGtG）→ 需要<b>在训练循环之外审计评估器</b></li>
             <li>harness 差异：同模型不同 harness 方差 30% → 需要<b>harness 敏感度报告标准</b></li>
-            <li>递归监督 η^k 衰减 → 需要<b>每层保真度的实测方法</b></li>
+            <li>递归监督 η^k 衰减 → 需要<b>实测每层保真度的方法</b></li>
             <li>宏观加速测不出来 → 需要 METR 式<b>组织级纵向测量</b></li>
-            <li>自改动的安全性 → 需要<b>可证伪发布门</b>（预测错自动关闭）</li>
+            <li>确保自改动安全 → 需要<b>可证伪发布门</b>（预测错自动关闭）</li>
           </ul>
         </div>
-        <div class="quote">2025 年的稀缺资源是能自改进的 agent；2026 年的稀缺资源是<b>能证明改进为真的测量系统</b>。研究重心从 optimizer 移向 auditor。</div>
+        <div class="quote">2025 年的稀缺资源是能自改进的 agent；2026 年的稀缺资源是<b>能验证改进的测量系统</b>。研究重心从 optimizer 移向 auditor。</div>
       </div>
       <div class="col" style="flex:0.9;">
         <div class="card" style="height:96%;">
-          <h3>对三类读者的含义</h3>
-          <p style="margin-bottom:8px;"><b>研究者</b>：评估器审计、锚集构造、监督保真度测量都缺人做，比再提一个进化框架更有价值。AI4AI-Bench 中 43% 的负改进值得研究：为什么设计能力上不去。</p>
-          <p style="margin-bottom:8px;"><b>工程团队</b>：上线自进化系统前先回答三个问题：锚在哪、怎么回滚、评估器塌了怎么发现。SESG/OLE/Falsifiable Gates 可以直接参考。</p>
+          <h3>给三类读者的建议</h3>
+          <p style="margin-bottom:8px;"><b>研究者</b>：审计评估器、构造锚集、测量监督保真度都缺人做。AI4AI-Bench 中 43% 的负改进可用于研究设计能力为何不足。</p>
+          <p style="margin-bottom:8px;"><b>工程团队</b>：上线前明确三个问题：用什么锚、怎么回滚、怎么发现评估器塌缩。SESG/OLE/Falsifiable Gates 可以直接参考。</p>
           <p><b>政策制定者</b>：METR 试点表明实验室愿意配合外部测量；窗口期在内部自动化数据披露标准定型之前。IFP 23 条里的可验证暂停依赖锚定测量。</p>
         </div>
       </div>
@@ -1172,18 +1172,18 @@
 <!-- S32 实践建议 -->
 <section class="slide" data-n="33">
   <div class="eyebrow">操作层</div>
-  <h2>如果你现在就要搭一个自改进系统</h2>
-  <p class="sub">六篇论文 + 生产案例得出的最小安全配置，每一条都有具体出处。</p>
+  <h2>搭建自改进系统的最小配置</h2>
+  <p class="sub">最小安全配置来自六篇论文 + 生产案例，逐条列出出处。</p>
   <div class="slide-body">
     <table style="font-size:14px;">
       <tr><th style="width:22%;">环节</th><th style="width:44%;">最小配置</th><th>出处</th></tr>
       <tr><td>评估器</td><td>可以进化，但晋升必须过<b>固定锚集</b>的统计检验；锚集不参与任何进化</td><td>RQGM 锚定晋升 / WGtG 锚定纪律</td></tr>
       <tr><td>评估器形态</td><td>优先<b>可读表达式/rubric</b>，不用黑盒打分器，Goodhart 事件要能一行定位</td><td>WGtG 空标签事件 / EvoLM 可验证检查</td></tr>
       <tr><td>反馈模块</td><td>critic/judge 必须<b>跟着 policy 更新</b>；冻结的反馈比没有反馈更糟</td><td>ECHO 冻结消融（68.58 &lt; 82.88）</td></tr>
-      <tr><td>改动门控</td><td><b>收紧自动、放松人批</b>；提议者必须预测自己 diff 的效果，预测错自动关闭</td><td>Falsifiable Release Gates</td></tr>
-      <tr><td>回归防线</td><td>历史失败集重放是每次自改动的前置门</td><td>MOSS 失败重放</td></tr>
-      <tr><td>知识沉淀</td><td>经验先进 wiki 再编译成技能；技能库定期修剪冗余、审计效用</td><td>WikiSkill / HyperSkill / SkillProx</td></tr>
-      <tr><td>验证纪律</td><td><b>永远不用下游任务分数验证评估器</b>；单独留一条真值审计通道</td><td>WGtG 的否定性结论</td></tr>
+      <tr><td>改动门控</td><td><b>收紧自动、放松人批</b>；提议者须预测 diff 效果，预测错自动关闭</td><td>Falsifiable Release Gates</td></tr>
+      <tr><td>回归防线</td><td>每次自改动前须重放历史失败集</td><td>MOSS 失败重放</td></tr>
+      <tr><td>保存经验</td><td>经验先存入 wiki 再编译成技能；定期删除冗余技能、审计效用</td><td>WikiSkill / HyperSkill / SkillProx</td></tr>
+      <tr><td>验证纪律</td><td><b>不用下游任务分数验证评估器</b>；单独留一条真值审计通道</td><td>WGtG 的否定性结论</td></tr>
     </table>
   </div>
   <div class="footer"><span>报告 10 §5</span><span>33</span></div>
@@ -1204,14 +1204,14 @@
             <li>03-06 EvoLM · RQGM · WGtG · ECHO（评估侧 / 模型侧）</li>
             <li>07-09 DGM · MOSS · WikiSkill · 11 Continual Harness（免重置 + 共学习）</li>
             <li>10 汇总 insight（本 PPT 的长文版）</li>
-            <li>12-18 谱系扩编七篇 · 19 iCoder（后续开发基座）</li>
+            <li>12-18 谱系扩编七篇 · 19 iCoder（后续开发基础）</li>
             <li>20-22 Metan · Co-Harness · 共进化综述 · 24-25 EvalCEGAR vs RHO · 28 编码域综述</li>
             <li>26-27 合评：技能进化五篇 · 安全治理五篇</li>
           </ul>
         </div>
         <div class="card">
           <h3>papers/ · 中英双语 PDF</h3>
-          <p style="font-size:14px;">en/ 61 篇英文原文 + classics/ 起源经典 6 篇；zh/ 61 篇 + classics/ 5 篇 super_translate 翻译的中文版（保版式、冻结公式图表、术语表注入）；<b>全部英文 PDF 均有中译</b>，仅 Good 1965 扫描件无文本层。</p>
+          <p style="font-size:14px;">en/ 61 篇英文原文 + classics/ 起源经典 6 篇；zh/ 61 篇 + classics/ 5 篇 super_translate 中译（保留版式、公式图表不动、按术语表翻译）；<b>全部英文 PDF 均有中译</b>，仅 Good 1965 扫描件无文本层。</p>
         </div>
       </div>
       <div class="col">
@@ -1225,7 +1225,7 @@
         </div>
         <div class="card" style="background:#F6EFE9;">
           <h3>本调研的主要结论</h3>
-          <p style="font-size:15.5px; line-height:1.7;">执行已基本自动化，评估标准正被编译成技能；<b>锚仍需人工生产</b>。谁能低成本生产不可 game 的 ground truth，就决定 RSI 的速度。</p>
+          <p style="font-size:15.5px; line-height:1.7;">执行已基本自动化，评估标准正转成技能；<b>锚仍需人工生产</b>。能否低成本生产不可 game 的 ground truth，决定 RSI 的速度。</p>
         </div>
         <p style="font-size:12.5px; color:var(--ink-faint); margin-top:10px;">2026-09-03（首版 2026-08-31）· 材料截至 2026-08-31 · 写作遵循 anti-defensive-writing / 说人话规范：直接陈述、保留数字与限定条件、不加表演性铺垫</p>
       </div>
