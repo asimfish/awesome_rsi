@@ -6,6 +6,9 @@
 ![zh-PDF](https://img.shields.io/badge/zh--PDF-66-green)
 ![slides](https://img.shields.io/badge/slides-34p-orange)
 ![full report](https://img.shields.io/badge/full_report-150p-8a2be2)
+[![License: CC BY 4.0](https://img.shields.io/badge/license-CC_BY_4.0-lightgrey)](LICENSE)
+
+> **English summary.** A curated list and survey repository on Recursive Self-Improvement (RSI), from Good's 1965 intelligence-explosion argument to the 2026 wave of self-evolving agents (harness optimization, evaluator co-evolution, skill evolution, safety gates). Every paper links to the original, a layout-preserving Chinese translation (`papers/zh/`), and, for 29 of them, a structured Chinese deep-dive (`reports/`). Main finding: every self-evolving system that works keeps a fixed evaluation reference outside the evolution loop (a human-labeled anchor set, a frozen verifier, a regression test); remove it and the evaluator drifts in ways task scores cannot reveal. Papers are grouped in §4; the report index is in §5; a 20-system comparison matrix is in §7.3. Prose is in Chinese.
 
 这是一个关于 Recursive Self-Improvement（递归自改进）的论文列表和调研仓库，覆盖从 1965 年 Good 的智能爆炸猜想到 2026 年的自进化 agent 研究。每篇核心论文都附有原文链接、中文解读和保留原版式的中文翻译 PDF。
 
@@ -42,7 +45,9 @@
 - [9. Repository Layout & Build](#9-repository-layout--build)
 - [10. Roadmap](#10-roadmap)
 - [11. Related Resources](#11-related-resources)
-- [12. Disclaimer & Credits](#12-disclaimer--credits)
+- [12. Changelog](#12-changelog)
+- [13. Citation](#13-citation)
+- [14. Disclaimer & Credits](#14-disclaimer--credits)
 
 标记说明：⭐ 表示调研发起时的十份核心精读对象；`[解读]` 表示有专门的中文解读报告；每条论文都附原文链接 `[paper]` 和仓库内的 `[PDF-en]` / `[PDF-zh]`。
 
@@ -482,8 +487,34 @@ awesome_rsi/
 - [asimfish/super_translate](https://github.com/asimfish/super_translate) — 本仓库中文 PDF 的翻译工具
 - [Lil'Log · Harness Engineering for Self-Improvement](https://lilianweng.github.io/posts/2026-07-04-harness/) — 本调研的总纲，§4.9 和 §4.12 的初始条目来自其参考文献
 
-## 12. Disclaimer & Credits
+## 12. Changelog
+
+| 日期 | 内容 |
+|---|---|
+| 2026-08-31 | 首版：10 份核心材料解读、26 篇 PDF 与中译、22 页 PPT |
+| 2026-09-01 – 09-03 | 加入 Continual Harness、六个 harness 系统、iCoder、三份综述与起源经典；PPT 扩至 34 页；生成时间线与分类树两图；加入 149 页全文合订报告 |
+| 2026-09-05 | 29 份解读全部重写为七节结构（约 8.3 万字）；补齐全部 61 篇论文的中译 PDF（共 66 篇） |
+| 2026-09-06 | README 重排为 12 个章节并统一条目格式；README、29 份解读、34 页 PPT 的中文表达由本地 Codex（gpt-6-astra）逐篇打磨，改为平实陈述；全文报告重建为 150 页 |
+| 2026-09-08 | README 加英文摘要、Changelog、引用格式与许可证文件 |
+
+## 13. Citation
+
+引用本仓库的解读或对照矩阵时可以用：
+
+```bibtex
+@misc{awesome_rsi_2026,
+  title        = {Awesome Recursive Self-Improvement: papers, Chinese deep-dives and translations},
+  author       = {Li, Yufeng},
+  year         = {2026},
+  howpublished = {\url{https://github.com/asimfish/awesome_rsi}},
+  note         = {29 structured deep-dives, 66 layout-preserving Chinese translations, 34-slide summary}
+}
+```
+
+论文本身请引用各条目 `[paper]` 链接指向的原文。
+
+## 14. Disclaimer & Credits
 
 - 论文 PDF 版权归原作者与 arXiv 所有，本仓库仅作研究备份与学习用途；中文翻译为机器翻译，引用请以英文原文为准。
-- 解读、slides 与两张图为本仓库原创内容（CC BY 4.0），转载请注明出处。
-- 欢迎提 PR 补充新论文，条目格式与解读模板见 [CONTRIBUTING.md](CONTRIBUTING.md)。
+- 解读、slides 与两张图为本仓库原创内容，采用 [CC BY 4.0](LICENSE) 许可，转载请注明出处。
+- 欢迎提 PR 补充新论文，条目格式、解读模板与文字规范见 [CONTRIBUTING.md](CONTRIBUTING.md)。
