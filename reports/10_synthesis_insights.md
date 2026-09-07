@@ -92,6 +92,8 @@ WikiSkill 的消融显示，Skill Proposer 使用持久 wiki 后，得分从 48.
 
 MOSS 之后的部署方案包含四项要求：为每次自改动保存版本和来源；保留计划、diff、构建日志和评分矩阵以供审计；由提议者预测改动效果，Falsifiable Release Gates 要求预测自己 diff 的效果，并在预测错误时自动关闭；通过健康探针和 last-known-good 镜像支持回滚。人类的职责也随之调整：收紧类修改通过验证后可自动应用，放松类修改必须由人类合并，并接受定期审计，即单向棘轮。SESG 的生产数据给出了人工成本下界：每轮处理新威胁约需 2 小时人工。
 
+这四项要求已经开始变成通用基础设施。Reef（Human-Agent-Society，2026，开源）把服务、反馈记录、候选评估、版本化发布做成一个循环（Serve → Observe → Grow → Commit），同时支持训练权重和修改 harness 的 prompt、规则与技能，更新期间服务不中断，全部版本可回滚；内置的 recipe 覆盖 SAO、TTT-Discover、SkillClaw、GEPA 等方法。它没有解决锚从哪里来的问题（候选评估仍由使用者提供评估器），但把"评估门 + 版本化回滚"从每篇论文各自实现变成了可复用的组件。Proteus 是另一个同类框架，限定 agent 只能修改预先声明的 harness 区域，改动通过验证后才启用。
+
 ### Insight 8 · 微观加速与宏观节奏之间存在实证鸿沟
 
 同一时间窗内，Anthropic 内部人均产出达到 8 倍，OpenAI Sol 自动后训练 Luna，AlphaEvolve 参与下一代 TPU 设计。但 METR 多实验室试点（Anthropic/Google/Meta/OpenAI 参与）显示，**没有公司报告研发整体节奏加速 2x**，Anthropic 也明确承认这一点；没有公司让 AI 作终审判断。METR 桌演给出半定量解释：speedup ∝ TH^0.39，时间视野增加 17 倍，只带来约 3 倍提速。执行耗时趋近于零后，仍需串行等待人类反馈、真实 ML 实验和外部评审，符合 Amdahl 定律。AI 已参与构建 AI，但宏观数据尚未显示复合式加速。
