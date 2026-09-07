@@ -1189,8 +1189,44 @@
   <div class="footer"><span>报告 10 §5</span><span>33</span></div>
 </section>
 
-<!-- S33 仓库导览 -->
+<!-- S34 外部资源对照 -->
 <section class="slide" data-n="34">
+  <div class="eyebrow">外部清单 · 定义 · 基础设施</div>
+  <h2>三个外部资源对本仓库的检验<span class="en">报告 29 · 30 · 31</span></h2>
+  <p class="sub">Prism-Shadow 的清单和长文检验本仓库的分类与定义，Reef 检验路线图。三者都在 2026 年 8–9 月出现。</p>
+  <div class="slide-body">
+    <div class="cols">
+      <div class="col">
+        <div class="card" style="border-left:4px solid var(--gold);">
+          <h3>Prism-Shadow/awesome-rsi · 清单（报告 29）</h3>
+          <p style="font-size:13.4px;">27 个基准按七维、31 个方法按九维打标签，网站可筛选。与本仓库重叠 12 篇；它独有 19 篇，以记忆线为主（SEAL、ReasoningBank、A-MEM、Recuris）和 Mendel Gödel Machine；本仓库独有 48 篇（评估器共进化、安全治理、思想史）。它的"验收标准"维度最接近本仓库的锚，但把"无独立验证"列为中性取值。基准表是本仓库的空白：2026-08 一个月新出 9 个 RSI 基准。</p>
+        </div>
+        <div class="card" style="border-left:4px solid var(--blue);">
+          <h3>《万字长文带你读懂 RSI》（报告 30）</h3>
+          <p style="font-size:13.4px;">定义 A(t+1) = U(A(t), τ, f)，比 Bostrom 判据宽：带记忆的 agent 都算。五组维度里有两个本仓库没单列的：<b>进化结构</b>（链 / 树 / 图；Mendel GM 用跨分支对照把 Polyglot 从 77.9% 提到 93.2%）和<b>更新者</b>（自身 / 教师 / 联合，对应 Self-Harness 与 Meta-Harness 之分）。FinEvo-Bench 的状态重置对照组是测"知识积累"的正面例子。全文不讨论评估器被优化压力带偏。</p>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card" style="border-left:4px solid var(--green);">
+          <h3>Reef · 持续自改进基础设施（报告 31）</h3>
+          <p style="font-size:13.4px;">Serve → Observe → Grow → Commit：每次模型调用返回 receipt，反馈只能引用 receipt；每个 recipe 必须带评估器与选择器（gate）；版本链只追加不回退。两条学习面：slime + SGLang 训权重，或改 harness 的 prompt、规则、技能、代码。六个 recipe 附复现：SAO 0.479 &gt; 基线 0.458 &gt; GRPO 0.417（48 rollout）；GEPA AIME 2025 种子 0 26.67% → 46.67%；TTT-Discover 与原论文差 &lt; 8e-7。</p>
+        </div>
+        <div class="card" style="background:#F6EFE9;">
+          <h3>对本仓库的三点修正</h3>
+          <ul style="font-size:13.4px;">
+            <li>分类图加两个维度：进化结构、更新者；对照矩阵加"验收标准"一列</li>
+            <li>增加基准一节；补 Mendel GM、ReasoningBank、SEAL、FinEvo-Bench、GDPevo</li>
+            <li>Reef 把评估门做成组件，但 selection: always 即无锚运行，锚从哪来仍是用户的事；路线图上它可接 iCoder 的运行时层，接缝在 recipe</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span>报告 29 · 30 · 31 · README §4.14 / §11</span><span>34</span></div>
+</section>
+
+<!-- S35 仓库导览 -->
+<section class="slide" data-n="35">
   <div class="eyebrow">交付物</div>
   <h2>仓库导览<span class="en">awesome_rsi/</span></h2>
   <div class="slide-body" style="padding-top:6px;">
@@ -1231,11 +1267,11 @@
       </div>
     </div>
   </div>
-  <div class="footer"><span>RSI 全景调研 2026-08</span><span>34 / 34</span></div>
+  <div class="footer"><span>RSI 全景调研 2026-08</span><span>35 / 35</span></div>
 </section>
 
 </div>
-<div id="hud"><span id="cur">1</span> / 34</div>
+<div id="hud"><span id="cur">1</span> / 35</div>
 <div class="kbd-hint">← → 翻页 · Home/End 首尾 · P 打印</div>
 <script>
 (function(){

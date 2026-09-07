@@ -3386,8 +3386,8 @@ WikiSkill 的分层规则，即知识层永不回滚、技能层经过严格验�
 id="汇总洞察--rsi-全景递归自改进研究的发展与评估问题19652026">汇总洞察 ·
 RSI 全景：递归自改进研究的发展与评估问题（1965–2026）</h1>
 <blockquote>
-<p>本报告综合其余 28
-份解读（reports/00–09、11–28）与扩展调研（assets/trends_research_raw.md，覆盖
+<p>本报告综合其余 31
+份解读（reports/00–09、11–31）与扩展调研（assets/trends_research_raw.md，覆盖
 2026 年 6–8 月 19 项新工作、9 项工业动态、7 项基准动态、8
 项安全治理），给出 RSI 领域的结构化地图与十条核心
 insight。所有数字可回溯到单篇报告或原始笔记的来源链接。
@@ -3756,7 +3756,61 @@ WikiSkill、Weng、Anthropic 与 6-8
 <p>各系统都需要权衡固定评估依据与扩大可修改范围。2026 年的 RSI
 研究已验证自改进可行，接下来需要设计评估结构，使改进可以测量，同时避免固定标准限制能力增长。</p>
 <hr />
-<h2 id="五开放问题按可检验性排序">五、开放问题（按可检验性排序）</h2>
+<h2
+id="五与外部清单和基础设施的对照报告-2931">五、与外部清单和基础设施的对照（报告
+29–31）</h2>
+<p>2026 年 9 月本仓库收录了三个不是论文的资源：Prism-Shadow 的
+awesome-rsi 清单、该清单配套的长文《万字长文带你读懂
+RSI》、Human-Agent-Society 的 Reef
+基础设施。三者分别检验了本仓库的分类、定义和路线图。</p>
+<p><strong>分类：本仓库缺两个维度。</strong> Prism-Shadow 给 31
+个方法打了九维标签（进化对象、模式、拓扑、验收标准、更新者、反馈来源、反馈类型、更新频率、经验范围），给
+27
+个基准打了七维标签。与本报告第二节的两轴地图对照：它的"进化对象"对应"改哪层"，它的"验收标准"对应"锚在哪"；它多出两个本仓库没有单列的维度——<strong>进化结构</strong>（链
+/ 树 / 图）和<strong>更新者</strong>（自身 / 教师 /
+联合）。前者有直接证据支持其重要性：Mendel Gödel Machine 在 DGM
+的树形档案上增加跨任务、跨分支的轨迹对照，同等评估预算下 Polyglot
+从单轨迹基线的 77.9% 提到 93.2%。后者对应本仓库反复比较的
+Meta-Harness（外部 proposer 改）与
+Self-Harness（模型自己改），此前没有作为一个轴写出来。下一版分类图应加上这两个维度。</p>
+<p><strong>定义：RSI 一词有宽窄两种用法。</strong> 长文把 RSI 定义为
+A(t+1) = U(A(t), τ(t),
+f(t))，即用本轮轨迹和反馈更新自身并在后续任务中使用；按这个定义，ReasoningBank
+这类记忆方法都是 RSI。本仓库报告 00 采用 Bostrom
+的判据：一次改进是否提升了系统做下一次改进的能力；按这个判据，多数记忆方法是经验积累而不是递归改进。两个定义各有用处，宽定义便于编目，窄定义便于讨论
+crossover。引用时需要说明用的是哪一个。</p>
+<p><strong>覆盖：两个仓库的重叠只有 12 篇。</strong> Prism-Shadow 独有
+19
+篇，以记忆线为主（SEAL、AWM、A-MEM、ReasoningBank、Mem²Evolve、HeLa-Mem、Memp、Recuris）和几篇
+harness / 技能工作（HarnessX、HarnessBank、SkillSmith、TRACE、Mendel
+Gödel Machine）；本仓库独有 48 篇，集中在评估器共进化、harness
+工业化的另一半、安全治理和思想史。它还收录了 27 个专为 RSI
+设计的基准（2026 年 8 月一个月新出 9
+个），本仓库在基准上几乎空白——这正是 insight 10
+说的测量基础设施瓶颈已被社区行动回应的证据。其中 FinEvo-Bench
+给每次实验配一个状态重置的对照组、两组之差即保留经验的提升，GDPevo
+用规则重组构造"不重复但相关"的训练与测试任务；这两个设计回答了报告 12 对
+TMLR 综述"现有基准测不到知识积累"的批评。</p>
+<p><strong>基础设施：评估门已被做成组件，但门里放什么仍由用户决定。</strong>
+Reef 把服务、反馈记录、候选评估、版本发布接成 Serve → Observe → Grow →
+Commit 循环：每次模型调用返回 receipt，反馈只能引用 receipt；每个 recipe
+必须带 CandidateEvaluator 和
+CandidateSelector；版本链只追加不回退。它支持权重训练（slime +
+SGLang）和 harness 进化两条学习面，六个
+recipe（SAO、TTT-Discover、Guidance-TTT、OpenClaw-RL、SkillClaw、GEPA）都附复现结果，另有
+Meta-Harness 实现。这把本报告 insight 7
+所说的版本、审计、回滚三项从各篇论文自己实现变成了默认行为。但它没有解决锚从哪来：<code>selection: always</code>
+是合法配置，也就是允许无锚运行，本仓库报告 05 和 16
+的结论在这里变成一个配置问题。Reef
+的快速入门记录也再次显示能力地板：qwen2.5:7b 作为提案者的多数运行被 gate
+拒绝或打平，Qwen3-8B 和 DeepSeek-V4-Flash 才有发布。</p>
+<p><strong>对路线图的影响。</strong> iCoder 提供研究流水线，Reef
+可以提供运行时层；两者的接缝在 recipe——iCoder
+的多阶段可回退流程能否表示为 Reef 的一组 recipe，以及 Reef
+的评估器能否接入独立于训练循环的锚集，是下一步要核实的两件事。待补的论文按优先级：Mendel
+Gödel Machine、ReasoningBank、SEAL、FinEvo-Bench、GDPevo、Recuris。</p>
+<hr />
+<h2 id="六开放问题按可检验性排序">六、开放问题（按可检验性排序）</h2>
 <ol type="1">
 <li><strong>最小锚问题</strong>：防止评估器塌缩至少需要多少人工锚定数据？WGtG
 的锚定集、EvalCEGAR 的碰撞对提供了两个实验依据，尚无理论下界。</li>
@@ -3780,12 +3834,15 @@ WikiSkill、Weng、Anthropic 与 6-8
 作为可执行程序"，可使用 Evo-Harness 已有的隔离框架。</li>
 <li><strong>crossover 的可操作测量</strong>：逐步降低 iCoder 的 prior
 密度，观察性能何时明显下降，能否成为标准测量协议？</li>
+<li><strong>无验收更新的实际后果</strong>：Prism-Shadow
+清单里验收标准标为"无独立验证"的方法，在多轮运行后是否出现本仓库预测的退化？这些方法是检验
+insight 2 的现成样本。</li>
 <li><strong>何时能测到宏观加速</strong>：如果 2027 年 METR 仍测不到 2x
 节奏加速，是受到 Amdahl
 串行瓶颈限制，还是节省的时间被用于更多实验？怎样通过预测区分这两个假说？</li>
 </ol>
 <hr />
-<h2 id="六给从业者的三条行动建议">六、给从业者的三条行动建议</h2>
+<h2 id="七给从业者的三条行动建议">七、给从业者的三条行动建议</h2>
 <ol type="1">
 <li><strong>为 harness
 固定评估依据</strong>：自改进循环上线前，保留一小块不参与进化的评估数据，如人工标注锚定集、蜜罐任务或隐藏碰撞对。所有自动晋级都必须满足"锚上性能不降"。六篇论文都支持这一成本较低的控制措施。</li>

@@ -4,8 +4,8 @@
 ![papers](https://img.shields.io/badge/papers-61%2B6_classics-blue)
 ![reports](https://img.shields.io/badge/deep--dives-32-red)
 ![zh-PDF](https://img.shields.io/badge/zh--PDF-66-green)
-![slides](https://img.shields.io/badge/slides-34p-orange)
-![full report](https://img.shields.io/badge/full_report-167p-8a2be2)
+![slides](https://img.shields.io/badge/slides-35p-orange)
+![full report](https://img.shields.io/badge/full_report-168p-8a2be2)
 [![License: CC BY 4.0](https://img.shields.io/badge/license-CC_BY_4.0-lightgrey)](LICENSE)
 
 > **English summary.** A curated list and survey repository on Recursive Self-Improvement (RSI), from Good's 1965 intelligence-explosion argument to the 2026 wave of self-evolving agents (harness optimization, evaluator co-evolution, skill evolution, safety gates). Every paper links to the original, a layout-preserving Chinese translation (`papers/zh/`), and, for the core ones, a structured Chinese deep-dive (`reports/`, 32 reports covering 29 papers/surveys plus three resources: the Prism-Shadow list, its RSI guide, and the Reef infrastructure). Main finding: every self-evolving system that works keeps a fixed evaluation reference outside the evolution loop (a human-labeled anchor set, a frozen verifier, a regression test); remove it and the evaluator drifts in ways task scores cannot reveal. Papers are grouped in §4; the report index is in §5; a 20-system comparison matrix is in §7.3. Prose is in Chinese.
@@ -25,8 +25,8 @@
 | 中文解读（统一七节结构，约 9.8 万字） | 32 份（29 篇论文 / 综述 + 3 个资源与基础设施） | [`reports/`](reports/)，索引见 [§5](#5-deep-dive-reports) |
 | 英文论文 PDF | 61 篇 + 6 篇起源经典 | [`papers/en/`](papers/en/)，[`papers/classics/`](papers/classics/) |
 | 中文翻译 PDF（[super_translate](https://github.com/asimfish/super_translate) 生成，保留原版式） | 66 篇，全部英文 PDF 均有对应中译 | [`papers/zh/`](papers/zh/) |
-| 汇总 PPT | 34 页 HTML / PDF | [`report/awesome_rsi_slides.html`](report/awesome_rsi_slides.html)，[PDF](report/awesome_rsi_slides.pdf) |
-| 全文合订报告（32 份解读 + 两张图） | 167 页 | [`report/awesome_rsi_full_report.pdf`](report/awesome_rsi_full_report.pdf)，[HTML](report/awesome_rsi_full_report.html) |
+| 汇总 PPT | 35 页 HTML / PDF | [`report/awesome_rsi_slides.html`](report/awesome_rsi_slides.html)，[PDF](report/awesome_rsi_slides.pdf) |
+| 全文合订报告（32 份解读 + 两张图） | 168 页 | [`report/awesome_rsi_full_report.pdf`](report/awesome_rsi_full_report.pdf)，[HTML](report/awesome_rsi_full_report.html) |
 
 ## Contents
 
@@ -57,9 +57,9 @@
 
 | 预算 | 路线 |
 |---|---|
-| 15 分钟 | [汇总 PPT](report/awesome_rsi_slides.html)（浏览器中用方向键翻页，P 键打印）或 [PDF 版](report/awesome_rsi_slides.pdf) |
+| 15 分钟 | [汇总 PPT](report/awesome_rsi_slides.html)（浏览器中用方向键翻页，P 键打印）或 [PDF 版](report/awesome_rsi_slides.pdf)（35 页） |
 | 2 小时 | [报告 10 汇总](reports/10_synthesis_insights.md) → [报告 01 Weng](reports/01_lilian_weng_harness_engineering.md) → [报告 05 Who Grades the Grader](reports/05_who_grades_the_grader.md)（说明为什么评估器需要循环外的锚） |
-| 通读 | [全文合订报告](report/awesome_rsi_full_report.pdf)（167 页，32 份解读按编号排列） |
+| 通读 | [全文合订报告](report/awesome_rsi_full_report.pdf)（168 页，32 份解读按编号排列） |
 | 系统研读 | `reports/` 按 00 → 23 → 01 → 02 → 07 → 03 → 04 → 05 → 06 → 08 → 11 → 09 → 10 的顺序读，其余按需；对照 `papers/zh/` 的中文 PDF |
 
 按目的：
@@ -311,7 +311,7 @@ _Proteus Authors_ — 与具体 harness 解耦的自进化框架：每个 episod
 
 ## 5. Deep-Dive Reports
 
-32 份中文解读（[`reports/`](reports/)），统一七节结构：一句话定位、要解决的问题、为什么此前做不通、方法机制、实验结果、局限、与其他报告的关系。每篇 2000 到 5200 字，数字标注到论文表号。全部合订为 [167 页 PDF](report/awesome_rsi_full_report.pdf)。
+32 份中文解读（[`reports/`](reports/)），统一七节结构：一句话定位、要解决的问题、为什么此前做不通、方法机制、实验结果、局限、与其他报告的关系。每篇 2000 到 5200 字，数字标注到论文表号。全部合订为 [168 页 PDF](report/awesome_rsi_full_report.pdf)。
 
 | # | 报告 | 对象 | 主要内容 |
 |---|---|---|---|
@@ -465,8 +465,8 @@ _Proteus Authors_ — 与具体 harness 解耦的自进化框架：每个 episod
 awesome_rsi/
 ├── README.md · CONTRIBUTING.md
 ├── report/
-│   ├── awesome_rsi_slides.html / .pdf        # 34 页汇总 PPT（方向键翻页，P 键打印）
-│   └── awesome_rsi_full_report.html / .pdf   # 167 页全文合订（32 份解读 + 封面 + 目录 + 两图）
+│   ├── awesome_rsi_slides.html / .pdf        # 35 页汇总 PPT（方向键翻页，P 键打印）
+│   └── awesome_rsi_full_report.html / .pdf   # 168 页全文合订（32 份解读 + 封面 + 目录 + 两图）
 ├── reports/                                  # 32 份解读 00–31（索引见 §5）
 ├── papers/
 │   ├── en/                                   # 61 篇英文原版 PDF（arXiv + iCoder 技术报告）
@@ -514,7 +514,7 @@ awesome_rsi/
 | 2026-09-01 – 09-03 | 加入 Continual Harness、六个 harness 系统、iCoder、三份综述与起源经典；PPT 扩至 34 页；生成时间线与分类树两图；加入 149 页全文合订报告 |
 | 2026-09-05 | 29 份解读全部重写为七节结构（约 8.3 万字）；补齐全部 61 篇论文的中译 PDF（共 66 篇） |
 | 2026-09-06 | README 重排为 12 个章节并统一条目格式；README、29 份解读、34 页 PPT 的中文表达由本地 Codex（gpt-6-astra）逐篇打磨，改为平实陈述；全文报告重建为 150 页 |
-| 2026-09-08 | 全文报告重建为 167 页；README 加英文摘要、Changelog、引用格式与许可证文件；新增 §4.14 开源系统与基础设施（Reef、Proteus）；相关资源加入 Prism-Shadow/awesome-rsi 及其《读懂 RSI》长文；新增解读 29（Prism 清单）、30（《读懂 RSI》）、31（Reef） |
+| 2026-09-08 | 全文报告重建为 168 页；README 加英文摘要、Changelog、引用格式与许可证文件；新增 §4.14 开源系统与基础设施（Reef、Proteus）；相关资源加入 Prism-Shadow/awesome-rsi 及其《读懂 RSI》长文；新增解读 29（Prism 清单）、30（《读懂 RSI》）、31（Reef）；报告 10 加第五节"与外部清单和基础设施的对照"；PPT 加第 34 页对照三个外部资源，共 35 页 |
 
 ## 13. Citation
 
@@ -526,7 +526,7 @@ awesome_rsi/
   author       = {Li, Yufeng},
   year         = {2026},
   howpublished = {\url{https://github.com/asimfish/awesome_rsi}},
-  note         = {32 structured deep-dives, 66 layout-preserving Chinese translations, 34-slide summary}
+  note         = {32 structured deep-dives, 66 layout-preserving Chinese translations, 35-slide summary}
 }
 ```
 
