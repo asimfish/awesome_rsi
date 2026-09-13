@@ -1,8 +1,8 @@
 # Awesome Recursive Self-Improvement (RSI)
 
 [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
-![papers](https://img.shields.io/badge/papers-61%2B6_classics-blue)
-![reports](https://img.shields.io/badge/deep--dives-32-red)
+![papers](https://img.shields.io/badge/papers-62%2B6_classics-blue)
+![reports](https://img.shields.io/badge/deep--dives-33-red)
 ![zh-PDF](https://img.shields.io/badge/zh--PDF-66-green)
 ![slides](https://img.shields.io/badge/slides-35p-orange)
 ![full report](https://img.shields.io/badge/full_report-168p-8a2be2)
@@ -22,8 +22,8 @@
 
 | 类型 | 数量 | 位置 |
 |---|---|---|
-| 中文解读（统一七节结构，约 9.8 万字） | 32 份（29 篇论文 / 综述 + 3 个资源与基础设施） | [`reports/`](reports/)，索引见 [§5](#5-deep-dive-reports) |
-| 英文论文 PDF | 61 篇 + 6 篇起源经典 | [`papers/en/`](papers/en/)，[`papers/classics/`](papers/classics/) |
+| 中文解读（统一七节结构，约 9.8 万字） | 33 份（29 篇论文 / 综述 + 3 个资源与基础设施） | [`reports/`](reports/)，索引见 [§5](#5-deep-dive-reports) |
+| 英文论文 PDF | 62 篇 + 6 篇起源经典 | [`papers/en/`](papers/en/)，[`papers/classics/`](papers/classics/) |
 | 中文翻译 PDF（[super_translate](https://github.com/asimfish/super_translate) 生成，保留原版式） | 66 篇，全部英文 PDF 均有对应中译 | [`papers/zh/`](papers/zh/) |
 | 汇总 PPT | 35 页 HTML / PDF | [`report/awesome_rsi_slides.html`](report/awesome_rsi_slides.html)，[PDF](report/awesome_rsi_slides.pdf) |
 | 全文合订报告（32 份解读 + 两张图） | 168 页 | [`report/awesome_rsi_full_report.pdf`](report/awesome_rsi_full_report.pdf)，[HTML](report/awesome_rsi_full_report.html) |
@@ -298,6 +298,9 @@ _Daniel Eth, Tom Davidson_ — 把 Bostrom 的 recalcitrance 具体化为软件�
 3. **Measuring AI Ability to Complete Long Software Tasks.** arXiv, 2025\. [paper](https://arxiv.org/abs/2503.14499), [PDF-en](papers/en/2503.14499_METR_LongTasks.pdf), [PDF-zh](papers/zh/2503.14499_METR_LongTasks_zh.pdf)
 _Thomas Kwa, Ben West, Joel Becker, et al. (METR)_ — 测量 AI 能可靠完成的软件任务时长，50% 成功率对应的任务时长约每 7 个月翻倍。目前唯一持续公开的宏观节奏测量。
 
+
+**The Last AI Built by Humans: Toward Genuine Recursive Self-Improvement.** arXiv, 2026. [paper](https://arxiv.org/abs/2609.11873), [PDF-en](papers/en/2609.11873_TheLastAI.pdf), [解读](reports/32_last_ai_built_by_humans.md)
+_Yi Duan et al._ — 用 HCI 衡量模型能力余量，并提出从改进执行到递归元改进的五级 RSI 路线图。
 ### 4.14 Open-Source Systems & Infrastructure
 
 > 可以直接运行的自进化系统和基础设施。论文配套代码已在各条目的 `[code]` 链接中，这里只列独立的工程项目，并汇总本仓库内带代码的系统，方便二次开发时选型。
