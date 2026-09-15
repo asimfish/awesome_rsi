@@ -18,7 +18,7 @@
 
 *图 1：71 项工作的时间线，按十个类别分行，横轴为 arXiv 首版年月（非 arXiv 材料取发布月）。★ 为本调研的十份核心材料。1965–2014 与 2023–2026 之间断轴。2026 年 8 月一个月有 21 项。*
 
-**字节三篇专题**：[Self-Developing Agents](report/bytedance-self-developing/index.html) — Aspire、S³Gym、HarnessDev 的目标、经验与系统三层对照；[合读报告](report/bytedance-self-developing/research.md)及中英文 PDF 集中入口。
+**字节三篇专题**：[Self-Developing Agents 在线博客](https://asimfish.github.io/awesome_rsi/bytedance/) — Aspire、S³Gym、HarnessDev 的目标、经验与系统三层对照；[合读报告](report/bytedance-self-developing/research.md)及中英文 PDF 集中入口。
 
 **仓库内容**
 

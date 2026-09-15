@@ -1,14 +1,137 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Self-Developing Agents · 字节三篇专题</title><style>
-:root{--bg:#f4f3ed;--ink:#152f36;--muted:#50656a;--blue:#125cc0;--line:#cbd5d2}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.75 system-ui,"Noto Sans CJK SC",sans-serif}main{max-width:1160px;margin:auto;padding:36px 28px 70px}a{color:var(--blue);text-underline-offset:4px}nav{display:flex;flex-wrap:wrap;justify-content:space-between;gap:15px;font-size:14px}header{padding:65px 0 40px;border-bottom:1px solid var(--line)}.kicker{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}h1{font-size:clamp(36px,5.5vw,66px);line-height:1.14;letter-spacing:-2px;margin:18px 0 24px}header p{max-width:770px;font-size:19px;color:var(--muted)}h2{font-size:28px;line-height:1.35;margin:48px 0 20px}h3{font-size:25px;margin:12px 0}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:28px}.card{background:#fff;padding:25px;border:1px solid var(--line);border-top:4px solid var(--blue);display:flex;flex-direction:column}.card:nth-child(2){border-top-color:#19735a}.card:nth-child(3){border-top-color:#bc5c24}.card p{color:var(--muted);margin:10px 0}.num{font-size:34px;font-weight:700;line-height:1.2}.links{margin-top:auto;padding-top:22px;display:flex;gap:15px;flex-wrap:wrap;font-size:14px}.evidence{background:var(--ink);color:white;padding:30px;margin-top:28px}.evidence p{color:#d0dddd}.evidence a{color:#a9cdff}.tablewrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}th,td{text-align:left;padding:13px 15px;border-bottom:1px solid #496168}th{font-size:13px;color:#c9d9d9}td.pos{color:#9fe1bc}td.neg{color:#ffb5a0}.note{font-size:14px;color:var(--muted)}.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}.steps strong{display:block}.steps p{color:var(--muted)}footer{border-top:1px solid var(--line);margin-top:45px;padding-top:20px;font-size:13px;color:var(--muted)}@media(max-width:760px){main{padding:24px 18px}.grid,.steps{grid-template-columns:1fr}header{padding-top:40px}.evidence{padding:20px}h1{letter-spacing:-1px}td,th{white-space:nowrap}}@media print{body{background:white}main{max-width:none}header{padding-top:20px}a{color:inherit}.card,.evidence{break-inside:avoid}.evidence{background:white;color:var(--ink)}.evidence p,.evidence th,.evidence td{color:var(--ink)}nav{display:none}}
-</style></head><body><main>
-<nav><a href="../../README.md">← Awesome RSI</a><span><a href="research.md">三篇合读</a> · <a href="https://self-developing-agents.github.io/">官方项目页 ↗</a></span></nav>
-<header><div class="kicker">ByteDance Seed × TokenWave · Research collection</div><h1>自我改进，<br>从哪里开始验证？</h1><p>Aspire、S³Gym、HarnessDev：从目标形成，到经验学习，再到持久化的执行框架。三篇独立评测研究，集中检验改进能否迁移到未见任务和后续决策。</p><a href="research.md">阅读专题合评 →</a></header>
-<section aria-label="三篇论文"><div class="grid">
-<article class="card"><div class="kicker">01 / Target · 目标</div><h3>Aspire</h3><strong>应该改进什么？</strong><p>给出模糊的能力目标，让 agent 自选数据、更新方法和自测信号，再用隐藏专家题检验目标是否选对。</p><p><span class="num">520</span> 道隐藏专家题 · 六类目标</p><div class="links"><a href="https://arxiv.org/abs/2608.31111">论文</a><a href="../../papers/en/2608.31111_Aspire.pdf">英文 PDF</a><a href="../../papers/zh/2608.31111_Aspire_zh.pdf">中文 · 23 页</a></div></article>
-<article class="card"><div class="kicker">02 / Experience · 经验</div><h3>S³Gym</h3><strong>经验改善下一次决策了吗？</strong><p>分离宽松探索与严格评测，比较原始历史、摘要记忆和参数更新。有效的经验表达依赖任务结构。</p><p><span class="num">7</span> 个文本游戏 · 可执行验证器</p><div class="links"><a href="https://arxiv.org/abs/2608.31100">论文</a><a href="../../papers/en/2608.31100_S3Gym.pdf">英文 PDF</a><a href="../../papers/zh/2608.31100_S3Gym_zh.pdf">中文 · 25 页</a></div></article>
-<article class="card"><div class="kicker">03 / System · 系统</div><h3>HarnessDev</h3><strong>哪些框架修改值得保留？</strong><p>先创建、再演化 harness，冻结版本后独立测试。区分创建者与执行者，观察收益的泛化与迁移。</p><p><span class="num">34 / 64</span> 次版本变化方向一致</p><div class="links"><a href="https://arxiv.org/abs/2609.01437">论文</a><a href="../../papers/en/2609.01437_HarnessDev.pdf">英文 PDF</a><a href="../../papers/zh/2609.01437_HarnessDev_zh.pdf">中文 · 41 页</a></div></article>
-</div><p class="note">来源：Aspire §3；S³Gym §3；HarnessDev §4.3。“方向一致”比较可见反馈与 SWE-Pro 留出集，不表示任务成功率。</p></section>
-<section><h2>可见分数提高后，留出集发生了什么？</h2><div class="evidence"><strong>HarnessDev · 固定 Gemini 执行模型 · 表 6</strong><p>四条轨迹的可见反馈均提高，只有一条的留出集成绩提高。每条轨迹与各自的初始 harness 比较。</p><div class="tablewrap"><table><thead><tr><th>创建者</th><th>可见反馈增量 / 百分点</th><th>留出集增量 / 百分点</th></tr></thead><tbody><tr><td>Opus 4.8</td><td class="pos">+9.7</td><td class="pos">+2.70</td></tr><tr><td>Qwen 3.7 Max</td><td class="pos">+1.1</td><td class="neg">−1.11</td></tr><tr><td>DeepSeek V4 Pro</td><td class="pos">+6.5</td><td class="neg">−2.38</td></tr><tr><td>GPT-5.5</td><td class="pos">+2.4</td><td class="neg">−10.32</td></tr></tbody></table></div><p style="font-size:14px">可见反馈是 SWE-Pro-100 与 Terminal-Bench-89 的等权均值；留出评测仅使用 SWE-Pro-630。两列任务范围不同，不能直接相减作为“过拟合损失”。这是论文报告结果，非本地复现。</p><a href="https://arxiv.org/html/2609.01437v1#S4.T6">查看论文表 6 ↗</a></div></section>
-<section><h2>把三篇放在一起读</h2><div class="steps"><div><strong>先看目标</strong><p>内部自测优化了什么？它与真实能力的关系，是否在隐藏评测上得到验证？</p></div><div><strong>再看经验</strong><p>提炼的摘要保留了哪些信息？策略能否在严格条件下改善未来决策？</p></div><div><strong>最后看版本</strong><p>哪个版本被选中？冻结制品换一组任务、固定执行模型后，收益还在吗？</p></div></div><a href="research.md">完整对照、局限与仓库研究连线 →</a></section>
-<footer>字节 Seed 与 TokenWave 等合作团队 · 三篇 v1 论文专题。作者机构以论文署名为准。中译保留公式、部分图表文字及提示词/代码块原文。三个基准不等于一套已验证的端到端闭环 RSI 系统。</footer>
-</main></body></html>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="字节 Seed 与 TokenWave 的 Aspire、S³Gym、HarnessDev 三篇合读：目标形成、经验学习与执行框架改进，含实验对照与中文论文。"><title>自我改进的三个关口 · RSI 研究札记</title><link rel="stylesheet" href="blog.css"></head><body>
+<a class="skip" href="#article">跳到正文</a><div class="progress" aria-hidden="true"></div><header class="topbar"><a class="brand" href="#">RSI <span>研究札记</span></a><div><a href="https://asimfish.github.io/awesome_rsi/">芯片专题</a><button id="theme" aria-label="切换深色模式">深色阅读</button></div></header><div class="layout"><aside><div class="eyebrow">ON THIS PAGE</div><nav aria-label="文章目录"><div class="toc">
+<ul>
+<li><a href="#section-1">1. 一句话定位</a></li>
+<li><a href="#section-2">2. 共同问题：改进目标和判断依据由谁提供</a></li>
+<li><a href="#section-3">3. 分工：三个基准不能互相替代</a></li>
+<li><a href="#section-4">4. 方法机制：读论文时应追踪哪些变量</a></li>
+<li><a href="#section-5">5. 关键证据：局部收益能否留下来</a></li>
+<li><a href="#section-6">6. 局限与解释边界</a></li>
+<li><a href="#section-7">7. 在本仓库中的位置</a></li>
+</ul>
+</div>
+</nav><a class="back" href="#downloads">↓ 论文与中译</a><p class="sidebar-note">三个独立基准<br>一条共同问题线：<br>改进怎样得到验证？</p></aside><main id="article"><div class="hero"><div class="eyebrow">专题 01 / SELF-DEVELOPING AGENTS</div><h1>自我改进的<br><em>三个关口</em></h1><p class="dek">字节三篇合读：从选对目标，到学会经验，再到保留有效的系统改进。</p><p class="meta">ByteDance Seed × TokenWave 等合作团队 · 论文 v1<br>约 10 分钟阅读 · <a href="https://self-developing-agents.github.io/">官方项目页 ↗</a></p></div><div class="takeaway"><span>先读这个</span><p>能够完成更新循环，不等于获得可靠的能力提升。三篇论文把这段距离拆成了三个可以分别测量的问题。</p></div><div class="route" aria-label="三篇研究分工"><div><small>01 · 目标形成</small><b>Aspire</b><span>改进什么？</span></div><div><small>02 · 经验学习</small><b>S³Gym</b><span>学到了什么？</span></div><div><small>03 · 系统改进</small><b>HarnessDev</b><span>留下了什么？</span></div></div><section id="downloads"><h2>论文与中文翻译</h2><div class="paper"><strong>Aspire</strong><span>23 页</span><a href="https://arxiv.org/abs/2608.31111">原文</a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/zh/2608.31111_Aspire_zh.pdf">中文 PDF ↗</a></div><div class="paper"><strong>S³Gym</strong><span>25 页</span><a href="https://arxiv.org/abs/2608.31100">原文</a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/zh/2608.31100_S3Gym_zh.pdf">中文 PDF ↗</a></div><div class="paper"><strong>HarnessDev</strong><span>41 页</span><a href="https://arxiv.org/abs/2609.01437">原文</a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/zh/2609.01437_HarnessDev_zh.pdf">中文 PDF ↗</a></div><p class="fine">中文 PDF 保留原页面尺寸与页数。公式、部分图表文字以及提示词／代码块保留原文。</p></section><div class="article-body"><h2 id="section-1">1. 一句话定位</h2>
+<p>这组三篇基准论文分别检验 agent 能否选择有效的学习目标、从交互经验中获得可迁移的策略，以及把改进保存在可运行的 harness 中。Aspire 用六类能力目标和 520 道隐藏专家题考察目标选择；S³Gym 在七个文本游戏中比较经验利用方式；HarnessDev 的 64 次相邻版本切换中，可见反馈与留出集的变化方向仅 34 次一致。它们共同提示：完成更新循环与获得可靠能力提升，需要分别验证。数字来源为 Aspire §3、S³Gym §3、HarnessDev §4.3。</p>
+<h2 id="section-2">2. 共同问题：改进目标和判断依据由谁提供</h2>
+<p>已有自改进工作常从明确任务、固定奖励和现成执行框架出发。在这样的环境里，模型可以优化一个人已定义好的目标。真实部署还要求系统解释模糊需求、判断经验是否有用，并把有效改变保留到下一次任务。这三种能力不能仅凭最终任务得分来区分。</p>
+<p>Aspire 隐藏下游评测，让 agent 自行选择数据、更新手段与验证信号。S³Gym 提供可以探索的环境，同时把正式评估放在更严格的条件下。HarnessDev 直接将生成的执行框架作为评测对象，记录冻结版本，再让它执行下游任务。三者分别移动了原先由人固定的一部分边界，但正式测量仍依赖专家题、环境验证器或留出任务。</p>
+<h2 id="section-3">3. 分工：三个基准不能互相替代</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>研究</th>
+<th>保留的外部依据</th>
+<th>开放给 agent 的选择</th>
+<th>核心缺口</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Aspire</td>
+<td>隐藏的专家评测与基础模型参照</td>
+<td>将能力目标转成数据、训练或 harness 修改</td>
+<td>自建代理目标可能偏离真实能力</td>
+</tr>
+<tr>
+<td>S³Gym</td>
+<td>可执行的环境验证器、严格评测条件</td>
+<td>自测、自评，以及经验的存储与利用</td>
+<td>能辨认成功行为仍可能学不到有效策略</td>
+</tr>
+<tr>
+<td>HarnessDev</td>
+<td>冻结制品后的留出任务评测</td>
+<td>创建并迭代执行框架</td>
+<td>开发反馈、运行模型与版本选择可能共同导致误判</td>
+</tr>
+</tbody>
+</table></div>
+<p>这是一套互补的诊断视角。Aspire 的隐藏题成绩不能推出游戏中的经验学习能力，S³Gym 的成绩也不能证明 harness 能跨执行模型迁移。尤其不能把项目页“闭环 RSI”的研究方向当作已实现系统的实证结论。</p>
+<h2 id="section-4">4. 方法机制：读论文时应追踪哪些变量</h2>
+<p><strong>Aspire：目标的具体化。</strong> 输入是宽泛的自然语言能力目标，正式下游任务不向 agent 展示。系统允许权重更新与 harness 更新。读实验时应区分生成检查点、得到合格检查点、超过未改进基线，以及达到保留门槛；前一个事件发生不蕴含后一个事件。内部自测分数只说明选定的代理目标被优化，隐藏专家题才回答目标是否选对。</p>
+<p><strong>S³Gym：经验的表达与使用。</strong> History ICL 将原始交互历史放回上下文；Summary Memory 把经验压缩为可复用的文字；Training 则通过参数更新改变策略。摘要可能减少冗余，也可能丢掉状态相关的细节。因此“更紧凑的记忆”并不自动等于“更好的记忆”。论文同时报告不同成绩汇总指标；比较时必须保持指标一致。上下文方法与单独的训练实验不应被解读为同预算条件下的统一排名。</p>
+<p><strong>HarnessDev：创建、冻结、执行。</strong> 创建者从较弱但可运行的初始框架出发，构造完整 harness；演化阶段读取下游反馈并修改它。创建者和执行者是不同角色，固定执行模型的实验用于检查收益对运行模型的依赖。演化结束后，所有正式版本在 630 个 SWE-Pro 留出任务上评测，结果不反馈给创建者，也不参与它的停止和最终版本选择。</p>
+<h2 id="section-5">5. 关键证据：局部收益能否留下来</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>证据</th>
+<th>结果</th>
+<th>来源与边界</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Aspire 正式评测范围</td>
+<td>六类目标，520 道专家题</td>
+<td>§3；这是评测规模，不是成功次数</td>
+</tr>
+<tr>
+<td>S³Gym 环境范围</td>
+<td>七个文本游戏</td>
+<td>§3、表 2；不同游戏的状态与奖励结构不同</td>
+</tr>
+<tr>
+<td>HarnessDev 创建覆盖</td>
+<td>六个创建模型、四领域、五个基准、2,207 个下游实例</td>
+<td>§3.3；不能与演化阶段的代码任务覆盖混用</td>
+</tr>
+<tr>
+<td>HarnessDev 变化方向</td>
+<td>64 次版本切换中 34 次同向，53.1%</td>
+<td>§4.3；比较可见反馈与留出评测的方向</td>
+</tr>
+<tr>
+<td>HarnessDev 最终版本选择</td>
+<td>九条轨迹中两条声明最终版本为留出集最优</td>
+<td>§4.3；最终优于起点不代表最终选到了最好版本</td>
+</tr>
+</tbody>
+</table></div>
+<p>HarnessDev 表 6 的固定 Gemini 执行模型实验尤其值得单列。下表保留论文报告的百分点变化，四条轨迹均从各自的初始 harness 开始。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>创建者</th>
+<th style="text-align: right;">可见反馈组合分增量</th>
+<th style="text-align: right;">SWE-Pro 留出集增量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Opus 4.8</td>
+<td style="text-align: right;">+9.7</td>
+<td style="text-align: right;">+2.70</td>
+</tr>
+<tr>
+<td>Qwen 3.7 Max</td>
+<td style="text-align: right;">+1.1</td>
+<td style="text-align: right;">−1.11</td>
+</tr>
+<tr>
+<td>DeepSeek V4 Pro</td>
+<td style="text-align: right;">+6.5</td>
+<td style="text-align: right;">−2.38</td>
+</tr>
+<tr>
+<td>GPT-5.5</td>
+<td style="text-align: right;">+2.4</td>
+<td style="text-align: right;">−10.32</td>
+</tr>
+</tbody>
+</table></div>
+<p>可见反馈组合分是 SWE-Pro-100 与 Terminal-Bench-89 的等权平均，留出分只来自 SWE-Pro-630。两列不是相同任务上的同一指标，不能将它们相减解释成精确的“过拟合损失”。它们支持的判断是：可见改善并不保证留出改善。表内增量按论文报告值呈现，因此可能与已四舍五入的端点相减略有差异。</p>
+<h2 id="section-6">6. 局限与解释边界</h2>
+<ol>
+<li><strong>作者实验范围：</strong>HarnessDev 演化评测集中于代码任务，独立留出结果来自 SWE-Pro。创建阶段的多领域覆盖不能充当演化阶段的多领域证据。</li>
+<li><strong>作者实验范围：</strong>HarnessDev 报告九条单次演化轨迹，不能把相邻版本当作互相独立的重复实验。53.1% 不能直接推广为所有系统的概率。</li>
+<li><strong>作者结果：</strong>S³Gym 的上下文与参数学习路径并非同一模型、同一资源条件下的全面配对比较，不能由此选出通用最优更新方法。</li>
+<li><strong>本专题判断：</strong>外部评估仍是三篇研究测量能力变化的依据。隐藏目标、保留验证器与固定留出集降低了部分偏差，但不足以证明开放世界中的长期自我评估已经可靠。</li>
+<li><strong>本专题判断：</strong>论文中的模型版本、预算、反馈协议都会影响结果。本专题整理已报告的证据，不对未测试的模型或后续版本做性能承诺。</li>
+</ol>
+<h2 id="section-7">7. 在本仓库中的位置</h2>
+<p>与<a href="https://github.com/asimfish/awesome_rsi/blob/main/reports/05_who_grades_the_grader.md">报告 05：Who Grades the Grader</a>相连：S³Gym 将“自评是否有用”进一步落到未来决策，不能只看自评本身的正确率。</p>
+<p>与<a href="https://github.com/asimfish/awesome_rsi/blob/main/reports/13_meta_harness.md">报告 13：Meta-Harness</a>相连：HarnessDev 提供另一种评测视角，既看框架能否生成，也看冻结后能否泛化及其对执行模型的依赖。</p>
+<p>与<a href="https://github.com/asimfish/awesome_rsi/blob/main/reports/14_self_harness.md">报告 14：Self-Harness</a>相连：前者将回归验证用于接受修改，HarnessDev 的后验留出测试则揭示没有参与选择的信息如何改变对版本优劣的判断。这两种验证位置应在阅读时区分。</p>
+<p>与<a href="https://github.com/asimfish/awesome_rsi/blob/main/reports/26_skill_evolution_wave.md">报告 26：技能进化</a>相连：S³Gym 说明压缩经验可能有益，也可能损失决策所需细节，技能提炼的价值应在后续任务上验证。</p>
+<p>与<a href="https://github.com/asimfish/awesome_rsi/blob/main/reports/10_synthesis_insights.md">报告 10：汇总洞察</a>相连：这组三篇补充了“锚在哪”的问题。除了外部评估依据，还要追踪 agent 选择什么目标、经验经过何种变换、最终保留哪个版本。专题据此建议采用四列实验记录：内部指标、独立指标、所选版本与执行模型，分别记录收益和退化。</p></div><section class="closing"><h2>继续阅读</h2><p>这是一份基于论文的研究解读，实验数字为作者报告值，未进行本地复现。作者机构以各篇署名为准。</p><a href="https://github.com/asimfish/awesome_rsi/tree/main/report/bytedance-self-developing">查看原始笔记与来源 →</a></section><footer>RSI 研究札记 · 从结果追问改进机制<br><a href="#">返回顶部 ↑</a></footer></main></div><script src="blog.js"></script></body></html>
