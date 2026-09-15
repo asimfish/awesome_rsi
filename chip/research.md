@@ -100,4 +100,4 @@ score = 0.50 × (WNS − WNS₀) / WNS₀
 - 评价下一设计的收益与通过率，同时记录回退率和负迁移，而不只比较单次最好结果。
 - 使用冻结的功能参考与独立留出验证，控制优化器对验收信号的过拟合。
 
-这与本仓库既有的 [iCoder 调研](../../reports/19_icoder.md)、[技能进化合评](../../reports/26_skill_evolution_wave.md)、[Who Grades the Grader](../../reports/05_who_grades_the_grader.md) 和 [汇总洞察](../../reports/10_synthesis_insights.md) 对应：能写代码是起点，可靠的选择与跨任务积累才决定改进能否持续。
+这与本仓库既有的 [iCoder 调研](https://github.com/asimfish/awesome_rsi/blob/main/reports/19_icoder.md)、[技能进化合评](https://github.com/asimfish/awesome_rsi/blob/main/reports/26_skill_evolution_wave.md)、[Who Grades the Grader](https://github.com/asimfish/awesome_rsi/blob/main/reports/05_who_grades_the_grader.md) 和 [汇总洞察](https://github.com/asimfish/awesome_rsi/blob/main/reports/10_synthesis_insights.md) 对应：能写代码是起点，可靠的选择与跨任务积累才决定改进能否持续。
