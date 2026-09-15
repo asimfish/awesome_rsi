@@ -1,0 +1,9 @@
+read_verilog candidate.v
+hierarchy -check -top design
+synth -top design -flatten -noabc
+check -assert
+abc -exe /toolchain/usr/bin/berkeley-abc -liberty /inputs/NangateOpenCellLibrary_typical.lib -constr /inputs/abc.constr
+clean -purge
+stat -liberty /inputs/NangateOpenCellLibrary_typical.lib
+write_verilog -noattr mapped.v
+write_json mapped.json

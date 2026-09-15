@@ -1,0 +1,18 @@
+read_verilog /inputs/baseline.v
+hierarchy -check -top design
+proc
+flatten
+rename design gold
+design -stash reference
+read_verilog candidate.v
+hierarchy -check -top design
+proc
+flatten
+rename design gate
+design -copy-from reference -as gold gold
+miter -equiv -flatten gold gate miter
+hierarchy -check -top miter
+proc
+opt
+check -assert
+sat -verify -prove trigger 0 -show-inputs -show-outputs miter

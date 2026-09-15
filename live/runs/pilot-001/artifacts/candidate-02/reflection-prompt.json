@@ -1,0 +1,10 @@
+[
+  {
+    "role": "system",
+    "content": "Return JSON {\"lesson\": \"...\"}. Write one short evidence-grounded Chinese optimization lesson from the actual result. Mention mechanism, measured tradeoff or failure and a next-action recommendation. No invented measurements; distinguish hypotheses. This text will guide the next candidate."
+  },
+  {
+    "role": "user",
+    "content": "{\"result\": {\"sha256\": \"d619ed5c104c3b7940f2115b7fd313efe059ebe3c3bc66f8db126ee285f02ae4\", \"formal\": \"pending\", \"status\": \"rejected\", \"reason\": \"Unsupported directive, attribute, system call, escaped identifier or simulation construct\", \"id\": \"candidate-02\", \"rationale\": \"基线采用树形优先级编码器，但在64位宽输入下，面积与延迟仍有优化空间。通过分组并行检测最高优先级位，并利用生成循环构建紧凑的组合逻辑，可在保持正确性的同时降低映射后的面积与延迟乘积。\", \"strategy\": \"将64位输入分为8组，每组8位。每组内部先检测最高置位位并产生组内优先级编码。然后通过层级归约确定最高优先级组，并组合组索引与组内索引得到最终6位索引。同时产生独热码grant。采用纯组合逻辑和常量循环生成，避免锁存器和时序元件。\", \"usage\": {\"prompt_tokens\": 2390, \"completion_tokens\": 1346, \"total_tokens\": 3736, \"prompt_tokens_details\": {\"cached_tokens\": 0}, \"prompt_cache_hit_tokens\": 0, \"prompt_cache_miss_tokens\": 2390}, \"accepted\": false, \"parent\": \"baseline\"}, \"best\": {\"sha256\": \"d619ed5c104c3b7940f2115b7fd313efe059ebe3c3bc66f8db126ee285f02ae4\", \"formal\": \"pass\", \"status\": \"evaluated\", \"formal_seconds\": 0.138, \"synthesis_seconds\": 0.464, \"area_um2\": 254.562, \"cells\": 233, \"timing_seconds\": 0.163, \"delay_ns\": 0.562877, \"adp\": 143.28709487, \"id\": \"baseline\", \"label\": \"原始开源基线\"}, \"previous_memory\": [{\"version\": 1, \"from_candidate\": \"candidate-01\", \"lesson\": \"在64位优先级编码器中，采用分组并行检测与层级归约的结构虽然逻辑清晰，但该候选方案相比基线面积增加了49.9%，延迟增加了7.2%，导致面积-延迟积（ADP）劣化60.7%。机制上，分组内独立编码和层级归约引入了额外的组合逻辑层和冗余的中间信号，可能增加了关键路径长度和单元数量。建议下一步：避免过度分层，尝试更扁平化的并行前缀结构或直接使用casez/if-else链配合综合优化，并关注综合报告中的关键路径，优先减少逻辑级数。\"}]}"
+  }
+]
