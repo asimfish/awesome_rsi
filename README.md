@@ -1,14 +1,14 @@
 # Awesome Recursive Self-Improvement (RSI)
 
 [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
-![papers](https://img.shields.io/badge/papers-62%2B6_classics-blue)
+![papers](https://img.shields.io/badge/papers-65%2B6_classics-blue)
 ![reports](https://img.shields.io/badge/deep--dives-33-red)
-![zh-PDF](https://img.shields.io/badge/zh--PDF-66-green)
+![zh-PDF](https://img.shields.io/badge/zh--PDF-69-green)
 ![slides](https://img.shields.io/badge/slides-35p-orange)
-![full report](https://img.shields.io/badge/full_report-168p-8a2be2)
+![full report](https://img.shields.io/badge/full_report-167p-8a2be2)
 [![License: CC BY 4.0](https://img.shields.io/badge/license-CC_BY_4.0-lightgrey)](LICENSE)
 
-> **English summary.** A curated list and survey repository on Recursive Self-Improvement (RSI), from Good's 1965 intelligence-explosion argument to the 2026 wave of self-evolving agents (harness optimization, evaluator co-evolution, skill evolution, safety gates). Every paper links to the original, a layout-preserving Chinese translation (`papers/zh/`), and, for the core ones, a structured Chinese deep-dive (`reports/`, 32 reports covering 29 papers/surveys plus three resources: the Prism-Shadow list, its RSI guide, and the Reef infrastructure). Main finding: every self-evolving system that works keeps a fixed evaluation reference outside the evolution loop (a human-labeled anchor set, a frozen verifier, a regression test); remove it and the evaluator drifts in ways task scores cannot reveal. Papers are grouped in §4; the report index is in §5; a 20-system comparison matrix is in §7.3. Prose is in Chinese.
+> **English summary.** A curated list and survey repository on Recursive Self-Improvement (RSI), from Good's 1965 intelligence-explosion argument to the 2026 wave of self-evolving agents (harness optimization, evaluator co-evolution, skill evolution, safety gates). Papers link to the original, available layout-preserving Chinese translations (`papers/zh/`), and, for the core ones, a structured Chinese deep-dive (`reports/`, 32 reports covering 29 papers/surveys plus three resources: the Prism-Shadow list, its RSI guide, and the Reef infrastructure). Main finding: every self-evolving system that works keeps a fixed evaluation reference outside the evolution loop (a human-labeled anchor set, a frozen verifier, a regression test); remove it and the evaluator drifts in ways task scores cannot reveal. Papers are grouped in §4; the report index is in §5; a 20-system comparison matrix is in §7.3. Prose is in Chinese.
 
 这是一个关于 Recursive Self-Improvement（递归自改进）的论文列表和调研仓库，覆盖从 1965 年 Good 的智能爆炸猜想到 2026 年的自进化 agent 研究。每篇核心论文都附有原文链接、中文解读和保留原版式的中文翻译 PDF。
 
@@ -23,10 +23,10 @@
 | 类型 | 数量 | 位置 |
 |---|---|---|
 | 中文解读（统一七节结构，约 9.8 万字） | 33 份（29 篇论文 / 综述 + 3 个资源与基础设施） | [`reports/`](reports/)，索引见 [§5](#5-deep-dive-reports) |
-| 英文论文 PDF | 62 篇 + 6 篇起源经典 | [`papers/en/`](papers/en/)，[`papers/classics/`](papers/classics/) |
-| 中文翻译 PDF（[super_translate](https://github.com/asimfish/super_translate) 生成，保留原版式） | 66 篇，全部英文 PDF 均有对应中译 | [`papers/zh/`](papers/zh/) |
+| 英文论文 PDF | 65 篇 + 6 篇起源经典 | [`papers/en/`](papers/en/)，[`papers/classics/`](papers/classics/) |
+| 中文翻译 PDF（[super_translate](https://github.com/asimfish/super_translate) 生成，保留原版式） | 69 篇；The Last AI 待译 | [`papers/zh/`](papers/zh/) |
 | 汇总 PPT | 35 页 HTML / PDF | [`report/awesome_rsi_slides.html`](report/awesome_rsi_slides.html)，[PDF](report/awesome_rsi_slides.pdf) |
-| 全文合订报告（32 份解读 + 两张图） | 168 页 | [`report/awesome_rsi_full_report.pdf`](report/awesome_rsi_full_report.pdf)，[HTML](report/awesome_rsi_full_report.html) |
+| 全文合订报告（32 份解读 + 两张图） | 167 页 | [`report/awesome_rsi_full_report.pdf`](report/awesome_rsi_full_report.pdf)，[HTML](report/awesome_rsi_full_report.html) |
 
 ## Contents
 
@@ -38,6 +38,7 @@
   - [4.4 Framework Side](#44-framework-side) · [4.5 Evaluator Side](#45-evaluator-side) · [4.6 Model Side](#46-model-side) · [4.7 Knowledge Side](#47-knowledge-side) · [4.8 Online Side](#48-online-side)
   - [4.9 Harness Engineering (2026)](#49-harness-engineering-2026) · [4.10 Autonomous Research & Industrial Evidence](#410-autonomous-research--industrial-evidence)
   - [4.11 Safety & Governance](#411-safety--governance) · [4.12 Program Evolution Lineage](#412-program-evolution-lineage) · [4.13 Macro Debate & Measurement](#413-macro-debate--measurement) · [4.14 Open-Source Systems & Infrastructure](#414-open-source-systems--infrastructure)
+  - [4.15 Self-Improvement Benchmarks](#415-self-improvement-benchmarks)
 - [5. Deep-Dive Reports](#5-deep-dive-reports)
 - [6. Insights & Open Problems](#6-insights--open-problems)
 - [7. Reference](#7-reference) — [Glossary](#71-glossary) · [Timeline](#72-timeline) · [System Comparison Matrix](#73-system-comparison-matrix)
@@ -49,7 +50,7 @@
 - [13. Citation](#13-citation)
 - [14. Disclaimer & Credits](#14-disclaimer--credits)
 
-标记说明：⭐ 表示调研发起时的十份核心精读对象；`[解读]` 表示有专门的中文解读报告；每条论文都附原文链接 `[paper]` 和仓库内的 `[PDF-en]` / `[PDF-zh]`。
+标记说明：⭐ 表示调研发起时的十份核心精读对象；`[解读]` 表示有专门的中文解读报告；论文条目提供原文链接 `[paper]`，已归档文件标为 `[PDF-en]` / `[PDF-zh]`；尚未生成的中译不提供文件链接。
 
 ## 1. Start Here
 
@@ -59,7 +60,7 @@
 |---|---|
 | 15 分钟 | [汇总 PPT](report/awesome_rsi_slides.html)（浏览器中用方向键翻页，P 键打印）或 [PDF 版](report/awesome_rsi_slides.pdf)（35 页） |
 | 2 小时 | [报告 10 汇总](reports/10_synthesis_insights.md) → [报告 01 Weng](reports/01_lilian_weng_harness_engineering.md) → [报告 05 Who Grades the Grader](reports/05_who_grades_the_grader.md)（说明为什么评估器需要循环外的锚） |
-| 通读 | [全文合订报告](report/awesome_rsi_full_report.pdf)（168 页，32 份解读按编号排列） |
+| 通读 | [全文合订报告](report/awesome_rsi_full_report.pdf)（167 页，32 份解读按编号排列） |
 | 系统研读 | `reports/` 按 00 → 23 → 01 → 02 → 07 → 03 → 04 → 05 → 06 → 08 → 11 → 09 → 10 的顺序读，其余按需；对照 `papers/zh/` 的中文 PDF |
 
 按目的：
@@ -312,9 +313,20 @@ _Proteus Authors_ — 与具体 harness 解耦的自进化框架：每个 episod
 
 本仓库内带公开代码的系统：[DGM](https://github.com/jennyzzt/dgm)（§4.4）、[MOSS](https://github.com/hkgai-official/Moss)（§4.4）、[Metaⁿ](https://github.com/minnesotanlp/meta-n)（§4.4）、[EvoLM](https://github.com/stellalisy/EvoLM)（§4.5）、[Prime Agent](https://github.com/PrimeIntellect-ai/prime-agent)（§4.8）、[Meta-Harness](https://github.com/stanford-iris-lab/meta-harness-tbench2-artifact)（§4.9）、[EnvHarness](https://github.com/google-research/envharness)（§4.9）、[MetaCaster](https://github.com/D2I-Group/metacaster)（§4.9）、[RHO](https://github.com/wbopan/retro-harness)（§4.9）、[AHE](https://github.com/china-qijizhifeng/agentic-harness-engineering)（§4.9）、[iCoder](https://github.com/bingreeky/iCoder)（§4.10）、[GEPA](https://github.com/gepa-ai/gepa)（§4.12）。
 
+### 4.15 Self-Improvement Benchmarks
+
+> [Self-Developing Agents 项目页](https://self-developing-agents.github.io/)将目标形成、经验学习和系统改进分别作为评测对象。以下三篇均已归档英文原文及保留版式的中文翻译 PDF；公式、部分图表文字和提示词/代码块保留原文。
+
+1. **Aspire: Can Models Self-Evolve from Vague Goals?** arXiv, 2026\. [paper](https://arxiv.org/abs/2608.31111), [project](https://self-developing-agents.github.io/), [PDF-en](papers/en/2608.31111_Aspire.pdf), [PDF-zh](papers/zh/2608.31111_Aspire_zh.pdf)
+_Yuhao Wu, Jingyuan Zhang, Jiajun Shi, et al._ — 只提供自然语言能力目标，让 agent 自选数据、更新方法和验证信号，支持权重与 harness 更新；用覆盖六类目标的 520 道隐藏专家题评估。完成训练或修改循环并不保证隐藏集收益，持续更新还可能抹去此前提升（正文 §3–4）。
+2. **S³Gym: Can LLMs Turn Self-Testing and Self-Judging into Self-Improvement?** arXiv, 2026\. [paper](https://arxiv.org/abs/2608.31100), [project](https://self-developing-agents.github.io/), [PDF-en](papers/en/2608.31100_S3Gym.pdf), [PDF-zh](papers/zh/2608.31100_S3Gym_zh.pdf)
+_Jiajun Shi, Siyuan Tao, Yuhao Wu, et al._ — 在七个有可执行验证器的文本游戏中，分离宽松探索与严格留出评估，比较原始历史 ICL、摘要记忆和参数训练。记忆方法的优势依赖任务结构，参数更新可能产生负迁移；识别成功行为不等于学会可迁移策略（正文 §3–4、表 4）。
+3. **HarnessDev: Can LLMs Create and Evolve Their Own Agent Harness?** arXiv, 2026\. [paper](https://arxiv.org/abs/2609.01437), [project](https://self-developing-agents.github.io/), [PDF-en](papers/en/2609.01437_HarnessDev.pdf), [PDF-zh](papers/zh/2609.01437_HarnessDev_zh.pdf)
+_Yuhao Wu, Jingyuan Zhang, Jiajun Shi, et al._ — 分 Creation 与 Evolution 两阶段评估可运行的 harness，并区分创建模型与执行模型。64 次相邻版本切换中，可见反馈与 SWE-Pro 留出集的变化方向仅 34 次一致（53.1%）；九个声明最终版本中仅两个在留出集最优，说明开发集收益与版本选择仍需独立验证（正文 §4.3）。
+
 ## 5. Deep-Dive Reports
 
-32 份中文解读（[`reports/`](reports/)），统一七节结构：一句话定位、要解决的问题、为什么此前做不通、方法机制、实验结果、局限、与其他报告的关系。每篇 2000 到 5200 字，数字标注到论文表号。全部合订为 [168 页 PDF](report/awesome_rsi_full_report.pdf)。
+32 份中文解读（[`reports/`](reports/)），统一七节结构：一句话定位、要解决的问题、为什么此前做不通、方法机制、实验结果、局限、与其他报告的关系。每篇 2000 到 5200 字，数字标注到论文表号。全部合订为 [167 页 PDF](report/awesome_rsi_full_report.pdf)。
 
 | # | 报告 | 对象 | 主要内容 |
 |---|---|---|---|
@@ -469,11 +481,11 @@ awesome_rsi/
 ├── README.md · CONTRIBUTING.md
 ├── report/
 │   ├── awesome_rsi_slides.html / .pdf        # 35 页汇总 PPT（方向键翻页，P 键打印）
-│   └── awesome_rsi_full_report.html / .pdf   # 168 页全文合订（32 份解读 + 封面 + 目录 + 两图）
+│   └── awesome_rsi_full_report.html / .pdf   # 167 页全文合订（32 份解读 + 封面 + 目录 + 两图）
 ├── reports/                                  # 32 份解读 00–31（索引见 §5）
 ├── papers/
-│   ├── en/                                   # 61 篇英文原版 PDF（arXiv + iCoder 技术报告）
-│   ├── zh/                                   # 61 篇中文翻译 PDF，与 en/ 一一对应
+│   ├── en/                                   # 65 篇英文原版 PDF（arXiv + iCoder 技术报告）
+│   ├── zh/                                   # 64 篇中文翻译 PDF；The Last AI 待译
 │   └── classics/                             # 6 篇起源经典（Good 1965 为扫描件无文本层，其余 5 篇含中译）
 ├── assets/
 │   ├── fig1_timeline.svg · fig2_taxonomy.svg # 两张图（另有 _dark 变体供 PPT）
@@ -501,6 +513,8 @@ awesome_rsi/
 
 ## 11. Related Resources
 
+- [Self-Developing Agents](https://self-developing-agents.github.io/) — Aspire、S³Gym、HarnessDev 的联合项目页，分别讨论目标形成、经验学习和 harness 改进；论文及英文 PDF 见 [§4.15](#415-self-improvement-benchmarks)。
+
 - [Prism-Shadow/awesome-rsi](https://github.com/Prism-Shadow/awesome-rsi) · [网站](https://prism-shadow.github.io/awesome-rsi/) · [博客](https://prism-shadow.github.io/awesome-rsi/#blog/understanding-rsi) · [解读 29](reports/29_prism_awesome_rsi.md) / [解读 30](reports/30_prism_understanding_rsi.md) — 中英双语的 RSI 基准与方法清单：约 27 个基准、32 个方法、1 个开源系统（Proteus）和一组书籍课程，网站提供按 artifact / 模式 / 拓扑 / 验收标准等维度的筛选面板和引用图。配套长文《万字长文带你读懂 RSI》把 RSI 定义为 A(t+1) = U(A(t), τ(t), f(t))，按进化对象（参数 / 上下文 / 记忆 / 技能 / harness 代码）、进化结构（链 / 树 / 图）、更新者（自身 / 教师 / 联合）、更新时机（离线 / 在线 / 混合）和验收标准等维度分类。与本仓库的分工：它以基准和方法的可筛选元数据为主，本仓库以逐篇深度解读和"锚在哪"这条主轴为主；它的"验收标准"维度与本仓库的锚最接近。
 - [iSEngLab/Awesome-Self-Evolving-Coding-Agents](https://github.com/iSEngLab/Awesome-Self-Evolving-Coding-Agents) — arXiv 2608.03392 综述的配套清单，按进化对象六类组织，收录编码领域的工作；与本仓库互补，已互相收录（解读见[报告 28](reports/28_self_evolving_coding_agents_survey.md)）
 - [Human-Agent-Society/reef](https://github.com/Human-Agent-Society/reef) — 持续自改进 agent 的开源基础设施，Serve → Observe → Grow → Commit 循环，支持权重训练和 harness 进化两条学习面，带版本管理与回滚；详见 [§4.14](#414-open-source-systems--infrastructure) 与[解读 31](reports/31_reef.md)
@@ -510,6 +524,8 @@ awesome_rsi/
 - [Lil'Log · Harness Engineering for Self-Improvement](https://lilianweng.github.io/posts/2026-07-04-harness/) — 本调研的总纲，§4.9 和 §4.12 的初始条目来自其参考文献
 
 ## 12. Changelog
+
+2026-09-15：新增 Aspire、S³Gym、HarnessDev 三篇基准论文及英文 PDF，收录 Self-Developing Agents 项目页；英文论文共 65 篇（另有 6 篇经典），三篇中译 PDF 已完成（23 / 25 / 41 页，与原文一致），中译总数为 69 篇。
 
 | 日期 | 内容 |
 |---|---|
@@ -529,7 +545,7 @@ awesome_rsi/
   author       = {Li, Yufeng},
   year         = {2026},
   howpublished = {\url{https://github.com/asimfish/awesome_rsi}},
-  note         = {32 structured deep-dives, 66 layout-preserving Chinese translations, 35-slide summary}
+  note         = {32 structured deep-dives, 69 layout-preserving Chinese translations, 35-slide summary}
 }
 ```
 
