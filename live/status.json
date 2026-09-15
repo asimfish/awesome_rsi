@@ -3,16 +3,16 @@
   "run_id": "pilot-002",
   "title": "64 路优先编码器 · RSI 优化",
   "target": "verilog-axis / priority_encoder / WIDTH=64 / MSB first",
-  "state": "running",
-  "stage": "generating",
+  "state": "completed",
+  "stage": "completed",
   "started_at": "2026-09-15T14:28:50.007317+00:00",
-  "updated_at": "2026-09-15T14:30:17.510878+00:00",
+  "updated_at": "2026-09-15T14:31:36.430230+00:00",
   "budget": 4,
-  "completed": 3,
-  "api_calls": 7,
+  "completed": 4,
+  "api_calls": 8,
   "tokens": {
-    "prompt": 14944,
-    "completion": 10085
+    "prompt": 21352,
+    "completion": 16266
   },
   "model": "deepseek-v4-pro",
   "candidates": [
@@ -98,6 +98,14 @@
       "adp_gain_pct": 9.238,
       "area_gain_pct": -11.285,
       "delay_gain_pct": 18.442
+    },
+    {
+      "id": "candidate-04",
+      "status": "rejected",
+      "formal": "not_proven",
+      "reason": "ValueError: Model output incomplete",
+      "accepted": false,
+      "parent": "candidate-03"
     }
   ],
   "events": [
@@ -195,6 +203,26 @@
       "at": "2026-09-15T14:30:17.495070+00:00",
       "stage": "generating",
       "text": "候选 4/4：模型读取当前优胜与 4 条经验，生成等价 RTL。"
+    },
+    {
+      "at": "2026-09-15T14:31:31.533297+00:00",
+      "stage": "selection",
+      "text": "候选 4/4：未晋升，保留当前优胜。ValueError: Model output incomplete"
+    },
+    {
+      "at": "2026-09-15T14:31:31.539506+00:00",
+      "stage": "learning",
+      "text": "候选 4/4：根据真实验证结果提炼经验。"
+    },
+    {
+      "at": "2026-09-15T14:31:35.510564+00:00",
+      "stage": "revalidation",
+      "text": "候选预算已用完，独立重跑当前优胜。"
+    },
+    {
+      "at": "2026-09-15T14:31:36.430225+00:00",
+      "stage": "completed",
+      "text": "首轮实验结束：4 个候选已评估，优胜 candidate-03 已独立复跑。"
     }
   ],
   "memory": [
@@ -219,6 +247,12 @@
       "version": 3,
       "from_candidate": "candidate-03",
       "lesson": "已验证事实：面积 283.290 µm²（相对基线变化 +11.29%）；延迟 0.459069 ns（变化 -18.44%）；ADP 改善 +9.24%。 已晋升。 候选策略（模型自述）：层次化组选择与授权生成，复用组有效信号，优化索引编码。",
+      "model_reflection_status": "归档，未经独立核实，不回流"
+    },
+    {
+      "version": 4,
+      "from_candidate": "candidate-04",
+      "lesson": "已验证事实：评估未通过：ValueError: Model output incomplete 未晋升。 候选策略（模型自述）：",
       "model_reflection_status": "归档，未经独立核实，不回流"
     }
   ],
@@ -289,5 +323,20 @@
     "delay_gain_pct": -1.551
   },
   "researcher_intervention": "首轮失败后由研究者测试直接 grant 与分组结构；4 位分组种子已改善 ADP。此轮检验模型在研究者种子之上的继续优化，不能把种子收益归因于自主 RSI。",
-  "heartbeat_at": "2026-09-15T14:31:30.722267+00:00"
+  "revalidation": {
+    "pass": true,
+    "result": {
+      "sha256": "d8a7b0bb9b215e3adf635f5ab3d291fa8c464547daddf80879d5dd12bbb38f07",
+      "formal": "pass",
+      "status": "evaluated",
+      "formal_seconds": 0.231,
+      "synthesis_seconds": 0.493,
+      "area_um2": 283.29,
+      "cells": 221,
+      "timing_seconds": 0.149,
+      "delay_ns": 0.459069,
+      "adp": 130.04965701
+    }
+  },
+  "finished_at": "2026-09-15T14:31:36.430207+00:00"
 }
