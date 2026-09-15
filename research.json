@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "published_at": "2026-09-15T17:47:50.235138+00:00",
+  "published_at": "2026-09-15T17:48:53.227370+00:00",
   "interval_s": 60,
   "stale_after_s": 180,
   "workers": {
@@ -4155,6 +4155,17 @@
       "budget": 12,
       "method": "研究者编写 Triton 候选、测量反馈迭代。旧轮只记录候选起止，回放中的验证/计时/比较节点由保存结果展开，共用完成时间，不是历史阶段耗时。",
       "events": [
+        {
+          "node": 0,
+          "stage": "protocol",
+          "at": "2026-09-15T17:03:11.449871+00:00",
+          "text": "冻结 v2 计时协议；先完成三个朴素基线",
+          "candidate": "三个固定任务",
+          "memory": "本轮由研究者调整候选；未运行自主记忆更新。",
+          "memory_count": null,
+          "failure": false,
+          "derived": false
+        },
         {
           "at": "2026-09-15T17:03:11.748341+00:00",
           "candidate": "relu/naive",
