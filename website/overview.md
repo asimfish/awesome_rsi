@@ -3,8 +3,8 @@
 从哥德尔机到自进化 agent：一次跨论文的综合判断。
 
 <figure class="overview-figure">
-<a href="assets/rsi-overview/overview.png" aria-label="打开 RSI 综述图原图"><img src="assets/rsi-overview/overview.png" alt="RSI 研究全景：确定目标、提出与实施修改、检验候选、保留有效版本构成概念循环；独立评估依据用于检验候选。Aspire、S³Gym、HarnessDev 分别考察目标选择、经验学习和版本选择。局部收益已有证据，持续提升下一次改进的能力仍待证明。" width="1536" height="1024"></a>
-<figcaption>一图理解本文：改哪里、如何验证、哪些进展仍待证明。箭头表示综合概念框架，各方法覆盖的环节不同。<a href="assets/rsi-overview/overview.png">查看大图 ↗</a></figcaption>
+<a href="assets/rsi-literature-map/overview.png" aria-label="打开全部文献研究图谱原图"><img src="assets/rsi-literature-map/overview.png" alt="全部文献研究图谱：76 条收录、15 个分类。思想与谱系包括思想起源、早期桥接、程序进化和综述；系统自改写包括框架、harness 工程与在线适应；学习与反馈包括知识技能、模型权重与评估器；验证与落地包括安全治理、自主研究、宏观测量、工程基础设施和字节三篇基准。每条文献均标注名称和贡献。" width="1448" height="1086"></a>
+<figcaption>全部文献研究图谱：76 条收录、15 个分类，含经典文献和 2 个独立工程项目。连线表示主题归属。<a href="assets/rsi-literature-map/overview.png">点击查看大图 ↗</a> · <a href="papers.html">查找原文与翻译</a></figcaption>
 </figure>
 
 ## 先说结论
