@@ -24,3 +24,5 @@
 服务器区显示真实 CPU、内存、磁盘和逐卡 GPU 状态，由独立用户级定时器每 5 分钟发布到 server-data 分支；网页每 60 秒读取。[监控说明](live/server-monitor.md)。
 
 [我们的设计图](https://asimfish.github.io/awesome_rsi/scenes.html#design)支持原始 / 种子 / C03 对比、RTL 源码检查、完整标准单元网表、关键路径及 RSI 实验闭环。支持缩放、关键路径高亮和 SVG 下载。[图示来源与边界](live/design-guide.md)。
+
+首页直接展示本人的 RSI 芯片设计研究：选定的 C04 框架图、当前轮真实进度、已验证测量收益和 RSI 实验进程数。实验记录每 30 秒、服务器采样每 60 秒读取；断网、备用快照及过期心跳明确显示待核实。图集与精确电路设计仍可从导航进入。
