@@ -18,6 +18,8 @@
 
 *图 1：71 项工作的时间线，按十个类别分行，横轴为 arXiv 首版年月（非 arXiv 材料取发布月）。★ 为本调研的十份核心材料。1965–2014 与 2023–2026 之间断轴。2026 年 8 月一个月有 21 项。*
 
+**字节三篇专题**：[Self-Developing Agents](report/bytedance-self-developing/index.html) — Aspire、S³Gym、HarnessDev 的目标、经验与系统三层对照；[合读报告](report/bytedance-self-developing/research.md)及中英文 PDF 集中入口。
+
 **仓库内容**
 
 | 类型 | 数量 | 位置 |
@@ -314,6 +316,8 @@ _Proteus Authors_ — 与具体 harness 解耦的自进化框架：每个 episod
 本仓库内带公开代码的系统：[DGM](https://github.com/jennyzzt/dgm)（§4.4）、[MOSS](https://github.com/hkgai-official/Moss)（§4.4）、[Metaⁿ](https://github.com/minnesotanlp/meta-n)（§4.4）、[EvoLM](https://github.com/stellalisy/EvoLM)（§4.5）、[Prime Agent](https://github.com/PrimeIntellect-ai/prime-agent)（§4.8）、[Meta-Harness](https://github.com/stanford-iris-lab/meta-harness-tbench2-artifact)（§4.9）、[EnvHarness](https://github.com/google-research/envharness)（§4.9）、[MetaCaster](https://github.com/D2I-Group/metacaster)（§4.9）、[RHO](https://github.com/wbopan/retro-harness)（§4.9）、[AHE](https://github.com/china-qijizhifeng/agentic-harness-engineering)（§4.9）、[iCoder](https://github.com/bingreeky/iCoder)（§4.10）、[GEPA](https://github.com/gepa-ai/gepa)（§4.12）。
 
 ### 4.15 Self-Improvement Benchmarks
+
+**独立专题**：[字节 Seed × TokenWave：Self-Developing Agents](report/bytedance-self-developing/index.html) · [三篇合读](report/bytedance-self-developing/research.md)
 
 > [Self-Developing Agents 项目页](https://self-developing-agents.github.io/)将目标形成、经验学习和系统改进分别作为评测对象。以下三篇均已归档英文原文及保留版式的中文翻译 PDF；公式、部分图表文字和提示词/代码块保留原文。
 
