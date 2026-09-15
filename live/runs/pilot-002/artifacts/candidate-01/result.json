@@ -1,0 +1,23 @@
+{
+  "sha256": "16c459c7de0d438a820cc4125c340dd175ee12a5e3f4ccec4a946ca943b791aa",
+  "formal": "fail",
+  "status": "rejected",
+  "formal_seconds": 0.479,
+  "reason": "Formal proof failed or was incomplete",
+  "diagnostic": ".$and$candidate.v:111$606 ($and)\n    port Y[0] of cell $techmap\\gate.$and$candidate.v:71$883 ($and)\nWarning: multiple conflicting drivers for miter.\\gate.grant_int [24]:\n    port Y[0] of cell $techmap\\gate.$and$candidate.v:110$602 ($and)\n    port Y[0] of cell $techmap\\gate.$and$candidate.v:71$878 ($and)\nWarning: multiple conflicting drivers for miter.\\gate.grant_int [23]:\n    port Y[0] of cell $techmap\\gate.$and$candidate.v:109$598 ($and)\n    port Y[0] of cell $techmap\\gate.$and$candidate.v:71$873 ($and)\nWarning: multiple conflicting drivers for miter.\\gate.grant_int [22]:\n    port Y[0] of cell $techmap\\gate.$and$candidate.v:108$597 ($and)\n    port Y[0] of cell $techmap\\gate.$and$candidate.v:71$868 ($and)\nWarning: multiple conflicting drivers for miter.\\gate.grant_int [21]:\n    port Y[0] of cell $techmap\\gate.$and$candidate.v:107$594 ($and)\n    port Y[0] of cell $techmap\\gate.$and$candidate.v:71$863 ($and)\nWarning: multiple conflicting drivers for miter.\\gate.grant_int [20]:\n    port Y[0] of cell $techmap\\gate.$and$candidate.v:106$590 ($and)\n    port Y[0] of cell $techmap\\gate.$and$candidate.v:71$858 ($and)\nWarning: multiple conflicting drivers for miter.\\gate.grant_int [19]:\n    port Y[0] of cell $techmap\\gate.$and$candidate.v:105$586 ($and)\n    port Y[0] of cell $techmap\\gate.$and$candidate.v:71$853 ($and)\nWarning: multiple conflicting drivers for miter.\\gate.grant_int [18]:\n    port Y[0] of cell $techmap\\gate.$and$candidate.v:104$585 ($and)\n    port Y[0] of cell $techmap\\gate.$and$candidate.v:71$848 ($and)\nWarning: multiple conflicting drivers for miter.\\gate.grant_int [17]:\n    port Y[0] of cell $techmap\\gate.$and$candidate.v:103$582 ($and)\n    port Y[0] of cell $techmap\\gate.$and$candidate.v:71$843 ($and)\nWarning: multiple conflicting drivers for miter.\\gate.grant_int [16]:\n    port Y[0] of cell $techmap\\gate.$and$candidate.v:102$578 ($and)\n    port Y[0] of cell $techmap\\gate.$and$candidate.v:71$838 ($and)\nWarning: multiple conflicting drivers for miter.\\gate.grant_int [15]:\n    port Y[0] of cell $techmap\\gate.$and$candidate.v:101$574 ($and)\n    port Y[0] of cell $techmap\\gate.$and$candidate.v:71$833 ($and)\nWarning: multiple conflicting drivers for miter.\\gate.grant_int [14]:\n    port Y[0] of cell $techmap\\gate.$and$candidate.v:100$573 ($and)\n    port Y[0] of cell $techmap\\gate.$and$candidate.v:71$828 ($and)\nERROR: Found 64 problems in 'check -assert'.\n",
+  "id": "candidate-01",
+  "rationale": "在现有4位分组直接授权基础上，进一步优化高位索引生成和授权逻辑，减少关键路径延迟和面积。采用分层合并组有效信号，复用OR归约结果，避免冗余逻辑。",
+  "strategy": "分层组选择与授权生成，复用组有效信号，优化索引编码。",
+  "usage": {
+    "prompt_tokens": 3525,
+    "completion_tokens": 3252,
+    "total_tokens": 6777,
+    "prompt_tokens_details": {
+      "cached_tokens": 256
+    },
+    "prompt_cache_hit_tokens": 256,
+    "prompt_cache_miss_tokens": 3269
+  },
+  "accepted": false,
+  "parent": "seed"
+}

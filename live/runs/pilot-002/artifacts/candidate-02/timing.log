@@ -1,0 +1,36 @@
+OpenSTA 2.0.17 GITDIR-NOT Copyright (c) 2019, Parallax Software, Inc.
+License GPLv3: GNU GPL version 3 <http://gnu.org/licenses/gpl.html>
+
+This is free software, and you are free to change and redistribute it
+under certain conditions; type `show_copying' for details. 
+This program comes with ABSOLUTELY NO WARRANTY; for details type `show_warranty'.
+Startpoint: req[60] (input port clocked by virtual)
+Endpoint: valid (output port)
+Path Group: **default**
+Path Type: max
+
+      Delay        Time   Description
+-----------------------------------------------------------------
+   0.000000    0.000000 v input external delay
+   0.000000    0.000000 v req[60] (in)
+   0.144082    0.144082 ^ _163_/ZN (NOR4_X1)
+   0.113506    0.257588 ^ _166_/ZN (AND4_X1)
+   0.085707    0.343295 ^ _168_/ZN (AND4_X1)
+   0.077746    0.421041 ^ _170_/ZN (AND4_X2)
+   0.062398    0.483438 v _171_/ZN (NAND4_X1)
+   0.139355    0.622793 v _172_/ZN (OR4_X1)
+   0.144003    0.766796 ^ _173_/ZN (NOR4_X1)
+   0.035606    0.802402 v _174_/ZN (NAND2_X1)
+   0.000002    0.802404 v valid (out)
+               0.802404   data arrival time
+
+  10.000000   10.000000   max_delay
+   0.000000   10.000000   output external delay
+              10.000000   data required time
+-----------------------------------------------------------------
+              10.000000   data required time
+              -0.802404   data arrival time
+-----------------------------------------------------------------
+               9.197596   slack (MET)
+
+
