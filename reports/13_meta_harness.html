@@ -1,0 +1,375 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的论文、中文解读、分类与专题。"><title>Meta-Harness 深度解读：让 coding agent 根据完整执行轨迹修改 harness · RSI 研究札记</title><link rel="stylesheet" href="../site.css"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress"></div><header class="topbar"><a class="brand" href="../index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a href="../index.html">首页</a><a href="../papers.html">论文</a><a href="../reports.html">解读</a><a href="../insights.html">洞察</a><a href="../topics.html">专题</a><a href="../resources.html">资源</a></nav><button id="theme" aria-label="切换深色模式">深色阅读</button></header><div class="layout "><aside><div class="eyebrow">解读 / 13</div><div class="toc">
+<ul>
+<li><a href="#meta-harness-深度解读让-coding-agent-根据完整执行轨迹修改-harness">Meta-Harness 深度解读：让 coding agent 根据完整执行轨迹修改 harness</a><ul>
+<li><a href="#1-一句话定位">1. 一句话定位</a></li>
+<li><a href="#2-要解决的问题">2. 要解决的问题</a></li>
+<li><a href="#3-为什么此前做不通三条线各差一块">3. 为什么此前做不通：三条线各差一块</a></li>
+<li><a href="#4-方法机制">4. 方法机制</a><ul>
+<li><a href="#41-目标形式化">4.1 目标形式化</a></li>
+<li><a href="#42-极简外环algorithm-1">4.2 极简外环（Algorithm 1）</a></li>
+<li><a href="#43-proposer-的实际行为appendix-a">4.3 proposer 的实际行为（Appendix A）</a></li>
+</ul>
+</li>
+<li><a href="#5-实验结果全景">5. 实验结果全景</a><ul>
+<li><a href="#51-在线文本分类gpt-oss-120b">5.1 在线文本分类（GPT-OSS-120B）</a></li>
+<li><a href="#52-检索增强数学推理">5.2 检索增强数学推理</a></li>
+<li><a href="#53-terminalbench-289-任务">5.3 TerminalBench-2（89 任务）</a></li>
+</ul>
+</li>
+<li><a href="#6-局限">6. 局限</a></li>
+<li><a href="#7-意义与位置">7. 意义与位置</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="aside-links"><a href="../guide.html">完整仓库导览 ↗</a><a href="https://github.com/asimfish/awesome_rsi">GitHub 源码 ↗</a></div></aside><main id="content"><div class="eyebrow">解读 / 13</div><h1 id="meta-harness-深度解读让-coding-agent-根据完整执行轨迹修改-harness">Meta-Harness 深度解读：让 coding agent 根据完整执行轨迹修改 harness</h1>
+<blockquote>
+<p><strong>Meta-Harness: End-to-End Optimization of Model Harnesses</strong>
+arXiv 2603.28052 v1（2026-03-30）· Stanford IRIS Lab（Yoonho Lee、Roshen Nair、Qizheng Zhang、Chelsea Finn）+ KRAFTON（Kangwook Lee）+ MIT（Omar Khattab）
+代码：github.com/stanford-iris-lab/meta-harness-tbench2-artifact · 项目页 yoonholee.com/meta-harness
+归档：<a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2603.28052_MetaHarness.pdf">papers/en/2603.28052_MetaHarness.pdf</a> · 中译 <a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/zh/2603.28052_MetaHarness_zh.pdf">papers/zh/2603.28052_MetaHarness_zh.pdf</a></p>
+</blockquote>
+<hr/>
+<h2 id="1-一句话定位">1. 一句话定位</h2>
+<p>同一模型更换 harness 后，性能可相差 <strong>6×</strong>，但 harness 仍主要由工程师观察失败、调整启发式并反复修改。已有文本优化器（OPRO、TextGrad、GEPA、AlphaEvolve、TTT-Discover）将反馈压缩为分数、模板或 LLM 摘要，每步只读取 <strong>0.002–0.026 MTok</strong>，可能丢失追溯上游 harness 决策所需的信息。harness 对存储、检索和呈现方式的选择，会影响许多步之后的行为。</p>
+<p>Meta-Harness 将每个候选的源码、分数和原始执行轨迹全部存入文件系统，由 <strong>coding agent proposer</strong>（Claude Code + Opus-4.6）通过 grep/cat 自主选择材料，分析失败并决定修改位置，每轮中位读取 <strong>82 个文件</strong>、约 <strong>10 MTok</strong>。外环不预设父代选择规则或变异算子。</p>
+<p>三个领域的结果为：在线文本分类 <strong>48.6% vs ACE 40.9（+7.7）</strong>，上下文节省 <strong>4×</strong>；IMO 级数学检索 harness 在 5 个 held-out 模型上平均 <strong>+4.7 分</strong>；TerminalBench-2 上，Opus 4.6 达到 <strong>76.4%</strong>，高于手工 Terminus-KIRA 的 74.7%，全榜第 2，Haiku 4.5 达到 <strong>37.6%</strong>，全榜第 1。消融中，只给分数时为 34.6/41.3，加入摘要后为 34.9/38.7，使用全轨迹为 <strong>50.0/56.7</strong>，其中位候选也高于两个消融的最佳候选。本文首次在正式论文中实现了 Weng 总纲提出的 meta-harness 概念。</p>
+<h2 id="2-要解决的问题">2. 要解决的问题</h2>
+<p>Table 1 比较了各方法每轮读取的历史信息量：</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>历史</th>
+<th>日志内容</th>
+<th>MTok/轮</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OPRO</td>
+<td>窗口</td>
+<td>过去 (solution, score) 对</td>
+<td>0.002</td>
+</tr>
+<tr>
+<td>TextGrad</td>
+<td>最近</td>
+<td>当前工件的文本反馈</td>
+<td>0.015</td>
+</tr>
+<tr>
+<td>AlphaEvolve</td>
+<td>窗口</td>
+<td>程序库 + 评估分</td>
+<td>0.022</td>
+</tr>
+<tr>
+<td>GEPA</td>
+<td>摘要</td>
+<td>rollout 轨迹的反思反馈</td>
+<td>0.008</td>
+</tr>
+<tr>
+<td>Feedback Descent</td>
+<td>摘要</td>
+<td>对比 + 文本反馈</td>
+<td>0.012</td>
+</tr>
+<tr>
+<td>TTT-Discover</td>
+<td>窗口</td>
+<td>前一解的片段</td>
+<td>0.026</td>
+</tr>
+<tr>
+<td><strong>Meta-Harness</strong></td>
+<td><strong>全部</strong></td>
+<td><strong>全部日志与分数</strong></td>
+<td><strong>10.0</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>三个数量级的差距与任务结构有关。harness 在<strong>代码空间</strong>中优化，检索、记忆和 prompt 构造逻辑的小改动，可能经过许多推理步才显现效果，局部搜索启发式难以处理这种依赖。作者认为，既有优化器压缩反馈是为了控制成本和扩展规模，不能据此判断长程依赖没有信息价值。</p>
+<p>另一个问题是<strong>如何读取这些信息</strong>。10 MTok 远超单个上下文窗口，proposer 需要由 <strong>coding agent</strong> 担任，自主选择材料，并直接操作代码库验证编辑，单次 LLM 调用无法完成。作者说明，这一工作流直到 2026 年初 coding agent 能力提高后才变得可行。</p>
+<h2 id="3-为什么此前做不通三条线各差一块">3. 为什么此前做不通：三条线各差一块</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>已有路线</th>
+<th>有什么</th>
+<th>缺什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>文本优化器（GEPA、OPRO、TextGrad）</td>
+<td>迭代修改 prompt / 文本工件</td>
+<td>反馈压缩到 &lt;0.03 MTok；只见当前候选或摘要；<strong>无法跨候选做因果归因</strong></td>
+</tr>
+<tr>
+<td>程序进化（AlphaEvolve、OpenEvolve、ADAS、AFlow）</td>
+<td>在代码空间搜索，由 LLM 生成变异</td>
+<td>在固定 scaffold 中进化指定函数，或搜索工作流图；空间预先定义，档案和父代选择由人工设计</td>
+</tr>
+<tr>
+<td>记忆设计搜索（ACE、MCE）</td>
+<td>跨任务累积上下文</td>
+<td>更新经验，程序保持固定；上下文随时间增加（ACE 50.8K token）</td>
+</tr>
+<tr>
+<td>DGM（报告 07）</td>
+<td>修改自身源码、搜索档案</td>
+<td>按结构化规则采样父代，每步只见自身失败；<strong>改进者 = 被改进物</strong>，proposer 会被 game</td>
+</tr>
+<tr>
+<td>人工 harness 工程</td>
+<td>目前 SOTA（Terminus-KIRA、ForgeCode）</td>
+<td>不可扩展；每换一个模型都要重来</td>
+</tr>
+</tbody>
+</table></div>
+<p>反馈需要与读取者的能力匹配。LLM 无法一次处理全部历史，因此需要压缩；coding agent 能通过 grep 自主检索全历史，继续压缩反而会丢失信息。Meta-Harness 据此减少预设搜索规则，将材料选择、诊断和编辑交给系统完成。</p>
+<h2 id="4-方法机制">4. 方法机制</h2>
+<h3 id="41-目标形式化">4.1 目标形式化</h3>
+<p>harness 是运行在冻结模型 M 外围的有状态程序。给定任务 x ∼ X，执行 rollout τ ∼ p_M(H, x)：harness 构造 prompt，模型生成响应，harness 再更新状态。任务奖励 r(τ, x) 用于打分，目标为：</p>
+<p>H* = argmax_H E_{x∼X, τ∼p_M(H,x)} r(τ, x)</p>
+<p>同时优化准确率和上下文成本时，按 Pareto 支配关系维护前沿。实践中，每个 harness 是 <strong>100–1000 行的单文件 Python 程序</strong>，修改范围包括任务特定的 prompting、检索、记忆和编排逻辑。</p>
+<h3 id="42-极简外环algorithm-1">4.2 极简外环（Algorithm 1）</h3>
+<ol>
+<li>初始化种群 H，基线 harness 包括 zero-shot、few-shot、ACE、MCE，评估后写入文件系统 D；</li>
+<li>每轮由 proposer 查询 D，提出 k 个新 harness。通过接口校验的候选进入评估，全部日志（源码、推理轨迹、分数、执行轨迹）写入 D 的新目录；</li>
+<li>运行固定轮数后返回 Pareto 前沿，在测试集上做最终评估。</li>
+</ol>
+<p><strong>外环不预设搜索结构</strong>：proposer 可以读取任意先前 harness，无固定父代选择规则；proposer 自行决定局部编辑或整体重写，无固定变异算子；也不预设档案结构。作者认为，将诊断和编辑决策交给 proposer，可以让 Meta-Harness 随 coding agent 能力提高而改善。这是将 Bitter Lesson 用于 harness 搜索的做法。</p>
+<p><strong>数据隔离</strong>：proposer 全程只访问搜索集（search set），测试集用于最终评估。TerminalBench-2 未遵循这一设置，详见局限部分。</p>
+<h3 id="43-proposer-的实际行为appendix-a">4.3 proposer 的实际行为（Appendix A）</h3>
+<p><strong>文件访问统计</strong>（TB2 搜索，10 轮）：中位 <strong>82 文件/轮</strong>（69–99），其中 41% 为先前 harness 源码，40% 为执行轨迹，6% 为分数摘要，13% 为其他文件。访问模式是<strong>非马尔可夫</strong>的，通常检查大部分历史，超出了最近父代的范围。</p>
+<p><strong>跨候选归因过程</strong>（以下转述 TB2 搜索日志中 proposer 的分析）：
+- <strong>轮 1–2</strong>：两个候选都同时修改结构和 prompt 模板。结构修复包括标记剥离、循环打断，以及移除双重确认完成机制。两者均低于 64.4% 的基线，分别为 58.9%、57.8%。
+- <strong>轮 3 · 识别混淆变量</strong>：系统判断，prompt 模板中的清理指令导致 agent 在任务完成前删除必要状态，使结构修复与有害的 prompt 变更混在一起。evo_strip_only 单独保留两个已验证的结构修复，结果为 63.3%（−1.1pp）。下降幅度远小于前两版，支持了混淆变量的诊断。
+- <strong>轮 4–6</strong>：继续修复完成流状态机 bug，参考 configure-git-webserver 任务中反复验证 30–60 步的轨迹，同时放宽清理措辞、加入智能等待，结果全部下降。proposer 据此认为，即使局部假设合理，修改 prompt 和完成流仍有较高风险。
+- <strong>轮 7 · 胜出候选</strong>：系统将此前 6 轮下降归因于完成流、prompt 模板或观察处理的修改。evo_env_bootstrap 只新增一项功能：在首次 LLM 调用前，用一条 shell 命令收集环境快照，附到初始 prompt，其余方法保持不变。
+- <strong>轮 8 · 组合</strong>：合并环境快照与标记剥离两个相互独立的修复，保持 prompt 和确认流不变，因为这些修改在 7 轮中有 5 轮导致下降。
+- <strong>轮 10 · 跨运行迁移</strong>：引用另一次独立搜索的结果：保留服务产物、不执行清理，带来 +18pp。</p>
+<p>这段过程展示了如何跨候选追溯失败原因。压缩反馈的优化器缺少此类信息，GEPA 的反思摘要不会保留两个失败候选共享同一项 prompt 修改的细节。</p>
+<h2 id="5-实验结果全景">5. 实验结果全景</h2>
+<h3 id="51-在线文本分类gpt-oss-120b">5.1 在线文本分类（GPT-OSS-120B）</h3>
+<p><strong>设置</strong>：LawBench（215 类罪名）、Symptom2Disease（22 类）、USPTO-50k（180 类反应物）；20 轮 × 2 候选 = 40 harness。</p>
+<p><strong>vs 手工 harness（Table 2）</strong>：</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Harness</th>
+<th>USPTO</th>
+<th>S2D</th>
+<th>Law</th>
+<th>Avg Acc</th>
+<th>Ctx (K tok)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Zero-shot</td>
+<td>12.0</td>
+<td>63.2</td>
+<td>7.0</td>
+<td>27.4</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Few-shot (all)</td>
+<td>15.0</td>
+<td>78.3</td>
+<td>29.0</td>
+<td>40.8</td>
+<td>12.3</td>
+</tr>
+<tr>
+<td>MCE</td>
+<td>14.0</td>
+<td>83.0</td>
+<td>23.0</td>
+<td>40.0</td>
+<td>28.5</td>
+</tr>
+<tr>
+<td>ACE</td>
+<td>16.0</td>
+<td>77.8</td>
+<td>29.0</td>
+<td>40.9</td>
+<td>50.8</td>
+</tr>
+<tr>
+<td><strong>Meta-Harness</strong></td>
+<td>14.0</td>
+<td><strong>86.8</strong></td>
+<td><strong>45.0</strong></td>
+<td><strong>48.6</strong></td>
+<td><strong>11.4</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>相对 ACE 提高 +7.7 分，相对 MCE 提高 +8.6，上下文仅为 ACE 的 22%。Law 从 29→45，是单个数据集上的最大提升。</p>
+<p><strong>vs 文本优化器（Table 4，搜索集）</strong>：GEPA 32.6/40.2、Best-of-N 34.0/44.2、OpenEvolve 39.1/43.3、TTT-Discover 34.1/45.6、<strong>Meta-Harness 50.0/56.7</strong>（中位/最佳）。仅用 <strong>4 次评估</strong>就达到对手耗尽预算后的分数，评估效率高 10×；最终分数还高出 10 分以上。</p>
+<p><strong>反馈内容消融（Table 3）</strong>：</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>条件</th>
+<th>分数</th>
+<th>代码</th>
+<th>摘要</th>
+<th>轨迹</th>
+<th>中位</th>
+<th>最佳</th>
+<th>&gt;ZS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>只给分数</td>
+<td>✓</td>
+<td>✓</td>
+<td>×</td>
+<td>×</td>
+<td>34.6</td>
+<td>41.3</td>
+<td>26</td>
+</tr>
+<tr>
+<td>分数 + 摘要</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>×</td>
+<td>34.9</td>
+<td>38.7</td>
+<td>23</td>
+</tr>
+<tr>
+<td><strong>全接口</strong></td>
+<td>✓</td>
+<td>✓</td>
+<td>–</td>
+<td>✓</td>
+<td><strong>50.0</strong></td>
+<td><strong>56.7</strong></td>
+<td><strong>39</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>加入摘要后的最佳分数仍低于只给分数（38.7 &lt; 41.3），说明摘要未能补回反馈信息，可能遗漏了诊断细节。这组消融的增益来自原始执行轨迹。</p>
+<p><strong>OOD 泛化（Table 5）</strong>：9 个搜索期未见数据集的平均分为 <strong>73.1% vs ACE 70.2%</strong>，在 6/9 上最佳；few-shot 示例超过 32 个后，在 7/9 任务上表现下降。</p>
+<p><strong>Pareto 前沿（Fig. 3）</strong>：给 proposer 当前指标与期望权衡后，它能沿整条准确率-上下文曲线搜索 harness，覆盖多个取舍点。</p>
+<h3 id="52-检索增强数学推理">5.2 检索增强数学推理</h3>
+<p><strong>设置</strong>：≥500K 已解题语料（8 个开源数据集，去重去污，人工检查 held-out 的 BM25 top 检索）；250 题搜索集（OlympiadBench + Omni-MATH hard）；40 轮 109 候选；GPT-OSS-20B 上选出单个 harness；200 道 IMO 级 held-out 题（IMO-AnswerBench、IMO-ProofBench、ArXivMath）。</p>
+<p><strong>Table 6（pass@1，3 样本均值）</strong>：</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>GPT-5.4n</th>
+<th>GPT-5.4m</th>
+<th>Gem-3.1FL</th>
+<th>Gem-3F</th>
+<th>GPT-20B</th>
+<th>Avg</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>无检索</td>
+<td>23.0</td>
+<td>28.8</td>
+<td>28.6</td>
+<td>42.6</td>
+<td>47.6</td>
+<td>34.1</td>
+</tr>
+<tr>
+<td>Dense (k=5)</td>
+<td>31.1</td>
+<td>28.3</td>
+<td>37.1</td>
+<td>47.2</td>
+<td>46.7</td>
+<td>38.1</td>
+</tr>
+<tr>
+<td>BM25</td>
+<td>30.2</td>
+<td>29.2</td>
+<td>32.8</td>
+<td>46.6</td>
+<td>48.9</td>
+<td>37.5</td>
+</tr>
+<tr>
+<td><strong>Meta-Harness</strong></td>
+<td><strong>31.7</strong></td>
+<td><strong>30.4</strong></td>
+<td>34.9</td>
+<td>46.3</td>
+<td><strong>50.6</strong></td>
+<td><strong>38.8 (+4.7)</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>5 个 held-out 模型均未退化；相比之下，dense 在 GPT-5.4m 上 −0.5，随机 few-shot 平均 −1.9。得到的 harness 使用<strong>四路 BM25 词法路由</strong>（组合/几何/数论/默认），每路配置不同的去重、重排和取例策略。修改全部发生在同一 BM25 栈的代码中，未引入稠密编码器。</p>
+<h3 id="53-terminalbench-289-任务">5.3 TerminalBench-2（89 任务）</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>模型</th>
+<th>Harness</th>
+<th>Pass</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Opus 4.6</td>
+<td>Terminus-KIRA（手工）</td>
+<td>74.7</td>
+</tr>
+<tr>
+<td>Opus 4.6</td>
+<td>ForgeCode</td>
+<td>81.8（公开代码无法复现）</td>
+</tr>
+<tr>
+<td>Opus 4.6</td>
+<td><strong>Meta-Harness</strong></td>
+<td><strong>76.4</strong>（全榜 #2）</td>
+</tr>
+<tr>
+<td>Haiku 4.5</td>
+<td>Goose</td>
+<td>35.5</td>
+</tr>
+<tr>
+<td>Haiku 4.5</td>
+<td><strong>Meta-Harness</strong></td>
+<td><strong>37.6</strong>（全榜 #1）</td>
+</tr>
+</tbody>
+</table></div>
+<p>最终改动是在 Terminus-KIRA 上添加约 <strong>80 行</strong>环境快照 bootstrap。agent 循环开始前，系统运行一条复合 shell 命令，收集 pwd、/app 清单、语言版本（Python/GCC/Node/Java/Rust/Go）、包管理器和内存信息，注入首个 prompt。命令设为 15 秒超时，失败时不报错。这省去了开头 <strong>2–4 个探索回合</strong>。89 个任务中净赢 7 个，protein-assembly、path-tracing 的提升最大。受益任务都需要先了解环境，包括生信库、渲染管线、棋引擎、密码学工具和 CoreWars 模拟器。</p>
+<h2 id="6-局限">6. 局限</h2>
+<ol>
+<li><strong>TB2 搜索集 = 测试集</strong>。论文将任务称为 discovery problem，援引该榜惯例，公开 writeup 已描述在 TB 上反复迭代 harness，并使用 regex 审计。但反复优化同一评估分布仍可能使评估失效：regex 能排查硬编码答案，无法排除对 89 个任务分布的<strong>软过拟合</strong>。解释 76.4% 时需要保留这一限制。</li>
+<li><strong>单一 proposer</strong>：全部结果来自 Claude Code + Opus-4.6，尚未验证跨 proposer 的稳健性，作者将其列为 future work。</li>
+<li><strong>proposer 冻结不进化</strong>：改进者与被改进对象完全分离，严格说属于<strong>自动化 harness 工程</strong>，尚不构成递归自改进。隔离使 proposer 不被 game，但 proposer 自身不会变强，也限制了后续改进。</li>
+<li><strong>成本未报告</strong>：每轮 10 MTok 意味着成本增加三个数量级。论文仅称耗时数小时，未给出搜索总开销，也未与基线比较 token 用量。</li>
+<li><strong>harness 在任务间重置</strong>：与记忆进化方法 ACE/MCE 不同，这里更新程序，不保留跨任务经验，因此未获得后者的跨任务累积收益。</li>
+<li><strong>文本分类中 USPTO 没有提升</strong>（14.0 vs ACE 16.0），收益集中在 Law 与 S2D。</li>
+</ol>
+<h2 id="7-意义与位置">7. 意义与位置</h2>
+<p><strong>对报告 01（Weng 总纲）</strong>：Weng 将 harness 定义为可执行搜索空间，并提出 meta-harness 层。本文以 Meta-Harness 为名实现了这一设想：外环只保留必要结构，文件系统保存全部历史，具体搜索决策由 proposer 作出。</p>
+<p><strong>对报告 07（DGM）</strong>：DGM 通过档案与父代采样管理历史，Meta-Harness 删去这些预设结构，让 proposer 自由 grep 全历史。消融中，压缩反馈降低了表现。两者的修改对象也不同：DGM 修改自身，Meta-Harness 的 proposer 始终在进化循环之外。</p>
+<p><strong>对报告 14（Self-Harness）</strong>：两者可用于比较"外部强 proposer vs 自我 proposer"。Meta-Harness 由前沿 proposer 读取完整反馈，追求更高表现；Self-Harness 压缩证据并设置回归检查，让 35B 级模型能够完成循环。Self-Harness 的证据包摘要属于 Meta-Harness 消融中会丢失信号的压缩方式。前者的上限取决于外部 proposer，后者则受弱模型处理上下文的能力限制。</p>
+<p><strong>对报告 11（Continual Harness）</strong>：CH 不重置环境，在故障现场修改，状态跨 episode 累积；Meta-Harness 重置环境后离线搜索，得到可读、可迁移的静态程序。CH 所遇到的最低能力要求在这里得到缓解：由前沿 proposer 负责搜索，较弱的目标模型 Haiku 4.5 也能从 harness 改进中受益。</p>
+<p><strong>对报告 05（WGtG 锚定纪律）</strong>：搜索集分数与官方 verifier 提供不参与进化的评估依据，测试集全程与 proposer 隔离。唯一例外是 TB2，这里用人工检查和 regex 审计作补充，尝试弥补测试独立性不足。</p>
+<p><strong>对报告 10（harness 资产化）</strong>：数学检索 harness 在 5 个未见模型上 +4.7，文本分类 harness 在 9 个 OOD 数据集上取得 6 胜，说明 harness 可以跨模型迁移，也便于人工审读。代码中的过拟合可以通过脆弱的 if 链、硬编码映射等形式识别，权重空间缺少这种直接审计方式。</p>
+<p><strong>Discussion 提出的后续方向</strong>：共同进化 harness 与模型权重，使策略影响模型学习的内容，模型再影响策略。Co-Harness（报告 21）与 Continual Harness 的 co-learning loop 正在研究这一过程。</p><div class="prevnext"><a href="12_self_evolving_agents_survey.html">← 上一篇</a><a href="14_self_harness.html">下一篇 →</a></div><footer>RSI 研究札记 · 根据 awesome_rsi 仓库生成<br>论文结论与研究判断以各篇来源及实验边界为准。<a href="#">返回顶部 ↑</a></footer></main></div><script src="../site.js"></script></body></html>

@@ -1,0 +1,30 @@
+{
+  "sha256": "d8a7b0bb9b215e3adf635f5ab3d291fa8c464547daddf80879d5dd12bbb38f07",
+  "formal": "pass",
+  "status": "evaluated",
+  "formal_seconds": 0.24,
+  "synthesis_seconds": 0.537,
+  "area_um2": 283.29,
+  "cells": 221,
+  "timing_seconds": 0.148,
+  "delay_ns": 0.459069,
+  "adp": 130.04965701,
+  "id": "candidate-03",
+  "rationale": "在现有4位分组直接授权基础上，通过层次化组选择信号减少高位索引逻辑，并复用组有效信号生成授权，降低面积和延迟。",
+  "strategy": "层次化组选择与授权生成，复用组有效信号，优化索引编码。",
+  "usage": {
+    "prompt_tokens": 4289,
+    "completion_tokens": 3395,
+    "total_tokens": 7684,
+    "prompt_tokens_details": {
+      "cached_tokens": 256
+    },
+    "prompt_cache_hit_tokens": 256,
+    "prompt_cache_miss_tokens": 4033
+  },
+  "accepted": true,
+  "parent": "seed",
+  "adp_gain_pct": 9.238,
+  "area_gain_pct": -11.285,
+  "delay_gain_pct": 18.442
+}

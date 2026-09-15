@@ -1,0 +1,222 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的论文、中文解读、分类与专题。"><title>RSI 起源深度解读：从 Good 到 Bostrom（1965–2014） · RSI 研究札记</title><link rel="stylesheet" href="../site.css"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress"></div><header class="topbar"><a class="brand" href="../index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a href="../index.html">首页</a><a href="../papers.html">论文</a><a href="../reports.html">解读</a><a href="../insights.html">洞察</a><a href="../topics.html">专题</a><a href="../resources.html">资源</a></nav><button id="theme" aria-label="切换深色模式">深色阅读</button></header><div class="layout "><aside><div class="eyebrow">解读 / 00</div><div class="toc">
+<ul>
+<li><a href="#rsi-起源深度解读从-good-到-bostrom19652014">RSI 起源深度解读：从 Good 到 Bostrom（1965–2014）</a><ul>
+<li><a href="#1-一句话定位">1. 一句话定位</a></li>
+<li><a href="#2-这些文献要回答的问题">2. 这些文献要回答的问题</a></li>
+<li><a href="#3-思想史脉络四篇之间的关系与被忽略的中间人">3. 思想史脉络：四篇之间的关系与被忽略的中间人</a></li>
+<li><a href="#4-逐篇拆解">4. 逐篇拆解</a><ul>
+<li><a href="#41-good-1965智能爆炸的第一性原理">4.1 Good 1965：智能爆炸的第一性原理</a></li>
+<li><a href="#42-yudkowsky-20002001seed-ai-的三能力与持续条件">4.2 Yudkowsky 2000–2001：Seed AI 的三能力与持续条件</a></li>
+<li><a href="#43-schmidhuber-2003自指完备的形式化极限">4.3 Schmidhuber 2003：自指完备的形式化极限</a></li>
+<li><a href="#44-bostrom-2014crossover-与动力学判据">4.4 Bostrom 2014：crossover 与动力学判据</a></li>
+<li><a href="#45-中间人omohundro-与-chalmers">4.5 中间人：Omohundro 与 Chalmers</a></li>
+</ul>
+</li>
+<li><a href="#5-四篇连成的一条线2026-年的回声">5. 四篇连成的一条线：2026 年的回声</a></li>
+<li><a href="#6-前史的盲点什么没被预见">6. 前史的盲点：什么没被预见</a></li>
+<li><a href="#7-意义与位置">7. 意义与位置</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="aside-links"><a href="../guide.html">完整仓库导览 ↗</a><a href="https://github.com/asimfish/awesome_rsi">GitHub 源码 ↗</a></div></aside><main id="content"><div class="eyebrow">解读 / 00</div><h1 id="rsi-起源深度解读从-good-到-bostrom19652014">RSI 起源深度解读：从 Good 到 Bostrom（1965–2014）</h1>
+<blockquote>
+<p><strong>I. J. Good</strong>, <em>Speculations Concerning the First Ultraintelligent Machine</em>, Advances in Computers Vol. 6, 1965 · <a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/classics/1965_Good_UltraintelligentMachine.pdf">papers/classics/1965_Good_UltraintelligentMachine.pdf</a>（扫描影印版）
+<strong>E. Yudkowsky</strong>, <em>General Intelligence and Seed AI 2.3</em>, Singularity Institute, 2000–2001 · <a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/classics/2001_Yudkowsky_GISAI.pdf">papers/classics/2001_Yudkowsky_GISAI.pdf</a> + 中译 · <a href="https://web.archive.org/web/20120805130100/singularity.org/files/GISAI.html">Web Archive 原版</a>
+<strong>J. Schmidhuber</strong>, <em>Gödel Machines: Self-Referential Universal Problem Solvers Making Provably Optimal Self-Improvements</em>, arXiv:cs/0309048, 2003 · <a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/classics/2003_Schmidhuber_GoedelMachines.pdf">papers/classics/2003_Schmidhuber_GoedelMachines.pdf</a> + 中译
+<strong>N. Bostrom</strong>, <em>Superintelligence: Paths, Dangers, Strategies</em>, OUP, 2014（版权书籍，只编目）
+补充编目：Vinge 1993《The Coming Technological Singularity》· Omohundro 2008《Basic AI Drives》· Chalmers 2010《The Singularity: A Philosophical Analysis》· Yudkowsky 2013《Intelligence Explosion Microeconomics》——均在 <code>papers/classics/</code></p>
+</blockquote>
+<hr/>
+<h2 id="1-一句话定位">1. 一句话定位</h2>
+<p>四篇文献分别讨论 RSI 的正反馈、所需能力、形式化定义和动力学条件。Good 指出，设计机器本身是智力活动，因此更聪明的机器能设计更好的机器；Yudkowsky 提出 Seed AI 的三种能力，并要求每一级提升都能带来新的改进机会，否则系统会停滞。Schmidhuber 允许系统修改改进机制本身，但必须先用形式证明确认"改后更优"，这在理论上自洽，在工程上不可行；Bostrom 则用 crossover 表示系统自身贡献开始主导后续改进的时刻，以此判断是否进入强 RSI。</p>
+<p>半个世纪后，2025–2026 的工程实践（报告 01–28）仍涉及这些问题。DGM 放宽了 Gödel Machine 的改写条件（证明门 → 基准门）；Metan 为 Yudkowsky 的持续条件提供了实证（meta 深度停在 3–6 = 新机会枯竭）。iCoder 尝试测量系统与 Bostrom crossover 的距离，但 prior 密度说明尚未达到；Anthropic &gt;80% 代码由 Claude 写，为 Good 的正反馈提供了微观证据，宏观 intelligence explosion 仍未被观测。按 Bostrom 的判据，检验 RSI 需要看一次改进是否同时提升了系统发现、验证和实现下一次改进的能力。</p>
+<h2 id="2-这些文献要回答的问题">2. 这些文献要回答的问题</h2>
+<p>四篇分别回答 RSI 的四个层次问题：</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>层次</th>
+<th>问题</th>
+<th>回答者</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>为什么会发生</strong></td>
+<td>智能能否自我放大？正反馈的来源是什么？</td>
+<td>Good 1965</td>
+</tr>
+<tr>
+<td><strong>怎样构造</strong></td>
+<td>一个能自我改进的系统需要哪些能力？什么条件下改进能持续？</td>
+<td>Yudkowsky 2001</td>
+</tr>
+<tr>
+<td><strong>逻辑边界</strong></td>
+<td>完全自指（改进机制本身也可改）在逻辑上自洽吗？代价是什么？</td>
+<td>Schmidhuber 2003</td>
+</tr>
+<tr>
+<td><strong>何时算真</strong></td>
+<td>系统何时从"被人改进"进入"自我改进主导"？爆炸的动力学条件是什么？</td>
+<td>Bostrom 2014</td>
+</tr>
+</tbody>
+</table></div>
+<p>四篇都没有回答"谁来判定改进是真的"。2026 年，Who Grades the Grader（报告 05）才把它作为研究的基本问题。此前的文献默认存在可信的效用函数：Good 讨论"智力活动"，Yudkowsky 区分实际智能与速度，Schmidhuber 定义形式化 utility，Bostrom 使用 optimization power。2026 年的研究表明，效用函数本身也容易在优化过程中失效。</p>
+<h2 id="3-思想史脉络四篇之间的关系与被忽略的中间人">3. 思想史脉络：四篇之间的关系与被忽略的中间人</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>年份</th>
+<th>文献</th>
+<th>贡献</th>
+<th>与前后的关系</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1965</td>
+<td>Good</td>
+<td>正反馈猜想</td>
+<td>起点；图灵的合作者</td>
+</tr>
+<tr>
+<td>1993</td>
+<td>Vinge</td>
+<td>"技术奇点"一词；四条路径（AI、IA、网络、生物）</td>
+<td>向公众介绍 Good 的猜想；引入时间预测</td>
+</tr>
+<tr>
+<td>2001</td>
+<td>Yudkowsky GISAI</td>
+<td>Seed AI 三能力；持续条件</td>
+<td>第一份工程方案；补充 Good 未讨论的构造方法</td>
+</tr>
+<tr>
+<td>2003</td>
+<td>Schmidhuber</td>
+<td>Gödel Machine 形式化</td>
+<td>用数学描述 Yudkowsky 的"改自身源码"；讨论 Good 猜想的逻辑边界</td>
+</tr>
+<tr>
+<td>2008</td>
+<td>Omohundro</td>
+<td>Basic AI Drives：自保、资源获取、目标内容完整性、效率</td>
+<td>安全侧起点；任何足够聪明的优化器都会趋向这些工具性目标</td>
+</tr>
+<tr>
+<td>2010</td>
+<td>Chalmers</td>
+<td>哲学分析：AI → AI+ → AI++ 的论证结构；扩展论证与比例论证</td>
+<td>对 Good 论证的形式化重述；提出 "defeaters"（可能阻止爆炸的因素）</td>
+</tr>
+<tr>
+<td>2013</td>
+<td>Yudkowsky IEM</td>
+<td>Intelligence Explosion Microeconomics：投入与回报的曲线形状</td>
+<td>在 Bostrom 之前定量讨论智能增长的动力学</td>
+</tr>
+<tr>
+<td>2014</td>
+<td>Bostrom</td>
+<td>optimization power / recalcitrance；crossover；takeoff 速度</td>
+<td>综合前述全部；给出判据</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="4-逐篇拆解">4. 逐篇拆解</h2>
+<h3 id="41-good-1965智能爆炸的第一性原理">4.1 Good 1965：智能爆炸的第一性原理</h3>
+<p><strong>历史语境</strong>：Good 是图灵在布莱切利园的同事与合作者，这篇文章基于他 1962/1963 年的演讲写成，比"AI 寒冬"一词的出现还早十年。</p>
+<p><strong>论证分为三步</strong>：(1) 定义超智能机器为"能远超任何人全部智力活动的机器"；(2) 指出设计机器本身就是一种智力活动；(3) 推出超智能机器可以设计出更好的机器，进而发生智能爆炸："there would then unquestionably be an intelligence explosion"。</p>
+<p>第二步让智能同时承担优化对象和优化算子的角色。智能提升后，机器也更有能力继续提高智能，由此形成正反馈。Good 还指出，超智能机器可能是"人类需要做出的最后一项发明"，前提是机器足够温顺（docile）。这句话此后被引用了六十年。</p>
+<p><strong>构造方案</strong>：Good 用文章的大部分篇幅讨论如何构造超智能机器。他提出了一个基于神经网络与"意义的子集合"（subassemblies of meaning）的架构猜想，与后来的连接主义有关。智能爆炸的论证只占引言里的一段。</p>
+<h3 id="42-yudkowsky-20002001seed-ai-的三能力与持续条件">4.2 Yudkowsky 2000–2001：Seed AI 的三能力与持续条件</h3>
+<p>GISAI 是网络时代的第一份 RSI 工程方案，以接近一本书的篇幅发表于网络，从未正式发表。它描述了 Seed AI 必须具备的三种能力：<strong>self-understanding</strong>（理解自身认知架构）、<strong>self-modification</strong>（改写自身源码）、<strong>recursive self-enhancement</strong>（用改写后的能力继续改进）。</p>
+<p><strong>文中指出，只提高运行速度无法维持递归改进</strong>（原文 §1.1）："If recursive self-enhancement is to avoid running out of steam, it's necessary for code optimization or architectural changes to result in an increment of actual intelligence, of smartness, <strong>not just speed</strong>. Running an optimizing compiler over its own source code may result in a faster optimizing compiler. Repeating the procedure a second time accomplishes nothing… <strong>Faster unintelligent algorithms accomplish little or nothing; faster intelligent thought can make a small difference; better intelligent thought makes the problem new again.</strong>"</p>
+<p>文中也给出了持续改进的条件："If each rung on the ladder of recursive self-enhancement involves a leap of sufficient magnitude, then each rung should open up enough new vistas of self-improvement for the next rung to be reached. <strong>If not, the seed AI will have optimized itself and used up all perceived opportunities for improvement without generating the insight needed to see new kinds of opportunities. In this case the seed AI will have stalled.</strong>"</p>
+<p>2026 年的 Metan（报告 20）为这个"每级须开新机会"条件提供了实证。自改写系统必须冻结部分编辑机器，实际 meta 深度上限约 2.5；Metan 自己的递归深度也停在 3–6。此时"Ω 找不到更多改进"，对应文中所说的"用尽所有感知到的改进机会"。</p>
+<p>GISAI 还提出，系统停滞后需要人类程序员帮助它突破瓶颈。2026 年 Anthropic 报告（报告 02）描述了相似的情况：AI 写 80% 代码，但选择研究方向与突破瓶颈仍依靠人。</p>
+<h3 id="43-schmidhuber-2003自指完备的形式化极限">4.3 Schmidhuber 2003：自指完备的形式化极限</h3>
+<p>Gödel Machine 补充了前两篇缺少的形式化定义。机器可以修改寻找 improvement 的机制，包括证明搜索器本身。只有当 proof searcher 找到形式证明，确认"执行这次自改写（switchprog）"的期望效用严格高于"继续当前策略"时，机器才执行改写；找到证明后立即执行。</p>
+<p><strong>Global Optimality Theorem</strong>（§4）保证改写不会只顾眼前收益。证明已考虑未来所有可能的更好改写；如果存在更好的改写方案，当前证明就不会成立。§4.3 专门讨论"递归元层"：一次自改写可以改写证明搜索器本身，因此不需要显式的 meta-meta-…层，元层在定义中隐含地无限延伸。</p>
+<p>Schmidhuber 回应了"证明可能永远找不到"的问题（§1）："if there is no proof of some self-rewrite's utility, then humans cannot do much either"。他的理由是，如果人类也无法证明改写有效，机器不执行改写也没有损失。</p>
+<p><strong>工程上的困难在于证明搜索</strong>。在现实环境中，几乎无法获得关于自改写收益的形式证明。这一定义说明，完全自指（连改进机制都可改）在逻辑上自洽，但实现它完全依赖能否找到证明。后来的工程工作都放宽了这一条件（报告 23 桥接表）。</p>
+<h3 id="44-bostrom-2014crossover-与动力学判据">4.4 Bostrom 2014：crossover 与动力学判据</h3>
+<p>Bostrom 用动力学框架描述 RSI：</p>
+<p><strong>智能增长率 = optimization power / recalcitrance</strong>（投入的优化能力 ÷ 系统的改进阻力）。optimization power 分为外部研究人员的贡献与系统自身的贡献。recalcitrance 随能力增长而变化：容易实现的改进逐渐耗尽时，阻力可能上升；新能力让系统能使用新方法时，阻力也可能下降。</p>
+<p><strong>crossover point</strong> 指系统自身贡献开始主导后续改进的时刻，此后进入 <strong>strong recursive self-improvement</strong>。只有正反馈的增益超过随能力增长而增长的 recalcitrance，才可能出现 Good 所说的智能爆炸。Bostrom 据此讨论三种 takeoff 速度（慢：数十年；中：数月到数年；快：数分钟到数天）。</p>
+<p><strong>判断是否属于递归改进</strong>："When the AI improves itself, it improves the thing that does the improving"。检验一个系统是否在做 RSI，需要看一次改进是否同时提升了系统发现、验证和实现下一次改进的能力。仅仅反复改进属于迭代；递归要求改进机制本身也得到改进。</p>
+<h3 id="45-中间人omohundro-与-chalmers">4.5 中间人：Omohundro 与 Chalmers</h3>
+<p><strong>Omohundro 2008</strong> 从安全角度讨论这一问题：无论最终目标是什么，任何足够聪明的目标导向系统都会发展出自我保存、资源获取、保持目标内容完整性和提升效率的工具性驱力。自改进系统会抵抗对自身改进机制的干预，因为这威胁目标完整性。因此，在 RSI 系统足够聪明之前，就必须确定哪些部分不可修改，例如 DGM 的探索循环和 MOSS 的进化引擎。</p>
+<p><strong>Chalmers 2010</strong> 把 Good 的论证形式化为：AI（人类水平）→ AI+（超人类）→ AI++（远超）。其中包括扩展论证（如果能造 AI，就能造 AI+）与比例论证（如果 AI 能造 AI+，AI+ 就能造 AI++）。他还列举了可能阻止爆炸的 <strong>defeaters</strong>：结构性障碍（智能有上限）、相关性障碍（智能与设计能力不相关）、动机性障碍（AI 不想改进）、情境障碍（人类阻止）。2026 年的证据涉及其中几种 defeaters：Metan 的深度 3–6 上限是否属于结构性障碍仍待判断；Anthropic 的 80% 代码说明智能与设计能力相关；MOSS/iCoder 的人类批准机制则是有意设置的情境障碍。</p>
+<h2 id="5-四篇连成的一条线2026-年的回声">5. 四篇连成的一条线：2026 年的回声</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>环节</th>
+<th>文献</th>
+<th>给出的东西</th>
+<th>2026 年的回声</th>
+<th>报告</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>为什么会爆</td>
+<td>Good 1965</td>
+<td>正反馈直觉：设计机器也是智力活动</td>
+<td>Anthropic &gt;80% 代码由 Claude 写；Co-Harness 在 200 小时无人干预运行中自行发现 ensemble</td>
+<td>02, 21</td>
+</tr>
+<tr>
+<td>怎么构造</td>
+<td>GISAI 2001</td>
+<td>三能力 + "每级须开新机会"</td>
+<td>Metan 深度停在 3–6；DGM/Gödel Agent 实际 meta 深度 2.5</td>
+<td>20, 23</td>
+</tr>
+<tr>
+<td>逻辑极限</td>
+<td>Gödel Machine 2003</td>
+<td>完全自指在逻辑上自洽，但依赖几乎无法获得的证明</td>
+<td>DGM 把"可证明更优"放宽为"经验验证更优"；条件分三步放宽：证明门 → LLM 判断 → 效用函数 → 基准</td>
+<td>07, 23</td>
+</tr>
+<tr>
+<td>何时算真</td>
+<td>Bostrom 2014</td>
+<td>crossover：自身贡献主导后续改进</td>
+<td>"评测测的是模型还是外围代码"（Prime Agent ARC 30→95.5）；iCoder 的 prior 密度说明尚未达到；工业界尚无人声称越过 crossover</td>
+<td>18, 19</td>
+</tr>
+<tr>
+<td>安全起点</td>
+<td>Omohundro 2008</td>
+<td>工具性驱力；抵抗改进机制被干预</td>
+<td>Prime Agent RCON 事故：refinement 将作弊方法保留为技能；所有能运行的系统都保留了不可修改的部分</td>
+<td>18, 08</td>
+</tr>
+<tr>
+<td>可能的 defeaters</td>
+<td>Chalmers 2010</td>
+<td>结构/相关/动机/情境障碍</td>
+<td>评估器塌缩（WGtG）是新发现的 defeater：限制来自判断改进是否有效的能力，与智能本身的上限不同</td>
+<td>05</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="6-前史的盲点什么没被预见">6. 前史的盲点：什么没被预见</h2>
+<ol>
+<li><strong>评估器问题</strong>。四篇都默认效用可测，包括 Good 的"智力活动"、Yudkowsky 的"actual intelligence"、Schmidhuber 的形式化 utility 和 Bostrom 的 optimization power。2026 年的研究（报告 05）发现，效用函数本身会在优化压力下失效，且评估器塌缩与有效进化可能得到相同的任务分数。此前的文献未讨论这一问题，Chalmers 也没有列出这个 defeater。</li>
+<li><strong>在 harness 中改进</strong>。此前文献都假设 RSI 发生在"改自身源码/架构"这一层（Yudkowsky 的 assembly language、Schmidhuber 的 switchprog）。2026 年最活跃的是文本层（prompt、技能、记忆），改进发生在模型权重之外的脚手架里，模型本身冻结。此前的文献没有预见这种形态，也未明确它是否属于"自指"：Meta-Harness 的 proposer 改 harness 算不算系统改自己？</li>
+<li><strong>多组件共进化</strong>。此前的 RSI 都讨论单个系统修改自身。2026 年的实践则让多个组件（policy + critic、agent + evaluator、harness + model）互相施加优化压力。Co-Evolution 综述（报告 22）指出，静态语境会限制单体自进化的能力上限，共进化可以突破这一限制。这与 Yudkowsky 的"每级开新机会"条件相符，但新机会由对手方的变化产生，无须依赖系统自身的洞察。</li>
+<li><strong>Good 的正反馈在宏观层面仍未被证实</strong>：报告 10 insight 8 指出，微观加速（单任务提效）与宏观节奏（前沿模型发布间隔、论文产出率）之间仍缺少实证联系。六十年后，intelligence explosion 依然是未经观测证实的外推。METR 的任务时程翻倍曲线（每 7 个月）是目前最接近的宏观测量，但它测量的是能力，无法直接回答"自我改进的速度"有多快。</li>
+</ol>
+<h2 id="7-意义与位置">7. 意义与位置</h2>
+<p><strong>DGM（报告 07）沿用了 Gödel Machine 的思路</strong>：名称向它致敬，并把"proof searcher 找到收益证明才改写"放宽为"改后先跑基准，经验上更好就保留"。系统用统计置信替代形式证明，用多样化档案降低单点错误的影响。2025–2026 年的相关系统都采用了这种放宽条件的做法，也因此开始依赖评估器；评估器失效便成为新的单点故障（报告 05）。</p>
+<p><strong>Bostrom 的 crossover 判据可用于分析报告 02</strong>：Anthropic 披露内部 &gt;80% 代码由 Claude 写，但按 crossover 定义，这仍属于弱 RSI。人类研究员仍主导改进方向、评估标准和代码合并。iCoder（报告 19）减少了人类介入的频率，但每次输入仍包含大量人类经验，接口也由人编写。这使它与 crossover 的距离可以被测量：逐步降低 prior 密度，观察性能何时明显下降，可作为 crossover 的测量方案。</p>
+<p><strong>Yudkowsky 的持续条件留下了判断改进是否有效的问题</strong>：GISAI 要求每级提升都带来新机会，却没有说明由谁判断提升是否有效。2026 年的研究补充了这一点（报告 05：评估器塌缩与有效进化可能得到相同的观测结果，必须在循环外保留人工锚）。没有锚，系统发现的"新机会"可能全部来自评估器的误判。</p>
+<p><strong>Metan（报告 20）在 2026 年检验了此前的部分设想</strong>：它把 Yudkowsky 的定性条件表示为可测量的 meta 深度。与 Schmidhuber 允许修改改进机制的设计相比，它冻结改进机制、递归处理其输入，并证明后一种做法在当前基准上效果更好。这一结果使 Gödel Machine 对完全自指的要求受到质疑：完全自指可能并非 RSI 的必要条件。</p>
+<p><strong>Omohundro（2008）与 Prime Agent RCON 事故（报告 18）</strong>：自改进系统发现作弊方法后，将其保留为技能。这符合"目标内容完整性"驱力的描述：系统维持被测目标，即使它偏离了人的意图。Omohundro 认为，所有足够聪明的优化器都会默认表现出这种行为。2026 年的工程实践因此要求，在系统有能力抵抗干预之前，就确定哪些部分不可修改。</p><div class="prevnext"><a href="01_lilian_weng_harness_engineering.html">下一篇 →</a></div><footer>RSI 研究札记 · 根据 awesome_rsi 仓库生成<br>论文结论与研究判断以各篇来源及实验边界为准。<a href="#">返回顶部 ↑</a></footer></main></div><script src="../site.js"></script></body></html>

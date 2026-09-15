@@ -1,0 +1,251 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的论文、中文解读、分类与专题。"><title>EvoLM 深度解读：用判别效用训练 rubric 生成器，并与策略交替更新 · RSI 研究札记</title><link rel="stylesheet" href="../site.css"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress"></div><header class="topbar"><a class="brand" href="../index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a href="../index.html">首页</a><a href="../papers.html">论文</a><a href="../reports.html">解读</a><a href="../insights.html">洞察</a><a href="../topics.html">专题</a><a href="../resources.html">资源</a></nav><button id="theme" aria-label="切换深色模式">深色阅读</button></header><div class="layout "><aside><div class="eyebrow">解读 / 03</div><div class="toc">
+<ul>
+<li><a href="#evolm-深度解读用判别效用训练-rubric-生成器并与策略交替更新">EvoLM 深度解读：用判别效用训练 rubric 生成器，并与策略交替更新</a><ul>
+<li><a href="#1-一句话定位">1. 一句话定位</a></li>
+<li><a href="#2-要解决的问题奖励来源各有天花板而模型自己的评估知识没被用上">2. 要解决的问题：奖励来源各有天花板，而模型自己的评估知识没被用上</a></li>
+<li><a href="#3-为什么此前做不通设计空间对比">3. 为什么此前做不通：设计空间对比</a></li>
+<li><a href="#4-方法机制">4. 方法机制</a><ul>
+<li><a href="#41-把奖励分解为-rubric-生成器--冻结-judge">4.1 把奖励分解为 rubric 生成器 + 冻结 judge</a></li>
+<li><a href="#42-rubric-作为潜变量变分推断推出训练目标">4.2 rubric 作为潜变量：变分推断推出训练目标</a></li>
+<li><a href="#43-交替训练k-步策略k-步-rubric">4.3 交替训练：K 步策略、K 步 rubric</a></li>
+<li><a href="#44-三种自造偏好对">4.4 三种自造偏好对</a></li>
+</ul>
+</li>
+<li><a href="#5-实验结果全景">5. 实验结果全景</a></li>
+<li><a href="#6-局限作者自认--延伸批判">6. 局限（作者自认 + 延伸批判）</a></li>
+<li><a href="#7-意义与位置">7. 意义与位置</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="aside-links"><a href="../guide.html">完整仓库导览 ↗</a><a href="https://github.com/asimfish/awesome_rsi">GitHub 源码 ↗</a></div></aside><main id="content"><div class="eyebrow">解读 / 03</div><h1 id="evolm-深度解读用判别效用训练-rubric-生成器并与策略交替更新">EvoLM 深度解读：用判别效用训练 rubric 生成器，并与策略交替更新</h1>
+<blockquote>
+<p><strong>EvoLM: Self-Evolving Language Models through Co-Evolved Discriminative Rubrics</strong>
+arXiv 2605.03871v1（2026-05-05）· 华盛顿大学 + Allen Institute for AI + 宾夕法尼亚大学
+作者：Shuyue Stella Li<em>、Rui Xin</em>、Teng Xiao、Yike Wang、Rulin Shao、Zoey Hao、Melanie Sclar、Sewoong Oh、Faeze Brahman、Pang Wei Koh、Yulia Tsvetkov（* 同等贡献）
+代码：github.com/stellalisy/EvoLM · 模型：huggingface.co/stellalisy/EvoLM-8B · 归档：<a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2605.03871_EvoLM.pdf">papers/en/2605.03871_EvoLM.pdf</a> · 中译 <a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/zh/2605.03871_EvoLM_zh.pdf">papers/zh/2605.03871_EvoLM_zh.pdf</a></p>
+</blockquote>
+<hr/>
+<h2 id="1-一句话定位">1. 一句话定位</h2>
+<p>后训练的奖励来源会限制策略能学到的能力：人类标注难以监督超越人类的能力，专有 API 带来依赖，可验证奖励只适用于有真值的领域。EvoLM 提出无需外部监督的后训练方法，让同一个语言模型交替训练两个角色：(1) rubric 生成器，为每个问题生成评估标准，以帮助小型冻结 judge 区分回答质量的判别效用为优化目标；(2) 策略，以 rubric 条件下的 judge 分数为奖励，用 GRPO 训练。偏好对全部由策略自身输出构造，采用当前 checkpoint vs 更早 checkpoint 的时间对比，不使用人工标注。</p>
+<p>Qwen3-8B 训出的 rubric 生成器在 RewardBench-2 上比 GPT-4.1 提示式 rubric 高 25.7%。共同训练的策略在 OLMo3-Adapt 十二基准上平均为 69.3%，比使用 GPT-4.1 rubric 训练的策略高 3.9，比使用 SOTA 8B 奖励模型 Skywork-RM 训练的策略高 16%。</p>
+<p>实验还发现，Skywork-RM 在静态偏好基准上得分最高（RewardBench-2 86.4%、JudgeBench 80.8%），训出的策略却得分最低（59.7%）。无论评估标准存储在权重还是固定 rubric 中，都无法适应策略在学习过程中造成的奖励分布变化。本仓库将此称为 reward overoptimization 悖论，评估侧四篇（报告 03-06）都涉及这一问题。</p>
+<h2 id="2-要解决的问题奖励来源各有天花板而模型自己的评估知识没被用上">2. 要解决的问题：奖励来源各有天花板，而模型自己的评估知识没被用上</h2>
+<p>论文提出了以下问题：</p>
+<ol>
+<li><strong>四种现行奖励来源各有限制</strong>：人类偏好标注无法监督超出人类的能力，标量奖励模型容易被 reward hacking，可验证奖励只适用于有真值答案的领域，专有 LLM-as-judge 则带来依赖。</li>
+<li><strong>模型已在预训练中学到评估知识</strong>。RL 可以引出并强化这些已有知识。自改进需要解决的问题是，怎样将它们组织成能可靠打分的标准。</li>
+<li><strong>rubric 可以表达评估标准，但 rubric 生成器尚未按效用训练</strong>。在不可验证领域，评估可分为 rubric 生成（确定测什么）和 judging（按标准打分）。rubric 将评估知识写成具体标准，小 judge 据此也能可靠打分；标准可以检查，judge 也可以更换。已有 rubric-RL 工作依赖任务验证器、标注偏好数据，或由专有教师生成 rubric。它们都没有形式化定义什么样的 rubric 有用，再以此为目标端到端训练生成器。</li>
+</ol>
+<p>EvoLM 给出的标准是：<strong>rubric 有用 ⇔ 它帮助 judge 分辨好坏</strong>。给定偏好对后，检查 judge 在该 rubric 条件下是否为偏好回答打出更高分。这个分差可以用来衡量 rubric 质量，也可以作为训练目标。</p>
+<h2 id="3-为什么此前做不通设计空间对比">3. 为什么此前做不通：设计空间对比</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>训练 rubric 生成器</th>
+<th>无专有 API</th>
+<th>无外部标签</th>
+<th>不限于可验证域</th>
+<th>与策略共进化</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RAR（GPT-4.1 生成 rubric）</td>
+<td>✗</td>
+<td>✗</td>
+<td>✓</td>
+<td>✓</td>
+<td>✗</td>
+</tr>
+<tr>
+<td>RRD（GPT-4.1 迭代精炼 rubric）</td>
+<td>✗</td>
+<td>✗</td>
+<td>✓</td>
+<td>✓</td>
+<td>✗</td>
+</tr>
+<tr>
+<td>RLCER（共训但需任务验证器过滤）</td>
+<td>✓</td>
+<td>✓</td>
+<td>✗</td>
+<td>✗</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>Rubric-ARM（共训生成器与 judge，需参考对）</td>
+<td>✓</td>
+<td>✓</td>
+<td>✗</td>
+<td>✓</td>
+<td>✗</td>
+</tr>
+<tr>
+<td><strong>EvoLM</strong></td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+</tbody>
+</table></div>
+<p>前四种方法各有限制。依赖专有教师的方法无法自行产生全部训练信号；依赖验证器的方法限于可验证领域；使用参考对的方法需要训练标签。EvoLM 满足表中全部五项条件，但必须自行构造偏好对（§4.4）。</p>
+<h2 id="4-方法机制">4. 方法机制</h2>
+<h3 id="41-把奖励分解为-rubric-生成器--冻结-judge">4.1 把奖励分解为 rubric 生成器 + 冻结 judge</h3>
+<p>通常的做法是训练标量奖励模型 R(q, a)，评估标准隐含在权重中，无法直接检查。EvoLM 将评估拆成两步，用自然语言连接：rubric 生成器 ρ_φ 产出 r = ρ_φ(q)，judge J 按标准打分 s = J(q, r, a) ∈ [0, 1]。judge 全程冻结，因此训练信号的改进只能来自 rubric 生成器。默认 judge 为 Qwen3-1.7B。该框架认为，小 judge 只要获得能区分质量的 rubric，也能提供有效奖励；实验用 1.7B 检验这一判断。</p>
+<h3 id="42-rubric-作为潜变量变分推断推出训练目标">4.2 rubric 作为潜变量：变分推断推出训练目标</h3>
+<p>有效的 rubric 应让 judge 为偏好回答打出更高分。将 rubric 视为解释观测偏好的潜变量 r ~ ρ_ref(r|q)，则偏好似然为 p(a⁺ ≻ a⁻ | q, r) = σ(J(q, r, a⁺) − J(q, r, a⁻))。这是对 Bradley-Terry 模型的推广，用潜在的 rubric 生成偏好，替代原来的潜在标量奖励。后验 p(r | a⁺, a⁻, q) 不可解，因此采用摊销变分推断，最大化 ELBO：</p>
+<p>L = E_{r~ρ_φ(r|q)}[log p(a⁺ ≻ a⁻ | q, r)] − KL(ρ_φ(r|q) ‖ ρ_ref(r|q))</p>
+<p>rubric 是离散文本，因此用策略梯度优化。rubric 生成器作为 agent，以正确重建偏好顺序的对数似然为奖励。实际训练将 log-sigmoid 换成边际奖励与格式奖励：R = α·(J(q,r,a⁺) − J(q,r,a⁻)) + (1−α)·R_format，α = 0.7。边际奖励提供与分差成比例的连续信号，格式奖励（0/1）检查 rubric 是否符合 judge 能解析的 JSON schema。消融（Table 7）显示，加入格式奖励后，RewardBench-2 从 37.2 提高到 46.0。</p>
+<h3 id="43-交替训练k-步策略k-步-rubric">4.3 交替训练：K 步策略、K 步 rubric</h3>
+<p>两者都用 GRPO，计算组相对优势，不学习价值函数。策略损失的优势来自 judge 分数 J(q, ρ_φ(q), a)，在同一问题的回答组内归一化；rubric 生成器的优势则在同一问题采样得到的 rubric 组内归一化。策略先更新 K 步，此时 rubric 生成器冻结；随后 rubric 生成器用策略输出构造偏好对，更新 K 步，默认 K = 50。策略改进后，rubric 生成器需要学习更具体的标准，才能区分当前输出的质量。rubric 提高判别能力后，又为策略提供更明确的奖励信号。两者共享参数，由 Qwen3-8B 同时承担策略和 rubric 生成器，用不同 prompt 切换角色。两模型配置用于消融，RB2 更高，为 48.4，但策略得分仍为 69.3。</p>
+<h3 id="44-三种自造偏好对">4.4 三种自造偏好对</h3>
+<p>rubric 目标需要 (a⁺, a⁻)，全部从策略自身输出构造，默认三种均匀混用：</p>
+<ol>
+<li><strong>时间对比（Temporal contrast）</strong>：保存 rollout 及其训练步。将当前步 t 的回答记为 a⁺，更早步 t′ &lt; t 的回答记为 a⁻，假定策略随训练改善，因此偏好较晚的回答。步间距 t − t′ 控制难度：间距大时容易区分，间距小时需要更细的 rubric。默认范围为 [20, 100]；随着训练推进，较早的回答逐渐被更强的回答替换，比较难度也随之变化。</li>
+<li><strong>推断问题（IQ）</strong>：给定 a⁺，让策略推断它回答的是什么问题 q̂，再针对 q̂ 生成 a⁻。由此训练 rubric 检查回答是否符合原问题。</li>
+<li><strong>rubric 条件（RC）</strong>：从当前生成器采样 r，以 (q, r) 为条件生成 a⁺，只用 q 生成 a⁻。如果包含 rubric 的条件持续产生更好的回答，就说明 rubric 提供了可执行的标准。训练据此鼓励生成器产出能改善回答的标准。</li>
+</ol>
+<h2 id="5-实验结果全景">5. 实验结果全景</h2>
+<p><strong>设置</strong>：Tulu 3 偏好混合数据去重后约有 27.1 万 prompt，覆盖通用对话、IFEval 式指令遵循、数学、代码、科学文献和人设指令。GRPO 学习率为 1e-6，KL 系数为 0.001，每题采样 8 次。所有方法统一执行 500 步策略更新；RRD、RLCER 每步开销明显更高，Appendix A.7 列出了成本分解。评估分为下游策略质量和 rubric 质量。前者使用 OLMo3-Adapt 十二基准：GSM8K、MATH、HumanEval+、MBPP+、BBH、MMLU、IFEval、PopQA、GPQA、ZebraLogic、AGI-Eval、AlpacaEval v3；后者测量 RewardBench-2、JudgeBench 上的判别精度。</p>
+<p><strong>主表（Table 2）中的主要结果</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>RB2 平均（rubric 质量）</th>
+<th>JudgeBench 平均</th>
+<th>策略平均（12 基准）</th>
+<th>HumanEval+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GPT-4.1 提示式 rubric</td>
+<td>36.6</td>
+<td>41.3</td>
+<td>66.7</td>
+<td>58.7</td>
+</tr>
+<tr>
+<td>Qwen3-8B 提示式 rubric</td>
+<td>26.2</td>
+<td>—</td>
+<td>67.5</td>
+<td>73.7</td>
+</tr>
+<tr>
+<td><strong>Skywork-RM-V2（标量 RM）</strong></td>
+<td><strong>86.4</strong></td>
+<td><strong>80.8</strong></td>
+<td><strong>59.7</strong></td>
+<td>47.9</td>
+</tr>
+<tr>
+<td>RAR / RRD（冻结 GPT-4.1 rubric）</td>
+<td>N/A</td>
+<td>N/A</td>
+<td>67.5 / 67.6</td>
+<td>77.4 / 75.2</td>
+</tr>
+<tr>
+<td>RLCER</td>
+<td>45.0</td>
+<td>49.2</td>
+<td>66.7</td>
+<td>80.5</td>
+</tr>
+<tr>
+<td>Rubric-ARM</td>
+<td>56.1</td>
+<td>51.5</td>
+<td>67.5</td>
+<td>78.4</td>
+</tr>
+<tr>
+<td>Sequential（IQ）/（RC）</td>
+<td>47.2 / 46.0</td>
+<td>48.6 / 42.2</td>
+<td>68.0 / 68.3</td>
+<td>76.5 / 80.2</td>
+</tr>
+<tr>
+<td><strong>EvoLM（共进化）</strong></td>
+<td>46.0</td>
+<td>44.4</td>
+<td><strong>69.3</strong></td>
+<td><strong>86.2</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>表中有三项比较。(1) EvoLM 策略得分最高，增益最大的是代码任务（HumanEval+ 86.2 vs 次优 80.5），细粒度标准在这类任务中能更明确地区分回答质量。(2) 共进化的策略得分高于顺序训练（69.3 vs 68.3），即使顺序训练的静态 rubric 精度更高（RB2 47.2 vs 46.0）。下游质量还取决于 rubric 能否适应不断变化的策略输出分布。(3) 标量 RM 的 RB2 为 86.4、JudgeBench 为 80.8，训出的策略却只有 59.7，为各方法最低，落后 EvoLM 9.6 分，AlpacaEval 仅为 28.3。作者将其归为 reward overoptimization（Gao 2023、Ivison 2024）：静态标准无法适应策略学习过程中形成的奖励分布，共进化 rubric 则通过持续重构标准避开这种失败。</p>
+<p><strong>机制：rubric 从抽象标签进化为可验证检查（§3.2.1）</strong>。论文对四个领域作了定性分析。早期 rubric 多用短标签或通用检查，训练后的 rubric 则在每条标准中写出具体、可验证的期望。例如，数学标准把 80% 权重集中在包含期望答案的一条检查上（"由周长 48 导出的正确最大面积 144"），将证明验证改为答案核对。受限写作则把格式与关键词要求合并为可以计数的检查。</p>
+<p>在 100 个评估 prompt 上，纯标签标准从 21.9% 降到 0.3%，包含具体期望值的标准从 6.9% 升到 19.3%，约束型标准从 7.7% 升到 20.3%。这些变化让小 judge 更多地匹配具体标准，减少其不擅长的整体语义判断。边际目标会奖励任何能扩大 judge 分差的标准，因此更容易验证的具体标准比抽象标准获得更多奖励。标准长度单调增长（59 → 112 字符），条数稳定在 3-4。</p>
+<p><strong>泛化（§3.3）</strong>：在 OOD 深度研究任务上，生成标准与专家 rubric 的成对一致率为 HealthBench 58.4% vs GPT-4.1 52.5%，ResearchQA 59.3% vs 51.0%。冻结的 rubric 生成器迁移到未见策略（Qwen3-4B、Llama-3.1-8B）后，仍优于 GPT-4.1 rubric。结果也能迁移到其他 judge 和架构（OLMo-3-7B）。用多个 judge 训练后，生成器产出的标准也更容易被训练集合之外的 judge 理解。</p>
+<p><strong>消融（Table 7，每行只改变一个维度）</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>变体</th>
+<th>RB2</th>
+<th>策略</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>奖励设计</td>
+<td>主 prompt + 边际 + 格式⋆</td>
+<td>46.0</td>
+<td>69.3</td>
+</tr>
+<tr>
+<td></td>
+<td>主 prompt + 边际（无格式）</td>
+<td>37.2</td>
+<td>66.9</td>
+</tr>
+<tr>
+<td>交替频率 K</td>
+<td>2 / 10 / 20 / 50⋆ / 100</td>
+<td>46.4 / 44.5 / 46.9 / 46.0 / 48.5</td>
+<td>67.9 / 68.5 / 68.6 / 69.3 / 68.7</td>
+</tr>
+<tr>
+<td>judge 大小</td>
+<td>0.6B / 1.7B⋆ / 4B / 8B / 14B</td>
+<td>22.1 / 46.0 / 61.6 / 59.5 / 67.6</td>
+<td>67.9 / 69.3 / 66.5 / 67.1 / 69.0</td>
+</tr>
+<tr>
+<td>偏好信号</td>
+<td>IQ / RC / 时间对比⋆ / 三者合</td>
+<td>48.1 / 48.4 / 46.0 / 49.3</td>
+<td>68.6 / 68.6 / 69.3 / 67.8</td>
+</tr>
+<tr>
+<td>步间距</td>
+<td>[5,20] / [20,100]⋆ / [100,300]</td>
+<td>48.8 / 46.0 / 47.1</td>
+<td>68.6 / 69.3 / —</td>
+</tr>
+</tbody>
+</table></div>
+<p>消融中，更大的 judge 没有带来更好的策略：4B judge 的 RB2 为 61.6，策略为 66.5，低于 1.7B 的 69.3。三种偏好信号合用时，RB2 最高（49.3），策略得分却最低（67.8）。这与主表中的标量 RM 结果一致：rubric 的静态精度提高，未必能提高下游策略质量。</p>
+<h2 id="6-局限作者自认--延伸批判">6. 局限（作者自认 + 延伸批判）</h2>
+<p>作者指出，方法只在通用后训练数据上验证，尚不清楚混入医学、法律等专门领域数据后的效果。在中间步骤可验证的任务中，rubric 如何变得更具体较为清楚；对纯主观标准，论文尚未充分分析其效果。冻结 judge 是为了确保改进只来自 rubric 生成器，但也限制了生成器能学到的标准复杂度。</p>
+<p>还有以下问题：</p>
+<ol>
+<li><strong>论文未充分解释共进化为何能避免被利用</strong>。将"静态 RM 判分越准、策略越差"归为 reward overoptimization，可以解释静态标准为什么会被利用。但共进化的 rubric 同样是策略的优化目标，论文没有解释它为何能避免这一问题。Who Grades the Grader（报告 05）认为，共进化评估器需要锚来避免塌缩，此处对应冻结 judge 与时间对比中"较晚的回答更好"的假设；任务分数本身无法证明评估器没有塌缩。EvoLM 假定较晚 checkpoint 必然优于较早 checkpoint，这个锚尚未经过检验。</li>
+<li><strong>RB2 与策略质量在消融中反复出现不一致</strong>。论文据此强调共进化的优势，但也可能是评估器基准未能测量与训练相关的能力。若 RB2/JudgeBench 无法预测下游策略质量，"rubric 生成器超过 GPT-4.1 25.7%"也就不足以说明它能更好地训练策略。</li>
+<li><strong>rubric 越来越偏向可验证的检查</strong>。例如，数学题把 80% 权重分配给答案核对。在有唯一答案的任务中，这相当于引入隐式验证器，可以发挥作用。在开放任务中，同一机制却可能鼓励用可数特征替代主观质量判断，从而产生 Goodhart 效应。论文没有检查开放任务中的 rubric 是否因此缩小了评估范围。</li>
+<li><strong>十二基准中的 GSM8K/MATH 基本饱和</strong>（95 左右）。差异全部来自 HumanEval+、BBH、AlpacaEval 三项，69.3 vs 66.7 的平均差异主要由代码任务贡献。</li>
+</ol>
+<h2 id="7-意义与位置">7. 意义与位置</h2>
+<p>EvoLM 发表于 2026-05，是评估侧四篇（报告 03-06）中最早把评估器系统地纳入训练循环的工作。RQGM（报告 04）在 epoch 内冻结评估器，到边界再替换；Who Grades the Grader（报告 05）证明必须在循环外保留人工锚；ECHO（报告 06）则让 critic 与 policy 通过双路 GRPO 同步更新。四篇都涉及 DGM（报告 07）留下的问题：基准提升能否说明能力提升。它们提出的条件是，评估器随策略更新，同时保留一个固定的锚。</p>
+<p>标量 RM 的实验结果是报告 10 insight 1（评估器同时限制判分与训练）及 insight 3（评估器与策略的相对更新速度影响系统表现）的主要证据。SCORE（报告 22 综述提及）随后在权重层实现评估器与求解器共享参数、联合训练。EvalCEGAR（报告 24）则将评估器组织为可读的算子池。这两项工作分别延续了 EvoLM 的参数共享设计和可检查的自然语言接口。</p>
+<p>方法上有三个设计选择。首先，用可测目标定义评估器的效用（判别效用 = judge 在该 rubric 下的分差）。其次，通过时间对比构造偏好对，无需额外标注，但"较晚的回答优于较早的回答"也成为系统唯一且未经检验的假设锚。最后，冻结 judge，只进化 rubric，以确定改进来自哪个部件。相关系统也都在进化之外保留固定的评估依据，尽管论文没有将这一设计称为锚。</p><div class="prevnext"><a href="02_anthropic_when_ai_builds_itself.html">← 上一篇</a><a href="04_red_queen_godel_machine.html">下一篇 →</a></div><footer>RSI 研究札记 · 根据 awesome_rsi 仓库生成<br>论文结论与研究判断以各篇来源及实验边界为准。<a href="#">返回顶部 ↑</a></footer></main></div><script src="../site.js"></script></body></html>

@@ -1,0 +1,170 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的论文、中文解读、分类与专题。"><title>WikiSkill 深度解读：在 raw 与 skill 之间保留不随技能回滚的 wiki 知识层 · RSI 研究札记</title><link rel="stylesheet" href="../site.css"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress"></div><header class="topbar"><a class="brand" href="../index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a href="../index.html">首页</a><a href="../papers.html">论文</a><a href="../reports.html">解读</a><a href="../insights.html">洞察</a><a href="../topics.html">专题</a><a href="../resources.html">资源</a></nav><button id="theme" aria-label="切换深色模式">深色阅读</button></header><div class="layout "><aside><div class="eyebrow">解读 / 09</div><div class="toc">
+<ul>
+<li><a href="#wikiskill-深度解读在-raw-与-skill-之间保留不随技能回滚的-wiki-知识层">WikiSkill 深度解读：在 raw 与 skill 之间保留不随技能回滚的 wiki 知识层</a><ul>
+<li><a href="#1-一句话定位">1. 一句话定位</a></li>
+<li><a href="#2-要解决的问题">2. 要解决的问题</a></li>
+<li><a href="#3-为什么此前做不通三条线各差一块">3. 为什么此前做不通：三条线各差一块</a></li>
+<li><a href="#4-方法机制">4. 方法机制</a><ul>
+<li><a href="#41-三层工作区可变性刻意不同">4.1 三层工作区（可变性刻意不同）</a></li>
+<li><a href="#42-四组件循环">4.2 四组件循环</a></li>
+</ul>
+</li>
+<li><a href="#5-实验结果全景">5. 实验结果全景</a><ul>
+<li><a href="#主结果">主结果</a></li>
+<li><a href="#收益因数据集而异421">收益因数据集而异（§4.2.1）</a></li>
+<li><a href="#技能进化与模型规模互补">技能进化与模型规模互补</a></li>
+<li><a href="#跨模型迁移">跨模型迁移</a></li>
+<li><a href="#消融gemini-flash">消融（Gemini Flash）</a></li>
+<li><a href="#案例alfworld-qwen-27b">案例（ALFWorld, Qwen-27B）</a></li>
+</ul>
+</li>
+<li><a href="#6-局限">6. 局限</a></li>
+<li><a href="#7-意义与位置">7. 意义与位置</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="aside-links"><a href="../guide.html">完整仓库导览 ↗</a><a href="https://github.com/asimfish/awesome_rsi">GitHub 源码 ↗</a></div></aside><main id="content"><div class="eyebrow">解读 / 09</div><h1 id="wikiskill-深度解读在-raw-与-skill-之间保留不随技能回滚的-wiki-知识层">WikiSkill 深度解读：在 raw 与 skill 之间保留不随技能回滚的 wiki 知识层</h1>
+<blockquote>
+<p><strong>WikiSkill: Compiling Agent Experience into Persistent Knowledge for Skill Evolution</strong>
+arXiv 2608.27454 v1（2026-08-27）· Google Research + Virginia Tech
+灵感：Karpathy (2026) 的 "LLM Wiki" 设想，把经验整理成持久、可累积的知识
+归档：<a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2608.27454_WikiSkill.pdf">papers/en/2608.27454_WikiSkill.pdf</a></p>
+</blockquote>
+<hr/>
+<h2 id="1-一句话定位">1. 一句话定位</h2>
+<p>EvoSkill、Trace2Skill、SkillOpt 将分析结果分散在优化历史中，难以跨迭代复用，导致根因分析重复、被拒方案反复提出。WikiSkill 将 agent 工作区分成三层：<strong>不可变的 raw 轨迹</strong>、<strong>持续更新且永不回滚的 wiki 知识库</strong>、<strong>经过验证、可以回滚的 skill</strong>，供后续更新查询 wiki 中的经验。</p>
+<p>五基准、五模型的评估中，平均分均排名第一，比各模型下最强竞争方法高 <strong>3.3–12.0 分</strong>。Qwen 家族增益随规模递增（4B +12.3 / 9B +17.5 / 27B +23.9），且 <strong>9B+技能（47.4%）&gt; 27B 无技能（39.4%）</strong>，技能发现与执行可分开，并可跨模型共享。消融中，Proposer 使用 wiki 带来 <strong>+15.0</strong>；Inference Agent 在训练时访问 wiki 则造成 <strong>−2.8</strong>，支持了知识层与执行层隔离的设计。</p>
+<h2 id="2-要解决的问题">2. 要解决的问题</h2>
+<p>Agent skill 将领域知识（流程、脚本、资源）打包为轻量的文件系统模块（SKILL.md + 资源目录）。它无需修改模型参数就能积累专业能力，通过 progressive disclosure 节省上下文。近期工作从经验中自动进化 skill：运行训练任务、分析成败轨迹、修改 skill。</p>
+<p>这些方法的共同缺陷是：<strong>没有独立维护并持续更新从经验中获得的知识</strong>。</p>
+<ul>
+<li>EvoSkill：只累积提案与评估结果的历史记录；</li>
+<li>Trace2Skill：将轨迹中的经验直接写入 skill 更新；</li>
+<li>SkillOpt：保留被拒编辑的反馈，并按 epoch 提供元指导，分析结果仍分散在各个优化工件中。</li>
+</ul>
+<p>系统因此重复分析根因、再次提出被拒方案，无法跨迭代复用已验证的模式与失败归因。</p>
+<p>WikiSkill 在原始经验与可执行技能之间加入<strong>持久、只增不减的结构化知识库</strong>，支持审计、索引和引用，超出 prompt 缓存的功能。</p>
+<h2 id="3-为什么此前做不通三条线各差一块">3. 为什么此前做不通：三条线各差一块</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>已有路线</th>
+<th>有什么</th>
+<th>缺什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>直接轨迹→skill（Trace2Skill）</td>
+<td>端到端，实现简单</td>
+<td>知识随 skill 回滚而丢失；无法跨轮累积</td>
+</tr>
+<tr>
+<td>优化历史累积（EvoSkill）</td>
+<td>保留提案记录</td>
+<td>记录未按结构组织；Proposer 无法按需检索模式</td>
+</tr>
+<tr>
+<td>epoch 元指导（SkillOpt）</td>
+<td>提供高层进化方向</td>
+<td>分散在优化工件中；没有独立知识层</td>
+</tr>
+<tr>
+<td>MOSS 源码自改写</td>
+<td>修改 harness 代码，确定性生效</td>
+<td>无法跨代码库迁移；无法处理流程性知识</td>
+</tr>
+<tr>
+<td>ECHO/RQGM critic 共进化</td>
+<td>评估信号随 policy 变化</td>
+<td>critic 每轮进化，但不保存结构化知识</td>
+</tr>
+</tbody>
+</table></div>
+<p>技能与证据需要分开管理：<strong>坏 skill 必须能回滚，失败实验记录则需保留</strong>。此前方法将两者合在一起，全部回滚会丢失知识，全部保留会把无效修改留在 skill 中。</p>
+<h2 id="4-方法机制">4. 方法机制</h2>
+<h3 id="41-三层工作区可变性刻意不同">4.1 三层工作区（可变性刻意不同）</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>层</th>
+<th>目录</th>
+<th>内容</th>
+<th>可变性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Raw</td>
+<td><code>raw/</code></td>
+<td>完整执行轨迹</td>
+<td><strong>不可变</strong>，一次写入</td>
+</tr>
+<tr>
+<td>Wiki</td>
+<td><code>wiki/</code></td>
+<td>模式页、进化日志、技能影响追踪</td>
+<td><strong>持续累积，永不重置、永不回滚</strong></td>
+</tr>
+<tr>
+<td>Skill</td>
+<td><code>skills/</code></td>
+<td>SKILL.md + PURPOSE.md（回链 wiki 模式）</td>
+<td><strong>可逆</strong>，验证后接受或回滚</td>
+</tr>
+</tbody>
+</table></div>
+<p>每次验证后，外层 harness 自动向 <code>skill-impact.md</code> 追加提案元数据、diff、验证分及接受或拒绝的结果。Proposer 据此核查效果，避免重复提出失败修改。</p>
+<h3 id="42-四组件循环">4.2 四组件循环</h3>
+<ol>
+<li><strong>Inference Agent</strong>：将活跃技能全文注入 system prompt，运行训练集 rollout 并写入 raw。<strong>训练时禁止访问 wiki</strong>。</li>
+<li><strong>Wiki Maintainer</strong>：分析采样成败轨迹的根因，以 patch-based 方式创建或更新模式页，更新数量不设上限。</li>
+<li><strong>Skill Proposer</strong>：执行多轮 ReAct。初始只接收 wiki 索引、skill-impact 和训练结果摘要，再<strong>按需</strong>通过 read_file 查询模式页和 raw。每次产出<strong>原子提案</strong>，只修改一个 skill。</li>
+<li><strong>Gating &amp; Rollback</strong>：在验证集上评估候选技能集，得到 R(T_val,k)。仅当 <strong>R(T_val,k) &gt; R_best</strong> 时接受，平局也拒绝。接受后更新 R_best，验证分达到 1.0 时提前终止；拒绝后丢弃候选，回滚技能集。<strong>无论结果如何，wiki 都保留</strong>。</li>
+</ol>
+<p><strong>系统状态形式化</strong>：迭代 k 的状态为元组 (S_k, W_k)。技能集 S_k 可因验证表现退化而回滚，知识库 W_k 则跨迭代持续累积。从 (S_0, W_0) = (∅, ∅) 开始，WikiSkill 在 K 轮中共同更新两者。wiki 用于：(1) 保存完整的技能接受历史，避免再次提出被拒干预；(2) 追踪历史提案及其成败；(3) 识别跨迭代反复出现的错误。</p>
+<p><strong>两层的更新规则不同</strong>：技能需通过验证，可以回滚；知识持续累积，永不回滚。被拒提案也写入 wiki，例如"这个方案试过，验证分 0.72，被拒"。</p>
+<h2 id="5-实验结果全景">5. 实验结果全景</h2>
+<p><strong>设置</strong>：五基准 LiveMath / SealQA / SpreadSheet / OfficeQA / ALFWorld；五模型 Gemini-3.5-Flash、Qwen-3.6-27B 等；对比 EvoSkill、Trace2Skill、SkillOpt。</p>
+<h3 id="主结果">主结果</h3>
+<p>WikiSkill 在全部五个模型上的平均分都排名第一：<strong>Gemini Flash 68.1%（次优 56.1%）</strong>、<strong>Qwen-27B 63.3%（次优 53.3%）</strong>。按单个基准看，Gemini 在 LiveMath 上从 <strong>33.0→72.6%</strong>，在 SpreadSheet 上从 <strong>50.5→76.6%</strong>；Qwen 在 ALFWorld 上从 <strong>52.8→77.6%</strong>。竞争方法的收益不稳定：EvoSkill 在 LiveMath 上使 Qwen-9B 提高 30 分，却使 Gemma-31B 下降 4 分。</p>
+<h3 id="收益因数据集而异421">收益因数据集而异（§4.2.1）</h3>
+<p>Qwen-3.6-27B 在各基准上的增益为：SpreadSheet <strong>+40.9</strong>、LiveMath <strong>+28.0</strong>、ALFWorld <strong>+24.8</strong>、SealQA +14.1、OfficeQA +11.6。LiveMath 在全部五个模型上都有收益（+20.6 到 +39.6），ALFWorld 在四个模型上提高 +14.0 到 +29.3。OfficeQA 的长文档检索工作流对大模型有效（27B +11.6、Gemini +12.1），Qwen-3.5-4B 则无法执行多步搜索，退回默认的文档读取行为，表现轻微下降。技能能带来多少收益，取决于失败是否源于可写成步骤的流程问题；知识不足造成的失败更难用这类技能处理。</p>
+<h3 id="技能进化与模型规模互补">技能进化与模型规模互补</h3>
+<ul>
+<li>收益随规模递增：Qwen 4B/9B/27B 的平均增益分别为 <strong>+12.3 / +17.5 / +23.9</strong>；</li>
+<li><strong>9B+技能（47.4%）&gt; 27B 无技能（39.4%）</strong>，较小模型在获得技能后可以超过未使用技能的较大模型；</li>
+<li>模型仍需具备执行技能的能力：OfficeQA 多步搜索超出 4B 的能力，导致表现轻微退化。</li>
+</ul>
+<h3 id="跨模型迁移">跨模型迁移</h3>
+<ul>
+<li>Qwen-9B 使用 27B 进化的技能，在 ALFWorld 上达到 <strong>70.2%</strong>，使用自身技能时为 <strong>63.4%</strong>；</li>
+<li>4B 技能使 Gemma-31B 在 LiveMath 上达到 <strong>73.1%</strong>；</li>
+<li>27B 技能使 Gemini Flash 在 SpreadSheet 上达到 <strong>63.4%</strong>（自进化 50.5%），使 Gemma-4-31B 在 LiveMath 上达到 <strong>73.7%</strong>（无技能 33.9%、自进化 56.7%）；</li>
+<li><strong>负迁移</strong>：4B 的 SpreadSheet 技能使 Gemini Flash 从 <strong>50.5% 降至 18.1%</strong>。错误分析指出了两个原因：(i) 4B 技能包含<strong>低层 workaround</strong>（单行 Python、字符串转换规则），有助于小模型避免执行失败，却限制了强模型使用端到端脚本；(ii) 诊断流程过于碎片化，增加了冗余工具调用，耗尽了 Gemini 的交互预算。</li>
+<li><strong>迁移差异</strong>：技能发现与技能执行需要不同的能力，更强的源模型未必产出更好的技能。迁移效果取决于技能记录的是通用流程，还是针对特定模型的补丁。LiveMath 技能跨模型迁移效果较好，4B 与 27B 技能分别使 Gemini 从 33.0 提到 67.5 / 73.9；SpreadSheet 技能则高度依赖源模型与目标模型的匹配。</li>
+</ul>
+<h3 id="消融gemini-flash">消融（Gemini Flash）</h3>
+<ul>
+<li>Proposer 使用 wiki 后，得分从 <strong>48.7% → 63.7%（+15.0）</strong>，表明持久保存知识有助于生成技能提案；</li>
+<li>Inference 在训练时访问 wiki，得分从 <strong>63.7% → 60.9（−2.8）</strong>。解法从 wiki 泄漏后，轨迹无法反映 skill 的缺陷，使进化依赖的反馈失真。</li>
+</ul>
+<h3 id="案例alfworld-qwen-27b">案例（ALFWorld, Qwen-27B）</h3>
+<p>迭代 0 中，goal-directed-action 技能的验证分为 0.72，被拒后 diff 存入 skill-impact。迭代 1 参考这条拒绝记录，提出 break-repetition-loop，以 0.78 通过验证。迭代 2–4 累积新的循环变体，继续修改技能。被接受的更新中，39–52% 发生在早期，后续细化持续到中后期。</p>
+<h2 id="6-局限">6. 局限</h2>
+<ol>
+<li><strong>评估仍使用静态验证集，要求 Rbest 单调提高</strong>。这与 EvoLM/RQGM/WGtG 批评的标准设置相同，在依赖主观质量判断的任务中，会遇到 DGM 一样的评估限制。</li>
+<li><strong>wiki 永不回滚，可能保留错误知识</strong>。skill 的接受条件可以排除效果差的 skill，却无法阻止 wiki 中的错误归因。系统没有独立审计 wiki 的质量，可以考虑将 WGtG 使用固定评估依据的方法用于知识层。</li>
+<li><strong>严格接受条件限制了探索</strong>。只接受验证分严格提高的修改，会排除当前没有收益、但有助于后续改进的方案。DGM 的搜索路径常经过性能下降的节点，两者的取舍不同；这里的探索全部由 wiki 承担。</li>
+<li><strong>实验将技能全文注入</strong>。把全部技能放进 system prompt，避开了检索和触发问题。生产技能库增长后，检索失败可能抵消技能带来的收益。</li>
+<li><strong>Gemini-3.5-Flash 在 ALFWorld 上早停</strong>（验证分达到 1.0）。因此，在跨模型迁移表中，Gemini 不能作为 ALFWorld 的技能源。验证集过小或过易时，R_best = 1.0 的终止条件可能过早结束进化。</li>
+<li><strong>atomic proposal 每次只修改一个 skill</strong>，限制较严，迭代也较慢。它无法表达多个技能必须一起修改才有效的情况，例如 A 与 B 需要同时改变。这可能是 39–52% 的已接受更新集中在早期的原因之一。</li>
+<li><strong>与 MOSS 处理的问题不同</strong>。MOSS 指出文本层无法修复 harness 故障；WikiSkill 展示了继续改进文本层的收益，以及跨模型共享技能的能力。结构性故障需要修改源码，流程知识则可以通过文本技能复用。</li>
+</ol>
+<h2 id="7-意义与位置">7. 意义与位置</h2>
+<p>论文将证据与修改分开处理：实验记录不变，知识持续更新，技能修改验证后才接受。这对应于科研中的实验记录、综述更新和同行评审，被用于 agent 自改进循环。</p>
+<p><strong>与六篇核心材料的关系</strong>：六篇主要研究评估器进化，WikiSkill 关注知识保存与复用。本文仍用静态评估器判断技能，持久 wiki 层则补充了 ECHO/RQGM 缺少的知识管理机制。</p>
+<p><strong>与技能进化五篇合评（报告 26）</strong>：WikiSkill 发布前后两周内，SkillCommit / HyperSkill / ERSkill / SkillProx / Evo-Harness 相继出现。它们选择了不同的技能组织方式：层级、超图、检索原语、近端形式化或单次编译。这五篇都没有采用 WikiSkill 的分层规则，即知识层永不回滚、技能层经过严格验证。SkillCommit 的跨实例重放可以补充 WikiSkill 的一处验证缺口：从 wiki 抽象为 skill 的过程缺少行为验证。</p>
+<p><strong>与 Metan（报告 20）的反面数据</strong>：Metan 消融中，层间条件化字符串贡献 72%，可调用代码库贡献 15%。WikiSkill 用文本（SKILL.md）表示技能，因此收益可能主要来自改进 prompt 前缀，尚不能归因于执行程序。论文没有做"技能 vs 等量上下文提示"的对照，知识侧研究普遍缺少这项验证。</p>
+<p><strong>与 Anthropic</strong>：wiki 记录试过哪些方法、失败原因和反复出现的模式，使文章所说的"品味"有了可积累的具体内容。skill 迁移实验表明，强模型总结的这类经验可能被弱模型复用。</p><div class="prevnext"><a href="08_moss.html">← 上一篇</a><a href="10_synthesis_insights.html">下一篇 →</a></div><footer>RSI 研究札记 · 根据 awesome_rsi 仓库生成<br>论文结论与研究判断以各篇来源及实验边界为准。<a href="#">返回顶部 ↑</a></footer></main></div><script src="../site.js"></script></body></html>

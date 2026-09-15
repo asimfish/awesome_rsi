@@ -1,0 +1,198 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的论文、中文解读、分类与专题。"><title>Self-Evolving Coding Agents 综述深度解读：编码反馈如何支持自进化，错误又如何被长期保留 · RSI 研究札记</title><link rel="stylesheet" href="../site.css"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress"></div><header class="topbar"><a class="brand" href="../index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a href="../index.html">首页</a><a href="../papers.html">论文</a><a href="../reports.html">解读</a><a href="../insights.html">洞察</a><a href="../topics.html">专题</a><a href="../resources.html">资源</a></nav><button id="theme" aria-label="切换深色模式">深色阅读</button></header><div class="layout "><aside><div class="eyebrow">解读 / 28</div><div class="toc">
+<ul>
+<li><a href="#self-evolving-coding-agents-综述深度解读编码反馈如何支持自进化错误又如何被长期保留">Self-Evolving Coding Agents 综述深度解读：编码反馈如何支持自进化，错误又如何被长期保留</a><ul>
+<li><a href="#1-一句话定位">1. 一句话定位</a></li>
+<li><a href="#2-综述要回答的问题">2. 综述要回答的问题</a></li>
+<li><a href="#3-与其他综述的分工">3. 与其他综述的分工</a></li>
+<li><a href="#4-三个正交维度拆解">4. 三个正交维度拆解</a><ul>
+<li><a href="#维度一--进化对象3主分类">维度一 · 进化对象（§3，主分类）</a></li>
+<li><a href="#维度二--进化时间41">维度二 · 进化时间（§4.1）</a></li>
+<li><a href="#维度三--进化证据42">维度三 · 进化证据（§4.2）</a></li>
+</ul>
+</li>
+<li><a href="#5-编码域特有的风险6">5. 编码域特有的风险（§6）</a></li>
+<li><a href="#6-局限">6. 局限</a></li>
+<li><a href="#7-意义与位置">7. 意义与位置</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="aside-links"><a href="../guide.html">完整仓库导览 ↗</a><a href="https://github.com/asimfish/awesome_rsi">GitHub 源码 ↗</a></div></aside><main id="content"><div class="eyebrow">解读 / 28</div><h1 id="self-evolving-coding-agents-综述深度解读编码反馈如何支持自进化错误又如何被长期保留">Self-Evolving Coding Agents 综述深度解读：编码反馈如何支持自进化，错误又如何被长期保留</h1>
+<blockquote>
+<p><strong>Self-Evolving Coding Agents: A Survey</strong>
+arXiv 2608.03392 v1（2026-08）· 南京理工大学 + 南京大学 iSEngLab（Hao Zhou、Haichuan Hu、Ye Shang、Quanjun Zhang）
+配套仓库：<a href="https://github.com/iSEngLab/Awesome-Self-Evolving-Coding-Agents">iSEngLab/Awesome-Self-Evolving-Coding-Agents</a>（论文清单按进化对象六类组织，持续维护）
+中文解读：微信公众号《一篇 Self-Evolving Coding Agents 最新综述》mp.weixin.qq.com/s/hSrJLcZN3j7J7X02N2HIMg
+归档：<a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2608.03392_SelfEvolvingCodingAgentsSurvey.pdf">papers/en/2608.03392_SelfEvolvingCodingAgentsSurvey.pdf</a> · 中译 <a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/zh/2608.03392_SelfEvolvingCodingAgentsSurvey_zh.pdf">papers/zh/2608.03392_SelfEvolvingCodingAgentsSurvey_zh.pdf</a></p>
+</blockquote>
+<hr/>
+<h2 id="1-一句话定位">1. 一句话定位</h2>
+<p>编码 agent 已能检查仓库、调用工具、运行测试、调试和生成补丁，但大多数在部署后不再更新自身。仓库演化、依赖变更、测试失败和修复尝试仍会不断留下可复用的经验。综述区分了三种情况：给传统编码 agent 添加学习模块、将通用自进化 agent 用于代码任务，以及自进化编码 agent。后者指"基于此前编码尝试与软件特有反馈更新自身行为或内部组件的 agentic 软件工程系统"。</p>
+<p>编码域的进化围绕可执行制品展开。单元测试、编译诊断、运行轨迹、静态分析、仓库历史、CI 日志和代码评审，都可以为系统修改提供证据。综述从三个相互独立的维度分类：进化对象（框架 / 记忆 / 技能工具 / 模型 / 工作流拓扑）、进化时间（任务时 / 任务后 / 阶段式）、进化证据（结果 / 环境反馈 / 轨迹）。三类证据不能互相替代。结果用于选择，环境反馈用于在线适应，轨迹用于积累经验。</p>
+<p>风险一节讨论错误如何长期保留。不可靠的测试结果、噪声轨迹、弱验证器或基准捷径，可能被写入记忆、蒸馏为技能、用于选择工作流或更新模型。这些错误会继续影响后续任务。这是本仓库第三份综述，专门讨论编码域。配套 awesome 列表与本仓库收录的资源较为接近。</p>
+<h2 id="2-综述要回答的问题">2. 综述要回答的问题</h2>
+<p>编码域在 RSI 文献中占比最高，DGM、SICA、Meta-Harness、Self-Harness、AutoSaddler、HarnessFix、RHO 都主要使用编码基准。综述将原因归于可执行反馈。运行代码、检查测试是否通过、读取编译错误，都能提供监督信号。综述认为，这些信号免费、确定且即时，写作、研究和对话等领域缺少同类反馈。</p>
+<p>这也带来两个问题：</p>
+<ol>
+<li><strong>可执行反馈的可靠性</strong>：测试可能不完整，编译通过也不代表代码正确。CI 日志可能含有噪声，基准可能泄漏。需要检验 agent 能否从这些信号中获得可靠经验。</li>
+<li><strong>向其他域迁移的条件</strong>：如果收益全部依赖可执行反馈，就无法据此支持非编码域的自进化，RSI 方法的适用范围也会受到限制。</li>
+</ol>
+<p>综述按证据分类，分别讨论各类证据支持哪些进化方式，以及使用时有哪些风险。</p>
+<h2 id="3-与其他综述的分工">3. 与其他综述的分工</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>综述</th>
+<th>中心</th>
+<th>本文对应</th>
+<th>本文增量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TMLR 四维（报告 12）</td>
+<td>What / When / How / Where</td>
+<td>进化对象 ≈ What；进化时间 ≈ When；进化证据 ≈ How 的输入侧</td>
+<td>应用于编码域，并区分三类证据</td>
+</tr>
+<tr>
+<td>Co-Evolution（报告 22）</td>
+<td>多组件相互影响</td>
+<td>本文的"框架自进化"与"工作流拓扑自进化"部分重叠</td>
+<td>从单体出发，未处理共进化</td>
+</tr>
+<tr>
+<td>Weng 总纲（报告 01）</td>
+<td>harness 阶梯</td>
+<td>本文的"框架自进化" = Weng 第三级</td>
+<td>具体分析编码域的风险</td>
+</tr>
+<tr>
+<td>iSEngLab awesome 列表</td>
+<td>论文清单</td>
+<td>本文提供其分类框架</td>
+<td>与本仓库互补，已互相收录</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="4-三个正交维度拆解">4. 三个正交维度拆解</h2>
+<h3 id="维度一--进化对象3主分类">维度一 · 进化对象（§3，主分类）</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>对象</th>
+<th>内容</th>
+<th>本仓库对应</th>
+<th>风险等级</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>框架自进化</strong></td>
+<td>修改自身脚手架实现</td>
+<td>SICA、DGM 及后继（报告 07/23）、Meta-Harness（13）</td>
+<td><strong>最高</strong>，比更轻量的形式更难保证可靠性</td>
+</tr>
+<tr>
+<td><strong>记忆自进化</strong></td>
+<td>仓库记忆、issue 解决经验库</td>
+<td>WikiSkill（09）的 wiki 层</td>
+<td>中，错误归因可能被长期保留</td>
+</tr>
+<tr>
+<td><strong>技能与工具自进化</strong></td>
+<td>将编码轨迹蒸馏为技能注册表</td>
+<td>技能进化合评（26）、SkillCommit</td>
+<td>中，技能会过时或冗余</td>
+</tr>
+<tr>
+<td><strong>模型自进化</strong></td>
+<td>用软件演化数据训练策略</td>
+<td>iCoder（19）、Co-Harness（21）</td>
+<td>高，权重不可回滚</td>
+</tr>
+<tr>
+<td><strong>工作流与拓扑自进化</strong></td>
+<td>更新多 agent 角色、通信模式和拓扑</td>
+<td>HyperAgents</td>
+<td>高，难以明确责任</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="维度二--进化时间41">维度二 · 进化时间（§4.1）</h3>
+<ul>
+<li><strong>任务时（task-time）</strong>：解题时根据测试失败或编译错误即时修改补丁、调整工具用法，成本最低，效果持续时间最短；</li>
+<li><strong>任务后（post-task）</strong>：将结果抽象为记忆、技能或仓库知识，成本和持久性居中；</li>
+<li><strong>阶段式（stage-wise）</strong>：累积一批验证轨迹后更新模型或组织，成本最高，效果最持久。</li>
+</ul>
+<p>本调研还区分免重置/重置式（报告 11）。与这一区分比较，任务时 ≈ intra-episode，对应 CH 的设置；阶段式 ≈ 离线批次，对应 AutoSaddler、Co-Harness 的设置。</p>
+<h3 id="维度三--进化证据42">维度三 · 进化证据（§4.2）</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>证据</th>
+<th>内容</th>
+<th>支撑什么</th>
+<th>粒度</th>
+<th>可靠性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>结果证据</strong></td>
+<td>基准解决率、测试通过率、验证器分、准确-成本-延迟综合效用</td>
+<td><strong>选择</strong>（SICA/DGM 据此筛选自改写版本）</td>
+<td>粗</td>
+<td>受基准泄漏、测试不完整影响</td>
+</tr>
+<tr>
+<td><strong>环境反馈</strong></td>
+<td>编译诊断、测试日志、运行错误、工具输出</td>
+<td><strong>在线适应</strong></td>
+<td>中</td>
+<td>受工具 bug、沙箱保真度影响</td>
+</tr>
+<tr>
+<td><strong>轨迹证据</strong></td>
+<td>完整轨迹里成功与失败动作揭示的可复用策略、反复错误、仓库特有实践</td>
+<td><strong>积累</strong>（跨任务经验/记忆/技能）</td>
+<td>细</td>
+<td>受噪声、LLM 非确定性影响</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>证据用途</strong>：三类证据都能提示需要修改，但提供的监督信息不同，不能互换。常见误用是仅凭一次通过测试的结果，就将所用策略视为有效经验保存下来。</p>
+<h2 id="5-编码域特有的风险6">5. 编码域特有的风险（§6）</h2>
+<p><strong>错误如何累积</strong>：不可靠的测试结果、噪声轨迹、弱验证器或基准特定捷径，可能通过记忆、技能、工作流选择和模型更新被长期保留。单次推理中的错误只影响当次结果。自进化系统还可能从错误中学习，使后续任务反复受其影响。</p>
+<p>四组挑战：</p>
+<ol>
+<li>
+<p><strong>可复现性、污染与基准过拟合</strong>：SICA、DGM 用基准结果选择自改写版本，综述指出这类系统对评估噪声与基准泄漏尤其敏感。代码评估已有数据污染问题。分数提高可能来自能力提升，也可能来自记住样本、反复调参或过拟合公开验证信号，需要区分这些来源。Meta-Harness 的 TB2 搜索集 = 测试集就存在这一问题（报告 13 局限 1）。</p>
+</li>
+<li>
+<p><strong>反馈可靠性、安全与工具依赖</strong>：测试、编译器、CI 日志、生成测试和奖励模型都可能出错。系统使用这些反馈，也会继承其偏差与盲点。agent 修改工具、工作流或自身脚手架时，误导性反馈还会影响后续行为。因此需要检验工具可靠性、沙箱保真度和安全检查。EnvHarness 对环境反馈失真的讨论也涉及这一问题（报告 15 局限 2）。</p>
+</li>
+<li>
+<p><strong>长期记忆、技能与协调</strong>：经验库、仓库记忆和技能库会过时或冗余。它们可能过于依赖特定仓库，也可能被失败轨迹污染。多 agent 与工作流进化还会增加成本，造成运行不稳定和责任不清。WikiSkill 存在 wiki 污染风险（报告 09 局限 2）。SkillProx 为处理这类问题单独设计了删除机制（报告 26）。</p>
+</li>
+<li>
+<p><strong>超越短基准的评估</strong>：现有评估主要测量短时程通过率和解决率。真实软件工程还需要检验可维护性、安全性、可评审性、效率与长期可靠性。迁移证据大多限于域内或近域，尚少有研究检验基于软件工程反馈学到的改进能否用于非编码域。</p>
+</li>
+</ol>
+<h2 id="6-局限">6. 局限</h2>
+<ol>
+<li><strong>与报告 12 的分类接近</strong>：进化对象六类 ≈ TMLR 的 What 维、进化时间三类 ≈ When 维、进化证据 ≈ How 维的输入侧。框架本身变化有限，新增内容主要是将分类用于编码域，并区分三类证据。</li>
+<li><strong>同样没有锚的理论</strong>：§6 指出了错误会被长期保留，要求评估区分能力提升与过拟合，但未说明如何区分。Who Grades the Grader（报告 05）提出在系统外设置不参与进化的锚。本文未给出这类具体办法，也未引用相关研究。</li>
+<li><strong>收录截至 2026 年中</strong>：Meta-Harness、AutoSaddler、HarnessFix、RHO 等 2026 年 6–8 月的 harness 优化工作，多数尚未纳入正文分类。正文因此缺少编码域中大量近期自进化工作，配套 awesome 列表仍在补充。</li>
+<li><strong>可执行反馈的可靠性仍需检验</strong>：综述强调可执行反馈对编码域的优势，但 HVTB（报告 27）与 Prime Agent（报告 18）显示，这类反馈同样可被 game。通过测试并不代表解决了问题，执行结果的可信度还需单独检验。DGM 的伪造日志（报告 07）是最早的例子。</li>
+<li><strong>未回答如何迁移到非编码域</strong>：这一问题影响 RSI 方法的适用范围，综述虽已提出，却只用一句话讨论。</li>
+<li><strong>无定量元分析</strong>：与 TMLR 综述一样，本文主要依靠文献覆盖面支持分析。</li>
+</ol>
+<h2 id="7-意义与位置">7. 意义与位置</h2>
+<p><strong>三综述的分工</strong>（报告 12 / 22 / 28）：TMLR 用四个维度描述单体自进化。Co-Evolution 将多组件相互影响分为三个阶段。本文按对象、时间和证据三个维度组织编码域研究。本仓库的每篇论文都能用其中至少两套框架分类。</p>
+<p><strong>证据三分法是对报告 10 §2 两轴地图的补充</strong>：报告 10 按修改对象和改进瓶颈分类，本文补充了修改所依据的证据。结果、环境和轨迹证据的可靠性不同。报告 03–06、24–25 讨论评估器可靠性，本文在编码域中区分了这些证据的用途与限制。</p>
+<p><strong>对报告 23 桥接史的独立确认</strong>：综述将 SICA 与 DGM 并列为用结果证据验证自改写的代表，也将它们归入基准过拟合风险最高的一类。这与报告 23 梳理的"证明门 → 效用门 → 基准门"三步放宽过程一致。</p>
+<p><strong>对报告 13–16 harness 工业化四篇</strong>：按本文分类，Meta-Harness / Self-Harness / AutoSaddler 都属于"框架自进化 + 阶段式 + 结果证据"，处于风险最高的一类。它们分别采用 proposer 隔离、双 split 回归和 dev 门，处理本文风险 1 所述的问题。</p>
+<p><strong>对报告 19 iCoder</strong>：iCoder 属于"模型自进化 + 阶段式 + 结果证据（verifier）"。本文因权重不可回滚而将其列为高风险。iCoder 要求追溯 checkpoint 来源，并禁止削弱 verifier，以此约束模型更新。</p>
+<p><strong>"错误被持久化"是本调研 insight 之一的独立表述</strong>：报告 10 将评估器塌缩视为自进化失败的主要原因，本文则讨论错误如何进入记忆、技能和工作流。前者关注锚的设置，后者关注缺少锚时错误如何影响后续行为。</p>
+<p><strong>配套 awesome 列表是本仓库的近邻</strong>：iSEngLab 按进化对象组织论文，主要覆盖编码域。本仓库按锚的位置组织 RSI 研究，还包括前史、评估侧和宏观争论。两者覆盖范围互补，已互相收录。</p><div class="prevnext"><a href="27_safety_governance.html">← 上一篇</a><a href="29_prism_awesome_rsi.html">下一篇 →</a></div><footer>RSI 研究札记 · 根据 awesome_rsi 仓库生成<br>论文结论与研究判断以各篇来源及实验边界为准。<a href="#">返回顶部 ↑</a></footer></main></div><script src="../site.js"></script></body></html>

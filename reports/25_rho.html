@@ -1,0 +1,288 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的论文、中文解读、分类与专题。"><title>RHO 深度解读：从未标注轨迹优化 harness，单轮 SWE-Bench Pro 59%→78% · RSI 研究札记</title><link rel="stylesheet" href="../site.css"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress"></div><header class="topbar"><a class="brand" href="../index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a href="../index.html">首页</a><a href="../papers.html">论文</a><a href="../reports.html">解读</a><a href="../insights.html">洞察</a><a href="../topics.html">专题</a><a href="../resources.html">资源</a></nav><button id="theme" aria-label="切换深色模式">深色阅读</button></header><div class="layout "><aside><div class="eyebrow">解读 / 25</div><div class="toc">
+<ul>
+<li><a href="#rho-深度解读从未标注轨迹优化-harness单轮-swe-bench-pro-5978">RHO 深度解读：从未标注轨迹优化 harness，单轮 SWE-Bench Pro 59%→78%</a><ul>
+<li><a href="#1-一句话定位">1. 一句话定位</a></li>
+<li><a href="#2-要解决的问题">2. 要解决的问题</a></li>
+<li><a href="#3-为什么此前做不通三条线各差一块">3. 为什么此前做不通：三条线各差一块</a></li>
+<li><a href="#4-方法机制algorithm-1单轮">4. 方法机制（Algorithm 1，单轮）</a><ul>
+<li><a href="#41-阶段-1--coreset-选择dpp">4.1 阶段 1 · Coreset 选择（DPP）</a></li>
+<li><a href="#42-阶段-2--组-rollout-与自诊断">4.2 阶段 2 · 组 rollout 与自诊断</a></li>
+<li><a href="#43-阶段-3--best-of-n-提案--自偏好选择">4.3 阶段 3 · Best-of-N 提案 + 自偏好选择</a></li>
+<li><a href="#44-harness-表面">4.4 harness 表面</a></li>
+</ul>
+</li>
+<li><a href="#5-实验结果全景">5. 实验结果全景</a><ul>
+<li><a href="#51-主结果table-1held-out-通过率codex-风格-cli-agent--gpt-55">5.1 主结果（Table 1，held-out 通过率，Codex 风格 CLI agent + GPT-5.5）</a></li>
+<li><a href="#52-vs-meta-harnesstable-2swe-bench-pro">5.2 vs Meta-Harness（Table 2，SWE-Bench Pro）</a></li>
+<li><a href="#53-诊断消融table-4">5.3 诊断消融（Table 4）</a></li>
+<li><a href="#54-best-of-n-的价值table-3n3">5.4 Best-of-N 的价值（Table 3，N=3）</a></li>
+<li><a href="#55-行为分析61">5.5 行为分析（§6.1）</a></li>
+</ul>
+</li>
+<li><a href="#6-局限">6. 局限</a></li>
+<li><a href="#7-意义与位置">7. 意义与位置</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="aside-links"><a href="../guide.html">完整仓库导览 ↗</a><a href="https://github.com/asimfish/awesome_rsi">GitHub 源码 ↗</a></div></aside><main id="content"><div class="eyebrow">解读 / 25</div><h1 id="rho-深度解读从未标注轨迹优化-harness单轮-swe-bench-pro-5978">RHO 深度解读：从未标注轨迹优化 harness，单轮 SWE-Bench Pro 59%→78%</h1>
+<blockquote>
+<p><strong>RHO: Retrospective Harness Optimization from Unlabeled Trajectories</strong>
+arXiv 2606.05922 v3（2026-06 首发，v3 2026-08-29）· 香港城市大学 + 微软亚洲研究院（Wenbo Pan、Shujie Liu、Chin-Yew Lin、Jingying Zeng、Xianfeng Tang、Xiangyang Zhou、Yan Lu、Xiaohua Jia）
+代码 / 项目页：github.com/wbopan/retro-harness · paper-rho.wenbo.io
+归档：<a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2606.05922_RHO.pdf">papers/en/2606.05922_RHO.pdf</a></p>
+</blockquote>
+<hr/>
+<h2 id="1-一句话定位">1. 一句话定位</h2>
+<p>harness 优化方法几乎都需要带 ground truth 的验证集，包括 Meta-Harness、AutoSaddler、Self-Harness。部署场景很难获得这些标注数据，通常只有历史轨迹。RHO（Retrospective Harness Optimization）用行列式点过程（DPP）从历史中选出困难且多样的任务 coreset，并行重解 G 次。agent 检查单条轨迹内能否确认自己的结果，也比较 G 条轨迹间是否存在分歧。这两类信号分别称为自验证和自一致性，用于诊断失败、编写改进指令。系统再通过 best-of-N 生成候选 harness（Skills + Tools），用 agent 自己的成对自偏好选择候选。</p>
+<p>优化过程不使用外部评分。单轮优化把 SWE-Bench Pro 从 59% 提到 78%（Terminal-Bench 2 71→76、GAIA-2 29→37）。作为对照，Meta-Harness 需要标签。在匹配算力的单轮设置下，Meta-Harness 通过率为 0.62；十轮达到 0.80，使用了 3.1× 算力，且仍需标签。</p>
+<p>RHO 用组内相对信号替代外部评估器，Who Grades the Grader（报告 05）和 EvalCEGAR（报告 24）则依赖锚。作者在局限 (4) 中指出，只评估了单轮，不声称多轮增益会累积或保持单调。WGtG 的塌缩结论涉及多轮动态，因此仍需多轮实验检验 RHO 能否持续改进。</p>
+<h2 id="2-要解决的问题">2. 要解决的问题</h2>
+<p>论文研究如何在只有历史轨迹、没有标签的情况下，改进 harness 并提升未来任务的表现。</p>
+<p>三个现实约束：</p>
+<ol>
+<li><strong>标签稀缺</strong>：部署系统积累了大量用户会话和任务日志，但几乎没有 ground truth，通常无人逐次标注会话结果的对错；</li>
+<li><strong>验证集会过时</strong>：部署分布会随时间变化，已有验证集可能无法反映新的任务分布；</li>
+<li><strong>既有方法全部依赖验证反馈</strong>：Meta-Harness 读取完整历史，依靠搜索集分数选择候选；AutoSaddler 用 dev 集筛选；Self-Harness 用双 split 通过率判定。没有标签，这些方法的选择机制就无法运行。</li>
+</ol>
+<p>RHO 假设 agent 能通过自身行为识别失败。它可以在单条轨迹内运行测试、检查输出，也可以比较同一任务 G 次解法的分歧，判断表现是否稳定。这两个信号无需标签，可用于定位 harness 需要修改的部分。</p>
+<h2 id="3-为什么此前做不通三条线各差一块">3. 为什么此前做不通：三条线各差一块</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>已有路线</th>
+<th>有什么</th>
+<th>缺什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Meta-Harness（报告 13）</td>
+<td>全历史 + 前沿 proposer</td>
+<td>用<strong>搜索集分数</strong>选候选，需要标签；多轮运行消耗较多算力</td>
+</tr>
+<tr>
+<td>AutoSaddler（报告 16）</td>
+<td>mini-batch + dev 门</td>
+<td>用 <strong>dev 集</strong>检验泛化；消融显示不经 dev 门筛选时收益为负</td>
+</tr>
+<tr>
+<td>Self-Harness（报告 14）</td>
+<td>双 split 回归门</td>
+<td><strong>held-in/held-out 通过率</strong>；需 verifier</td>
+</tr>
+<tr>
+<td>Dynamic Cheatsheet / ReasoningBank / Sleep-time Compute</td>
+<td>从轨迹积累记忆/技能，无标签</td>
+<td>保存经验，但不比较和选择 harness；增益 ≤ +0.05</td>
+</tr>
+<tr>
+<td>自一致性（Wang et al.）</td>
+<td>多次采样投票</td>
+<td>用于<strong>推理时</strong>选答案，不用于选 harness</td>
+</tr>
+<tr>
+<td>WGtG（报告 05）</td>
+<td>证明无锚不可验证</td>
+<td>规范性结论，不给无锚场景的可行方案</td>
+</tr>
+</tbody>
+</table></div>
+<p>这些方法尚未用 agent 的自偏好选择 harness。记忆类方法无需标签，会保存所有经验，但不筛选候选。RHO 从 N 个候选 harness 中选择一个。</p>
+<h2 id="4-方法机制algorithm-1单轮">4. 方法机制（Algorithm 1，单轮）</h2>
+<h3 id="41-阶段-1--coreset-选择dpp">4.1 阶段 1 · Coreset 选择（DPP）</h3>
+<p>历史轨迹中大多是简单任务，直接重放会把预算花在已能完成的任务上。RHO 用 DPP 核 L 对轨迹排序，使 coreset 包含困难任务，并覆盖不同失败模式。难度项衡量此前失败或置信度低的情况，多样性项用嵌入距离衡量覆盖了哪些失败模式。两项按 θ 加权，再由 DPP-Greedy 选出 k 条。消融（§6.2）显示，只按难度（θ=1）、只按覆盖（θ=0）和随机采样都不如 DPP 混合。</p>
+<h3 id="42-阶段-2--组-rollout-与自诊断">4.2 阶段 2 · 组 rollout 与自诊断</h3>
+<p>对 coreset 中的每个任务并行重解 G 次，提取两类信号：</p>
+<ul>
+<li><strong>自验证</strong>（self-validation）：检查单条轨迹内部 agent 能否确认自己的结果，包括是否运行测试、检查输出；</li>
+<li><strong>自一致性</strong>（self-consistency）：比较 G 条轨迹之间是否存在分歧。一致性低通常意味着当前 harness 在该任务上表现不稳定。</li>
+</ul>
+<p>agent 据此写出改进指令 I_t，再合并各任务的指令，形成诊断摘要。</p>
+<h3 id="43-阶段-3--best-of-n-提案--自偏好选择">4.3 阶段 3 · Best-of-N 提案 + 自偏好选择</h3>
+<p>harness 优化具有随机性，即使输入信号有效，性能也可能不提升。RHO 并行生成 N 个候选 harness，分别在 coreset 上重跑，得到新轨迹。agent 逐个任务比较"新轨迹 vs 原 harness 的旧轨迹"，给出偏好分。系统汇总各任务的偏好分，选择得分最高的候选。整个过程不读取 ground-truth 标签。</p>
+<h3 id="44-harness-表面">4.4 harness 表面</h3>
+<p>系统编辑 Skills + Tools。Skills 记录 grader 或环境中此前导致失败的特定要求，例如某个基准的验收方式。Tools 提供可执行的辅助程序，例如修复-验证工具。</p>
+<h2 id="5-实验结果全景">5. 实验结果全景</h2>
+<h3 id="51-主结果table-1held-out-通过率codex-风格-cli-agent--gpt-55">5.1 主结果（Table 1，held-out 通过率，Codex 风格 CLI agent + GPT-5.5）</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>编辑表面</th>
+<th>需标签</th>
+<th>SWE-Bench Pro</th>
+<th>Terminal-Bench 2</th>
+<th>GAIA-2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Vanilla Codex</td>
+<td>无</td>
+<td>–</td>
+<td>0.59</td>
+<td>0.71</td>
+<td>0.29</td>
+</tr>
+<tr>
+<td>Dynamic Cheatsheet</td>
+<td>Skills</td>
+<td>否</td>
+<td>0.62</td>
+<td>0.73</td>
+<td>0.30</td>
+</tr>
+<tr>
+<td>ReasoningBank</td>
+<td>Memory</td>
+<td>否</td>
+<td>0.61</td>
+<td>0.73</td>
+<td>0.28</td>
+</tr>
+<tr>
+<td>Sleep-time Compute</td>
+<td>Memory</td>
+<td>否</td>
+<td>0.64</td>
+<td>0.73</td>
+<td>0.32</td>
+</tr>
+<tr>
+<td><strong>RHO</strong></td>
+<td>Skills + Tools</td>
+<td><strong>否</strong></td>
+<td><strong>0.78（+0.19）</strong></td>
+<td><strong>0.76（+0.05）</strong></td>
+<td><strong>0.37（+0.08）</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>三个记忆/技能类基线的增益都在 +0.05 以内。RHO 在 SWE-Bench Pro 上单轮提升 +0.19。</p>
+<h3 id="52-vs-meta-harnesstable-2swe-bench-pro">5.2 vs Meta-Harness（Table 2，SWE-Bench Pro）</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>验证标签</th>
+<th>Agent 调用（相对 RHO）</th>
+<th>通过率</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>RHO</strong></td>
+<td><strong>无</strong></td>
+<td>103（1.0×）</td>
+<td><strong>0.78</strong></td>
+</tr>
+<tr>
+<td>Meta-Harness（1 轮）</td>
+<td>需要</td>
+<td>41（0.4×）</td>
+<td>0.62</td>
+</tr>
+<tr>
+<td>Meta-Harness（10 轮）</td>
+<td>需要</td>
+<td>320（3.1×）</td>
+<td>0.80</td>
+</tr>
+</tbody>
+</table></div>
+<p>Meta-Harness 十轮的通过率比 RHO 单轮高 2 个点，使用了 3.1× 算力，仍依赖 held-out 标签。</p>
+<h3 id="53-诊断消融table-4">5.3 诊断消融（Table 4）</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>变体</th>
+<th>SWE Pro</th>
+<th>TB 2</th>
+<th>GAIA-2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>完整诊断</strong></td>
+<td><strong>0.78</strong></td>
+<td><strong>0.76</strong></td>
+<td><strong>0.37</strong></td>
+</tr>
+<tr>
+<td>− 自一致性</td>
+<td><strong>0.56</strong></td>
+<td>0.75</td>
+<td>0.27</td>
+</tr>
+<tr>
+<td>− 自验证</td>
+<td>0.70</td>
+<td>0.73</td>
+<td>0.30</td>
+</tr>
+<tr>
+<td>原始轨迹（跳过诊断）</td>
+<td>0.60</td>
+<td>0.75</td>
+<td>0.29</td>
+</tr>
+</tbody>
+</table></div>
+<p>去掉自一致性后，SWE-Bench Pro 通过率降到 0.56，低于未优化基线 0.59。这是上述消融中降幅最大的一项。只给原始轨迹、不做诊断时，收益也很小（0.60）。TB2 对诊断不敏感，增益来自程序化 playbook，工具没有贡献。</p>
+<h3 id="54-best-of-n-的价值table-3n3">5.4 Best-of-N 的价值（Table 3，N=3）</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>数据集</th>
+<th>均值（随机选）</th>
+<th>RHO 选中</th>
+<th>最低</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SWE-Bench Pro</td>
+<td>0.79</td>
+<td>0.78</td>
+<td>0.73</td>
+</tr>
+<tr>
+<td>TB2</td>
+<td>0.74</td>
+<td>0.76</td>
+<td>0.71</td>
+</tr>
+<tr>
+<td>GAIA-2</td>
+<td>0.34</td>
+<td>0.37</td>
+<td>0.32</td>
+</tr>
+</tbody>
+</table></div>
+<p>自偏好选择在 TB2/GAIA-2 上选到了高于均值的候选。SWE-Bench Pro 上选中的候选略低于均值（0.78 vs 0.79），该机制主要起到避开最差候选（0.73）的作用。</p>
+<h3 id="55-行为分析61">5.5 行为分析（§6.1）</h3>
+<p>增益主要来自长时程任务，短任务在优化前就已能做对。SWE-Bench Pro 上，优化后的 agent 更频繁地主动运行测试等验证操作。GAIA-2 上，新增的环境 helper 每个任务运行约 20 次。TB2 中生成的脚本从未执行，增益来自写入指令的程序化 playbook。RHO 在不同环境中改动的 harness 部分不同，可执行工具只在部分环境中发挥作用。</p>
+<h2 id="6-局限">6. 局限</h2>
+<p><strong>作者自列五条</strong>：</p>
+<ol>
+<li>组 rollout 要求环境能重置到初始状态，并允许重复尝试，因此不适用于一次性或不可逆任务；</li>
+<li>方法假设 agent 有相当一部分能力受可编辑 harness 影响；</li>
+<li>单一骨干与框架（GPT-5.5 Codex CLI），迁移性未验证；</li>
+<li><strong>只评估了单轮</strong>，不声称多轮增益会累积甚至保持单调；</li>
+<li>优化后的 harness 适应了各自的基准环境（例如针对某基准的修复-验证工具）。</li>
+</ol>
+<p><strong>本调研补充</strong>：</p>
+<ol start="6">
+<li><strong>自偏好是已知偏差源</strong>：文献多次记录了 LLM judge 的自偏好、位置和冗长偏差，EvalCEGAR 报告 24 开篇也引用了这些结果。RHO 将自偏好作为唯一选择信号。单轮有效尚不能排除偏差在多轮中累积、造成系统性漂移的可能。Table 3 已显示，RHO 在 SWE-Bench Pro 上选到了略低于均值的候选。作者在局限 (4) 中也承认，尚未验证多轮效果。</li>
+<li><strong>"无外部评分"的边界仍需澄清</strong>：Skills 记录了 grader 的具体要求，harness 学到的部分内容因此与评估器有关。这在部署中合理，但部分增益来自对评估器的适应。held-out split 能隔离任务泄漏，无法隔离 grader 泄漏。</li>
+<li><strong>N=3 太小</strong>：实验尚未探索 best-of-N 的收益上限。</li>
+</ol>
+<h2 id="7-意义与位置">7. 意义与位置</h2>
+<p><strong>对报告 05 锚定纪律的最强反例候选</strong>：Who Grades the Grader 认为，无锚时无法区分塌缩与进化。RHO 报告了不依赖锚的单轮 +0.19 增益。WGtG 讨论多轮动态，RHO 只测了单轮，两者尚不矛盾。RHO 选择候选时不使用标签，报告效果时仍用带标签的 held-out 通过率验证结果。多轮实验可以检验锚是否必要。如果多轮保持单调，insight 2 需要修正为"无锚不可验证地进化"；如果无法保持，则为 insight 2 提供实证。</p>
+<p><strong>与 AutoSaddler（报告 16）的关键对照</strong>：AutoSaddler 的消融显示，去掉 dev 集泛化门后，自动优化的结果低于未优化基线（50.6 vs 53.0）。RHO 报告完全不用 dev 集也能提升 +0.19。best-of-N 自偏好选择可能起到了部分筛选作用，Table 3 显示它至少避开了最差候选。差异也可能来自单轮与多轮设置，需要通过复现判断具体原因。</p>
+<p><strong>与 EvalCEGAR（报告 24）的对极</strong>：两篇论文在同一时期讨论评估器稀缺问题，分别采用充分利用稀缺锚 vs 完全不用锚的方案。RHO 无需锚，部署门槛更低。EvalCEGAR 的每个算子都能阅读和证伪，便于审计。RHO 的自偏好判断无法用同样的方式审计。</p>
+<p><strong>与 Meta-Harness（报告 13）</strong>：RHO 无需标签，使用 1/3 算力，通过率达到 Meta-Harness 十轮的 97%。Meta-Harness 已展示多轮持续提升，RHO 只验证了单轮效果。两者修改的 harness 范围也不同。Meta-Harness 修改整个 Python 程序，RHO 只改 Skills + Tools。</p>
+<p><strong>与 ECHO（报告 06）</strong>：ECHO 的 critic 由冻结的外部 R 锚定；RHO 通过自一致性诊断失败。两者都使用 policy 自身的分歧作信号，但只有 ECHO 用 R 提供外部约束。去掉自一致性后，RHO 低于基线（0.56 &lt; 0.59），表明当前方法依赖这一信号。</p>
+<p><strong>对报告 10 insight 2（无锚不进化）的压力测试</strong>：目前只有 RHO 声称可以完全不用标签优化 harness。是否需要调整 insight 2 的表述，仍取决于 RHO 的多轮实验结果。</p><div class="prevnext"><a href="24_evalcegar.html">← 上一篇</a><a href="26_skill_evolution_wave.html">下一篇 →</a></div><footer>RSI 研究札记 · 根据 awesome_rsi 仓库生成<br>论文结论与研究判断以各篇来源及实验边界为准。<a href="#">返回顶部 ↑</a></footer></main></div><script src="../site.js"></script></body></html>

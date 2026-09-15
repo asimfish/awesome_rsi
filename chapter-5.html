@@ -1,0 +1,211 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的论文、中文解读、分类与专题。"><title>解读目录 · RSI 研究札记</title><link rel="stylesheet" href="site.css"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress"></div><header class="topbar"><a class="brand" href="index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a href="index.html">首页</a><a href="papers.html">论文</a><a href="reports.html">解读</a><a href="insights.html">洞察</a><a href="topics.html">专题</a><a href="resources.html">资源</a></nav><button id="theme" aria-label="切换深色模式">深色阅读</button></header><div class="layout "><aside><div class="eyebrow">长文阅读</div><div class="toc">
+<ul>
+<li><a href="#解读目录">解读目录</a></li>
+</ul>
+</div>
+<div class="aside-links"><a href="guide.html">完整仓库导览 ↗</a><a href="https://github.com/asimfish/awesome_rsi">GitHub 源码 ↗</a></div></aside><main id="content"><div class="eyebrow">长文阅读</div><h1 id="解读目录">解读目录</h1>
+<p>32 份中文解读（<a href="https://github.com/asimfish/awesome_rsi/blob/main/reports/"><code>reports/</code></a>），统一七节结构：一句话定位、要解决的问题、为什么此前做不通、方法机制、实验结果、局限、与其他报告的关系。每篇 2000 到 5200 字，数字标注到论文表号。全部合订为 <a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/report/awesome_rsi_full_report.pdf">167 页 PDF</a>。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>报告</th>
+<th>对象</th>
+<th>主要内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>00</td>
+<td><a href="reports/00_origins_1965_2014.html">起源 1965–2014</a></td>
+<td>Good / Yudkowsky / Schmidhuber / Bostrom 及四位中间人</td>
+<td>四篇文献分别提出的概念；早期文献没有预见评估器问题</td>
+</tr>
+<tr>
+<td>01</td>
+<td><a href="reports/01_lilian_weng_harness_engineering.html">Weng 总纲</a></td>
+<td>Harness Engineering for Self-Improvement</td>
+<td>harness 代码可以搜索和优化；七个挑战分别对应哪些后续论文</td>
+</tr>
+<tr>
+<td>02</td>
+<td><a href="reports/02_anthropic_when_ai_builds_itself.html">Anthropic 进度报告</a></td>
+<td>When AI builds itself</td>
+<td>执行环节已自动化，实验方向仍由人定；按 crossover 标准尚未进入强 RSI</td>
+</tr>
+<tr>
+<td>03</td>
+<td><a href="reports/03_evolm.html">EvoLM</a></td>
+<td>rubric 共进化</td>
+<td>静态奖励模型越准、训出的策略越差</td>
+</tr>
+<tr>
+<td>04</td>
+<td><a href="reports/04_red_queen_godel_machine.html">RQGM</a></td>
+<td>分 epoch 的评估器进化</td>
+<td>评估器可以参与进化，但需要循环外的人类标注数据集</td>
+</tr>
+<tr>
+<td>05</td>
+<td><a href="reports/05_who_grades_the_grader.html">Who Grades the Grader</a></td>
+<td>十条锚定样本下的指标进化</td>
+<td>去掉锚定守卫后评估器退化，任务分数看不出来</td>
+</tr>
+<tr>
+<td>06</td>
+<td><a href="reports/06_echo.html">ECHO</a></td>
+<td>critic 与策略同步 GRPO</td>
+<td>冻结的 critic 比不用 critic 更差</td>
+</tr>
+<tr>
+<td>07</td>
+<td><a href="reports/07_darwin_godel_machine.html">DGM</a></td>
+<td>开放式档案自改写</td>
+<td>用基准测试代替形式证明；出现绕过评估的行为</td>
+</tr>
+<tr>
+<td>08</td>
+<td><a href="reports/08_moss.html">MOSS</a></td>
+<td>生产环境源码自改写</td>
+<td>路由、hook 等故障只能通过修改代码修复；批准和回滚流程</td>
+</tr>
+<tr>
+<td>09</td>
+<td><a href="reports/09_wikiskill.html">WikiSkill</a></td>
+<td>经验、wiki、技能三层</td>
+<td>知识库只增不删；技能层通过检查后更新，可回滚</td>
+</tr>
+<tr>
+<td>10</td>
+<td><a href="reports/10_synthesis_insights.html">汇总</a></td>
+<td>全部材料</td>
+<td>两轴地图、十条 insight、18 个系统的锚对照表、开放问题</td>
+</tr>
+<tr>
+<td>11</td>
+<td><a href="reports/11_continual_harness.html">Continual Harness</a></td>
+<td>免重置在线精炼 + 权重共学习</td>
+<td>弱模型自改进后表现反而更差</td>
+</tr>
+<tr>
+<td>12</td>
+<td><a href="reports/12_self_evolving_agents_survey.html">TMLR 综述</a></td>
+<td>What / When / How / Where</td>
+<td>四维分类；现有基准测不到知识积累</td>
+</tr>
+<tr>
+<td>13</td>
+<td><a href="reports/13_meta_harness.html">Meta-Harness</a></td>
+<td>外部 proposer 读全部历史</td>
+<td>proposer 需要完整执行轨迹，摘要不够</td>
+</tr>
+<tr>
+<td>14</td>
+<td><a href="reports/14_self_harness.html">Self-Harness</a></td>
+<td>模型修改自己的 harness</td>
+<td>加入回归检查后，35B 模型也能提升</td>
+</tr>
+<tr>
+<td>15</td>
+<td><a href="reports/15_envharness.html">EnvHarness</a></td>
+<td>修改环境而不修改 agent</td>
+<td>验证器不动；从静态环境提取的技能可能降低表现</td>
+</tr>
+<tr>
+<td>16</td>
+<td><a href="reports/16_autosaddler.html">AutoSaddler</a></td>
+<td>小批量 harness 学习</td>
+<td>没有泛化检查时自动优化比不优化更差</td>
+</tr>
+<tr>
+<td>17</td>
+<td><a href="reports/17_metacaster.html">MetaCaster</a></td>
+<td>时序预测领域落地</td>
+<td>用真实数据误差当优化信号；harness 比 LLM 骨干影响大</td>
+</tr>
+<tr>
+<td>18</td>
+<td><a href="reports/18_prime_agent.html">Prime Agent</a></td>
+<td>免重置 harness 的开源实现</td>
+<td>换 harness 让 ARC-AGI-3 从 30% 到 95%；作弊被保存为技能</td>
+</tr>
+<tr>
+<td>19</td>
+<td><a href="reports/19_icoder.html">iCoder</a></td>
+<td>AI 主导开发 27B 模型</td>
+<td>人类保留四项：目标、权限、验证标准、证据规则</td>
+</tr>
+<tr>
+<td>20</td>
+<td><a href="reports/20_metan.html">Metan</a></td>
+<td>固定 Ω、递归输入</td>
+<td>不修改改进机制也能增加深度；增益主要来自文本条件化</td>
+</tr>
+<tr>
+<td>21</td>
+<td><a href="reports/21_co_harness.html">Co-Harness</a></td>
+<td>harness 与权重交替优化</td>
+<td>通过微调将 harness 带来的收益保留到模型中，使模型不再依赖 harness</td>
+</tr>
+<tr>
+<td>22</td>
+<td><a href="reports/22_coevolution_survey.html">Co-Evolution 综述</a></td>
+<td>三阶段分类</td>
+<td>按其标准，只有 RQGM 达到 Meta 阶段</td>
+</tr>
+<tr>
+<td>23</td>
+<td><a href="reports/23_godel_agent_to_sica.html">Gödel Agent 到 SICA</a></td>
+<td>2024–2025 桥接</td>
+<td>触发条件从证明放宽到基准；监督者首次出现</td>
+</tr>
+<tr>
+<td>24</td>
+<td><a href="reports/24_evalcegar.html">EvalCEGAR</a></td>
+<td>碰撞对驱动的评估器进化</td>
+<td>根据评估器无法区分的答案改进评估器</td>
+</tr>
+<tr>
+<td>25</td>
+<td><a href="reports/25_rho.html">RHO</a></td>
+<td>不用标签的 harness 优化</td>
+<td>单轮 59% 到 78%；多轮效果未知</td>
+</tr>
+<tr>
+<td>26</td>
+<td><a href="reports/26_skill_evolution_wave.html">技能进化五篇</a></td>
+<td>SkillCommit / HyperSkill / ERSkill / SkillProx / Evo-Harness</td>
+<td>把经验抽象成技能优于存储原始轨迹；技能的组织结构尚无定论</td>
+</tr>
+<tr>
+<td>27</td>
+<td><a href="reports/27_safety_governance.html">安全与治理五篇</a></td>
+<td>SESG / OLE / HarnessFix / Gates / HVTB</td>
+<td>在进化循环外做三种检查：不变量、蜜罐、红队集</td>
+</tr>
+<tr>
+<td>28</td>
+<td><a href="reports/28_self_evolving_coding_agents_survey.html">Coding Agents 综述</a></td>
+<td>对象 × 时间 × 证据</td>
+<td>可执行反馈的优势和风险；错误会被保留</td>
+</tr>
+<tr>
+<td>29</td>
+<td><a href="reports/29_prism_awesome_rsi.html">Prism-Shadow/awesome-rsi 清单</a></td>
+<td>27 个基准 + 31 个方法的九维元数据</td>
+<td>与本仓库重叠 12 篇；它有基准表和记忆线，本仓库有评估器与安全治理线</td>
+</tr>
+<tr>
+<td>30</td>
+<td><a href="reports/30_prism_understanding_rsi.html">《读懂 RSI》长文</a></td>
+<td>A(t+1) = U(A(t), τ, f) 与五组分类维度</td>
+<td>进化结构（链 / 树 / 图）和更新者是本仓库缺的两个维度；定义比 Bostrom 宽</td>
+</tr>
+<tr>
+<td>31</td>
+<td><a href="reports/31_reef.html">Reef</a></td>
+<td>持续自改进 agent 的开源基础设施</td>
+<td>Serve → Observe → Grow → Commit；评估门是接口，锚由用户提供</td>
+</tr>
+</tbody>
+</table></div><footer>RSI 研究札记 · 根据 awesome_rsi 仓库生成<br>论文结论与研究判断以各篇来源及实验边界为准。<a href="#">返回顶部 ↑</a></footer></main></div><script src="site.js"></script></body></html>

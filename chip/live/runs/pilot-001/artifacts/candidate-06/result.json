@@ -1,0 +1,21 @@
+{
+  "sha256": "20ef076629e5ef30cc3754efb6bcd592c14678bf8fcd66024c29c92f8598e528",
+  "formal": "pending",
+  "status": "rejected",
+  "reason": "Unsupported directive, attribute, system call, escaped identifier or simulation construct",
+  "id": "candidate-06",
+  "rationale": "基线采用树形优先级编码器，面积和延迟乘积为143.29。分析显示，其关键路径包括多级归约和索引生成。通过采用并行前缀结构，利用分组检测和前缀或运算，可同时降低逻辑级数和单元数量，从而减少面积-延迟积。",
+  "strategy": "将64位输入分为8组，每组8位。使用generate循环生成组内优先级编码和组有效信号。然后利用并行前缀计算组间优先级，得到最高优先级组索引。最后组合组内索引和组索引生成6位索引，并通过译码生成独热码grant。",
+  "usage": {
+    "prompt_tokens": 4349,
+    "completion_tokens": 1297,
+    "total_tokens": 5646,
+    "prompt_tokens_details": {
+      "cached_tokens": 256
+    },
+    "prompt_cache_hit_tokens": 256,
+    "prompt_cache_miss_tokens": 4093
+  },
+  "accepted": false,
+  "parent": "baseline"
+}

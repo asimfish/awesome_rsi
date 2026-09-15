@@ -1,0 +1,123 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的论文、中文解读、分类与专题。"><title>资源与引用 · RSI 研究札记</title><link rel="stylesheet" href="site.css"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress"></div><header class="topbar"><a class="brand" href="index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a href="index.html">首页</a><a href="papers.html">论文</a><a href="reports.html">解读</a><a href="insights.html">洞察</a><a href="topics.html">专题</a><a href="resources.html" aria-current="page">资源</a></nav><button id="theme" aria-label="切换深色模式">深色阅读</button></header><div class="layout "><aside><div class="eyebrow">长文阅读</div><div class="toc">
+<ul>
+<li><a href="#资源与引用">资源与引用</a><ul>
+<li><a href="#中文导读">中文导读</a></li>
+<li><a href="#仓库与构建">仓库与构建</a></li>
+<li><a href="#研究路线图">研究路线图</a></li>
+<li><a href="#相关资源">相关资源</a></li>
+<li><a href="#更新记录">更新记录</a></li>
+<li><a href="#引用本站">引用本站</a></li>
+<li><a href="#说明与致谢">说明与致谢</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="aside-links"><a href="guide.html">完整仓库导览 ↗</a><a href="https://github.com/asimfish/awesome_rsi">GitHub 源码 ↗</a></div></aside><main id="content"><div class="eyebrow">长文阅读</div><h1 id="资源与引用">资源与引用</h1>
+<h2 id="中文导读">中文导读</h2>
+<p>本调研的信息源和配套中文解读：</p>
+<ul>
+<li>小红书：RSI 六篇论文导读帖（§4.4–4.6 六篇 ⭐ 论文的最初信息源）— <a href="https://www.xiaohongshu.com/explore/6a93e8a3000000001f000d72">post</a></li>
+<li>微信：Continual Harness 中文解读（§4.8）— <a href="https://mp.weixin.qq.com/s/xMuLJvX3kwRUUw5WQ7R3ww">article</a></li>
+<li>微信：Harness 自进化全景，三种范式与六个系统（§4.9 的 Self-Harness / Meta-Harness / AutoSaddler / EnvHarness / Prime Agent / MetaCaster）— <a href="https://mp.weixin.qq.com/s/Lm_hmnkeeWlN6zVGlBBphw">article</a></li>
+<li>微信：Agentic RL 系列（§4.6）— 上：环境、轨迹、Reward 与训练闭环 <a href="https://mp.weixin.qq.com/s/Ly2BvP3y2bFB9czGqRguWQ">article</a>；中：SkillRL <a href="https://mp.weixin.qq.com/s/wqMM1D4NZQmRtWOcebuhTA">article</a>；下：Evolving-RL <a href="https://mp.weixin.qq.com/s/bu3-RyqaYPdA1mH79oF39g">article</a></li>
+<li>微信：iCoder 中文解读（§4.10）— <a href="https://mp.weixin.qq.com/s/28q7O59IzEXl_tiWulYbDA">article</a></li>
+<li>微信：Self-Evolving Coding Agents 综述解读（§4.3）— <a href="https://mp.weixin.qq.com/s/hSrJLcZN3j7J7X02N2HIMg">article</a></li>
+<li>Prism-Shadow：《万字长文带你读懂 RSI（自进化，Self-Evolving）》— <a href="https://prism-shadow.github.io/awesome-rsi/#blog/understanding-rsi">中英双语博客</a>，<a href="reports/30_prism_understanding_rsi.html">解读</a>；用进化对象、链树图结构、更新者、更新时机、验收标准五组维度梳理 RSI，配 SEAL / Prime Agent / ReasoningBank / SkillSmith / DGM / Evo-Harness 等十余篇代表工作的图解。与本仓库的分类图（§3）可以对照着读</li>
+<li>2026 年 6–8 月趋势扫描笔记（19 篇新论文、9 项工业动态、7 项基准动态、8 项安全治理）— <a href="assets/trends_research_raw.md"><code>assets/trends_research_raw.md</code></a></li>
+</ul>
+<h2 id="仓库与构建">仓库与构建</h2>
+<pre><code>awesome_rsi/
+├── README.md · CONTRIBUTING.md
+├── report/
+│   ├── awesome_rsi_slides.html / .pdf        # 35 页汇总 PPT（方向键翻页，P 键打印）
+│   └── awesome_rsi_full_report.html / .pdf   # 167 页全文合订（32 份解读 + 封面 + 目录 + 两图）
+├── reports/                                  # 32 份解读 00–31（索引见 §5）
+├── papers/
+│   ├── en/                                   # 65 篇英文原版 PDF（arXiv + iCoder 技术报告）
+│   ├── zh/                                   # 64 篇中文翻译 PDF；The Last AI 待译
+│   └── classics/                             # 6 篇起源经典（Good 1965 为扫描件无文本层，其余 5 篇含中译）
+├── assets/
+│   ├── fig1_timeline.svg · fig2_taxonomy.svg # 两张图（另有 _dark 变体供 PPT）
+│   ├── fulltext/                             # 论文提取全文（解读撰写底稿）
+│   └── trends_research_raw.md                # 2026H2 趋势扫描笔记
+├── scripts/
+│   ├── make_figures.py                       # 生成两张图
+│   ├── build_full_report.py                  # pandoc 合订 reports/*.md → HTML → Chrome PDF
+│   └── translate_batch5.sh                   # 批量中译（三条可并行队列）
+└── logs/                                     # 翻译日志
+</code></pre>
+<p>重建产物：<code>python3 scripts/make_figures.py</code> 重新生成两图；<code>python3 scripts/build_full_report.py --pdf</code> 重建全文报告；slides PDF 用 Chrome headless <code>--print-to-pdf</code> 生成。</p>
+<p>翻译管线：中文 PDF 由 <a href="https://github.com/asimfish/super_translate">super_translate</a> 生成，流程为冻结公式和图表等结构对象、注入术语表、按原坐标替换文本、QA 审计和确定性修复。后端为 DeepSeek API，逐篇带翻译缓存。翻译保留原版式与页码，术语和公式以英文原版为准。批量脚本见 <code>scripts/translate_batch5.sh</code>。</p>
+<h2 id="研究路线图">研究路线图</h2>
+<ul>
+<li>基座：以 <a href="https://github.com/bingreeky/iCoder">iCoder</a> 代码库为后续开发基础，复用其 Research Skills 表示、治理组件（任务队列、实验日志、决策记录、审批门）和 Data → SFT → OPSD → RLVR 可回退状态机。评估见<a href="reports/19_icoder.html">报告 19</a>。</li>
+<li>运行时基础设施：评估 <a href="https://github.com/Human-Agent-Society/reef">Reef</a>（§4.14）能否承担服务、反馈记录、候选评估和版本化发布这一层——它已经实现了本仓库要求的评估门和回滚，权重训练（Slime + SGLang）与 harness 进化两条学习面都有 recipe；需要核实的是它的候选评估能否接入独立于训练循环的锚集，以及 recipe 机制能否容纳 iCoder 式的多阶段研究流水线。</li>
+<li>待定的设计选择：harness 修改用 Meta-Harness 式的全轨迹自由改写（<a href="reports/13_meta_harness.html">13</a>）还是 AutoSaddler 式的归因约束局部 diff（<a href="reports/16_autosaddler.html">16</a>）；权重更新用 Co-Harness 的离线批次（<a href="reports/21_co_harness.html">21</a>）还是 Continual Harness 的在线共学习（<a href="reports/11_continual_harness.html">11</a>）。</li>
+<li>必须保留的机制：进化循环外的独立锚（<a href="reports/05_who_grades_the_grader.html">05</a>）、回归门（<a href="reports/14_self_harness.html">14</a>）、版本化回滚（<a href="reports/08_moss.html">08</a> / <a href="reports/21_co_harness.html">21</a>）、过程级测试（<a href="reports/22_coevolution_survey.html">22</a>）。</li>
+<li>待补论文（据解读 29、30 的对照）：Mendel Gödel Machine（框架侧，DGM 后续，Polyglot 50.8% → 93.2%）、ReasoningBank 与 SEAL（记忆线与参数线的起点）、FinEvo-Bench 与 GDPevo（带状态重置对照组的 RSI 基准）；并考虑增加"基准"一节与"进化结构""更新者"两个分类维度。</li>
+<li>维护：新论文按 §4 格式追加，入库 PDF-en / PDF-zh；重点论文补解读（模板见 <a href="https://github.com/asimfish/awesome_rsi/blob/main/CONTRIBUTING.md">CONTRIBUTING</a>）；之后重建全文报告、按需更新两图，同步 slides 与本 README 的计数。</li>
+</ul>
+<h2 id="相关资源">相关资源</h2>
+<ul>
+<li>
+<p><a href="https://self-developing-agents.github.io/">Self-Developing Agents</a> — Aspire、S³Gym、HarnessDev 的联合项目页，分别讨论目标形成、经验学习和 harness 改进；论文及英文 PDF 见 <a href="guide.html#415-self-improvement-benchmarks">§4.15</a>。</p>
+</li>
+<li>
+<p><a href="https://github.com/Prism-Shadow/awesome-rsi">Prism-Shadow/awesome-rsi</a> · <a href="https://prism-shadow.github.io/awesome-rsi/">网站</a> · <a href="https://prism-shadow.github.io/awesome-rsi/#blog/understanding-rsi">博客</a> · <a href="reports/29_prism_awesome_rsi.html">解读 29</a> / <a href="reports/30_prism_understanding_rsi.html">解读 30</a> — 中英双语的 RSI 基准与方法清单：约 27 个基准、32 个方法、1 个开源系统（Proteus）和一组书籍课程，网站提供按 artifact / 模式 / 拓扑 / 验收标准等维度的筛选面板和引用图。配套长文《万字长文带你读懂 RSI》把 RSI 定义为 A(t+1) = U(A(t), τ(t), f(t))，按进化对象（参数 / 上下文 / 记忆 / 技能 / harness 代码）、进化结构（链 / 树 / 图）、更新者（自身 / 教师 / 联合）、更新时机（离线 / 在线 / 混合）和验收标准等维度分类。与本仓库的分工：它以基准和方法的可筛选元数据为主，本仓库以逐篇深度解读和"锚在哪"这条主轴为主；它的"验收标准"维度与本仓库的锚最接近。</p>
+</li>
+<li><a href="https://github.com/iSEngLab/Awesome-Self-Evolving-Coding-Agents">iSEngLab/Awesome-Self-Evolving-Coding-Agents</a> — arXiv 2608.03392 综述的配套清单，按进化对象六类组织，收录编码领域的工作；与本仓库互补，已互相收录（解读见<a href="reports/28_self_evolving_coding_agents_survey.html">报告 28</a>）</li>
+<li><a href="https://github.com/Human-Agent-Society/reef">Human-Agent-Society/reef</a> — 持续自改进 agent 的开源基础设施，Serve → Observe → Grow → Commit 循环，支持权重训练和 harness 进化两条学习面，带版本管理与回滚；详见 <a href="guide.html#414-open-source-systems--infrastructure">§4.14</a> 与<a href="reports/31_reef.html">解读 31</a></li>
+<li><a href="https://github.com/CharlesQ9/Self-Evolving-Agents">CharlesQ9/Self-Evolving-Agents</a> — TMLR 综述的配套清单</li>
+<li><a href="https://github.com/Thinklab-SJTU/awesome-ml4co">Thinklab-SJTU/awesome-ml4co</a> — 本仓库编目格式的参考</li>
+<li><a href="https://github.com/asimfish/super_translate">asimfish/super_translate</a> — 本仓库中文 PDF 的翻译工具</li>
+<li><a href="https://lilianweng.github.io/posts/2026-07-04-harness/">Lil'Log · Harness Engineering for Self-Improvement</a> — 本调研的总纲，§4.9 和 §4.12 的初始条目来自其参考文献</li>
+</ul>
+<h2 id="更新记录">更新记录</h2>
+<p>2026-09-15：新增 Aspire、S³Gym、HarnessDev 三篇基准论文及英文 PDF，收录 Self-Developing Agents 项目页；英文论文共 65 篇（另有 6 篇经典），三篇中译 PDF 已完成（23 / 25 / 41 页，与原文一致），中译总数为 69 篇。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>日期</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2026-08-31</td>
+<td>首版：10 份核心材料解读、26 篇 PDF 与中译、22 页 PPT</td>
+</tr>
+<tr>
+<td>2026-09-01 – 09-03</td>
+<td>加入 Continual Harness、六个 harness 系统、iCoder、三份综述与起源经典；PPT 扩至 34 页；生成时间线与分类树两图；加入 149 页全文合订报告</td>
+</tr>
+<tr>
+<td>2026-09-05</td>
+<td>29 份解读全部重写为七节结构（约 8.3 万字）；补齐全部 61 篇论文的中译 PDF（共 66 篇）</td>
+</tr>
+<tr>
+<td>2026-09-06</td>
+<td>README 重排为 12 个章节并统一条目格式；README、29 份解读、34 页 PPT 的中文表达由本地 Codex（gpt-6-astra）逐篇打磨，改为平实陈述；全文报告重建为 150 页</td>
+</tr>
+<tr>
+<td>2026-09-08</td>
+<td>全文报告重建为 168 页；README 加英文摘要、Changelog、引用格式与许可证文件；新增 §4.14 开源系统与基础设施（Reef、Proteus）；相关资源加入 Prism-Shadow/awesome-rsi 及其《读懂 RSI》长文；新增解读 29（Prism 清单）、30（《读懂 RSI》）、31（Reef）；报告 10 加第五节"与外部清单和基础设施的对照"；PPT 加第 34 页对照三个外部资源，共 35 页</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="引用本站">引用本站</h2>
+<p>引用本仓库的解读或对照矩阵时可以用：</p>
+<pre><code class="language-bibtex">@misc{awesome_rsi_2026,
+  title        = {Awesome Recursive Self-Improvement: papers, Chinese deep-dives and translations},
+  author       = {Li, Yufeng},
+  year         = {2026},
+  howpublished = {\url{https://github.com/asimfish/awesome_rsi}},
+  note         = {32 structured deep-dives, 69 layout-preserving Chinese translations, 35-slide summary}
+}
+</code></pre>
+<p>论文本身请引用各条目 <code>[paper]</code> 链接指向的原文。</p>
+<h2 id="说明与致谢">说明与致谢</h2>
+<ul>
+<li>论文 PDF 版权归原作者与 arXiv 所有，本仓库仅作研究备份与学习用途；中文翻译为机器翻译，引用请以英文原文为准。</li>
+<li>解读、slides 与两张图为本仓库原创内容，采用 <a href="https://github.com/asimfish/awesome_rsi/blob/main/LICENSE">CC BY 4.0</a> 许可，转载请注明出处。</li>
+<li>欢迎提 PR 补充新论文，条目格式、解读模板与文字规范见 <a href="https://github.com/asimfish/awesome_rsi/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a>。</li>
+</ul><footer>RSI 研究札记 · 根据 awesome_rsi 仓库生成<br>论文结论与研究判断以各篇来源及实验边界为准。<a href="#">返回顶部 ↑</a></footer></main></div><script src="site.js"></script></body></html>

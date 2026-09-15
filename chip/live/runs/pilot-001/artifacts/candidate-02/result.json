@@ -1,0 +1,21 @@
+{
+  "sha256": "d619ed5c104c3b7940f2115b7fd313efe059ebe3c3bc66f8db126ee285f02ae4",
+  "formal": "pending",
+  "status": "rejected",
+  "reason": "Unsupported directive, attribute, system call, escaped identifier or simulation construct",
+  "id": "candidate-02",
+  "rationale": "基线采用树形优先级编码器，但在64位宽输入下，面积与延迟仍有优化空间。通过分组并行检测最高优先级位，并利用生成循环构建紧凑的组合逻辑，可在保持正确性的同时降低映射后的面积与延迟乘积。",
+  "strategy": "将64位输入分为8组，每组8位。每组内部先检测最高置位位并产生组内优先级编码。然后通过层级归约确定最高优先级组，并组合组索引与组内索引得到最终6位索引。同时产生独热码grant。采用纯组合逻辑和常量循环生成，避免锁存器和时序元件。",
+  "usage": {
+    "prompt_tokens": 2390,
+    "completion_tokens": 1346,
+    "total_tokens": 3736,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "prompt_cache_hit_tokens": 0,
+    "prompt_cache_miss_tokens": 2390
+  },
+  "accepted": false,
+  "parent": "baseline"
+}

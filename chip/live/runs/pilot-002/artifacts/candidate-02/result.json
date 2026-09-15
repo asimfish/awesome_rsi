@@ -1,0 +1,30 @@
+{
+  "sha256": "cddaa802393e805aaab9b0f31ddf2d3aa955d03639bc394ae70cc15a3334d6de",
+  "formal": "pass",
+  "status": "evaluated",
+  "formal_seconds": 0.244,
+  "synthesis_seconds": 0.548,
+  "area_um2": 227.962,
+  "cells": 211,
+  "timing_seconds": 0.154,
+  "delay_ns": 0.802404,
+  "adp": 182.91762065,
+  "id": "candidate-02",
+  "rationale": "在现有4位分组直接授权基础上，利用分组有效信号和组选择信号，生成每个比特的授权。通过共享中间OR归约信号减少逻辑深度，并优化索引编码以避免嵌套解码。",
+  "strategy": "基于分组有效信号的直接授权生成，复用OR归约，优化索引编码。",
+  "usage": {
+    "prompt_tokens": 3848,
+    "completion_tokens": 3073,
+    "total_tokens": 6921,
+    "prompt_tokens_details": {
+      "cached_tokens": 256
+    },
+    "prompt_cache_hit_tokens": 256,
+    "prompt_cache_miss_tokens": 3592
+  },
+  "accepted": false,
+  "parent": "seed",
+  "adp_gain_pct": -27.658,
+  "area_gain_pct": 10.449,
+  "delay_gain_pct": -42.554
+}

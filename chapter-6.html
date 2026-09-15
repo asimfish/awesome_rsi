@@ -1,0 +1,32 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的论文、中文解读、分类与专题。"><title>洞察与开放问题 · RSI 研究札记</title><link rel="stylesheet" href="site.css"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress"></div><header class="topbar"><a class="brand" href="index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a href="index.html">首页</a><a href="papers.html">论文</a><a href="reports.html">解读</a><a href="insights.html">洞察</a><a href="topics.html">专题</a><a href="resources.html">资源</a></nav><button id="theme" aria-label="切换深色模式">深色阅读</button></header><div class="layout "><aside><div class="eyebrow">长文阅读</div><div class="toc">
+<ul>
+<li><a href="#洞察与开放问题">洞察与开放问题</a></li>
+</ul>
+</div>
+<div class="aside-links"><a href="guide.html">完整仓库导览 ↗</a><a href="https://github.com/asimfish/awesome_rsi">GitHub 源码 ↗</a></div></aside><main id="content"><div class="eyebrow">长文阅读</div><h1 id="洞察与开放问题">洞察与开放问题</h1>
+<p>十条主要发现（完整论证见<a href="reports/10_synthesis_insights.html">报告 10</a>）：</p>
+<ol>
+<li>评估器决定能力上限，也是被利用的目标。</li>
+<li>去掉进化循环外的评估依据后系统会退化（AutoSaddler 去掉 dev 集检查后低于未优化基线）。RHO 的单轮无标签结果是目前的例外，尚待多轮验证。</li>
+<li>优化期间应固定评估标准，在优化窗口之外更新（RQGM 的 epoch、MOSS 的关键点锁定）。</li>
+<li>自改写系统实际能达到的 meta 深度约 2.5 层。Metan 保持机制不变，只改输入，达到 3 到 6 层。</li>
+<li>发现技能和使用技能是两种能力，技能可以跨模型迁移。Metan 的消融显示，文本条件化比代码复用贡献更大，技能库的收益来源需要重新测量。</li>
+<li>经验需要先整理成结构化知识，再转成技能。采用什么组织结构尚无定论。</li>
+<li>进入生产的系统都有版本、审计、预测、回滚四项机制。</li>
+<li>微观产出增加（Anthropic 人均 8 倍），但 METR 的多实验室调查中，没有公司报告整体研发节奏翻倍。</li>
+<li>宏观争论取决于算力与认知劳动的替代弹性 σ。</li>
+<li>基准饱和速度加快，测量工具本身成为瓶颈。</li>
+</ol>
+<p>开放问题（按可检验程度排序）：</p>
+<ol>
+<li>要让评估器不退化，最少需要多少人工标注？WGtG 用十条样本，EvalCEGAR 用十个碰撞对，尚无理论。</li>
+<li>不用标签的自偏好优化，经过多轮后是否仍能提升？RHO 只测了一轮。</li>
+<li>技能库的收益有多少来自把技能用作 prompt 前缀，多少来自把技能用作可执行程序？Metan 测得 72% 对 15%，需在技能进化场景中复现。</li>
+<li>能否根据基座模型能力预测某个 harness 改动会提升还是降低性能？目前观察到弱模型受益为负、中等模型受益最大、强模型饱和。</li>
+<li>基准报告是否应附带 harness 规格，并给出按 harness 归一化后的分数？</li>
+<li>如何测量系统离 crossover 有多远？iCoder 的方案是逐步减少人类 prior，观察性能何时下降。</li>
+<li>知识库能否在操作流程之外，积累对"该做什么实验"的判断？</li>
+<li>锚本身需要更新时（RQGM 换评估器、SESG 更新护栏），由谁验证更新？目前都由人验证。</li>
+<li>如果 2027 年 METR 仍测不到整体节奏翻倍，是串行瓶颈所致，还是加速被用于做更多实验？</li>
+<li>何时会有人做 σ 的受控实验（随机分配研究者的算力预算）？Epoch AI 已给出实验设计。</li>
+</ol><footer>RSI 研究札记 · 根据 awesome_rsi 仓库生成<br>论文结论与研究判断以各篇来源及实验边界为准。<a href="#">返回顶部 ↑</a></footer></main></div><script src="site.js"></script></body></html>

@@ -1,0 +1,72 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的论文、中文解读、分类与专题。"><title>从这里开始 · RSI 研究札记</title><link rel="stylesheet" href="site.css"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress"></div><header class="topbar"><a class="brand" href="index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a href="index.html">首页</a><a href="papers.html">论文</a><a href="reports.html">解读</a><a href="insights.html">洞察</a><a href="topics.html">专题</a><a href="resources.html">资源</a></nav><button id="theme" aria-label="切换深色模式">深色阅读</button></header><div class="layout "><aside><div class="eyebrow">长文阅读</div><div class="toc">
+<ul>
+<li><a href="#从这里开始">从这里开始</a></li>
+</ul>
+</div>
+<div class="aside-links"><a href="guide.html">完整仓库导览 ↗</a><a href="https://github.com/asimfish/awesome_rsi">GitHub 源码 ↗</a></div></aside><main id="content"><div class="eyebrow">长文阅读</div><h1 id="从这里开始">从这里开始</h1>
+<p>按时间预算：</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>预算</th>
+<th>路线</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>15 分钟</td>
+<td><a href="slides.html">汇总 PPT</a>（浏览器中用方向键翻页，P 键打印）或 <a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/report/awesome_rsi_slides.pdf">PDF 版</a>（35 页）</td>
+</tr>
+<tr>
+<td>2 小时</td>
+<td><a href="reports/10_synthesis_insights.html">报告 10 汇总</a> → <a href="reports/01_lilian_weng_harness_engineering.html">报告 01 Weng</a> → <a href="reports/05_who_grades_the_grader.html">报告 05 Who Grades the Grader</a>（说明为什么评估器需要循环外的锚）</td>
+</tr>
+<tr>
+<td>通读</td>
+<td><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/report/awesome_rsi_full_report.pdf">全文合订报告</a>（167 页，32 份解读按编号排列）</td>
+</tr>
+<tr>
+<td>系统研读</td>
+<td><code>reports/</code> 按 00 → 23 → 01 → 02 → 07 → 03 → 04 → 05 → 06 → 08 → 11 → 09 → 10 的顺序读，其余按需；对照 <code>papers/zh/</code> 的中文 PDF</td>
+</tr>
+</tbody>
+</table></div>
+<p>按目的：</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>目的</th>
+<th>路线</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>了解全貌</td>
+<td><a href="reports/10_synthesis_insights.html">10</a> → 三份综述 <a href="reports/12_self_evolving_agents_survey.html">12</a> / <a href="reports/22_coevolution_survey.html">22</a> / <a href="reports/28_self_evolving_coding_agents_survey.html">28</a></td>
+</tr>
+<tr>
+<td>harness 工程</td>
+<td><a href="reports/01_lilian_weng_harness_engineering.html">01</a> Weng → <a href="reports/07_darwin_godel_machine.html">07</a> DGM → <a href="reports/13_meta_harness.html">13</a> Meta-Harness 与 <a href="reports/14_self_harness.html">14</a> Self-Harness 对照 → <a href="reports/16_autosaddler.html">16</a> AutoSaddler → <a href="reports/11_continual_harness.html">11</a> Continual Harness</td>
+</tr>
+<tr>
+<td>评估器问题</td>
+<td><a href="reports/03_evolm.html">03</a> EvoLM → <a href="reports/04_red_queen_godel_machine.html">04</a> RQGM → <a href="reports/05_who_grades_the_grader.html">05</a> WGtG → <a href="reports/06_echo.html">06</a> ECHO → <a href="reports/24_evalcegar.html">24</a> EvalCEGAR 与 <a href="reports/25_rho.html">25</a> RHO 对照（用锚 vs 不用锚）</td>
+</tr>
+<tr>
+<td>生产部署</td>
+<td><a href="reports/02_anthropic_when_ai_builds_itself.html">02</a> Anthropic → <a href="reports/08_moss.html">08</a> MOSS → <a href="reports/19_icoder.html">19</a> iCoder → <a href="reports/18_prime_agent.html">18</a> Prime Agent → <a href="reports/27_safety_governance.html">27</a> 安全治理五篇</td>
+</tr>
+<tr>
+<td>思想史与递归深度</td>
+<td><a href="reports/00_origins_1965_2014.html">00</a> Good 到 Bostrom → <a href="reports/23_godel_agent_to_sica.html">23</a> Gödel Agent 到 SICA → <a href="reports/07_darwin_godel_machine.html">07</a> DGM → <a href="reports/20_metan.html">20</a> Metan</td>
+</tr>
+<tr>
+<td>技能库</td>
+<td><a href="reports/09_wikiskill.html">09</a> WikiSkill → <a href="reports/26_skill_evolution_wave.html">26</a> 技能进化五篇 → <a href="reports/15_envharness.html">15</a> EnvHarness</td>
+</tr>
+<tr>
+<td>二次开发</td>
+<td><a href="reports/19_icoder.html">19</a> iCoder 代码库评估 → <a href="reports/13_meta_harness.html">13</a> / <a href="reports/16_autosaddler.html">16</a> 两种 harness 修改方式 → <a href="reports/21_co_harness.html">21</a> Co-Harness → <a href="reports/22_coevolution_survey.html">22</a> 过程级测试 → <a href="reports/27_safety_governance.html">27</a> 部署检查清单</td>
+</tr>
+</tbody>
+</table></div><footer>RSI 研究札记 · 根据 awesome_rsi 仓库生成<br>论文结论与研究判断以各篇来源及实验边界为准。<a href="#">返回顶部 ↑</a></footer></main></div><script src="site.js"></script></body></html>

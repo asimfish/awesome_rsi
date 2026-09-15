@@ -1,0 +1,28 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的论文、中文解读、分类与专题。"><title>仓库与构建 · RSI 研究札记</title><link rel="stylesheet" href="site.css"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress"></div><header class="topbar"><a class="brand" href="index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a href="index.html">首页</a><a href="papers.html">论文</a><a href="reports.html">解读</a><a href="insights.html">洞察</a><a href="topics.html">专题</a><a href="resources.html">资源</a></nav><button id="theme" aria-label="切换深色模式">深色阅读</button></header><div class="layout "><aside><div class="eyebrow">长文阅读</div><div class="toc">
+<ul>
+<li><a href="#仓库与构建">仓库与构建</a></li>
+</ul>
+</div>
+<div class="aside-links"><a href="guide.html">完整仓库导览 ↗</a><a href="https://github.com/asimfish/awesome_rsi">GitHub 源码 ↗</a></div></aside><main id="content"><div class="eyebrow">长文阅读</div><h1 id="仓库与构建">仓库与构建</h1>
+<pre><code>awesome_rsi/
+├── README.md · CONTRIBUTING.md
+├── report/
+│   ├── awesome_rsi_slides.html / .pdf        # 35 页汇总 PPT（方向键翻页，P 键打印）
+│   └── awesome_rsi_full_report.html / .pdf   # 167 页全文合订（32 份解读 + 封面 + 目录 + 两图）
+├── reports/                                  # 32 份解读 00–31（索引见 §5）
+├── papers/
+│   ├── en/                                   # 65 篇英文原版 PDF（arXiv + iCoder 技术报告）
+│   ├── zh/                                   # 64 篇中文翻译 PDF；The Last AI 待译
+│   └── classics/                             # 6 篇起源经典（Good 1965 为扫描件无文本层，其余 5 篇含中译）
+├── assets/
+│   ├── fig1_timeline.svg · fig2_taxonomy.svg # 两张图（另有 _dark 变体供 PPT）
+│   ├── fulltext/                             # 论文提取全文（解读撰写底稿）
+│   └── trends_research_raw.md                # 2026H2 趋势扫描笔记
+├── scripts/
+│   ├── make_figures.py                       # 生成两张图
+│   ├── build_full_report.py                  # pandoc 合订 reports/*.md → HTML → Chrome PDF
+│   └── translate_batch5.sh                   # 批量中译（三条可并行队列）
+└── logs/                                     # 翻译日志
+</code></pre>
+<p>重建产物：<code>python3 scripts/make_figures.py</code> 重新生成两图；<code>python3 scripts/build_full_report.py --pdf</code> 重建全文报告；slides PDF 用 Chrome headless <code>--print-to-pdf</code> 生成。</p>
+<p>翻译管线：中文 PDF 由 <a href="https://github.com/asimfish/super_translate">super_translate</a> 生成，流程为冻结公式和图表等结构对象、注入术语表、按原坐标替换文本、QA 审计和确定性修复。后端为 DeepSeek API，逐篇带翻译缓存。翻译保留原版式与页码，术语和公式以英文原版为准。批量脚本见 <code>scripts/translate_batch5.sh</code>。</p><footer>RSI 研究札记 · 根据 awesome_rsi 仓库生成<br>论文结论与研究判断以各篇来源及实验边界为准。<a href="#">返回顶部 ↑</a></footer></main></div><script src="site.js"></script></body></html>

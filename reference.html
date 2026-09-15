@@ -1,0 +1,378 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的论文、中文解读、分类与专题。"><title>术语与系统对照 · RSI 研究札记</title><link rel="stylesheet" href="site.css"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress"></div><header class="topbar"><a class="brand" href="index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a href="index.html">首页</a><a href="papers.html">论文</a><a href="reports.html">解读</a><a href="insights.html">洞察</a><a href="topics.html">专题</a><a href="resources.html">资源</a></nav><button id="theme" aria-label="切换深色模式">深色阅读</button></header><div class="layout "><aside><div class="eyebrow">长文阅读</div><div class="toc">
+<ul>
+<li><a href="#术语时间线与系统对照">术语、时间线与系统对照</a><ul>
+<li><a href="#71-glossary">7.1 Glossary</a></li>
+<li><a href="#72-timeline">7.2 Timeline</a></li>
+<li><a href="#73-system-comparison-matrix">7.3 System Comparison Matrix</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="aside-links"><a href="guide.html">完整仓库导览 ↗</a><a href="https://github.com/asimfish/awesome_rsi">GitHub 源码 ↗</a></div></aside><main id="content"><div class="eyebrow">长文阅读</div><h1 id="术语时间线与系统对照">术语、时间线与系统对照</h1>
+<h3 id="71-glossary">7.1 Glossary</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>术语</th>
+<th>含义</th>
+<th>出处</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RSI（递归自改进）</td>
+<td>一次改进提升了系统发现、验证、实现下一次改进的能力。仅仅反复改进自身还不够</td>
+<td>Bostrom 2014，报告 00</td>
+</tr>
+<tr>
+<td>crossover point / recalcitrance</td>
+<td>系统自身贡献开始主导后续改进的时刻 / 系统对改进的阻力；增长率 = optimization power ÷ recalcitrance</td>
+<td>Bostrom 2014，报告 00</td>
+</tr>
+<tr>
+<td>Harness</td>
+<td>基座模型之外决定信息流的代码：编排、规划、工具调用、上下文管理、评估。Weng 的观点是 harness 可以像其他代码一样被搜索</td>
+<td>报告 01</td>
+</tr>
+<tr>
+<td>三层改进面</td>
+<td>文本层（prompt、技能，改动快）、权重层（微调，改动慢）、源码层（改 harness 代码，用于结构性故障）；2026 年的做法是按层分工</td>
+<td>报告 10</td>
+</tr>
+<tr>
+<td>锚 / 锚定纪律</td>
+<td>进化循环之外保留一个不参与进化的评估依据：人工标注集、冻结的验证器或奖励模型、回归测试、外部 proposer、dev 集</td>
+<td>报告 05、11、15、16</td>
+</tr>
+<tr>
+<td>评估器塌缩 / 观测等价</td>
+<td>评估器在优化压力下偏离原有标准后，训出的策略在任务分数上与正常情况相同。只有循环外的锚能分辨</td>
+<td>报告 05</td>
+</tr>
+<tr>
+<td>reward overoptimization</td>
+<td>静态奖励模型判分越准，训出的策略反而越差，因为策略利用了固定判据</td>
+<td>报告 03</td>
+</tr>
+<tr>
+<td>critic staleness</td>
+<td>固定的 critic 跟不上策略的分布变化，反馈效果下降，甚至起反作用。解决办法是让 critic 与策略同步更新</td>
+<td>报告 06</td>
+</tr>
+<tr>
+<td>免重置 vs 重置式</td>
+<td>重置式（DGM、RQGM、GEPA）通过完整评测判断改动是否有效。免重置（Continual Harness、Prime Agent）在任务进行中修改 harness，能处理只在 episode 后期出现的失败</td>
+<td>报告 11、18</td>
+</tr>
+<tr>
+<td>能力地板</td>
+<td>基座能力低于某个阈值时，自改进反而使表现下降（Continual Harness）。Self-Harness 显示，加上回归检查后 35B 模型也能提升。这一阈值取决于模型和接受机制两者</td>
+<td>报告 11、14</td>
+</tr>
+<tr>
+<td>Harness Debt</td>
+<td>训练时用 harness 弥补模型弱点，可能让模型依赖 harness，脱离 harness 测试时表现下降。Co-Harness 实测每轮脱离 harness 测试的精度都上升</td>
+<td>报告 21</td>
+</tr>
+<tr>
+<td>realized meta-depth</td>
+<td>系统中行为发生变化的最高 meta 层级。自改写系统需要冻结驱动层，因此实际深度约为 2.5。Metan 用固定 Ω 递归输入达到 3 到 6</td>
+<td>报告 20</td>
+</tr>
+<tr>
+<td>harness 可迁移性</td>
+<td>优化后的 harness 换模型仍有效：Meta-Harness 在 5 个未见模型上 +4.7，AutoSaddler 用 Opus 优化、Haiku 运行 +5.6，MetaCaster 换四个骨干误差波动小于 0.1</td>
+<td>报告 13、16、17</td>
+</tr>
+<tr>
+<td>高密度低频接口</td>
+<td>把专家经验一次性写成约束（目标、harness、权限、验证、证据规则），运行期间只在权限变更时介入。iCoder 采用这种做法</td>
+<td>报告 19</td>
+</tr>
+<tr>
+<td>过程级测试</td>
+<td>评估共进化系统时，除了查看任务分数，还需进行历史交叉对弈和组件消融，并使用 held-out 评估器</td>
+<td>报告 22</td>
+</tr>
+<tr>
+<td>错误持久化</td>
+<td>自进化特有的风险：不可靠的测试结果、噪声轨迹或基准捷径会被存入记忆、蒸馏成技能、用于更新模型</td>
+<td>报告 28</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="72-timeline">7.2 Timeline</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>时间</th>
+<th>事件</th>
+<th>报告</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1965</td>
+<td>Good 提出 intelligence explosion</td>
+<td>00</td>
+</tr>
+<tr>
+<td>1993</td>
+<td>Vinge 提出"奇点"，列出四条路径</td>
+<td>00</td>
+</tr>
+<tr>
+<td>2000–01</td>
+<td>Yudkowsky GISAI：Seed AI 三能力，每级须开新机会</td>
+<td>00</td>
+</tr>
+<tr>
+<td>2003</td>
+<td>Schmidhuber Gödel Machine：自指的形式化定义</td>
+<td>00</td>
+</tr>
+<tr>
+<td>2008–13</td>
+<td>Omohundro 工具性驱力；Chalmers 形式化论证；Yudkowsky IEM 认知再投资回报率</td>
+<td>00</td>
+</tr>
+<tr>
+<td>2014</td>
+<td>Bostrom《Superintelligence》：crossover / recalcitrance</td>
+<td>00</td>
+</tr>
+<tr>
+<td>2023</td>
+<td>Voyager 可增长技能库；STOP 递归自改进代码生成；Erdil &amp; Besiroglu 爆炸增长综述</td>
+<td>23</td>
+</tr>
+<tr>
+<td>2024</td>
+<td>ADAS / AFlow 自动 agent 设计；AI Scientist 端到端自动研究；Gödel Agent 首个 LLM 版 Gödel Machine</td>
+<td>23</td>
+</tr>
+<tr>
+<td>2025 H1</td>
+<td>METR 任务时长 7 个月翻倍；SICA 17 → 53% 并引入异步监督者；DGM 开放式档案自改写</td>
+<td>23 · 07</td>
+</tr>
+<tr>
+<td>2025 H2</td>
+<td>AlphaEvolve / ShinkaEvolve 程序进化；GEPA 反思提示进化；TMLR 自进化综述；ACE 上下文进化</td>
+<td>12</td>
+</tr>
+<tr>
+<td>2026 Q1</td>
+<td>ECHO；MCE；SkillRL；HyperAgents；Meta-Harness</td>
+<td>06 · 13</td>
+</tr>
+<tr>
+<td>2026 Q2</td>
+<td>AHE；EvoLM；Continual Harness；MOSS；Evolving-RL；SIA；Self-Harness；RQGM；RHO / HarnessFix / Adaptive Auto-Harness / SCORE</td>
+<td>03 · 04 · 08 · 11 · 14 · 25</td>
+</tr>
+<tr>
+<td>2026 Q3</td>
+<td>Weng 总纲；Anthropic 进度报告；Who Grades the Grader；Co-Harness；Falsifiable Gates；技能进化五篇；EnvHarness / AutoSaddler / MetaCaster / Prime Agent；Metan；WikiSkill；EvalCEGAR；SESG / OLE / HVTB；两份综述；iCoder</td>
+<td>01 · 02 · 05 · 09 · 15–22 · 24 · 26–28</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="73-system-comparison-matrix">7.3 System Comparison Matrix</h3>
+<p>20 个系统在本调研四条主轴上的位置，数字均可在对应报告中找到出处。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>系统</th>
+<th>改哪层</th>
+<th>锚在哪（不参与进化的部件）</th>
+<th>重置式 / 免重置</th>
+<th>生产部署</th>
+<th>关键数字</th>
+<th>报告</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DGM</td>
+<td>源码（harness 代码库）</td>
+<td>固定基准 + 沙箱人审</td>
+<td>重置式</td>
+<td>否</td>
+<td>SWE-bench Verified 20.0 → 50.0%</td>
+<td>07</td>
+</tr>
+<tr>
+<td>MOSS</td>
+<td>源码（生产 agent）</td>
+<td>失败重放 + 批准 / 回滚</td>
+<td>重置式</td>
+<td>是</td>
+<td>单轮 0.25 → 0.61</td>
+<td>08</td>
+</tr>
+<tr>
+<td>EvoLM</td>
+<td>权重（策略 + rubric 生成器）</td>
+<td>训练环内的 rubric 共进化</td>
+<td>重置式</td>
+<td>否</td>
+<td>静态 RM 越准、策略越差</td>
+<td>03</td>
+</tr>
+<tr>
+<td>RQGM</td>
+<td>harness + 评估器</td>
+<td>epoch 内冻结评估器 + 人类锚数据集</td>
+<td>重置式</td>
+<td>否</td>
+<td>论文写作接受率 40.5% vs 21.8%</td>
+<td>04</td>
+</tr>
+<tr>
+<td>Who Grades the Grader</td>
+<td>文本技能 + 评估指标</td>
+<td>十条人工锚定样本</td>
+<td>重置式</td>
+<td>否</td>
+<td>塌缩指标训出的技能任务分与正常相同</td>
+<td>05</td>
+</tr>
+<tr>
+<td>ECHO</td>
+<td>权重（critic + 策略）</td>
+<td>环境结果奖励</td>
+<td>重置式</td>
+<td>否</td>
+<td>77.85 vs GRPO 70.57；冻结 critic 68.58</td>
+<td>06</td>
+</tr>
+<tr>
+<td>WikiSkill</td>
+<td>文本（经验 → wiki → 技能）</td>
+<td>验证集 + 提案审计记录</td>
+<td>重置式</td>
+<td>否</td>
+<td>提议者有 wiki +15.0；9B+技能 &gt; 27B</td>
+<td>09</td>
+</tr>
+<tr>
+<td>Continual Harness</td>
+<td>文本四组件 + 权重</td>
+<td>冻结 PRM + 教师模型</td>
+<td>免重置</td>
+<td>否</td>
+<td>Pro 100%/$130 vs 98%/$215；Flash-Lite 之下为负</td>
+<td>11</td>
+</tr>
+<tr>
+<td>Meta-Harness</td>
+<td>源码（harness 代码）</td>
+<td>外部 proposer + 搜索集</td>
+<td>重置式</td>
+<td>否</td>
+<td>TB2 76.4% vs 手工 74.7%</td>
+<td>13</td>
+</tr>
+<tr>
+<td>Self-Harness</td>
+<td>harness 配置面</td>
+<td>回归门（双 split）</td>
+<td>重置式</td>
+<td>否</td>
+<td>9/9 提升，最大 +132%</td>
+<td>14</td>
+</tr>
+<tr>
+<td>EnvHarness</td>
+<td>环境（Stage / Contract / Chain）</td>
+<td>原环境验证器</td>
+<td>重置式</td>
+<td>否</td>
+<td>ALFWorld OOD +9.0</td>
+<td>15</td>
+</tr>
+<tr>
+<td>AutoSaddler</td>
+<td>prompt + 工具 + 中间件</td>
+<td>dev 集 + EvoDAG 回滚</td>
+<td>重置式</td>
+<td>否</td>
+<td>去 dev 门 50.6 &lt; 未优化 53.0</td>
+<td>16</td>
+</tr>
+<tr>
+<td>MetaCaster</td>
+<td>文本（系统提示 + 技能库）</td>
+<td>真实测试集误差（仅训练期）</td>
+<td>重置式</td>
+<td>否</td>
+<td>四骨干误差 0.267–0.366</td>
+<td>17</td>
+</tr>
+<tr>
+<td>Prime Agent</td>
+<td>文本 harness + 持久 REPL</td>
+<td>环境奖励（无独立锚）</td>
+<td>免重置</td>
+<td>是（开源）</td>
+<td>ARC-AGI-3 30.2% → 95.5%</td>
+<td>18</td>
+</tr>
+<tr>
+<td>iCoder</td>
+<td>权重（27B 模型）</td>
+<td>官方 verifier + 人类权限门</td>
+<td>重置式</td>
+<td>是（可发布）</td>
+<td>RTLLM 68.0 &gt; GPT-5.5 / Opus 4.8</td>
+<td>19</td>
+</tr>
+<tr>
+<td>Metan</td>
+<td>文本预处理 + 辅助代码</td>
+<td>基准验证分 + 档案（Ω 固定）</td>
+<td>重置式</td>
+<td>否</td>
+<td>ARC-AGI-2 0.331</td>
+<td>20</td>
+</tr>
+<tr>
+<td>Co-Harness</td>
+<td>harness diff + 权重</td>
+<td>验证集 + 归因分类 + 版本回滚</td>
+<td>重置式（离线批次）</td>
+<td>否</td>
+<td>平均 +20.4 pp</td>
+<td>21</td>
+</tr>
+<tr>
+<td>EvalCEGAR</td>
+<td>评估器（算子池）</td>
+<td>训练 split 的碰撞对</td>
+<td>—</td>
+<td>否</td>
+<td>55 行算子缩小 15.4% 差距</td>
+<td>24</td>
+</tr>
+<tr>
+<td>RHO</td>
+<td>Skills + Tools</td>
+<td>无（自偏好）</td>
+<td>重置式（需重放）</td>
+<td>否</td>
+<td>SWE-Bench Pro 0.59 → 0.78（单轮）</td>
+<td>25</td>
+</tr>
+<tr>
+<td>SESG</td>
+<td>权重（1.7B 护栏）</td>
+<td>红队测试集 + 人工约 2h/威胁</td>
+<td>—</td>
+<td>是（深信服）</td>
+<td>两个月 14/15 新威胁</td>
+<td>27</td>
+</tr>
+</tbody>
+</table></div>
+<p>除 RHO 外，表中所有系统的"锚在哪"一列都非空。"生产部署"一列有五个系统标为"是"。其中 MOSS、iCoder、SESG 采用人工批准、锁定验证器、人工标注。</p><footer>RSI 研究札记 · 根据 awesome_rsi 仓库生成<br>论文结论与研究判断以各篇来源及实验边界为准。<a href="#">返回顶部 ↑</a></footer></main></div><script src="site.js"></script></body></html>

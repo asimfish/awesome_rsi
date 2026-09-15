@@ -1,0 +1,31 @@
+{
+  "protocol": "pilot-002-v2",
+  "model": "deepseek-v4-pro",
+  "input_hashes": {
+    "priority_encoder.v": "df28220d95b47df349a72803a9751aad331eb8e1435416e8686d00572a974dd5",
+    "provenance.json": "1b73455d3101ea32b8ef8f32e47923ba13cc4bc6e60ee270132654ff084e6ff3",
+    "abc.constr": "9a1e8c9c6a23ea8834f60f7ec807331ccdfe150cf0a9b8f025cc5c607c04b845",
+    "baseline.v": "d619ed5c104c3b7940f2115b7fd313efe059ebe3c3bc66f8db126ee285f02ae4",
+    "COPYING": "8ea57f95365e9b16a5b516f422b71269183a1ae53bab5878ae6d69039e58fe77",
+    "NangateOpenCellLibrary_typical.lib": "8d540a4d4cf6d09d27c87ad067857a9c0c2eeb023ab7a56e058cd3113db4e9b1"
+  },
+  "evaluator_sha256": "a1613818840881a80dbfaec59d4ba7ca4857cd236e7bc94da7469c8b912587d6",
+  "tools": {
+    "yosys": "0.9 / 1979e0b",
+    "abc": "Ubuntu 1.01+20211229git48498af+dfsg-2",
+    "opensta": "2.0.17 / c018cb2"
+  },
+  "constraints": {
+    "input_slew_ns": 0.02,
+    "output_load_ff": 5,
+    "corner": "TT 1.1V 25C",
+    "parasitics": "none",
+    "ABC_driving_cell": "BUF_X1"
+  },
+  "selection": {
+    "min_adp_improvement": 0.01,
+    "max_delay_vs_original": 1.05
+  },
+  "max_candidates": 4,
+  "max_api_requests": 8
+}

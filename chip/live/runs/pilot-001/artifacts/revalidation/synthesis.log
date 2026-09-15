@@ -1,0 +1,1319 @@
+
+ /----------------------------------------------------------------------------\
+ |                                                                            |
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |                                                                            |
+ |  Copyright (C) 2012 - 2019  Clifford Wolf <clifford@clifford.at>           |
+ |                                                                            |
+ |  Permission to use, copy, modify, and/or distribute this software for any  |
+ |  purpose with or without fee is hereby granted, provided that the above    |
+ |  copyright notice and this permission notice appear in all copies.         |
+ |                                                                            |
+ |  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES  |
+ |  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF          |
+ |  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR   |
+ |  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES    |
+ |  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN     |
+ |  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF   |
+ |  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.            |
+ |                                                                            |
+ \----------------------------------------------------------------------------/
+
+ Yosys 0.9 (git sha1 1979e0b)
+
+
+-- Executing script file `synth.ys' --
+
+1. Executing Verilog-2005 frontend: candidate.v
+Parsing Verilog input from `candidate.v' to AST representation.
+Generating RTLIL representation for module `\priority_encoder'.
+Generating RTLIL representation for module `\design'.
+Successfully finished Verilog frontend.
+
+2. Executing HIERARCHY pass (managing design hierarchy).
+
+2.1. Analyzing design hierarchy..
+Top module:  \design
+Used module:     \priority_encoder
+
+2.2. Executing AST frontend in derive mode using pre-parsed AST for module `\priority_encoder'.
+Parameter \WIDTH = 64
+Parameter \LSB_HIGH_PRIORITY = 0
+Generating RTLIL representation for module `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0'.
+
+2.3. Analyzing design hierarchy..
+Top module:  \design
+Used module:     $paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0
+
+2.4. Analyzing design hierarchy..
+Top module:  \design
+Used module:     $paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0
+Removing unused module `\priority_encoder'.
+Removed 1 unused modules.
+
+3. Executing SYNTH pass.
+
+3.1. Executing HIERARCHY pass (managing design hierarchy).
+
+3.1.1. Analyzing design hierarchy..
+Top module:  \design
+Used module:     $paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0
+
+3.1.2. Analyzing design hierarchy..
+Top module:  \design
+Used module:     $paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0
+Removed 0 unused modules.
+
+3.2. Executing PROC pass (convert processes to netlists).
+
+3.2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+3.2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Removed a total of 0 dead cases.
+
+3.2.3. Executing PROC_INIT pass (extract init attributes).
+
+3.2.4. Executing PROC_ARST pass (detect async resets in processes).
+
+3.2.5. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:34$392'.
+     1/126: $0\stage_enc[5][5:0]
+     2/126: $0\stage_valid[5][0:0]
+     3/126: $0\stage_enc[4][9:0] [9:5]
+     4/126: $0\stage_valid[4][1:0] [1]
+     5/126: $0\stage_enc[4][9:0] [4:0]
+     6/126: $0\stage_valid[4][1:0] [0]
+     7/126: $0\stage_enc[3][15:0] [15:12]
+     8/126: $0\stage_valid[3][3:0] [3]
+     9/126: $0\stage_enc[3][15:0] [11:8]
+    10/126: $0\stage_valid[3][3:0] [2]
+    11/126: $0\stage_enc[3][15:0] [7:4]
+    12/126: $0\stage_valid[3][3:0] [1]
+    13/126: $0\stage_enc[3][15:0] [3:0]
+    14/126: $0\stage_valid[3][3:0] [0]
+    15/126: $0\stage_enc[2][23:0] [23:21]
+    16/126: $0\stage_valid[2][7:0] [7]
+    17/126: $0\stage_enc[2][23:0] [20:18]
+    18/126: $0\stage_valid[2][7:0] [6]
+    19/126: $0\stage_enc[2][23:0] [17:15]
+    20/126: $0\stage_valid[2][7:0] [5]
+    21/126: $0\stage_enc[2][23:0] [14:12]
+    22/126: $0\stage_valid[2][7:0] [4]
+    23/126: $0\stage_enc[2][23:0] [11:9]
+    24/126: $0\stage_valid[2][7:0] [3]
+    25/126: $0\stage_enc[2][23:0] [8:6]
+    26/126: $0\stage_valid[2][7:0] [2]
+    27/126: $0\stage_enc[2][23:0] [5:3]
+    28/126: $0\stage_valid[2][7:0] [1]
+    29/126: $0\stage_enc[2][23:0] [2:0]
+    30/126: $0\stage_valid[2][7:0] [0]
+    31/126: $0\stage_enc[1][31:0] [31:30]
+    32/126: $0\stage_valid[1][15:0] [15]
+    33/126: $0\stage_enc[1][31:0] [29:28]
+    34/126: $0\stage_valid[1][15:0] [14]
+    35/126: $0\stage_enc[1][31:0] [27:26]
+    36/126: $0\stage_valid[1][15:0] [13]
+    37/126: $0\stage_enc[1][31:0] [25:24]
+    38/126: $0\stage_valid[1][15:0] [12]
+    39/126: $0\stage_enc[1][31:0] [23:22]
+    40/126: $0\stage_valid[1][15:0] [11]
+    41/126: $0\stage_enc[1][31:0] [21:20]
+    42/126: $0\stage_valid[1][15:0] [10]
+    43/126: $0\stage_enc[1][31:0] [19:18]
+    44/126: $0\stage_valid[1][15:0] [9]
+    45/126: $0\stage_enc[1][31:0] [17:16]
+    46/126: $0\stage_valid[1][15:0] [8]
+    47/126: $0\stage_enc[1][31:0] [15:14]
+    48/126: $0\stage_valid[1][15:0] [7]
+    49/126: $0\stage_enc[1][31:0] [13:12]
+    50/126: $0\stage_valid[1][15:0] [6]
+    51/126: $0\stage_enc[1][31:0] [11:10]
+    52/126: $0\stage_valid[1][15:0] [5]
+    53/126: $0\stage_enc[1][31:0] [9:8]
+    54/126: $0\stage_valid[1][15:0] [4]
+    55/126: $0\stage_enc[1][31:0] [7:6]
+    56/126: $0\stage_valid[1][15:0] [3]
+    57/126: $0\stage_enc[1][31:0] [5:4]
+    58/126: $0\stage_valid[1][15:0] [2]
+    59/126: $0\stage_enc[1][31:0] [3:2]
+    60/126: $0\stage_valid[1][15:0] [1]
+    61/126: $0\stage_enc[1][31:0] [1:0]
+    62/126: $0\stage_valid[1][15:0] [0]
+    63/126: $0\stage_enc[0][31:0] [31]
+    64/126: $0\stage_valid[0][31:0] [31]
+    65/126: $0\stage_enc[0][31:0] [30]
+    66/126: $0\stage_valid[0][31:0] [30]
+    67/126: $0\stage_enc[0][31:0] [29]
+    68/126: $0\stage_valid[0][31:0] [29]
+    69/126: $0\stage_enc[0][31:0] [28]
+    70/126: $0\stage_valid[0][31:0] [28]
+    71/126: $0\stage_enc[0][31:0] [27]
+    72/126: $0\stage_valid[0][31:0] [27]
+    73/126: $0\stage_enc[0][31:0] [26]
+    74/126: $0\stage_valid[0][31:0] [26]
+    75/126: $0\stage_enc[0][31:0] [25]
+    76/126: $0\stage_valid[0][31:0] [25]
+    77/126: $0\stage_enc[0][31:0] [24]
+    78/126: $0\stage_valid[0][31:0] [24]
+    79/126: $0\stage_enc[0][31:0] [23]
+    80/126: $0\stage_valid[0][31:0] [23]
+    81/126: $0\stage_enc[0][31:0] [22]
+    82/126: $0\stage_valid[0][31:0] [22]
+    83/126: $0\stage_enc[0][31:0] [21]
+    84/126: $0\stage_valid[0][31:0] [21]
+    85/126: $0\stage_enc[0][31:0] [20]
+    86/126: $0\stage_valid[0][31:0] [20]
+    87/126: $0\stage_enc[0][31:0] [19]
+    88/126: $0\stage_valid[0][31:0] [19]
+    89/126: $0\stage_enc[0][31:0] [18]
+    90/126: $0\stage_valid[0][31:0] [18]
+    91/126: $0\stage_enc[0][31:0] [17]
+    92/126: $0\stage_valid[0][31:0] [17]
+    93/126: $0\stage_enc[0][31:0] [16]
+    94/126: $0\stage_valid[0][31:0] [16]
+    95/126: $0\stage_enc[0][31:0] [15]
+    96/126: $0\stage_valid[0][31:0] [15]
+    97/126: $0\stage_enc[0][31:0] [14]
+    98/126: $0\stage_valid[0][31:0] [14]
+    99/126: $0\stage_enc[0][31:0] [13]
+   100/126: $0\stage_valid[0][31:0] [13]
+   101/126: $0\stage_enc[0][31:0] [12]
+   102/126: $0\stage_valid[0][31:0] [12]
+   103/126: $0\stage_enc[0][31:0] [11]
+   104/126: $0\stage_valid[0][31:0] [11]
+   105/126: $0\stage_enc[0][31:0] [10]
+   106/126: $0\stage_valid[0][31:0] [10]
+   107/126: $0\stage_enc[0][31:0] [9]
+   108/126: $0\stage_valid[0][31:0] [9]
+   109/126: $0\stage_enc[0][31:0] [8]
+   110/126: $0\stage_valid[0][31:0] [8]
+   111/126: $0\stage_enc[0][31:0] [7]
+   112/126: $0\stage_valid[0][31:0] [7]
+   113/126: $0\stage_enc[0][31:0] [6]
+   114/126: $0\stage_valid[0][31:0] [6]
+   115/126: $0\stage_enc[0][31:0] [5]
+   116/126: $0\stage_valid[0][31:0] [5]
+   117/126: $0\stage_enc[0][31:0] [4]
+   118/126: $0\stage_valid[0][31:0] [4]
+   119/126: $0\stage_enc[0][31:0] [3]
+   120/126: $0\stage_valid[0][31:0] [3]
+   121/126: $0\stage_enc[0][31:0] [2]
+   122/126: $0\stage_valid[0][31:0] [2]
+   123/126: $0\stage_enc[0][31:0] [1]
+   124/126: $0\stage_valid[0][31:0] [1]
+   125/126: $0\stage_enc[0][31:0] [0]
+   126/126: $0\stage_valid[0][31:0] [0]
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$390'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$142[31:0]$391
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$388'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$141[31:0]$389
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$386'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:80$140[31:0]$387
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$384'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:74$139[31:0]$385
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$382'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$138[31:0]$383
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$380'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$137[31:0]$381
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$378'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:80$136[31:0]$379
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$376'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:74$135[31:0]$377
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$374'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$134[31:0]$375
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$372'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$133[31:0]$373
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$370'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:80$132[31:0]$371
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$368'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:74$131[31:0]$369
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$366'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$130[31:0]$367
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$364'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$129[31:0]$365
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$362'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:80$128[31:0]$363
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$360'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:74$127[31:0]$361
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$358'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$126[31:0]$359
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$356'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$125[31:0]$357
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$354'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:80$124[31:0]$355
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$352'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:74$123[31:0]$353
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$350'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$122[31:0]$351
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$348'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$121[31:0]$349
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$346'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:80$120[31:0]$347
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$344'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:74$119[31:0]$345
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$342'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$118[31:0]$343
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$340'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$117[31:0]$341
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$338'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:80$116[31:0]$339
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$336'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:74$115[31:0]$337
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$334'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$114[31:0]$335
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$332'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$113[31:0]$333
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$330'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:80$112[31:0]$331
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$328'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:74$111[31:0]$329
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$326'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$110[31:0]$327
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$324'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$109[31:0]$325
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$322'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:80$108[31:0]$323
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$320'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:74$107[31:0]$321
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$318'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$106[31:0]$319
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$316'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$105[31:0]$317
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$314'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:80$104[31:0]$315
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$312'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:74$103[31:0]$313
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$310'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$102[31:0]$311
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$308'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$101[31:0]$309
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$306'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:80$100[31:0]$307
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$304'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:74$99[31:0]$305
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$302'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$98[31:0]$303
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$300'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$97[31:0]$301
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$298'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:80$96[31:0]$299
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$296'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:74$95[31:0]$297
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$294'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$94[31:0]$295
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$292'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$93[31:0]$293
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$290'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:80$92[31:0]$291
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$288'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:74$91[31:0]$289
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$286'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$90[31:0]$287
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$284'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$89[31:0]$285
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$282'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:80$88[31:0]$283
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$280'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:74$87[31:0]$281
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$278'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$86[31:0]$279
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$276'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$85[31:0]$277
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$274'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:80$84[31:0]$275
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$272'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:74$83[31:0]$273
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$270'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$82[31:0]$271
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$268'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$81[31:0]$269
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$266'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:80$80[31:0]$267
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$264'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:74$79[31:0]$265
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$262'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$78[31:0]$263
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$260'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$77[31:0]$261
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$258'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:80$76[31:0]$259
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$256'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:74$75[31:0]$257
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$254'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$74[31:0]$255
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$252'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$73[31:0]$253
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$250'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:80$72[31:0]$251
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$248'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:74$71[31:0]$249
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$246'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$70[31:0]$247
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$244'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$69[31:0]$245
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$242'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:80$68[31:0]$243
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$240'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:74$67[31:0]$241
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$238'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$66[31:0]$239
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$236'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$65[31:0]$237
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$234'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:80$64[31:0]$235
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$232'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:74$63[31:0]$233
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$230'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$62[31:0]$231
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$228'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$61[31:0]$229
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$226'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:80$60[31:0]$227
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$224'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:74$59[31:0]$225
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$222'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$58[31:0]$223
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$220'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$57[31:0]$221
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$218'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:80$56[31:0]$219
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$216'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:74$55[31:0]$217
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$214'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$54[31:0]$215
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$212'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$53[31:0]$213
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$210'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:80$52[31:0]$211
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$208'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:74$51[31:0]$209
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$206'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$50[31:0]$207
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$204'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$49[31:0]$205
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$202'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:80$48[31:0]$203
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$200'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:74$47[31:0]$201
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$198'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$46[31:0]$199
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$196'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$45[31:0]$197
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$194'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:80$44[31:0]$195
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$192'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:74$43[31:0]$193
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$190'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$42[31:0]$191
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$188'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$41[31:0]$189
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$186'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:80$40[31:0]$187
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$184'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:74$39[31:0]$185
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$182'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$38[31:0]$183
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$180'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$37[31:0]$181
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$178'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:80$36[31:0]$179
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$176'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:74$35[31:0]$177
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$174'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$34[31:0]$175
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$172'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$33[31:0]$173
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$170'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:80$32[31:0]$171
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$168'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:74$31[31:0]$169
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$166'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$30[31:0]$167
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$164'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$29[31:0]$165
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$162'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:80$28[31:0]$163
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$160'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:74$27[31:0]$161
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$158'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$26[31:0]$159
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$156'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$25[31:0]$157
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$154'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:80$24[31:0]$155
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$152'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:74$23[31:0]$153
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$150'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$22[31:0]$151
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$148'.
+     1/1: $0$mem2bits$\stage_enc$candidate.v:80$21[31:0]$149
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$146'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:80$20[31:0]$147
+Creating decoders for process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$144'.
+     1/1: $0$mem2bits$\stage_valid$candidate.v:74$19[31:0]$145
+
+3.2.6. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.\stage_valid[0]' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:34$392'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.\stage_valid[1] [15:0]' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:34$392'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.\stage_enc[0]' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:34$392'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.\stage_enc[1]' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:34$392'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.\stage_valid[2] [7:0]' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:34$392'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.\stage_valid[3] [3:0]' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:34$392'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.\stage_valid[4] [1:0]' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:34$392'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.\stage_valid[5] [0]' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:34$392'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.\stage_enc[2] [23:0]' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:34$392'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.\stage_enc[3] [15:0]' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:34$392'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.\stage_enc[4] [9:0]' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:34$392'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.\stage_enc[5] [5:0]' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:34$392'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$142' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$390'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$141' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$388'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:80$140' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$386'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:74$139' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$384'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$138' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$382'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$137' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$380'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:80$136' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$378'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:74$135' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$376'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$134' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$374'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$133' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$372'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:80$132' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$370'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:74$131' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$368'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$130' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$366'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$129' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$364'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:80$128' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$362'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:74$127' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$360'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$126' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$358'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$125' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$356'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:80$124' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$354'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:74$123' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$352'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$122' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$350'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$121' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$348'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:80$120' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$346'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:74$119' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$344'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$118' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$342'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$117' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$340'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:80$116' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$338'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:74$115' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$336'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$114' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$334'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$113' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$332'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:80$112' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$330'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:74$111' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$328'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$110' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$326'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$109' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$324'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:80$108' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$322'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:74$107' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$320'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$106' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$318'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$105' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$316'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:80$104' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$314'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:74$103' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$312'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$102' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$310'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$101' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$308'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:80$100' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$306'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:74$99' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$304'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$98' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$302'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$97' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$300'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:80$96' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$298'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:74$95' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$296'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$94' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$294'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$93' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$292'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:80$92' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$290'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:74$91' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$288'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$90' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$286'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$89' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$284'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:80$88' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$282'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:74$87' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$280'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$86' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$278'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$85' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$276'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:80$84' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$274'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:74$83' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$272'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$82' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$270'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$81' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$268'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:80$80' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$266'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:74$79' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$264'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$78' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$262'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$77' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$260'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:80$76' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$258'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:74$75' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$256'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$74' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$254'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$73' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$252'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:80$72' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$250'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:74$71' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$248'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$70' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$246'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$69' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$244'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:80$68' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$242'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:74$67' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$240'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$66' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$238'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$65' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$236'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:80$64' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$234'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:74$63' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$232'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$62' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$230'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$61' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$228'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:80$60' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$226'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:74$59' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$224'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$58' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$222'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$57' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$220'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:80$56' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$218'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:74$55' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$216'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$54' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$214'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$53' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$212'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:80$52' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$210'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:74$51' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$208'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$50' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$206'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$49' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$204'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:80$48' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$202'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:74$47' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$200'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$46' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$198'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$45' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$196'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:80$44' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$194'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:74$43' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$192'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$42' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$190'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$41' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$188'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:80$40' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$186'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:74$39' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$184'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$38' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$182'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$37' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$180'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:80$36' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$178'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:74$35' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$176'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$34' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$174'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$33' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$172'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:80$32' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$170'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:74$31' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$168'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$30' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$166'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$29' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$164'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:80$28' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$162'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:74$27' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$160'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$26' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$158'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$25' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$156'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:80$24' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$154'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:74$23' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$152'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$22' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$150'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_enc$candidate.v:80$21' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$148'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:80$20' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$146'.
+No latch inferred for signal `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$mem2bits$\stage_valid$candidate.v:74$19' from process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$144'.
+
+3.2.7. Executing PROC_DFF pass (convert process syncs to FFs).
+
+3.2.8. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:34$392'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$390'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$388'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$386'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$384'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$382'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$380'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$378'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$376'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$374'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$372'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$370'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$368'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$366'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$364'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$362'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$360'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$358'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$356'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$354'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$352'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$350'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$348'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$346'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$344'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$342'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$340'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$338'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$336'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$334'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$332'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$330'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$328'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$326'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$324'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$322'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$320'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$318'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$316'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$314'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$312'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$310'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$308'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$306'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$304'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$302'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$300'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$298'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$296'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$294'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$292'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$290'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$288'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$286'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$284'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$282'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$280'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$278'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$276'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$274'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$272'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$270'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$268'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$266'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$264'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$262'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$260'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$258'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$256'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$254'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$252'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$250'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$248'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$246'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$244'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$242'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$240'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$238'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$236'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$234'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$232'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$230'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$228'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$226'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$224'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$222'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$220'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$218'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$216'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$214'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$212'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$210'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$208'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$206'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$204'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$202'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$200'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$198'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$196'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$194'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$192'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$190'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$188'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$186'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$184'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$182'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$180'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$178'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$176'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$174'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$172'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$170'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$168'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$166'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$164'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$162'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$160'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$158'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$156'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$154'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$152'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$150'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$148'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:80$146'.
+Removing empty process `$paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.$proc$candidate.v:74$144'.
+Cleaned up 0 empty switches.
+
+3.3. Executing FLATTEN pass (flatten design).
+Using template $paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0 for cells of type $paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.
+<suppressed ~1 debug messages>
+No more expansions possible.
+Deleting now unused module $paramod\priority_encoder\WIDTH=64\LSB_HIGH_PRIORITY=0.
+
+3.4. Executing OPT_EXPR pass (perform const folding).
+Optimizing module design.
+
+3.5. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \design..
+Removed 0 unused cells and 355 unused wires.
+<suppressed ~1 debug messages>
+
+3.6. Executing CHECK pass (checking for obvious problems).
+checking module design..
+found and reported 0 problems.
+
+3.7. Executing OPT pass (performing simple optimizations).
+
+3.7.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module design.
+
+3.7.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\design'.
+Removed a total of 0 cells.
+
+3.7.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \design..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~1 debug messages>
+
+3.7.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \design.
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:61$393: { \req [0] \req [1] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:61$394: { \req [2] \req [3] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:74$425: { \req [0] \req [1] \req [2] \req [3] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:61$395: { \req [4] \req [5] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:61$396: { \req [6] \req [7] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:74$427: { \req [4] \req [5] \req [6] \req [7] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:74$457: { \req [0] \req [1] \req [2] \req [3] \req [4] \req [5] \req [6] \req [7] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:61$397: { \req [8] \req [9] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:61$398: { \req [10] \req [11] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:74$429: { \req [8] \req [9] \req [10] \req [11] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:61$399: { \req [12] \req [13] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:61$400: { \req [14] \req [15] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:74$431: { \req [12] \req [13] \req [14] \req [15] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:74$459: { \req [8] \req [9] \req [10] \req [11] \req [12] \req [13] \req [14] \req [15] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:74$473: { \req [0] \req [1] \req [2] \req [3] \req [4] \req [5] \req [6] \req [7] \req [8] \req [9] \req [10] \req [11] \req [12] \req [13] \req [14] \req [15] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:61$401: { \req [16] \req [17] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:61$402: { \req [18] \req [19] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:74$433: { \req [16] \req [17] \req [18] \req [19] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:61$403: { \req [20] \req [21] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:61$404: { \req [22] \req [23] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:74$435: { \req [20] \req [21] \req [22] \req [23] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:74$461: { \req [16] \req [17] \req [18] \req [19] \req [20] \req [21] \req [22] \req [23] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:61$405: { \req [24] \req [25] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:61$406: { \req [26] \req [27] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:74$437: { \req [24] \req [25] \req [26] \req [27] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:61$407: { \req [28] \req [29] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:61$408: { \req [30] \req [31] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:74$439: { \req [28] \req [29] \req [30] \req [31] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:74$463: { \req [24] \req [25] \req [26] \req [27] \req [28] \req [29] \req [30] \req [31] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:74$475: { \req [16] \req [17] \req [18] \req [19] \req [20] \req [21] \req [22] \req [23] \req [24] \req [25] \req [26] \req [27] \req [28] \req [29] \req [30] \req [31] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:74$481: { \req [0] \req [1] \req [2] \req [3] \req [4] \req [5] \req [6] \req [7] \req [8] \req [9] \req [10] \req [11] \req [12] \req [13] \req [14] \req [15] \req [16] \req [17] \req [18] \req [19] \req [20] \req [21] \req [22] \req [23] \req [24] \req [25] \req [26] \req [27] \req [28] \req [29] \req [30] \req [31] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:61$409: { \req [32] \req [33] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:61$410: { \req [34] \req [35] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:74$441: { \req [32] \req [33] \req [34] \req [35] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:61$411: { \req [36] \req [37] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:61$412: { \req [38] \req [39] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:74$443: { \req [36] \req [37] \req [38] \req [39] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:74$465: { \req [32] \req [33] \req [34] \req [35] \req [36] \req [37] \req [38] \req [39] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:61$413: { \req [40] \req [41] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:61$414: { \req [42] \req [43] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:74$445: { \req [40] \req [41] \req [42] \req [43] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:61$415: { \req [44] \req [45] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:61$416: { \req [46] \req [47] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:74$447: { \req [44] \req [45] \req [46] \req [47] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:74$467: { \req [40] \req [41] \req [42] \req [43] \req [44] \req [45] \req [46] \req [47] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:74$477: { \req [32] \req [33] \req [34] \req [35] \req [36] \req [37] \req [38] \req [39] \req [40] \req [41] \req [42] \req [43] \req [44] \req [45] \req [46] \req [47] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:61$417: { \req [48] \req [49] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:61$418: { \req [50] \req [51] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:74$449: { \req [48] \req [49] \req [50] \req [51] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:61$419: { \req [52] \req [53] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:61$420: { \req [54] \req [55] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:74$451: { \req [52] \req [53] \req [54] \req [55] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:74$469: { \req [48] \req [49] \req [50] \req [51] \req [52] \req [53] \req [54] \req [55] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:61$421: { \req [56] \req [57] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:61$422: { \req [58] \req [59] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:74$453: { \req [56] \req [57] \req [58] \req [59] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:61$423: { \req [60] \req [61] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:61$424: { \req [62] \req [63] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:74$455: { \req [60] \req [61] \req [62] \req [63] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:74$471: { \req [56] \req [57] \req [58] \req [59] \req [60] \req [61] \req [62] \req [63] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:74$479: { \req [48] \req [49] \req [50] \req [51] \req [52] \req [53] \req [54] \req [55] \req [56] \req [57] \req [58] \req [59] \req [60] \req [61] \req [62] \req [63] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:74$483: { \req [32] \req [33] \req [34] \req [35] \req [36] \req [37] \req [38] \req [39] \req [40] \req [41] \req [42] \req [43] \req [44] \req [45] \req [46] \req [47] \req [48] \req [49] \req [50] \req [51] \req [52] \req [53] \req [54] \req [55] \req [56] \req [57] \req [58] \req [59] \req [60] \req [61] \req [62] \req [63] }
+    New input vector for $reduce_or cell $techmap\dut.$reduce_or$candidate.v:74$485: { \req [0] \req [1] \req [2] \req [3] \req [4] \req [5] \req [6] \req [7] \req [8] \req [9] \req [10] \req [11] \req [12] \req [13] \req [14] \req [15] \req [16] \req [17] \req [18] \req [19] \req [20] \req [21] \req [22] \req [23] \req [24] \req [25] \req [26] \req [27] \req [28] \req [29] \req [30] \req [31] \req [32] \req [33] \req [34] \req [35] \req [36] \req [37] \req [38] \req [39] \req [40] \req [41] \req [42] \req [43] \req [44] \req [45] \req [46] \req [47] \req [48] \req [49] \req [50] \req [51] \req [52] \req [53] \req [54] \req [55] \req [56] \req [57] \req [58] \req [59] \req [60] \req [61] \req [62] \req [63] }
+  Optimizing cells in module \design.
+Performed a total of 63 changes.
+
+3.7.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\design'.
+Removed a total of 0 cells.
+
+3.7.6. Executing OPT_RMDFF pass (remove dff with constant values).
+
+3.7.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \design..
+Removed 31 unused cells and 0 unused wires.
+<suppressed ~31 debug messages>
+
+3.7.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module design.
+
+3.7.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+3.7.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \design..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~1 debug messages>
+
+3.7.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \design.
+Performed a total of 0 changes.
+
+3.7.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\design'.
+Removed a total of 0 cells.
+
+3.7.13. Executing OPT_RMDFF pass (remove dff with constant values).
+
+3.7.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \design..
+
+3.7.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module design.
+
+3.7.16. Finished OPT passes. (There is nothing left to do.)
+
+3.8. Executing WREDUCE pass (reducing word size of cells).
+Removed top 30 bits (of 32) from port A of cell design.$techmap\dut.$shl$candidate.v:88$143 ($shl).
+Removed top 8 bits (of 32) from wire design.dut.stage_enc[2].
+Removed top 16 bits (of 32) from wire design.dut.stage_enc[3].
+Removed top 22 bits (of 32) from wire design.dut.stage_enc[4].
+Removed top 16 bits (of 32) from wire design.dut.stage_valid[1].
+
+3.9. Executing PEEPOPT pass (run peephole optimizers).
+
+3.10. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \design..
+Removed 0 unused cells and 4 unused wires.
+<suppressed ~1 debug messages>
+
+3.11. Executing TECHMAP pass (map to technology primitives).
+
+3.11.1. Executing Verilog-2005 frontend: /toolchain/usr/bin/../share/yosys/cmp2lut.v
+Parsing Verilog input from `/toolchain/usr/bin/../share/yosys/cmp2lut.v' to AST representation.
+Generating RTLIL representation for module `\_90_lut_cmp_'.
+Successfully finished Verilog frontend.
+
+3.11.2. Continuing TECHMAP pass.
+No more expansions possible.
+
+3.12. Executing ALUMACC pass (create $alu and $macc cells).
+Extracting $alu and $macc cells in module design:
+  created 0 $alu and 0 $macc cells.
+
+3.13. Executing SHARE pass (SAT-based resource sharing).
+
+3.14. Executing OPT pass (performing simple optimizations).
+
+3.14.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module design.
+
+3.14.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\design'.
+Removed a total of 0 cells.
+
+3.14.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \design..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~1 debug messages>
+
+3.14.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \design.
+Performed a total of 0 changes.
+
+3.14.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\design'.
+Removed a total of 0 cells.
+
+3.14.6. Executing OPT_RMDFF pass (remove dff with constant values).
+
+3.14.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \design..
+
+3.14.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module design.
+
+3.14.9. Finished OPT passes. (There is nothing left to do.)
+
+3.15. Executing FSM pass (extract and optimize FSM).
+
+3.15.1. Executing FSM_DETECT pass (finding FSMs in design).
+
+3.15.2. Executing FSM_EXTRACT pass (extracting FSM from design).
+
+3.15.3. Executing FSM_OPT pass (simple optimizations of FSMs).
+
+3.15.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \design..
+
+3.15.5. Executing FSM_OPT pass (simple optimizations of FSMs).
+
+3.15.6. Executing FSM_RECODE pass (re-assigning FSM state encoding).
+
+3.15.7. Executing FSM_INFO pass (dumping all available information on FSM cells).
+
+3.15.8. Executing FSM_MAP pass (mapping FSMs to basic logic).
+
+3.16. Executing OPT pass (performing simple optimizations).
+
+3.16.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module design.
+
+3.16.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\design'.
+Removed a total of 0 cells.
+
+3.16.3. Executing OPT_RMDFF pass (remove dff with constant values).
+
+3.16.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \design..
+
+3.16.5. Finished fast OPT passes.
+
+3.17. Executing MEMORY pass.
+
+3.17.1. Executing MEMORY_DFF pass (merging $dff cells to $memrd and $memwr).
+
+3.17.2. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \design..
+
+3.17.3. Executing MEMORY_SHARE pass (consolidating $memrd/$memwr cells).
+
+3.17.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \design..
+
+3.17.5. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+3.18. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \design..
+
+3.19. Executing OPT pass (performing simple optimizations).
+
+3.19.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module design.
+<suppressed ~66 debug messages>
+
+3.19.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\design'.
+Removed a total of 0 cells.
+
+3.19.3. Executing OPT_RMDFF pass (remove dff with constant values).
+
+3.19.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \design..
+
+3.19.5. Finished fast OPT passes.
+
+3.20. Executing MEMORY_MAP pass (converting $mem cells to logic and flip-flops).
+
+3.21. Executing OPT pass (performing simple optimizations).
+
+3.21.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module design.
+
+3.21.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\design'.
+Removed a total of 0 cells.
+
+3.21.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \design..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~1 debug messages>
+
+3.21.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \design.
+Performed a total of 0 changes.
+
+3.21.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\design'.
+Removed a total of 0 cells.
+
+3.21.6. Executing OPT_RMDFF pass (remove dff with constant values).
+
+3.21.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \design..
+
+3.21.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module design.
+
+3.21.9. Finished OPT passes. (There is nothing left to do.)
+
+3.22. Executing TECHMAP pass (map to technology primitives).
+
+3.22.1. Executing Verilog-2005 frontend: <techmap.v>
+Parsing Verilog input from `<techmap.v>' to AST representation.
+Generating RTLIL representation for module `\_90_simplemap_bool_ops'.
+Generating RTLIL representation for module `\_90_simplemap_reduce_ops'.
+Generating RTLIL representation for module `\_90_simplemap_logic_ops'.
+Generating RTLIL representation for module `\_90_simplemap_compare_ops'.
+Generating RTLIL representation for module `\_90_simplemap_various'.
+Generating RTLIL representation for module `\_90_simplemap_registers'.
+Generating RTLIL representation for module `\_90_shift_ops_shr_shl_sshl_sshr'.
+Generating RTLIL representation for module `\_90_shift_shiftx'.
+Generating RTLIL representation for module `\_90_fa'.
+Generating RTLIL representation for module `\_90_lcu'.
+Generating RTLIL representation for module `\_90_alu'.
+Generating RTLIL representation for module `\_90_macc'.
+Generating RTLIL representation for module `\_90_alumacc'.
+Generating RTLIL representation for module `\$__div_mod_u'.
+Generating RTLIL representation for module `\$__div_mod'.
+Generating RTLIL representation for module `\_90_div'.
+Generating RTLIL representation for module `\_90_mod'.
+Generating RTLIL representation for module `\_90_pow'.
+Generating RTLIL representation for module `\_90_pmux'.
+Generating RTLIL representation for module `\_90_lut'.
+Successfully finished Verilog frontend.
+
+3.22.2. Continuing TECHMAP pass.
+Using extmapper simplemap for cells of type $mux.
+Using extmapper simplemap for cells of type $reduce_or.
+Using template $paramod$constmap:78a9cf5d4b79148ed5d8978cd451c6e708b74624$paramod$cf7f21efbe78798611284aebaa785679136b4a12\_90_shift_ops_shr_shl_sshl_sshr for cells of type $shl.
+No more expansions possible.
+<suppressed ~915 debug messages>
+
+3.23. Executing OPT pass (performing simple optimizations).
+
+3.23.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module design.
+<suppressed ~31 debug messages>
+
+3.23.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\design'.
+<suppressed ~387 debug messages>
+Removed a total of 129 cells.
+
+3.23.3. Executing OPT_RMDFF pass (remove dff with constant values).
+
+3.23.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \design..
+Removed 0 unused cells and 63 unused wires.
+<suppressed ~1 debug messages>
+
+3.23.5. Finished fast OPT passes.
+
+3.24. Executing HIERARCHY pass (managing design hierarchy).
+
+3.24.1. Analyzing design hierarchy..
+Top module:  \design
+
+3.24.2. Analyzing design hierarchy..
+Top module:  \design
+Removed 0 unused modules.
+
+3.25. Printing statistics.
+
+=== design ===
+
+   Number of wires:                 31
+   Number of wire bits:           1038
+   Number of public wires:          21
+   Number of public wire bits:     656
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                245
+     $_MUX_                        181
+     $_NOT_                          1
+     $_OR_                          63
+
+3.26. Executing CHECK pass (checking for obvious problems).
+checking module design..
+found and reported 0 problems.
+
+4. Executing CHECK pass (checking for obvious problems).
+checking module design..
+found and reported 0 problems.
+
+5. Executing ABC pass (technology mapping using ABC).
+
+5.1. Extracting gate netlist of module `\design' to `<abc-temp-dir>/input.blif'..
+Extracted 245 gates and 310 wires to a netlist network with 64 inputs and 71 outputs.
+
+5.1.1. Executing ABC.
+Running ABC command: <yosys-exe-dir>/berkeley-abc -s -f <abc-temp-dir>/abc.script 2>&1
+ABC: ABC command line: "source <abc-temp-dir>/abc.script".
+ABC: 
+ABC: + read_blif <abc-temp-dir>/input.blif 
+ABC: + read_lib -w /inputs/NangateOpenCellLibrary_typical.lib 
+ABC: Parsing finished successfully.  Parsing time =     0.03 sec
+ABC: Scl_LibertyReadGenlib() skipped cell "ANTENNA_X1" due to dont_use attribute.
+ABC: Scl_LibertyReadGenlib() skipped cell "CLKGATETST_X1" without logic function.
+ABC: Scl_LibertyReadGenlib() skipped cell "CLKGATETST_X2" without logic function.
+ABC: Scl_LibertyReadGenlib() skipped cell "CLKGATETST_X4" without logic function.
+ABC: Scl_LibertyReadGenlib() skipped cell "CLKGATETST_X8" without logic function.
+ABC: Scl_LibertyReadGenlib() skipped cell "CLKGATE_X1" without logic function.
+ABC: Scl_LibertyReadGenlib() skipped cell "CLKGATE_X2" without logic function.
+ABC: Scl_LibertyReadGenlib() skipped cell "CLKGATE_X4" without logic function.
+ABC: Scl_LibertyReadGenlib() skipped cell "CLKGATE_X8" without logic function.
+ABC: Scl_LibertyReadGenlib() skipped sequential cell "DFFRS_X1".
+ABC: Scl_LibertyReadGenlib() skipped sequential cell "DFFRS_X2".
+ABC: Scl_LibertyReadGenlib() skipped sequential cell "DFFR_X1".
+ABC: Scl_LibertyReadGenlib() skipped sequential cell "DFFR_X2".
+ABC: Scl_LibertyReadGenlib() skipped sequential cell "DFFS_X1".
+ABC: Scl_LibertyReadGenlib() skipped sequential cell "DFFS_X2".
+ABC: Scl_LibertyReadGenlib() skipped sequential cell "DFF_X1".
+ABC: Scl_LibertyReadGenlib() skipped sequential cell "DFF_X2".
+ABC: Scl_LibertyReadGenlib() skipped sequential cell "DLH_X1".
+ABC: Scl_LibertyReadGenlib() skipped sequential cell "DLH_X2".
+ABC: Scl_LibertyReadGenlib() skipped sequential cell "DLL_X1".
+ABC: Scl_LibertyReadGenlib() skipped sequential cell "DLL_X2".
+ABC: Scl_LibertyReadGenlib() skipped cell "FILLCELL_X1" due to dont_use attribute.
+ABC: Scl_LibertyReadGenlib() skipped cell "TAPCELL_X1" due to dont_use attribute.
+ABC: Scl_LibertyReadGenlib() skipped cell "FILLCELL_X2" due to dont_use attribute.
+ABC: Scl_LibertyReadGenlib() skipped cell "FILLCELL_X4" due to dont_use attribute.
+ABC: Scl_LibertyReadGenlib() skipped cell "FILLCELL_X8" due to dont_use attribute.
+ABC: Scl_LibertyReadGenlib() skipped cell "FILLCELL_X16" due to dont_use attribute.
+ABC: Scl_LibertyReadGenlib() skipped cell "FILLCELL_X32" due to dont_use attribute.
+ABC: Scl_LibertyReadGenlib() skipped cell "LOGIC0_X1" due to dont_use attribute.
+ABC: Scl_LibertyReadGenlib() skipped cell "LOGIC1_X1" due to dont_use attribute.
+ABC: Scl_LibertyReadGenlib() skipped sequential cell "SDFFRS_X1".
+ABC: Scl_LibertyReadGenlib() skipped sequential cell "SDFFRS_X2".
+ABC: Scl_LibertyReadGenlib() skipped sequential cell "SDFFR_X1".
+ABC: Scl_LibertyReadGenlib() skipped sequential cell "SDFFR_X2".
+ABC: Scl_LibertyReadGenlib() skipped sequential cell "SDFFS_X1".
+ABC: Scl_LibertyReadGenlib() skipped sequential cell "SDFFS_X2".
+ABC: Scl_LibertyReadGenlib() skipped sequential cell "SDFF_X1".
+ABC: Scl_LibertyReadGenlib() skipped sequential cell "SDFF_X2".
+ABC: Scl_LibertyReadGenlib() skipped three-state cell "TBUF_X1".
+ABC: Scl_LibertyReadGenlib() skipped three-state cell "TBUF_X2".
+ABC: Scl_LibertyReadGenlib() skipped three-state cell "TBUF_X4".
+ABC: Scl_LibertyReadGenlib() skipped three-state cell "TBUF_X8".
+ABC: Scl_LibertyReadGenlib() skipped three-state cell "TBUF_X16".
+ABC: Scl_LibertyReadGenlib() skipped three-state cell "TINV_X1".
+ABC: Scl_LibertyReadGenlib() skipped sequential cell "TLAT_X1".
+ABC: Library "NangateOpenCellLibrary" from "/inputs/NangateOpenCellLibrary_typical.lib" has 90 cells (35 skipped: 21 seq; 6 tri-state; 8 no func; 10 dont_use).  Time =     0.05 sec
+ABC: Memory =    8.88 MB. Time =     0.05 sec
+ABC: Warning: Detected 2 multi-output gates (for example, "FA_X1").
+ABC: + read_constr -v /inputs/abc.constr 
+ABC: Setting driving cell to be "BUF_X1".
+ABC: Setting output load to be 5.000000.
+ABC: + strash 
+ABC: + ifraig 
+ABC: + scorr 
+ABC: Warning: The network is combinational (run "fraig" or "fraig_sweep").
+ABC: + dc2 
+ABC: + dretime 
+ABC: + retime 
+ABC: + strash 
+ABC: + &get -n 
+ABC: + &dch -f 
+ABC: + &nf 
+ABC: + &put 
+ABC: + buffer 
+ABC: + upsize 
+ABC: + dnsize 
+ABC: + stime -p 
+ABC: WireLoad = "none"  Gates =    233 ( 20.2 %)   Cap =  4.7 ff (  5.3 %)   Area =      254.56 ( 86.3 %)   Delay =   525.66 ps  ( 29.2 %)               
+ABC: Path  0 --      40 : 0    1 pi        A =   0.00  Df =  17.1   -5.7 ps  S =  18.1 ps  Cin =  0.0 ff  Cout =   6.7 ff  Cmax =   0.0 ff  G =    0  
+ABC: Path  1 --     141 : 2    2 NOR2_X4   A =   2.39  Df =  42.4   -9.8 ps  S =  17.7 ps  Cin =  6.3 ff  Cout =   8.8 ff  Cmax = 106.8 ff  G =  131  
+ABC: Path  2 --     142 : 3    3 NAND3_X4  A =   3.46  Df =  66.4  -12.8 ps  S =  13.4 ps  Cin =  6.6 ff  Cout =   9.3 ff  Cmax = 233.2 ff  G =  134  
+ABC: Path  3 --     144 : 4    3 NOR4_X4   A =   4.79  Df = 140.1  -74.3 ps  S =  39.0 ps  Cin =  5.8 ff  Cout =   5.0 ff  Cmax =  41.5 ff  G =   82  
+ABC: Path  4 --     145 : 2    1 AND2_X2   A =   1.33  Df = 177.8  -83.0 ps  S =   9.0 ps  Cin =  1.6 ff  Cout =   3.4 ff  Cmax = 120.8 ff  G =  196  
+ABC: Path  5 --     146 : 1    9 BUF_X4    A =   1.86  Df = 204.3  -83.2 ps  S =  12.0 ps  Cin =  3.2 ff  Cout =  15.7 ff  Cmax = 242.3 ff  G =  461  
+ABC: Path  6 --     153 : 2    3 AND2_X4   A =   2.39  Df = 233.6  -87.3 ps  S =   8.2 ps  Cin =  3.2 ff  Cout =   5.9 ff  Cmax = 241.7 ff  G =  172  
+ABC: Path  7 --     154 : 1    2 INV_X2    A =   0.80  Df = 241.4  -82.7 ps  S =   7.7 ps  Cin =  3.1 ff  Cout =   4.3 ff  Cmax = 121.5 ff  G =  131  
+ABC: Path  8 --     155 : 1   10 BUF_X4    A =   1.86  Df = 268.6  -80.5 ps  S =  15.2 ps  Cin =  3.2 ff  Cout =  21.4 ff  Cmax = 242.3 ff  G =  626  
+ABC: Path  9 --     251 : 3    7 OAI21_X4  A =   3.46  Df = 316.1  -70.6 ps  S =  33.3 ps  Cin =  6.1 ff  Cout =  19.3 ff  Cmax = 104.1 ff  G =  307  
+ABC: Path 10 --     285 : 1    5 INV_X4    A =   1.33  Df = 327.9  -62.2 ps  S =  10.9 ps  Cin =  6.0 ff  Cout =   9.8 ff  Cmax = 242.9 ff  G =  158  
+ABC: Path 11 --     288 : 4    4 AOI211_X2 A =   2.39  Df = 404.2  -69.5 ps  S =  48.5 ps  Cin =  3.1 ff  Cout =   6.6 ff  Cmax =  29.0 ff  G =  203  
+ABC: Path 12 --     289 : 3    4 NAND3_X1  A =   1.06  Df = 445.0  -71.0 ps  S =  24.8 ps  Cin =  1.6 ff  Cout =   6.6 ff  Cmax =  58.4 ff  G =  403  
+ABC: Path 13 --     290 : 3    1 NOR3_X1   A =   1.06  Df = 525.7 -131.6 ps  S =  50.0 ps  Cin =  1.6 ff  Cout =   5.0 ff  Cmax =  16.0 ff  G =  316  
+ABC: Start-point = pi39 (\req [52]).  End-point = po9 (\grant [2]).
+ABC: + write_blif <abc-temp-dir>/output.blif 
+
+5.1.2. Re-integrating ABC results.
+ABC RESULTS:           AND2_X1 cells:        7
+ABC RESULTS:           AND2_X2 cells:        1
+ABC RESULTS:           AND2_X4 cells:        1
+ABC RESULTS:         AOI211_X1 cells:        6
+ABC RESULTS:         AOI211_X2 cells:        1
+ABC RESULTS:          AOI21_X1 cells:       20
+ABC RESULTS:         AOI221_X1 cells:        4
+ABC RESULTS:         AOI221_X2 cells:        1
+ABC RESULTS:            BUF_X1 cells:        5
+ABC RESULTS:            BUF_X2 cells:        2
+ABC RESULTS:            BUF_X4 cells:        2
+ABC RESULTS:         CLKBUF_X1 cells:        5
+ABC RESULTS:            INV_X1 cells:       29
+ABC RESULTS:            INV_X2 cells:        3
+ABC RESULTS:            INV_X4 cells:        1
+ABC RESULTS:          NAND2_X1 cells:       11
+ABC RESULTS:          NAND3_X1 cells:        9
+ABC RESULTS:          NAND3_X4 cells:        1
+ABC RESULTS:          NAND4_X1 cells:        9
+ABC RESULTS:           NOR2_X1 cells:       34
+ABC RESULTS:           NOR2_X4 cells:        1
+ABC RESULTS:           NOR3_X1 cells:       35
+ABC RESULTS:           NOR3_X4 cells:        1
+ABC RESULTS:           NOR4_X1 cells:        5
+ABC RESULTS:           NOR4_X2 cells:        5
+ABC RESULTS:           NOR4_X4 cells:        1
+ABC RESULTS:         OAI211_X1 cells:        3
+ABC RESULTS:          OAI21_X1 cells:       19
+ABC RESULTS:          OAI21_X4 cells:        1
+ABC RESULTS:         OAI221_X1 cells:        2
+ABC RESULTS:            OR2_X1 cells:        3
+ABC RESULTS:            OR2_X2 cells:        1
+ABC RESULTS:            OR4_X1 cells:        4
+ABC RESULTS:        internal signals:      175
+ABC RESULTS:           input signals:       64
+ABC RESULTS:          output signals:       71
+Removing temp directory.
+Removed 0 unused cells and 162 unused wires.
+
+6. Printing statistics.
+
+=== design ===
+
+   Number of wires:                166
+   Number of wire bits:            297
+   Number of public wires:           4
+   Number of public wire bits:     135
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                233
+     AND2_X1                         7
+     AND2_X2                         1
+     AND2_X4                         1
+     AOI211_X1                       6
+     AOI211_X2                       1
+     AOI21_X1                       20
+     AOI221_X1                       4
+     AOI221_X2                       1
+     BUF_X1                          5
+     BUF_X2                          2
+     BUF_X4                          2
+     CLKBUF_X1                       5
+     INV_X1                         29
+     INV_X2                          3
+     INV_X4                          1
+     NAND2_X1                       11
+     NAND3_X1                        9
+     NAND3_X4                        1
+     NAND4_X1                        9
+     NOR2_X1                        34
+     NOR2_X4                         1
+     NOR3_X1                        35
+     NOR3_X4                         1
+     NOR4_X1                         5
+     NOR4_X2                         5
+     NOR4_X4                         1
+     OAI211_X1                       3
+     OAI21_X1                       19
+     OAI21_X4                        1
+     OAI221_X1                       2
+     OR2_X1                          3
+     OR2_X2                          1
+     OR4_X1                          4
+
+   Chip area for module '\design': 254.562000
+
+7. Executing Verilog backend.
+Dumping module `\design'.
+
+8. Executing JSON backend.
+
+End of script. Logfile hash: 4a947c49eb
+CPU: user 0.22s system 0.02s, MEM: 33.52 MB total, 28.12 MB resident
+Yosys 0.9 (git sha1 1979e0b)
+Time spent: 24% 2x stat (0 sec), 10% 2x write_verilog (0 sec), ...

@@ -1,0 +1,190 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的论文、中文解读、分类与专题。"><title>芯片设计专题 · RSI 研究札记</title><link rel="stylesheet" href="../site.css"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress"></div><header class="topbar"><a class="brand" href="../index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a href="../index.html">首页</a><a href="../papers.html">论文</a><a href="../reports.html">解读</a><a href="../insights.html">洞察</a><a href="../topics.html">专题</a><a href="../resources.html">资源</a></nav><button id="theme" aria-label="切换深色模式">深色阅读</button></header><div class="layout "><aside><div class="eyebrow">长文阅读</div><div class="toc">
+<ul>
+<li><a href="#rsi-用于芯片设计从-rtl-改写到可复用优化经验">RSI 用于芯片设计：从 RTL 改写到可复用优化经验</a><ul>
+<li><a href="#本站实际研究进展2026-09-15">本站实际研究进展（2026-09-15）</a></li>
+<li><a href="#1-结论与研究范围">1. 结论与研究范围</a></li>
+<li><a href="#2-技术地图到底改进什么">2. 技术地图：到底改进什么</a></li>
+<li><a href="#3-主案例源码dr-rtl-的两层循环">3. 主案例源码：Dr. RTL 的两层循环</a></li>
+<li><a href="#4-论文结果平均改善与个体权衡">4. 论文结果：平均改善与个体权衡</a></li>
+<li><a href="#5-本次源码检查发现的复现边界">5. 本次源码检查发现的复现边界</a></li>
+<li><a href="#6-本地验证小实验正确性门槛有实际作用">6. 本地验证小实验：正确性门槛有实际作用</a></li>
+<li><a href="#7-下一步怎么做最有研究价值">7. 下一步怎么做最有研究价值</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="aside-links"><a href="../guide.html">完整仓库导览 ↗</a><a href="https://github.com/asimfish/awesome_rsi">GitHub 源码 ↗</a></div></aside><main id="content"><div class="eyebrow">长文阅读</div><h1 id="rsi-用于芯片设计从-rtl-改写到可复用优化经验">RSI 用于芯片设计：从 RTL 改写到可复用优化经验</h1>
+<p>研究快照：2026-09-15。主案例：<a href="https://arxiv.org/abs/2604.14989v2">Dr. RTL v2</a>，Wenji Fang 等，HKUST。公开代码固定到 <a href="https://github.com/hkust-zhiyao/DR_RTL/tree/62b95a57223e8fb187d8b8ec1dcb3d193ef20c6b">62b95a57223e8fb187d8b8ec1dcb3d193ef20c6b</a>。</p>
+<p><a href="./">打开交互面板</a> · <a href="data/paper-results.json">逐设计数据</a> · <a href="data/local-experiment.json">本地验证记录</a></p>
+<h2 id="本站实际研究进展2026-09-15">本站实际研究进展（2026-09-15）</h2>
+<p>已经用开源 EDA 和真实 DeepSeek 调用运行两轮、共 10 个候选。研究者引导后的模型优胜在 64 路 priority_encoder 上实现 ADP 改善 9.238%，代价是面积增加 11.285%，延迟减少 18.442%。原始 RTL 和映射后的标准单元网表都通过形式等价，独立复跑一致。</p>
+<p><a href="live/results.md">查看真实实验与测量边界</a> · <a href="./#live">实时/历史进度</a> · <a href="live/research-bundle.zip">完整复跑证据</a>。以下 Dr. RTL 文献研究保持原有来源口径，不能把论文读数当作本站成果。</p>
+<h2 id="1-结论与研究范围">1. 结论与研究范围</h2>
+<p>芯片设计适合研究受约束的自改进：候选可以修改 RTL、综合策略或布线算法，工具提供功能检查与性能反馈。但“自动迭代优化”与“递归改进自身的改进能力”应分开。生成更好的电路，证明的是设计搜索有效；把经验提炼为可迁移的策略并用于后续设计，才进一步涉及改进过程的学习。</p>
+<p>本次主案例 Dr. RTL 同时具有这两层：内层修改 RTL，外层提炼文本技能。其模型权重不更新，原始功能参考与 EDA 约束仍由人确定。因此更准确的定位是<strong>工具反馈约束下的 RTL 与技能自改进</strong>，现有证据不足以证明开放式、无限递归的 RSI。</p>
+<p>本文完成了原论文阅读、公开代码检查、结果表提取及一个独立的布尔电路验证示例。未运行 Dr. RTL 的商业综合/SEC 全流程，论文指标均标为作者报告结果。本地示例不是论文复现，也没有调用 LLM 生成候选。</p>
+<h2 id="2-技术地图到底改进什么">2. 技术地图：到底改进什么</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>路线</th>
+<th>代表项目</th>
+<th>改进对象</th>
+<th>判断信号</th>
+<th>适合研究的问题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RTL 搜索与技能学习</td>
+<td><a href="https://github.com/hkust-zhiyao/DR_RTL">Dr. RTL</a></td>
+<td>RTL、pattern–strategy 技能库</td>
+<td>综合时序、面积、SEC</td>
+<td>成败经验怎样帮助下一设计</td>
+</tr>
+<tr>
+<td>RTL 与综合联合搜索</td>
+<td><a href="https://github.com/huawei-csl/rtlscout">RTLScout</a></td>
+<td>RTL 候选、综合优化与精英池</td>
+<td>Verilator 测试、Yosys/ABC、OpenROAD 等</td>
+<td>如何用开源工具路径做工程复现</td>
+</tr>
+<tr>
+<td>EDA 算法代码进化</td>
+<td><a href="https://github.com/ASU-VDA-Lab/GR-Evolve">GR-Evolve</a></td>
+<td>全局布线器代码</td>
+<td>设计相关 QoR</td>
+<td>优化设计产物，还是优化产生设计的算法</td>
+</tr>
+<tr>
+<td>测试时策略更新</td>
+<td><a href="https://arxiv.org/abs/2606.05253">Alpha-RTL / TTT-RTL</a></td>
+<td>单设计上的 LLM 策略权重</td>
+<td>语法、仿真、综合奖励</td>
+<td>固定策略搜索与参数学习的差异</td>
+</tr>
+</tbody>
+</table></div>
+<p>这些路线的验证器、工艺、任务和预算不同，不能把论文百分比混成一个排行榜。RTLScout 官方仓库提供离线假模型 smoke test，它只能检查软件管线，不能代表真实 LLM 或 EDA 优化成绩。Alpha-RTL 本次仅核实论文，未确认可用的官方代码发布。<a href="https://arxiv.org/abs/2606.06530">RTLScout 论文</a>、<a href="https://arxiv.org/abs/2604.22234">GR-Evolve 论文</a>。</p>
+<h2 id="3-主案例源码dr-rtl-的两层循环">3. 主案例源码：Dr. RTL 的两层循环</h2>
+<p>工作流由代理说明与 Python/TCL 工具脚本共同构成，不是一个完全独立、开箱即用的训练程序。主循环在 <a href="https://github.com/hkust-zhiyao/DR_RTL/blob/62b95a57223e8fb187d8b8ec1dcb3d193ef20c6b/CLAUDE.md">CLAUDE.md</a> 中定义：同一主版本产生五个独立候选，经历分析、改写、评估、记录，再挑选验证通过且分数最低者晋升，最多十个主轮次。</p>
+<p>分析器从时序报告选择 10–25 条关键路径。优化器结合瓶颈和技能库做变换，综合评估器运行 EDA。远程包装器负责传输与调用，EDA 主脚本实际执行 Design Compiler 和 JasperGold。代码中保留 Formality 路径，但主入口将它注释掉；<code>LSTM</code> 分支使用仿真而非 SEC。见 <a href="https://github.com/hkust-zhiyao/DR_RTL/blob/62b95a57223e8fb187d8b8ec1dcb3d193ef20c6b/syn_flow_eda/run_design.py">run_design.py</a>。</p>
+<p>选择分数为：</p>
+<pre><code class="language-text">score = 0.50 × (WNS − WNS₀) / WNS₀
+      + 0.35 × (TNS − TNS₀) / TNS₀
+      + 0.15 × (Area − Area₀) / Area₀
+      + 0.5 × I(Area 增幅 &gt; 10%)
+</code></pre>
+<p>对负的基线 WNS/TNS，改善意味着更接近零，对应负的归一化变化；越低的分数越好。不能随意将分母替换为绝对值后仍沿用“越低越好”，也应单独定义零违例基线的处理方式。</p>
+<p>外层技能提炼比较同组候选的成功与失败，将设计特定的改动总结为结构模式与策略。公开技能库分为高、中、低置信和避免策略，论文计数为 12 / 16 / 6 / 13，总计 47。例子包括共享条件预计算、减少重复表达式、扇出拆分、算术与选择逻辑的重排。技能说明也记录不应采用的变换，例如没有周期语义依据的寄存器移动。</p>
+<p><strong>研究判断：</strong>这类技能比一次性的分数上涨更接近 RSI 中的经验积累。但要证明持续元改进，仍需要跨设计、跨时间的严格留出评估，防止知识只记住当前任务或工艺。</p>
+<h2 id="4-论文结果平均改善与个体权衡">4. 论文结果：平均改善与个体权衡</h2>
+<p><a href="https://arxiv.org/pdf/2604.14989v2#page=6">论文表 2，第 6 页</a>给出 20 个设计。WNS、TNS 均为负裕量，以违例幅度减少解释改善。表 2 平均行报告 WNS 改善 21.3%、TNS 改善 16.9%、面积减少 5.8%，候选 SEC 平均通过率约 86%。全文摘要将前三项四舍五入为 21% / 17% / 6%。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>设计</th>
+<th style="text-align: right;">WNS：基线 → 优化（ns）</th>
+<th style="text-align: right;">TNS：基线 → 优化（ns）</th>
+<th style="text-align: right;">面积：基线 → 优化（μm²）</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>cpu_pipe</td>
+<td style="text-align: right;">-0.38 → -0.11</td>
+<td style="text-align: right;">-23.24 → -2.69</td>
+<td style="text-align: right;">2622 → 2313</td>
+<td>时序与面积共同改善</td>
+</tr>
+<tr>
+<td>pcie</td>
+<td style="text-align: right;">-0.79 → -0.44</td>
+<td style="text-align: right;">-23.83 → -19.75</td>
+<td style="text-align: right;">2156 → 1426</td>
+<td>明显的结构优化收益</td>
+</tr>
+<tr>
+<td>aes</td>
+<td style="text-align: right;">-0.70 → -0.67</td>
+<td style="text-align: right;">-913.49 → -876.71</td>
+<td style="text-align: right;">33755 → 33975</td>
+<td>改善幅度小、面积略增</td>
+</tr>
+<tr>
+<td>controller</td>
+<td style="text-align: right;">-0.38 → -0.33</td>
+<td style="text-align: right;">-2.85 → -2.57</td>
+<td style="text-align: right;">235 → 277</td>
+<td>时序收益伴随明显面积成本</td>
+</tr>
+<tr>
+<td>spi1</td>
+<td style="text-align: right;">-0.32 → -0.29</td>
+<td style="text-align: right;">-33.42 → -33.53</td>
+<td style="text-align: right;">1208 → 1276</td>
+<td>WNS 改善，但 TNS 和面积退步</td>
+</tr>
+</tbody>
+</table></div>
+<p>面板包含全部 20 行，不只展示最好的设计。面积数值是综合口径，不是版图面积；候选 SEC 通过率不是产品良率。所有设计的优化后 WNS 仍为负，因此不可宣称已完成全部时序收敛。图 6 中去除学习技能的变体，其候选 SEC 通过率从约 86% 降至约 78%，是技能影响搜索有效性的消融证据；它不等于证明技能可以无界增长。</p>
+<h2 id="5-本次源码检查发现的复现边界">5. 本次源码检查发现的复现边界</h2>
+<ol>
+<li><strong>核心 EDA 依赖非开源。</strong>公开脚本调用 <code>dc_shell</code>、<code>jaspergold</code>。本机未配置相应授权与工艺环境，未执行这些脚本，也没有尝试连接代码中原作者的远程服务器。</li>
+<li><strong>验收解析需要加强。</strong><code>parse_sec_report</code> 只要在日志找到独立的一行 <code>proven</code> 就置为通过。执行包装也需要检查返回码。完整复现应要求全部证明义务通过，并区分超时、未证明和运行错误。这是源码风险，不是已证实论文结果错误。</li>
+<li><strong>LSTM 是例外路径。</strong>主入口对字符串 <code>LSTM</code> 使用仿真，不能把所有路径都描述为同一种形式化保证。</li>
+<li><strong>晋升/停止协议应冻结。</strong>README 和 CLAUDE.md 对无晋升结束的叙述不完全一致，版本树示例也有终点笔误。需要明确“不优于父版本是否晋升”、最多轮次与无改进处理。</li>
+<li><strong>轨迹发布不完整。</strong>本次固定提交的树中未找到 README 描述的完整逐轮 <code>history.json</code>、<code>iter.json</code> 和 PPA 输出。因此不能把插值或动画称为作者真实轨迹；面板的循环播放只演示机制。</li>
+<li><strong>许可范围有限。</strong>技能子目录有 Apache-2.0 <code>LICENSE.txt</code>，根目录未发现 LICENSE。公开可阅读不自动意味着整个仓库统一授权。本站使用来源链接与自己的数据整理、代码示例，不整体再分发该仓库。</li>
+<li><strong>缺少流片与广泛迁移证据。</strong>综合阶段收益、形式检查和实际物理收敛是不同层次；同一工具/工艺上提炼的策略可能在另一环境失效。</li>
+</ol>
+<h2 id="6-本地验证小实验正确性门槛有实际作用">6. 本地验证小实验：正确性门槛有实际作用</h2>
+<p>我们构造了三种固定候选：8 位串行进位加法器、8 位并行前缀加法器、故意忽略 Cin 的缺陷前缀候选。用 Python 实现 AND/OR/XOR 门网络，对 <code>a,b ∈ [0,255]</code> 与 <code>cin ∈ {0,1}</code> 共 131,072 组输入穷举检查九位结果，对照独立整数算术 <code>a+b+cin</code>。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>候选</th>
+<th style="text-align: right;">正确输入数</th>
+<th style="text-align: right;">失败数</th>
+<th style="text-align: right;">门数</th>
+<th style="text-align: right;">单位门延迟逻辑深度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>串行进位</td>
+<td style="text-align: right;">131072</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">40</td>
+<td style="text-align: right;">17</td>
+</tr>
+<tr>
+<td>并行前缀</td>
+<td style="text-align: right;">131072</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">91</td>
+<td style="text-align: right;">8</td>
+</tr>
+<tr>
+<td>缺陷前缀</td>
+<td style="text-align: right;">65536</td>
+<td style="text-align: right;">65536</td>
+<td style="text-align: right;">91</td>
+<td style="text-align: right;">8</td>
+</tr>
+</tbody>
+</table></div>
+<p>缺陷候选的首个反例为 A=0、B=0、Cin=1：参考输出 1，候选输出 0。结构更浅也不能通过正确性门槛。并行前缀减少逻辑深度却增加门数，说明多目标权衡不能被一个“更快”口号代替。</p>
+<p><strong>口径限制：</strong>该门网络未做综合、布线、工艺映射或死逻辑消除；所有门按单位延迟计数，门数包括构建的全部节点。缺陷候选通过输入置零制造错误，因此这里只描述所构建网络的门数。这不是物理 PPA，不是时序 SEC，也不是 LLM 自主发现优化的证据。</p>
+<p>复跑：<code>python3 experiments/verify_adders.py</code>。结果带脚本 SHA-256，位于 <code>data/local-experiment.json</code>。面板中的手动输入演示使用独立 JavaScript 电路实现，验证记录来自 Python 穷举结果。</p>
+<h2 id="7-下一步怎么做最有研究价值">7. 下一步怎么做最有研究价值</h2>
+<p>若目标是迅速运行一套开源 EDA 路径，优先从 RTLScout 的公开工具链和受控小设计开始；若目标是研究 RSI 的经验机制，围绕 Dr. RTL 的技能库设计对照更有针对性：</p>
+<ul>
+<li>固定同一模型、工具版本、约束与候选预算，比较无技能、固定技能、持续更新技能。</li>
+<li>严格按设计家族分训练与留出集，避免同一设计的重命名或小变体泄漏。</li>
+<li>每个候选记录生成、综合、验证、面积、时序、耗时、成本及选中原因；保留失败结果。</li>
+<li>评价下一设计的收益与通过率，同时记录回退率和负迁移，而不只比较单次最好结果。</li>
+<li>使用冻结的功能参考与独立留出验证，控制优化器对验收信号的过拟合。</li>
+</ul>
+<p>这与本仓库既有的 <a href="../reports/19_icoder.html">iCoder 调研</a>、<a href="../reports/26_skill_evolution_wave.html">技能进化合评</a>、<a href="../reports/05_who_grades_the_grader.html">Who Grades the Grader</a> 和 <a href="../reports/10_synthesis_insights.html">汇总洞察</a> 对应：能写代码是起点，可靠的选择与跨任务积累才决定改进能否持续。</p><footer>RSI 研究札记 · 根据 awesome_rsi 仓库生成<br>论文结论与研究判断以各篇来源及实验边界为准。<a href="#">返回顶部 ↑</a></footer></main></div><script src="../site.js"></script></body></html>

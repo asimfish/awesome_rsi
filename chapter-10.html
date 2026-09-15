@@ -1,0 +1,14 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的论文、中文解读、分类与专题。"><title>研究路线图 · RSI 研究札记</title><link rel="stylesheet" href="site.css"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress"></div><header class="topbar"><a class="brand" href="index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a href="index.html">首页</a><a href="papers.html">论文</a><a href="reports.html">解读</a><a href="insights.html">洞察</a><a href="topics.html">专题</a><a href="resources.html">资源</a></nav><button id="theme" aria-label="切换深色模式">深色阅读</button></header><div class="layout "><aside><div class="eyebrow">长文阅读</div><div class="toc">
+<ul>
+<li><a href="#研究路线图">研究路线图</a></li>
+</ul>
+</div>
+<div class="aside-links"><a href="guide.html">完整仓库导览 ↗</a><a href="https://github.com/asimfish/awesome_rsi">GitHub 源码 ↗</a></div></aside><main id="content"><div class="eyebrow">长文阅读</div><h1 id="研究路线图">研究路线图</h1>
+<ul>
+<li>基座：以 <a href="https://github.com/bingreeky/iCoder">iCoder</a> 代码库为后续开发基础，复用其 Research Skills 表示、治理组件（任务队列、实验日志、决策记录、审批门）和 Data → SFT → OPSD → RLVR 可回退状态机。评估见<a href="reports/19_icoder.html">报告 19</a>。</li>
+<li>运行时基础设施：评估 <a href="https://github.com/Human-Agent-Society/reef">Reef</a>（§4.14）能否承担服务、反馈记录、候选评估和版本化发布这一层——它已经实现了本仓库要求的评估门和回滚，权重训练（Slime + SGLang）与 harness 进化两条学习面都有 recipe；需要核实的是它的候选评估能否接入独立于训练循环的锚集，以及 recipe 机制能否容纳 iCoder 式的多阶段研究流水线。</li>
+<li>待定的设计选择：harness 修改用 Meta-Harness 式的全轨迹自由改写（<a href="reports/13_meta_harness.html">13</a>）还是 AutoSaddler 式的归因约束局部 diff（<a href="reports/16_autosaddler.html">16</a>）；权重更新用 Co-Harness 的离线批次（<a href="reports/21_co_harness.html">21</a>）还是 Continual Harness 的在线共学习（<a href="reports/11_continual_harness.html">11</a>）。</li>
+<li>必须保留的机制：进化循环外的独立锚（<a href="reports/05_who_grades_the_grader.html">05</a>）、回归门（<a href="reports/14_self_harness.html">14</a>）、版本化回滚（<a href="reports/08_moss.html">08</a> / <a href="reports/21_co_harness.html">21</a>）、过程级测试（<a href="reports/22_coevolution_survey.html">22</a>）。</li>
+<li>待补论文（据解读 29、30 的对照）：Mendel Gödel Machine（框架侧，DGM 后续，Polyglot 50.8% → 93.2%）、ReasoningBank 与 SEAL（记忆线与参数线的起点）、FinEvo-Bench 与 GDPevo（带状态重置对照组的 RSI 基准）；并考虑增加"基准"一节与"进化结构""更新者"两个分类维度。</li>
+<li>维护：新论文按 §4 格式追加，入库 PDF-en / PDF-zh；重点论文补解读（模板见 <a href="https://github.com/asimfish/awesome_rsi/blob/main/CONTRIBUTING.md">CONTRIBUTING</a>）；之后重建全文报告、按需更新两图，同步 slides 与本 README 的计数。</li>
+</ul><footer>RSI 研究札记 · 根据 awesome_rsi 仓库生成<br>论文结论与研究判断以各篇来源及实验边界为准。<a href="#">返回顶部 ↑</a></footer></main></div><script src="site.js"></script></body></html>
