@@ -1,2 +1,141 @@
 <!DOCTYPE html>
-<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><meta content="Awesome RSI：递归自改进研究的论文、中文解读、分类与专题。" name="description"/><title>首页 · RSI 研究札记</title><link href="site.css" rel="stylesheet"/></head><body data-legacy-chip-anchors='["theme", "main", "live", "run-state", "run-dot", "run-stage", "run-freshness", "run-select", "refresh-live", "live-progress", "live-area", "live-delay", "live-gain", "run-progress-bar", "run-chart", "chart-note", "run-clock", "run-events", "run-intervention", "run-candidates", "candidate-title", "candidate-rationale", "candidate-links", "run-memory", "memory-meta", "explorer", "count", "search", "sort", "design-items", "design-name", "design-badge", "design-meta", "comparison", "sec-rate", "sec-bar", "design-note", "loop", "play-loop", "loop-steps", "loop-index", "loop-title", "loop-description", "loop-source", "loop-artifact", "lab", "adder-diagram", "input-a", "input-b", "input-cin", "expected", "actual", "input-status", "lab-status", "verified-number", "gate-depth", "gate-count", "candidate-note", "landscape", "audit", "sources", "commit-link"]'><a class="skip" href="#content">跳到正文</a><div id="progress"></div><header class="topbar"><a class="brand" href="index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a aria-current="page" href="index.html">首页</a><a href="papers.html">论文</a><a href="reports.html">解读</a><a href="insights.html">洞察</a><a href="topics.html">专题</a><a href="resources.html">资源</a></nav><button aria-label="切换深色模式" id="theme">深色阅读</button></header><div class="layout wide"><aside><div class="eyebrow">阅读</div><p>从论文到方法，<br/>从方法到评估。</p><div class="aside-links"><a href="guide.html">完整仓库导览 ↗</a><a href="https://github.com/asimfish/awesome_rsi">GitHub 源码 ↗</a></div></aside><main id="content"><div class="eyebrow">AWESOME RECURSIVE SELF-IMPROVEMENT</div><h1>AI 如何<br/><em>改进自己？</em></h1><p class="lead">从哥德尔机到自进化 agent，追踪目标、经验、代码与评估的变化。一个可以按问题阅读的 RSI 研究资料库。</p><div class="actions"><a class="primary" href="chapter-1.html">开始阅读 →</a><a href="papers.html">浏览全部论文</a></div><div class="stats"><div><strong>71</strong><span>英文 PDF（含 6 篇经典）</span></div><div><strong>69</strong><span>中文翻译</span></div><div><strong>33</strong><span>中文解读与笔记</span></div></div><h2>选择你的阅读路线</h2><div class="cards"><article class="feature"><div class="eyebrow">15 分钟 · 先看全貌</div><h3><a href="slides.html">35 页汇总演示</a></h3><p>浏览研究版图、代表方法与评估问题。</p></article><article class="feature"><div class="eyebrow">2 小时 · 抓住主线</div><h3><a href="insights.html">洞察与开放问题</a></h3><p>从“锚在哪”出发，再进入模型与评估器的共进化。</p></article><article class="feature"><div class="eyebrow">系统研读 · 逐篇展开</div><h3><a href="reports.html">全部中文解读</a></h3><p>按标题检索，阅读问题、机制、结果与局限。</p></article><article class="feature"><div class="eyebrow">查阅 · 随时回访</div><h3><a href="reference.html">术语与系统对照</a></h3><p>查询谱系、比较不同系统的改进对象和评估依据。</p></article></div><h2>研究专题</h2><div class="cards"><article class="feature"><div class="eyebrow">专题 01 · 目标 / 经验 / 系统</div><h2><a href="bytedance/">字节三篇：自我改进的三个关口</a></h2><p>Aspire、S³Gym、HarnessDev。把目标形成、经验迁移与系统更新放在一起读。</p></article><article class="feature"><div class="eyebrow">专题 02 · 芯片设计</div><h2><a href="chip/">SILICON LOOP · RSI × 芯片</a></h2><p>RTL 改写、技能积累与验证反馈，附论文数据探索和加法器实验。</p></article></div><h2>研究地图</h2><a href="chapter-3.html"><img alt="递归自改进分类图：思想史、改进对象、时机与评估依据" class="map" src="assets/fig2_taxonomy.svg"/></a><div class="callout"><h3>从论文结果到研究判断</h3><p>仓库围绕固定评估依据整理自改进研究。这个视角是一条阅读主线；各篇的实验条件、适用范围和反面结果，需结合原文理解。</p><a href="guide.html">查看完整仓库导览 →</a></div><footer>RSI 研究札记 · 根据 awesome_rsi 仓库生成<br/>论文结论与研究判断以各篇来源及实验边界为准。<a href="#">返回顶部 ↑</a></footer></main></div><script src="site.js"></script></body></html>
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><meta content="Awesome RSI：递归自改进研究的论文、中文解读、分类与专题。" name="description"/><title>递归自改进走到了哪一步？ · RSI 研究札记</title><link href="site.css" rel="stylesheet"/></head><body data-legacy-chip-anchors='["theme", "main", "live", "run-state", "run-dot", "run-stage", "run-freshness", "run-select", "refresh-live", "live-progress", "live-area", "live-delay", "live-gain", "run-progress-bar", "run-chart", "chart-note", "run-clock", "run-events", "run-intervention", "run-candidates", "candidate-title", "candidate-rationale", "candidate-links", "run-memory", "memory-meta", "explorer", "count", "search", "sort", "design-items", "design-name", "design-badge", "design-meta", "comparison", "sec-rate", "sec-bar", "design-note", "loop", "play-loop", "loop-steps", "loop-index", "loop-title", "loop-description", "loop-source", "loop-artifact", "lab", "adder-diagram", "input-a", "input-b", "input-cin", "expected", "actual", "input-status", "lab-status", "verified-number", "gate-depth", "gate-count", "candidate-note", "landscape", "audit", "sources", "commit-link"]'><a class="skip" href="#content">跳到正文</a><div id="progress"></div><header class="topbar"><a class="brand" href="index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a aria-current="page" href="index.html">首页</a><a href="papers.html">论文</a><a href="reports.html">解读</a><a href="insights.html">洞察</a><a href="topics.html">专题</a><a href="resources.html">资源</a></nav><button aria-label="切换深色模式" id="theme">深色阅读</button></header><div class="layout"><aside><div class="eyebrow">全景综述 / 从结果到判断</div><div class="toc">
+<ul>
+<li><a href="#递归自改进走到了哪一步">递归自改进走到了哪一步？</a><ul>
+<li><a href="#先说结论">先说结论</a></li>
+<li><a href="#1-什么样的改进才算递归">1. 什么样的改进才算“递归”？</a></li>
+<li><a href="#2-技术路线很多核心是改进落在哪里">2. 技术路线很多，核心是改进落在哪里</a></li>
+<li><a href="#3-最清楚的进展执行框架确实可以被优化">3. 最清楚的进展：执行框架确实可以被优化</a></li>
+<li><a href="#4-最重要的瓶颈分数上涨不一定说明改进判断正确">4. 最重要的瓶颈：分数上涨，不一定说明改进判断正确</a></li>
+<li><a href="#5-字节三篇补充了什么目标经验和版本选择">5. 字节三篇补充了什么：目标、经验和版本选择</a></li>
+<li><a href="#6-经验能积累但积累方式决定它是否有用">6. 经验能积累，但积累方式决定它是否有用</a></li>
+<li><a href="#7-从实验到生产还缺什么">7. 从实验到生产，还缺什么？</a></li>
+<li><a href="#8-下一步最值得回答的五个问题">8. 下一步最值得回答的五个问题</a></li>
+<li><a href="#按问题继续阅读">按问题继续阅读</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="aside-links"><a href="guide.html">完整仓库导览 ↗</a><a href="https://github.com/asimfish/awesome_rsi">GitHub 源码 ↗</a></div></aside><main id="content"><div class="eyebrow">全景综述 / 从结果到判断</div><h1 id="递归自改进走到了哪一步">递归自改进走到了哪一步？</h1>
+<p>从哥德尔机到自进化 agent：一次跨论文的综合判断。</p>
+<h2 id="先说结论">先说结论</h2>
+<p><strong>这些研究已经展示了 AI 改进自身某些组件的能力，但尚不足以证明系统能够自主、持续地提升“做下一次改进”的能力。</strong> 改写代码、优化提示、积累技能和更新权重，都可能带来真实收益；能否选择正确目标、识别有害更新，并把收益保留到新任务，仍是更难的部分。</p>
+<p>把整个仓库放在一起看，可以提炼出三条主线：</p>
+<ul>
+<li><strong>可修改的范围在扩大。</strong> 从提示与记忆，扩展到工具、执行框架、模型参数，以及产生反馈的评估器。</li>
+<li><strong>改进是否真实，越来越难由一个分数判断。</strong> 系统既可能学会任务，也可能学会迎合评分标准；开发集进步不必然迁移到未见任务。</li>
+<li><strong>研究正从“能不能修改”转向“该修改什么、哪些修改值得留下”。</strong> 字节三篇基准将目标形成、经验学习和执行框架改进分别拿出来测量，补上了只看最终成绩时容易遗漏的环节。</li>
+</ul>
+<p>这是基于仓库所收录工作的综合判断，而非领域中所有方法都适用的定理。下面沿着这三条线说明证据与分歧。</p>
+<h2 id="1-什么样的改进才算递归">1. 什么样的改进才算“递归”？</h2>
+<p>让模型回答得更好、让 agent 修改自己的代码，以及让系统更擅长发现和实施下一次改进，是三个不同强度的命题。</p>
+<p>宽泛用法把“利用轨迹和反馈更新自身，并在后续任务中使用”称为自改进；更严格的 RSI 讨论还要求：<strong>一次提升能够改善后续改进的机制或能力</strong>。因此，保存了一条有用记忆，并不能单独证明递归自改进已经成立。</p>
+<p>这一区分解释了为什么看似矛盾的说法可以同时成立：已有系统能够自改进，但开放式、持续的递归加速仍缺乏充分实证。Good 的正反馈设想和哥德尔机的形式化框架提供了问题定义；今天的工程方法主要通过实验反馈，尝试近似解决“这次修改是否值得接受”。<a href="reports/00_origins_1965_2014.html">思想史解读</a> · <a href="reports/23_godel_agent_to_sica.html">Gödel Agent 到 SICA</a></p>
+<h2 id="2-技术路线很多核心是改进落在哪里">2. 技术路线很多，核心是改进落在哪里</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>改进对象</th>
+<th>代表工作</th>
+<th>能解决什么</th>
+<th>新增的困难</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>提示、记忆与技能</td>
+<td>WikiSkill、ACE、SkillCommit、HyperSkill</td>
+<td>将交互经验用于后续任务，更新成本较低</td>
+<td>信息压缩会丢掉细节；技能可能依赖具体模型或场景</td>
+</tr>
+<tr>
+<td>harness 与源码</td>
+<td>DGM、Meta-Harness、Self-Harness、MOSS</td>
+<td>修改工具调用、控制流程与运行机制</td>
+<td>补丁可能过拟合开发任务，或引入其他路径的回归</td>
+</tr>
+<tr>
+<td>模型参数</td>
+<td>EvoLM、ECHO、Co-Harness</td>
+<td>将学习结果写入参数，减少对外部上下文的依赖</td>
+<td>训练成本、负迁移与遗忘；反馈分布会随策略变化</td>
+</tr>
+<tr>
+<td>环境与接口</td>
+<td>EnvHarness、Continual Harness 的在线设定</td>
+<td>改善经验获取，或在不中断任务的条件下适应</td>
+<td>环境与验证条件的变化可能干扰效果归因</td>
+</tr>
+<tr>
+<td>评估机制</td>
+<td>RQGM、Who Grades the Grader、EvalCEGAR</td>
+<td>让反馈跟上策略变化，发现原评估器区分不了的行为</td>
+<td>谁来检查改进后的评估器，成为新的问题</td>
+</tr>
+</tbody>
+</table></div>
+<p>这些路线可以组合。系统可以先在上下文中探索，把经验整理成技能，再通过训练吸收其中稳定有效的部分；结构性运行故障则可能需要修改源码。这里没有一条适用于所有任务的固定顺序，重要的是区分每层的收益、成本和接受条件。<a href="reports/01_lilian_weng_harness_engineering.html">harness 总纲</a> · <a href="reports/21_co_harness.html">Co-Harness</a></p>
+<h2 id="3-最清楚的进展执行框架确实可以被优化">3. 最清楚的进展：执行框架确实可以被优化</h2>
+<p>DGM 用经验评测筛选代码修改，展示了通过搜索自身 agent 实现来提高任务成绩的可能性。Meta-Harness 进一步让外部模型读取执行轨迹、诊断问题并修改 harness；Self-Harness 则研究模型修改自己框架时，回归检查能提供多少保护。</p>
+<p>这组工作的价值在于：能力变化不只来自更换基础模型。相同模型如何获得上下文、调用工具、处理失败和决定停止，也会影响结果。但“框架可以优化”与“任意框架改动都值得保留”之间，还有一个选择问题。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>作者报告的实验</th>
+<th>观察</th>
+<th>更稳妥的解读</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DGM：SWE-bench 从 20% 到 50%</td>
+<td>搜索 agent 源码能够改善任务结果</td>
+<td>支持受基准约束的代码自改进，不等于无限递归</td>
+</tr>
+<tr>
+<td>Self-Harness：九个模型—基准组合均提升</td>
+<td>带验证条件的自改写可以有效</td>
+<td>模型能力需要与修改范围、接受规则一起评价</td>
+</tr>
+<tr>
+<td>AutoSaddler：去掉 dev 检查后为 50.6，低于未优化的 53.0</td>
+<td>自动更新可能造成退化</td>
+<td>接受机制是方法的一部分，不能只比较提案能力</td>
+</tr>
+</tbody>
+</table></div>
+<p>这些是不同实验设置下的结果，不能合成跨论文排行榜。<a href="reports/07_darwin_godel_machine.html">DGM</a> · <a href="reports/13_meta_harness.html">Meta-Harness</a> · <a href="reports/14_self_harness.html">Self-Harness</a> · <a href="reports/16_autosaddler.html">AutoSaddler</a></p>
+<h2 id="4-最重要的瓶颈分数上涨不一定说明改进判断正确">4. 最重要的瓶颈：分数上涨，不一定说明改进判断正确</h2>
+<p>一个系统可以同时修改解题策略和评价策略的规则。这看起来更自主，却也让分数的含义发生变化。Who Grades the Grader 的关键反例是：评估器退化后，用它训练的技能仍可能获得不错的任务分数。<strong>任务分数本身不足以证明评估器可靠。</strong></p>
+<p>仓库用“锚”指代进化循环之外、不随候选一起优化的评估依据，例如人工标注样本、冻结验证器或独立留出任务。它们帮助区分系统确实变好与评分标准发生漂移。但反复拿同一验证集选择候选，也会降低其独立性；最终测试、开发反馈和晋升检查需要分清。</p>
+<p>也不能将这一经验直接写成“没有外部标签就不可能改进”。RHO 报告了基于自偏好的单轮收益，这说明无标签反馈可能有效；它尚不能回答多轮更新能否长期保持收益。因此，更值得检验的命题是：<strong>如何验证改进真实、可迁移并能持续，而不是仅要求循环成功运行。</strong> <a href="reports/05_who_grades_the_grader.html">Who Grades the Grader</a> · <a href="reports/04_red_queen_godel_machine.html">RQGM</a> · <a href="reports/25_rho.html">RHO</a></p>
+<h2 id="5-字节三篇补充了什么目标经验和版本选择">5. 字节三篇补充了什么：目标、经验和版本选择</h2>
+<p>Aspire 将评测任务隐藏，只给 agent 宽泛的能力目标。它要自己决定学习哪些数据、如何更新、如何自测。S³Gym 区分宽松探索与严格评测，检查交互历史、摘要记忆和参数学习是否改善后续决策。HarnessDev 则冻结生成的 harness，再观察它在留出任务上的表现。</p>
+<p>它们把“自改进是否成功”分解成三个可检验的问题：目标选对了吗？经验变成策略了吗？最终留下的是有效版本吗？</p>
+<p>HarnessDev 的反面数据尤其直接：64 次相邻版本切换中，可见反馈与留出集变化方向仅 34 次一致；九条轨迹中，只有两条声明的最终版本在留出集上最优。固定 Gemini 执行模型的四条轨迹，可见反馈均提高，但三条的留出集成绩下降。</p>
+<p>这里可见反馈是两个基准的组合分，留出分只来自 SWE-Pro，不能把两列相减当作精确的“过拟合损失”。这些结果支持的判断是：<strong>能产生候选、能观察到局部进步、能挑选可泛化的版本，是不同能力。</strong> <a href="bytedance/">字节三篇完整专题</a></p>
+<h2 id="6-经验能积累但积累方式决定它是否有用">6. 经验能积累，但积累方式决定它是否有用</h2>
+<p>WikiSkill 将证据与干预分开：知识记录持续保留，技能候选则经过验证后才采用，也可以撤回。技能进化研究进一步讨论如何组织、检索、合并和删除经验，而不只是不断追加历史。</p>
+<p>S³Gym 提醒我们，摘要并非总优于原始历史。可压缩成通用规则的任务可能受益于摘要；依赖精确状态的任务则可能因压缩丢掉关键信息。跨模型技能迁移也可能保留有用流程，或把某个模型特有的绕行办法带给另一个模型。</p>
+<p>因此，“拥有记忆库”还不是充分证据。需要观察经验在新任务中是否被正确使用，并与不保留经验、保留原始历史等对照比较。长期记录的价值也包括保存失败原因，避免系统重复提出已经被否决的更新。<a href="reports/09_wikiskill.html">WikiSkill</a> · <a href="reports/26_skill_evolution_wave.html">技能进化五篇</a></p>
+<h2 id="7-从实验到生产还缺什么">7. 从实验到生产，还缺什么？</h2>
+<p>生产系统关心的不只是最高分，还包括失败时能否恢复、修改能否解释，以及服务是否持续可用。MOSS 的源码更新流程和 Reef 的运行基础设施，将候选评估、版本记录与回滚变成了系统的一部分。</p>
+<p>这解决的是执行和管理问题，不能替使用者定义正确目标。评估门即使做成了组件，门里使用什么指标、覆盖哪些失败、谁有权放宽约束，仍需单独决定。芯片设计是一个具体例子：优化时延或面积之前，要先守住功能正确性；工具给出的局部指标还要结合工艺、约束和验证范围解释。<a href="reports/08_moss.html">MOSS</a> · <a href="reports/31_reef.html">Reef</a> · <a href="chip/">芯片专题</a></p>
+<p>同样，某一步实验加速或代码产出增加，不能直接推出整个研究过程按同样比例加速。方向选择、真实实验、外部反馈和最终判断，仍可能决定端到端速度。产业证据与论文基准应分开阅读，也应区分作者披露与独立验证。<a href="reports/02_anthropic_when_ai_builds_itself.html">产业进度解读</a></p>
+<h2 id="8-下一步最值得回答的五个问题">8. 下一步最值得回答的五个问题</h2>
+<ol>
+<li><strong>怎样选择目标？</strong> 当任务和评分不再由人明确给出，系统能否构建与真实需求一致的代理目标？</li>
+<li><strong>最少需要多少独立评估？</strong> 在有限标注和测试预算下，如何及时发现评估器漂移或有害修改？</li>
+<li><strong>经验何时能够迁移？</strong> 哪些知识应保留原始记录，哪些可以压缩成技能，哪些值得写入参数？</li>
+<li><strong>如何选择和保留版本？</strong> 当开发反馈与真实效果不一致，停止条件、回滚规则和候选选择怎样设计？</li>
+<li><strong>改进机制本身有没有变强？</strong> 必须把“多尝试了几轮”与“更擅长发现下一次改进”分开测量，才能讨论更严格的递归自改进。</li>
+</ol>
+<p>这几条问题把仓库中的模型、harness、技能、评估和治理研究连在了一起。已有结果让局部自改进成为可研究的工程问题；持续、可验证的改进能力，则仍需要更好的实验来建立证据。</p>
+<h2 id="按问题继续阅读">按问题继续阅读</h2>
+<ul>
+<li><strong>想看整体证据与更多分歧：</strong><a href="reports/10_synthesis_insights.html">完整汇总洞察</a>。旧报告中较强的概括，应结合本文列出的反例与实验边界理解。</li>
+<li><strong>想了解某一类方法：</strong><a href="papers.html">论文分类</a>，按对象和研究方向浏览。</li>
+<li><strong>想逐篇检查机制与实验：</strong><a href="reports.html">全部中文解读</a>。</li>
+<li><strong>想比较系统或查术语：</strong><a href="reference.html">术语与系统对照</a>。</li>
+<li><strong>想先快速浏览：</strong><a href="slides.html">35 页汇总演示</a>。</li>
+</ul><footer>RSI 研究札记 · 根据 awesome_rsi 仓库生成<br/>论文结论与研究判断以各篇来源及实验边界为准。<a href="#">返回顶部 ↑</a></footer></main></div><script src="site.js"></script></body></html>
