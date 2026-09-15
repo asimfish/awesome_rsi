@@ -1,10 +1,10 @@
 {
   "schema": 1,
-  "published_at": "2026-09-15T17:08:14.359633+00:00",
+  "published_at": "2026-09-15T17:09:17.221482+00:00",
   "interval_s": 60,
   "stale_after_s": 180,
   "workers": {
-    "chip": 2,
+    "chip": 0,
     "kernel": 0
   },
   "projects": {
@@ -12,18 +12,169 @@
       "schema": 1,
       "project": "chip",
       "run_id": "physical-002",
-      "state": "running",
-      "stage": "placement-routing",
-      "current": "baseline-r1",
+      "state": "completed",
+      "stage": "review",
+      "current": "",
       "started_at": "2026-09-15T17:08:12.400575+00:00",
-      "updated_at": "2026-09-15T17:08:12.408047+00:00",
-      "completed": 0,
+      "updated_at": "2026-09-15T17:09:16.451901+00:00",
+      "completed": 6,
       "planned": 6,
-      "results": [],
+      "results": [
+        {
+          "variant": "baseline",
+          "repeat": 1,
+          "name": "baseline-r1",
+          "state": "completed",
+          "elapsed_s": 10.08,
+          "artifact": "physical/baseline-r1/result.json",
+          "delay_ns": 0.609446,
+          "unrouted_same_tool_ns": 0.52194,
+          "area_um2": 254.562,
+          "adp": 155.14179265200002,
+          "cell_count": 233,
+          "connectivity_unchanged": true,
+          "route_drc": 0,
+          "wire_length_um": 7664,
+          "spef_sha256": "1279a7a79ccefd90361aba0538bfdd9e305a444964848abbe70109f1ab02cc77"
+        },
+        {
+          "variant": "seed",
+          "repeat": 1,
+          "name": "seed-r1",
+          "state": "completed",
+          "elapsed_s": 12.62,
+          "artifact": "physical/seed-r1/result.json",
+          "delay_ns": 0.594357,
+          "unrouted_same_tool_ns": 0.531788,
+          "area_um2": 239.932,
+          "adp": 142.605263724,
+          "cell_count": 216,
+          "connectivity_unchanged": true,
+          "route_drc": 0,
+          "wire_length_um": 7188,
+          "spef_sha256": "a3991815a261194483eae6693fb34ea89a6d3c8ef509c009a2a885856d760a82"
+        },
+        {
+          "variant": "candidate-03",
+          "repeat": 1,
+          "name": "candidate-03-r1",
+          "state": "completed",
+          "elapsed_s": 9.29,
+          "artifact": "physical/candidate-03-r1/result.json",
+          "delay_ns": 0.490613,
+          "unrouted_same_tool_ns": 0.42254,
+          "area_um2": 283.29,
+          "adp": 138.98575677000002,
+          "cell_count": 221,
+          "connectivity_unchanged": true,
+          "route_drc": 0,
+          "wire_length_um": 8041,
+          "spef_sha256": "e0b555580dca8801bcd5a9c7687bbe0453f7122bd275b2da024f5ca43053998d"
+        },
+        {
+          "variant": "baseline",
+          "repeat": 2,
+          "name": "baseline-r2",
+          "state": "completed",
+          "elapsed_s": 9.3,
+          "artifact": "physical/baseline-r2/result.json",
+          "delay_ns": 0.609446,
+          "unrouted_same_tool_ns": 0.52194,
+          "area_um2": 254.562,
+          "adp": 155.14179265200002,
+          "cell_count": 233,
+          "connectivity_unchanged": true,
+          "route_drc": 0,
+          "wire_length_um": 7664,
+          "spef_sha256": "c387d25711a9d1963aec8f9f04ef764424b780c1471dda34d5892941fe8be89e"
+        },
+        {
+          "variant": "seed",
+          "repeat": 2,
+          "name": "seed-r2",
+          "state": "completed",
+          "elapsed_s": 12.95,
+          "artifact": "physical/seed-r2/result.json",
+          "delay_ns": 0.594357,
+          "unrouted_same_tool_ns": 0.531788,
+          "area_um2": 239.932,
+          "adp": 142.605263724,
+          "cell_count": 216,
+          "connectivity_unchanged": true,
+          "route_drc": 0,
+          "wire_length_um": 7188,
+          "spef_sha256": "2919614c041d791e4e2d8aefe61db25e61307bc71d47aa618f47615f7c728492"
+        },
+        {
+          "variant": "candidate-03",
+          "repeat": 2,
+          "name": "candidate-03-r2",
+          "state": "completed",
+          "elapsed_s": 9.52,
+          "artifact": "physical/candidate-03-r2/result.json",
+          "delay_ns": 0.490613,
+          "unrouted_same_tool_ns": 0.42254,
+          "area_um2": 283.29,
+          "adp": 138.98575677000002,
+          "cell_count": 221,
+          "connectivity_unchanged": true,
+          "route_drc": 0,
+          "wire_length_um": 8041,
+          "spef_sha256": "984fdbd8d1b72073741758c540a434fbd0e8f89c93e8e4b24bc417bc6eeffb3e"
+        }
+      ],
       "events": [
         {
           "at": "2026-09-15T17:08:12.408053+00:00",
           "text": "开始布局布线 baseline-r1"
+        },
+        {
+          "at": "2026-09-15T17:08:22.522588+00:00",
+          "text": "完成 baseline-r1 · completed"
+        },
+        {
+          "at": "2026-09-15T17:08:22.535483+00:00",
+          "text": "开始布局布线 seed-r1"
+        },
+        {
+          "at": "2026-09-15T17:08:35.198603+00:00",
+          "text": "完成 seed-r1 · completed"
+        },
+        {
+          "at": "2026-09-15T17:08:35.208171+00:00",
+          "text": "开始布局布线 candidate-03-r1"
+        },
+        {
+          "at": "2026-09-15T17:08:44.534960+00:00",
+          "text": "完成 candidate-03-r1 · completed"
+        },
+        {
+          "at": "2026-09-15T17:08:44.549219+00:00",
+          "text": "开始布局布线 baseline-r2"
+        },
+        {
+          "at": "2026-09-15T17:08:53.898016+00:00",
+          "text": "完成 baseline-r2 · completed"
+        },
+        {
+          "at": "2026-09-15T17:08:53.907655+00:00",
+          "text": "开始布局布线 seed-r2"
+        },
+        {
+          "at": "2026-09-15T17:09:06.883266+00:00",
+          "text": "完成 seed-r2 · completed"
+        },
+        {
+          "at": "2026-09-15T17:09:06.895110+00:00",
+          "text": "开始布局布线 candidate-03-r2"
+        },
+        {
+          "at": "2026-09-15T17:09:16.444947+00:00",
+          "text": "完成 candidate-03-r2 · completed"
+        },
+        {
+          "at": "2026-09-15T17:09:16.451906+00:00",
+          "text": "本轮物理验证结束"
         }
       ],
       "scope": "Nangate45 TT；相同 60×60 µm die / 50×50 µm core；固定映射单元，无重综合；OpenROAD 布局、详细布线、OpenRCX 寄生提取。未做晶圆厂签核或功耗分析。",
