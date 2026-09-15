@@ -1,0 +1,3806 @@
+{
+  "schema": 1,
+  "published_at": "2026-09-15T17:07:00.011397+00:00",
+  "interval_s": 60,
+  "stale_after_s": 180,
+  "workers": {
+    "chip": 2,
+    "kernel": 0
+  },
+  "projects": {
+    "chip": {
+      "schema": 1,
+      "project": "chip",
+      "run_id": "physical-001",
+      "state": "running",
+      "stage": "placement-routing",
+      "current": "baseline-r2",
+      "started_at": "2026-09-15T17:06:09.952726+00:00",
+      "updated_at": "2026-09-15T17:06:58.866596+00:00",
+      "completed": 3,
+      "planned": 6,
+      "results": [
+        {
+          "variant": "baseline",
+          "repeat": 1,
+          "name": "baseline-r1",
+          "state": "completed",
+          "elapsed_s": 13.18,
+          "artifact": "physical/baseline-r1/result.json",
+          "delay_ns": 0.52194,
+          "unrouted_same_tool_ns": 0.52194,
+          "area_um2": 254.562,
+          "adp": 132.86609028,
+          "cell_count": 233,
+          "connectivity_unchanged": true,
+          "route_drc": 0,
+          "wire_length_um": 7664,
+          "spef_sha256": "99f61db58f5be7901aebcb436f9a55bca0df84b3d8f734577735b94a460a06b6"
+        },
+        {
+          "variant": "seed",
+          "repeat": 1,
+          "name": "seed-r1",
+          "state": "completed",
+          "elapsed_s": 12.57,
+          "artifact": "physical/seed-r1/result.json",
+          "delay_ns": 0.531788,
+          "unrouted_same_tool_ns": 0.531788,
+          "area_um2": 239.932,
+          "adp": 127.592958416,
+          "cell_count": 216,
+          "connectivity_unchanged": true,
+          "route_drc": 0,
+          "wire_length_um": 7188,
+          "spef_sha256": "0bb4fe6f9a7b84c7812d660218b7f8d53def92d9522c6657b086e5e2161ac118"
+        },
+        {
+          "variant": "candidate-03",
+          "repeat": 1,
+          "name": "candidate-03-r1",
+          "state": "completed",
+          "elapsed_s": 17.83,
+          "artifact": "physical/candidate-03-r1/result.json",
+          "delay_ns": 0.42254,
+          "unrouted_same_tool_ns": 0.42254,
+          "area_um2": 283.29,
+          "adp": 119.70135660000001,
+          "cell_count": 221,
+          "connectivity_unchanged": true,
+          "route_drc": 0,
+          "wire_length_um": 8041,
+          "spef_sha256": "20f2aabc1c9e8c2573278e096425a39bce1f96479afc9412b5fd024d259b9cb2"
+        }
+      ],
+      "events": [
+        {
+          "at": "2026-09-15T17:06:09.980460+00:00",
+          "text": "开始布局布线 baseline-r1"
+        },
+        {
+          "at": "2026-09-15T17:06:23.219519+00:00",
+          "text": "完成 baseline-r1 · completed"
+        },
+        {
+          "at": "2026-09-15T17:06:23.230552+00:00",
+          "text": "开始布局布线 seed-r1"
+        },
+        {
+          "at": "2026-09-15T17:06:39.137736+00:00",
+          "text": "完成 seed-r1 · completed"
+        },
+        {
+          "at": "2026-09-15T17:06:39.168950+00:00",
+          "text": "开始布局布线 candidate-03-r1"
+        },
+        {
+          "at": "2026-09-15T17:06:58.847604+00:00",
+          "text": "完成 candidate-03-r1 · completed"
+        },
+        {
+          "at": "2026-09-15T17:06:58.866609+00:00",
+          "text": "开始布局布线 baseline-r2"
+        }
+      ],
+      "scope": "Nangate45 TT；相同 60×60 µm die / 50×50 µm core；固定映射单元，无重综合；OpenROAD 布局、详细布线、OpenRCX 寄生提取。未做晶圆厂签核或功耗分析。",
+      "method": "原始基线、研究者种子、C03 各运行两次；与同版本工具的无布线时序对照。",
+      "next": "据布线后结果修订优化目标，再开展跨模块与独立轨迹对照。"
+    },
+    "kernel": {
+      "schema": 1,
+      "project": "kernel",
+      "run_id": "kernel-002",
+      "state": "completed",
+      "started_at": "2026-09-15T17:03:11.449859+00:00",
+      "updated_at": "2026-09-15T17:06:21.880474+00:00",
+      "stage": "review",
+      "current": "",
+      "completed": 12,
+      "planned": 12,
+      "results": [
+        {
+          "operator": "relu",
+          "candidate": "naive",
+          "candidate_sha256": "b6a471cb58ef0ba7cf22b07cd87a44436eb5527dbc4d765e33fdce532c0ca714",
+          "state": "completed",
+          "gpu_before": "NVIDIA GeForce RTX 5090, 21, 3997, 56, 143.70, 2595",
+          "torch": "2.7.0+cu128",
+          "triton": "3.3.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA GeForce RTX 5090",
+          "timing_protocol": "v2-cuda-graph-30-ops-x10-replays-7-rotated-pairs",
+          "scope": "custom shapes, FP32 contiguous; shared GPU; CUDA Graph device execution, excludes Python launch and allocation; not official KernelBench score",
+          "correctness": {
+            "pass": true,
+            "cases": [
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              }
+            ],
+            "max_abs_error": 0.0,
+            "negative_control_rejected": true,
+            "rtol": 0.0001,
+            "atol": 1e-05
+          },
+          "measurements": [
+            {
+              "eager": {
+                "median_us": 2.1423999468485513,
+                "min_us": 2.1158399184544883,
+                "max_us": 2.167253295580546,
+                "stdev_us": 0.02069571098039531,
+                "samples_us": [
+                  2.167253295580546,
+                  2.1530665953954062,
+                  2.116053303082784,
+                  2.1423999468485513,
+                  2.1158399184544883,
+                  2.151786684989929,
+                  2.1205333868662515
+                ]
+              },
+              "compiled": {
+                "median_us": 2.0528000593185425,
+                "min_us": 2.0488532384236655,
+                "max_us": 2.0891733964284263,
+                "stdev_us": 0.017291176575324613,
+                "samples_us": [
+                  2.0872533321380615,
+                  2.0666666825612388,
+                  2.0525866746902466,
+                  2.0891733964284263,
+                  2.0488532384236655,
+                  2.0528000593185425,
+                  2.0526933670043945
+                ]
+              },
+              "candidate": {
+                "median_us": 4.6803200244903564,
+                "min_us": 4.647786617279053,
+                "max_us": 4.713813463846843,
+                "stdev_us": 0.02207282482317984,
+                "samples_us": [
+                  4.694826602935791,
+                  4.713813463846843,
+                  4.660799900690715,
+                  4.682986736297607,
+                  4.647786617279053,
+                  4.6670933564503985,
+                  4.6803200244903564
+                ]
+              },
+              "shape": [
+                1024,
+                1024
+              ],
+              "speedup_vs_eager": 0.45774646512165346,
+              "speedup_vs_compiled": 0.4386024990977136,
+              "stable": true
+            },
+            {
+              "eager": {
+                "median_us": 100.2403195699056,
+                "min_us": 88.01205317179362,
+                "max_us": 133.45152537027994,
+                "stdev_us": 15.504856549603204,
+                "samples_us": [
+                  95.15605290730794,
+                  103.50133260091145,
+                  100.2403195699056,
+                  133.45152537027994,
+                  88.01205317179362,
+                  88.11914443969727,
+                  105.56010564168294
+                ]
+              },
+              "compiled": {
+                "median_us": 101.53216044108073,
+                "min_us": 95.01045227050781,
+                "max_us": 150.73802947998047,
+                "stdev_us": 19.680515473140638,
+                "samples_us": [
+                  105.54005304972331,
+                  106.62815729777019,
+                  150.73802947998047,
+                  96.57941182454427,
+                  95.70901234944661,
+                  95.01045227050781,
+                  101.53216044108073
+                ]
+              },
+              "candidate": {
+                "median_us": 96.1135991414388,
+                "min_us": 87.66634623209636,
+                "max_us": 108.40405782063802,
+                "stdev_us": 6.318727969153278,
+                "samples_us": [
+                  101.33589426676433,
+                  96.1135991414388,
+                  98.07647705078125,
+                  95.92906951904297,
+                  95.36821365356445,
+                  87.66634623209636,
+                  108.40405782063802
+                ]
+              },
+              "shape": [
+                4096,
+                4096
+              ],
+              "speedup_vs_eager": 1.0429358640746977,
+              "speedup_vs_compiled": 1.056376635024021,
+              "stable": false
+            }
+          ],
+          "gpu_after": "NVIDIA GeForce RTX 5090, 100, 5131, 59, 282.61, 2812",
+          "elapsed_s": 6.03,
+          "artifact": "evidence/relu/naive/result.json"
+        },
+        {
+          "operator": "softmax",
+          "candidate": "naive",
+          "candidate_sha256": "b6a471cb58ef0ba7cf22b07cd87a44436eb5527dbc4d765e33fdce532c0ca714",
+          "state": "completed",
+          "gpu_before": "NVIDIA GeForce RTX 5090, 44, 3997, 56, 156.26, 2820",
+          "torch": "2.7.0+cu128",
+          "triton": "3.3.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA GeForce RTX 5090",
+          "timing_protocol": "v2-cuda-graph-30-ops-x10-replays-7-rotated-pairs",
+          "scope": "custom shapes, FP32 contiguous; shared GPU; CUDA Graph device execution, excludes Python launch and allocation; not official KernelBench score",
+          "correctness": {
+            "pass": true,
+            "cases": [
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 101,
+                "max_abs_error": 1.1175870895385742e-08,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 202,
+                "max_abs_error": 1.862645149230957e-09,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 303,
+                "max_abs_error": 5.960464477539063e-08,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 101,
+                "max_abs_error": 1.4901161193847656e-08,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 303,
+                "max_abs_error": 1.1920928955078125e-07,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 101,
+                "max_abs_error": 2.7939677238464355e-09,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 303,
+                "max_abs_error": 1.7881393432617188e-07,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 101,
+                "max_abs_error": 4.656612873077393e-10,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 303,
+                "max_abs_error": 5.960464477539063e-08,
+                "pass": true
+              }
+            ],
+            "max_abs_error": 1.7881393432617188e-07,
+            "negative_control_rejected": true,
+            "rtol": 0.0001,
+            "atol": 1e-05
+          },
+          "measurements": [
+            {
+              "eager": {
+                "median_us": 2.27509339650472,
+                "min_us": 2.267520030339559,
+                "max_us": 2.3080533742904663,
+                "stdev_us": 0.01697953487321295,
+                "samples_us": [
+                  2.3080533742904663,
+                  2.2977066040039062,
+                  2.3027199506759644,
+                  2.27509339650472,
+                  2.2728532552719116,
+                  2.2718934218088784,
+                  2.267520030339559
+                ]
+              },
+              "compiled": {
+                "median_us": 1.5387733777364094,
+                "min_us": 1.5242666999499004,
+                "max_us": 1.5639467040697734,
+                "stdev_us": 0.015378244447058386,
+                "samples_us": [
+                  1.5639467040697734,
+                  1.5276799599329631,
+                  1.5595733126004536,
+                  1.5320533514022827,
+                  1.5434666474660237,
+                  1.5387733777364094,
+                  1.5242666999499004
+                ]
+              },
+              "candidate": {
+                "median_us": 1.463040014108022,
+                "min_us": 1.4502400159835815,
+                "max_us": 1.4756266276041667,
+                "stdev_us": 0.008529473576221035,
+                "samples_us": [
+                  1.4502400159835815,
+                  1.463040014108022,
+                  1.4756266276041667,
+                  1.4606933792432149,
+                  1.4660267035166423,
+                  1.4633599917093914,
+                  1.4523733655611675
+                ]
+              },
+              "shape": [
+                256,
+                1024
+              ],
+              "speedup_vs_eager": 1.5550452308659422,
+              "speedup_vs_compiled": 1.0517643829957448,
+              "stable": true
+            },
+            {
+              "eager": {
+                "median_us": 13.82922649383545,
+                "min_us": 13.210240205128988,
+                "max_us": 14.891306559244791,
+                "stdev_us": 0.5050667747728521,
+                "samples_us": [
+                  13.210240205128988,
+                  13.834560712178549,
+                  13.82922649383545,
+                  13.675306638081869,
+                  13.98325284322103,
+                  14.891306559244791,
+                  13.824000358581543
+                ]
+              },
+              "compiled": {
+                "median_us": 11.22208038965861,
+                "min_us": 10.48245350519816,
+                "max_us": 12.08341360092163,
+                "stdev_us": 0.7118443614540965,
+                "samples_us": [
+                  10.515946547190348,
+                  10.48245350519816,
+                  11.267626285552979,
+                  10.490026473999023,
+                  12.081706523895264,
+                  12.08341360092163,
+                  11.22208038965861
+                ]
+              },
+              "candidate": {
+                "median_us": 7.929813067118327,
+                "min_us": 7.351040045420329,
+                "max_us": 9.011092980702719,
+                "stdev_us": 0.5518535507278206,
+                "samples_us": [
+                  7.351040045420329,
+                  7.919893264770508,
+                  7.881173292795817,
+                  8.316906293233236,
+                  9.011092980702719,
+                  8.645866711934408,
+                  7.929813067118327
+                ]
+              },
+              "shape": [
+                1024,
+                4096
+              ],
+              "speedup_vs_eager": 1.743953656509201,
+              "speedup_vs_compiled": 1.4151759057463738,
+              "stable": true
+            }
+          ],
+          "gpu_after": "NVIDIA GeForce RTX 5090, 44, 4795, 54, 158.71, 2587",
+          "elapsed_s": 14.68,
+          "artifact": "evidence/softmax/naive/result.json"
+        },
+        {
+          "operator": "gelu",
+          "candidate": "naive",
+          "candidate_sha256": "b6a471cb58ef0ba7cf22b07cd87a44436eb5527dbc4d765e33fdce532c0ca714",
+          "state": "completed",
+          "gpu_before": "NVIDIA GeForce RTX 5090, 46, 3997, 55, 156.52, 2820",
+          "torch": "2.7.0+cu128",
+          "triton": "3.3.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA GeForce RTX 5090",
+          "timing_protocol": "v2-cuda-graph-30-ops-x10-replays-7-rotated-pairs",
+          "scope": "custom shapes, FP32 contiguous; shared GPU; CUDA Graph device execution, excludes Python launch and allocation; not official KernelBench score",
+          "correctness": {
+            "pass": true,
+            "cases": [
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 101,
+                "max_abs_error": 6.51925802230835e-08,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 303,
+                "max_abs_error": 1.1920928955078125e-07,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 101,
+                "max_abs_error": 1.1920928955078125e-07,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 303,
+                "max_abs_error": 1.1920928955078125e-07,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 101,
+                "max_abs_error": 2.384185791015625e-07,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 303,
+                "max_abs_error": 2.384185791015625e-07,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 101,
+                "max_abs_error": 1.1920928955078125e-07,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 303,
+                "max_abs_error": 1.1920928955078125e-07,
+                "pass": true
+              }
+            ],
+            "max_abs_error": 2.384185791015625e-07,
+            "negative_control_rejected": true,
+            "rtol": 0.0001,
+            "atol": 1e-05
+          },
+          "measurements": [
+            {
+              "eager": {
+                "median_us": 20.760960578918457,
+                "min_us": 18.886399269104004,
+                "max_us": 32.9805850982666,
+                "stdev_us": 7.151494539977007,
+                "samples_us": [
+                  32.7614943186442,
+                  20.760960578918457,
+                  32.9805850982666,
+                  32.336533864339195,
+                  18.9628807703654,
+                  18.886399269104004,
+                  18.88746738433838
+                ]
+              },
+              "compiled": {
+                "median_us": 2.25983997186025,
+                "min_us": 2.257279952367147,
+                "max_us": 2.2738132874170938,
+                "stdev_us": 0.005936865878214969,
+                "samples_us": [
+                  2.25983997186025,
+                  2.257386644681295,
+                  2.2652800877889,
+                  2.257279952367147,
+                  2.2738132874170938,
+                  2.265173395474752,
+                  2.259626587231954
+                ]
+              },
+              "candidate": {
+                "median_us": 4.7782401243845625,
+                "min_us": 4.770453373591105,
+                "max_us": 4.785813490549724,
+                "stdev_us": 0.00636999526096524,
+                "samples_us": [
+                  4.783573150634766,
+                  4.785813490549724,
+                  4.784853458404541,
+                  4.770453373591105,
+                  4.770773251851399,
+                  4.7782401243845625,
+                  4.778133233388265
+                ]
+              },
+              "shape": [
+                1024,
+                1024
+              ],
+              "speedup_vs_eager": 4.344896873844839,
+              "speedup_vs_compiled": 0.47294399465772297,
+              "stable": false
+            },
+            {
+              "eager": {
+                "median_us": 194.76000467936197,
+                "min_us": 175.14602661132812,
+                "max_us": 265.7212829589844,
+                "stdev_us": 29.840902270497573,
+                "samples_us": [
+                  199.57003275553384,
+                  201.41077677408853,
+                  194.76000467936197,
+                  265.7212829589844,
+                  191.0926946004232,
+                  182.35509236653647,
+                  175.14602661132812
+                ]
+              },
+              "compiled": {
+                "median_us": 20.621333122253418,
+                "min_us": 18.455573717753094,
+                "max_us": 26.12298647562663,
+                "stdev_us": 2.7282594195030394,
+                "samples_us": [
+                  20.621333122253418,
+                  20.712426503499348,
+                  23.78335952758789,
+                  26.12298647562663,
+                  19.595947265625,
+                  18.455573717753094,
+                  19.442346890767414
+                ]
+              },
+              "candidate": {
+                "median_us": 37.487894694010414,
+                "min_us": 35.11925379435221,
+                "max_us": 42.13695844014486,
+                "stdev_us": 2.932879568350331,
+                "samples_us": [
+                  39.70399856567383,
+                  37.487894694010414,
+                  42.13695844014486,
+                  41.28074645996094,
+                  35.1586119333903,
+                  35.11925379435221,
+                  35.92874526977539
+                ]
+              },
+              "shape": [
+                2048,
+                4096
+              ],
+              "speedup_vs_eager": 5.1952772026560226,
+              "speedup_vs_compiled": 0.5500797868371138,
+              "stable": false
+            }
+          ],
+          "gpu_after": "NVIDIA GeForce RTX 5090, 94, 4973, 59, 294.37, 2692",
+          "elapsed_s": 4.88,
+          "artifact": "evidence/gelu/naive/result.json"
+        },
+        {
+          "operator": "relu",
+          "candidate": "block256",
+          "candidate_sha256": "de1bc59051dd6fe71a0440e717b172b62dd069cb880d4487cf0f8b950abb08f8",
+          "state": "completed",
+          "gpu_before": "NVIDIA GeForce RTX 5090, 46, 3999, 55, 139.37, 2662",
+          "torch": "2.7.0+cu128",
+          "triton": "3.3.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA GeForce RTX 5090",
+          "timing_protocol": "v2-cuda-graph-30-ops-x10-replays-7-rotated-pairs",
+          "scope": "custom shapes, FP32 contiguous; shared GPU; CUDA Graph device execution, excludes Python launch and allocation; not official KernelBench score",
+          "correctness": {
+            "pass": true,
+            "cases": [
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              }
+            ],
+            "max_abs_error": 0.0,
+            "negative_control_rejected": true,
+            "rtol": 0.0001,
+            "atol": 1e-05
+          },
+          "measurements": [
+            {
+              "eager": {
+                "median_us": 2.1227733294169107,
+                "min_us": 2.1169066429138184,
+                "max_us": 2.141759991645813,
+                "stdev_us": 0.00880453830770424,
+                "samples_us": [
+                  2.141759991645813,
+                  2.1285333236058555,
+                  2.1169066429138184,
+                  2.1175465981165567,
+                  2.1314134200414023,
+                  2.1219199895858765,
+                  2.1227733294169107
+                ]
+              },
+              "compiled": {
+                "median_us": 2.059733271598816,
+                "min_us": 2.055893341700236,
+                "max_us": 2.065706650416056,
+                "stdev_us": 0.0035045526724178456,
+                "samples_us": [
+                  2.0601600408554077,
+                  2.0568533738454184,
+                  2.062293291091919,
+                  2.0568533738454184,
+                  2.065706650416056,
+                  2.055893341700236,
+                  2.059733271598816
+                ]
+              },
+              "candidate": {
+                "median_us": 2.7358933289845786,
+                "min_us": 2.7317333221435547,
+                "max_us": 2.744106650352478,
+                "stdev_us": 0.004204380487534017,
+                "samples_us": [
+                  2.7396267652511597,
+                  2.744106650352478,
+                  2.7358933289845786,
+                  2.737813393274943,
+                  2.733973264694214,
+                  2.7337600787480674,
+                  2.7317333221435547
+                ]
+              },
+              "shape": [
+                1024,
+                1024
+              ],
+              "speedup_vs_eager": 0.7758976956184084,
+              "speedup_vs_compiled": 0.7528558404589852,
+              "stable": true
+            },
+            {
+              "eager": {
+                "median_us": 99.0011723836263,
+                "min_us": 88.03594589233398,
+                "max_us": 128.69152069091797,
+                "stdev_us": 14.257007686954129,
+                "samples_us": [
+                  117.13717142740886,
+                  93.65578969319661,
+                  88.03594589233398,
+                  99.0011723836263,
+                  97.6699701944987,
+                  107.51722971598308,
+                  128.69152069091797
+                ]
+              },
+              "compiled": {
+                "median_us": 102.0574951171875,
+                "min_us": 89.65429306030273,
+                "max_us": 143.46271514892578,
+                "stdev_us": 19.56402558882474,
+                "samples_us": [
+                  127.63467152913411,
+                  95.92213312784831,
+                  89.65429306030273,
+                  102.0574951171875,
+                  106.75797780354817,
+                  143.46271514892578,
+                  96.22101465861003
+                ]
+              },
+              "candidate": {
+                "median_us": 97.07136154174805,
+                "min_us": 87.63189315795898,
+                "max_us": 103.86271794637044,
+                "stdev_us": 5.2976609648254955,
+                "samples_us": [
+                  97.07136154174805,
+                  95.69258371988933,
+                  87.63189315795898,
+                  103.86271794637044,
+                  102.03989028930664,
+                  98.5638427734375,
+                  94.98154958089192
+                ]
+              },
+              "shape": [
+                4096,
+                4096
+              ],
+              "speedup_vs_eager": 1.019880331451293,
+              "speedup_vs_compiled": 1.0513656499326534,
+              "stable": false
+            }
+          ],
+          "gpu_after": "NVIDIA GeForce RTX 5090, 96, 5119, 59, 295.48, 2812",
+          "elapsed_s": 4.93,
+          "artifact": "evidence/relu/block256/result.json"
+        },
+        {
+          "operator": "relu",
+          "candidate": "block1024",
+          "candidate_sha256": "40500188626b83ceb03ab8a05286fa637e3e5493ffeeb6f044fa6c5f9d1d6397",
+          "state": "completed",
+          "gpu_before": "NVIDIA GeForce RTX 5090, 33, 3999, 56, 152.60, 2812",
+          "torch": "2.7.0+cu128",
+          "triton": "3.3.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA GeForce RTX 5090",
+          "timing_protocol": "v2-cuda-graph-30-ops-x10-replays-7-rotated-pairs",
+          "scope": "custom shapes, FP32 contiguous; shared GPU; CUDA Graph device execution, excludes Python launch and allocation; not official KernelBench score",
+          "correctness": {
+            "pass": true,
+            "cases": [
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              }
+            ],
+            "max_abs_error": 0.0,
+            "negative_control_rejected": true,
+            "rtol": 0.0001,
+            "atol": 1e-05
+          },
+          "measurements": [
+            {
+              "eager": {
+                "median_us": 2.1233065923055015,
+                "min_us": 2.114026745160421,
+                "max_us": 2.135679920514425,
+                "stdev_us": 0.007520528926314335,
+                "samples_us": [
+                  2.135679920514425,
+                  2.1245867013931274,
+                  2.114026745160421,
+                  2.1235199769337973,
+                  2.116480072339376,
+                  2.1233065923055015,
+                  2.1150932709376016
+                ]
+              },
+              "compiled": {
+                "median_us": 2.0539732774098716,
+                "min_us": 2.04693337281545,
+                "max_us": 2.074133356412252,
+                "stdev_us": 0.009642338673520398,
+                "samples_us": [
+                  2.061333258946737,
+                  2.0539732774098716,
+                  2.0522665977478027,
+                  2.074133356412252,
+                  2.0476800203323364,
+                  2.062079906463623,
+                  2.04693337281545
+                ]
+              },
+              "candidate": {
+                "median_us": 2.0553600788116455,
+                "min_us": 2.0468266805013022,
+                "max_us": 2.0795732736587524,
+                "stdev_us": 0.012178328339449424,
+                "samples_us": [
+                  2.0553600788116455,
+                  2.0565332969029746,
+                  2.0468266805013022,
+                  2.067626714706421,
+                  2.0476800203323364,
+                  2.0795732736587524,
+                  2.0483199755350747
+                ]
+              },
+              "shape": [
+                1024,
+                1024
+              ],
+              "speedup_vs_eager": 1.0330582043478926,
+              "speedup_vs_compiled": 0.9993252756944779,
+              "stable": true
+            },
+            {
+              "eager": {
+                "median_us": 99.49141184488933,
+                "min_us": 88.10272216796875,
+                "max_us": 125.74602762858073,
+                "stdev_us": 12.615723620055949,
+                "samples_us": [
+                  109.77834065755208,
+                  88.10272216796875,
+                  91.6481081644694,
+                  103.06890487670898,
+                  99.49141184488933,
+                  125.74602762858073,
+                  97.2056516011556
+                ]
+              },
+              "compiled": {
+                "median_us": 100.11231740315755,
+                "min_us": 95.56565602620442,
+                "max_us": 128.40576171875,
+                "stdev_us": 11.529855968994525,
+                "samples_us": [
+                  97.02378590901692,
+                  95.56565602620442,
+                  101.11424128214519,
+                  100.11231740315755,
+                  102.83018747965495,
+                  128.40576171875,
+                  95.98112106323242
+                ]
+              },
+              "candidate": {
+                "median_us": 95.83498636881511,
+                "min_us": 88.22986602783203,
+                "max_us": 124.84970092773438,
+                "stdev_us": 12.351306585205316,
+                "samples_us": [
+                  95.83498636881511,
+                  91.3589350382487,
+                  88.22986602783203,
+                  105.98559697469075,
+                  96.4468256632487,
+                  124.84970092773438,
+                  95.61599731445312
+                ]
+              },
+              "shape": [
+                4096,
+                4096
+              ],
+              "speedup_vs_eager": 1.0381533468581368,
+              "speedup_vs_compiled": 1.0446322496241758,
+              "stable": true
+            }
+          ],
+          "gpu_after": "NVIDIA GeForce RTX 5090, 100, 5119, 59, 279.75, 2812",
+          "elapsed_s": 6.17,
+          "artifact": "evidence/relu/block1024/result.json"
+        },
+        {
+          "operator": "gelu",
+          "candidate": "block256",
+          "candidate_sha256": "de1bc59051dd6fe71a0440e717b172b62dd069cb880d4487cf0f8b950abb08f8",
+          "state": "completed",
+          "gpu_before": "NVIDIA GeForce RTX 5090, 10, 3999, 55, 149.37, 2820",
+          "torch": "2.7.0+cu128",
+          "triton": "3.3.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA GeForce RTX 5090",
+          "timing_protocol": "v2-cuda-graph-30-ops-x10-replays-7-rotated-pairs",
+          "scope": "custom shapes, FP32 contiguous; shared GPU; CUDA Graph device execution, excludes Python launch and allocation; not official KernelBench score",
+          "correctness": {
+            "pass": true,
+            "cases": [
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 101,
+                "max_abs_error": 6.51925802230835e-08,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 303,
+                "max_abs_error": 1.1920928955078125e-07,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 101,
+                "max_abs_error": 1.1920928955078125e-07,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 303,
+                "max_abs_error": 1.1920928955078125e-07,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 101,
+                "max_abs_error": 2.384185791015625e-07,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 303,
+                "max_abs_error": 2.384185791015625e-07,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 101,
+                "max_abs_error": 1.1920928955078125e-07,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 303,
+                "max_abs_error": 1.1920928955078125e-07,
+                "pass": true
+              }
+            ],
+            "max_abs_error": 2.384185791015625e-07,
+            "negative_control_rejected": true,
+            "rtol": 0.0001,
+            "atol": 1e-05
+          },
+          "measurements": [
+            {
+              "eager": {
+                "median_us": 18.61504077911377,
+                "min_us": 18.36202621459961,
+                "max_us": 19.92224057515462,
+                "stdev_us": 0.651654607740066,
+                "samples_us": [
+                  18.64415963490804,
+                  18.36202621459961,
+                  18.42144012451172,
+                  18.61504077911377,
+                  19.650665918986004,
+                  19.92224057515462,
+                  18.3622407913208
+                ]
+              },
+              "compiled": {
+                "median_us": 2.286720077196757,
+                "min_us": 2.2709333896636963,
+                "max_us": 2.324906587600708,
+                "stdev_us": 0.017858568163259255,
+                "samples_us": [
+                  2.2936532894770303,
+                  2.324906587600708,
+                  2.286720077196757,
+                  2.2851200898488364,
+                  2.291626731554667,
+                  2.2709333896636963,
+                  2.2731733322143555
+                ]
+              },
+              "candidate": {
+                "median_us": 2.8714666763941445,
+                "min_us": 2.8663466374079385,
+                "max_us": 2.8805333375930786,
+                "stdev_us": 0.005976503252865132,
+                "samples_us": [
+                  2.8666667143503823,
+                  2.8797866900761924,
+                  2.8805333375930786,
+                  2.8714666763941445,
+                  2.867520054181417,
+                  2.8716800610224404,
+                  2.8663466374079385
+                ]
+              },
+              "shape": [
+                1024,
+                1024
+              ],
+              "speedup_vs_eager": 6.482763993796257,
+              "speedup_vs_compiled": 0.7963596081387629,
+              "stable": true
+            },
+            {
+              "eager": {
+                "median_us": 201.98037465413412,
+                "min_us": 174.31967417399088,
+                "max_us": 272.2893778483073,
+                "stdev_us": 32.14850920602367,
+                "samples_us": [
+                  272.2893778483073,
+                  190.57290395100912,
+                  182.4147160847982,
+                  174.31967417399088,
+                  207.20255533854166,
+                  204.53248341878256,
+                  201.98037465413412
+                ]
+              },
+              "compiled": {
+                "median_us": 20.381226539611816,
+                "min_us": 18.945706685384113,
+                "max_us": 20.84554672241211,
+                "stdev_us": 0.714527943195472,
+                "samples_us": [
+                  20.5731201171875,
+                  19.82495943705241,
+                  18.945706685384113,
+                  19.29418722788493,
+                  20.84554672241211,
+                  20.503573417663574,
+                  20.381226539611816
+                ]
+              },
+              "candidate": {
+                "median_us": 19.873600006103516,
+                "min_us": 19.45034662882487,
+                "max_us": 20.61301390329997,
+                "stdev_us": 0.4016461385597458,
+                "samples_us": [
+                  19.842453002929688,
+                  19.873600006103516,
+                  19.45034662882487,
+                  20.007680257161457,
+                  20.32042662302653,
+                  20.61301390329997,
+                  19.601813952128094
+                ]
+              },
+              "shape": [
+                2048,
+                4096
+              ],
+              "speedup_vs_eager": 10.163250472591908,
+              "speedup_vs_compiled": 1.0255427568911721,
+              "stable": false
+            }
+          ],
+          "gpu_after": "NVIDIA GeForce RTX 5090, 99, 4961, 60, 290.23, 2572",
+          "elapsed_s": 4.64,
+          "artifact": "evidence/gelu/block256/result.json"
+        },
+        {
+          "operator": "gelu",
+          "candidate": "block1024",
+          "candidate_sha256": "40500188626b83ceb03ab8a05286fa637e3e5493ffeeb6f044fa6c5f9d1d6397",
+          "state": "completed",
+          "gpu_before": "NVIDIA GeForce RTX 5090, 45, 3999, 56, 141.02, 2640",
+          "torch": "2.7.0+cu128",
+          "triton": "3.3.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA GeForce RTX 5090",
+          "timing_protocol": "v2-cuda-graph-30-ops-x10-replays-7-rotated-pairs",
+          "scope": "custom shapes, FP32 contiguous; shared GPU; CUDA Graph device execution, excludes Python launch and allocation; not official KernelBench score",
+          "correctness": {
+            "pass": true,
+            "cases": [
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 101,
+                "max_abs_error": 6.51925802230835e-08,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 303,
+                "max_abs_error": 1.1920928955078125e-07,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 101,
+                "max_abs_error": 1.1920928955078125e-07,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 303,
+                "max_abs_error": 1.1920928955078125e-07,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 101,
+                "max_abs_error": 2.384185791015625e-07,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 303,
+                "max_abs_error": 2.384185791015625e-07,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 101,
+                "max_abs_error": 1.1920928955078125e-07,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 303,
+                "max_abs_error": 1.1920928955078125e-07,
+                "pass": true
+              }
+            ],
+            "max_abs_error": 2.384185791015625e-07,
+            "negative_control_rejected": true,
+            "rtol": 0.0001,
+            "atol": 1e-05
+          },
+          "measurements": [
+            {
+              "eager": {
+                "median_us": 17.543892860412598,
+                "min_us": 17.5165859858195,
+                "max_us": 17.562026977539062,
+                "stdev_us": 0.015090123093819413,
+                "samples_us": [
+                  17.562026977539062,
+                  17.549227078755695,
+                  17.5165859858195,
+                  17.534507115681965,
+                  17.54954655965169,
+                  17.529279390970867,
+                  17.543892860412598
+                ]
+              },
+              "compiled": {
+                "median_us": 2.2804266214370728,
+                "min_us": 2.2637865940729776,
+                "max_us": 2.3541333278020224,
+                "stdev_us": 0.030589989829967298,
+                "samples_us": [
+                  2.2884267568588257,
+                  2.2804266214370728,
+                  2.3541333278020224,
+                  2.2747733195622764,
+                  2.2687999407450357,
+                  2.2637865940729776,
+                  2.2804266214370728
+                ]
+              },
+              "candidate": {
+                "median_us": 2.5363200902938843,
+                "min_us": 2.5308799743652344,
+                "max_us": 2.5433599948883057,
+                "stdev_us": 0.005208663683352497,
+                "samples_us": [
+                  2.5427200396855674,
+                  2.5317333141962686,
+                  2.5363200902938843,
+                  2.5433599948883057,
+                  2.5319466988245645,
+                  2.5308799743652344,
+                  2.537920077641805
+                ]
+              },
+              "shape": [
+                1024,
+                1024
+              ],
+              "speedup_vs_eager": 6.917065762933645,
+              "speedup_vs_compiled": 0.8991083697061434,
+              "stable": true
+            },
+            {
+              "eager": {
+                "median_us": 204.2971674601237,
+                "min_us": 173.1941350301107,
+                "max_us": 257.2064971923828,
+                "stdev_us": 27.159100508489846,
+                "samples_us": [
+                  173.1941350301107,
+                  204.2971674601237,
+                  211.13119761149088,
+                  198.75754038492838,
+                  257.2064971923828,
+                  228.01353454589844,
+                  190.92426300048828
+                ]
+              },
+              "compiled": {
+                "median_us": 20.307520230611164,
+                "min_us": 19.014827410380047,
+                "max_us": 20.51413377126058,
+                "stdev_us": 0.6278366571734083,
+                "samples_us": [
+                  19.113599459330242,
+                  19.014827410380047,
+                  20.307520230611164,
+                  20.334827105204266,
+                  20.51413377126058,
+                  20.32863934834798,
+                  20.188159942626953
+                ]
+              },
+              "candidate": {
+                "median_us": 19.037760098775227,
+                "min_us": 17.66815980275472,
+                "max_us": 21.95456027984619,
+                "stdev_us": 1.3469505010145253,
+                "samples_us": [
+                  17.66815980275472,
+                  18.547733624776203,
+                  19.16810671488444,
+                  21.95456027984619,
+                  18.5480531056722,
+                  19.47146733601888,
+                  19.037760098775227
+                ]
+              },
+              "shape": [
+                2048,
+                4096
+              ],
+              "speedup_vs_eager": 10.731155682189048,
+              "speedup_vs_compiled": 1.0666969289059183,
+              "stable": true
+            }
+          ],
+          "gpu_after": "NVIDIA GeForce RTX 5090, 95, 4961, 60, 302.50, 2640",
+          "elapsed_s": 4.99,
+          "artifact": "evidence/gelu/block1024/result.json"
+        },
+        {
+          "operator": "softmax",
+          "candidate": "warps8",
+          "candidate_sha256": "11b7add92819b61bbe060a9ae32c5aadb320ade138752d9129baadf7abddf1ee",
+          "state": "completed",
+          "gpu_before": "NVIDIA GeForce RTX 5090, 47, 3999, 57, 147.13, 2760",
+          "torch": "2.7.0+cu128",
+          "triton": "3.3.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA GeForce RTX 5090",
+          "timing_protocol": "v2-cuda-graph-30-ops-x10-replays-7-rotated-pairs",
+          "scope": "custom shapes, FP32 contiguous; shared GPU; CUDA Graph device execution, excludes Python launch and allocation; not official KernelBench score",
+          "correctness": {
+            "pass": true,
+            "cases": [
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 101,
+                "max_abs_error": 1.1175870895385742e-08,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 202,
+                "max_abs_error": 1.862645149230957e-09,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 303,
+                "max_abs_error": 5.960464477539063e-08,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 101,
+                "max_abs_error": 1.4901161193847656e-08,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 303,
+                "max_abs_error": 1.1920928955078125e-07,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 101,
+                "max_abs_error": 3.725290298461914e-09,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 303,
+                "max_abs_error": 1.1920928955078125e-07,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 101,
+                "max_abs_error": 4.656612873077393e-10,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 303,
+                "max_abs_error": 5.960464477539063e-08,
+                "pass": true
+              }
+            ],
+            "max_abs_error": 1.1920928955078125e-07,
+            "negative_control_rejected": true,
+            "rtol": 0.0001,
+            "atol": 1e-05
+          },
+          "measurements": [
+            {
+              "eager": {
+                "median_us": 2.2525866826375327,
+                "min_us": 2.2501333554585776,
+                "max_us": 2.258133292198181,
+                "stdev_us": 0.002572859894147184,
+                "samples_us": [
+                  2.258133292198181,
+                  2.253440022468567,
+                  2.2525866826375327,
+                  2.2501333554585776,
+                  2.252266605695089,
+                  2.253440022468567,
+                  2.250986695289612
+                ]
+              },
+              "compiled": {
+                "median_us": 1.5064533551534016,
+                "min_us": 1.5018666783968608,
+                "max_us": 1.5082666277885437,
+                "stdev_us": 0.002570654222977767,
+                "samples_us": [
+                  1.5062399705251057,
+                  1.5064533551534016,
+                  1.5024000406265259,
+                  1.5064533551534016,
+                  1.5081600348154705,
+                  1.5082666277885437,
+                  1.5018666783968608
+                ]
+              },
+              "candidate": {
+                "median_us": 1.5010133385658264,
+                "min_us": 1.499626636505127,
+                "max_us": 1.502293348312378,
+                "stdev_us": 0.0009831595508389393,
+                "samples_us": [
+                  1.50218665599823,
+                  1.499626636505127,
+                  1.502293348312378,
+                  1.5014400084813435,
+                  1.5010133385658264,
+                  1.5004799763361614,
+                  1.5003732840220134
+                ]
+              },
+              "shape": [
+                256,
+                1024
+              ],
+              "speedup_vs_eager": 1.500710636448982,
+              "speedup_vs_compiled": 1.0036242293441395,
+              "stable": true
+            },
+            {
+              "eager": {
+                "median_us": 14.207572937011719,
+                "min_us": 13.614400227864584,
+                "max_us": 20.93802611033122,
+                "stdev_us": 3.5025702680242814,
+                "samples_us": [
+                  20.76298713684082,
+                  14.207572937011719,
+                  20.93802611033122,
+                  19.57386652628581,
+                  13.614400227864584,
+                  14.147413571675619,
+                  13.761812845865885
+                ]
+              },
+              "compiled": {
+                "median_us": 11.219306786855062,
+                "min_us": 10.983359813690186,
+                "max_us": 12.20906654993693,
+                "stdev_us": 0.423153676209536,
+                "samples_us": [
+                  10.983359813690186,
+                  12.20906654993693,
+                  11.219306786855062,
+                  11.458880106608072,
+                  11.474239826202393,
+                  11.13205353418986,
+                  11.017813682556152
+                ]
+              },
+              "candidate": {
+                "median_us": 7.964266935984294,
+                "min_us": 7.702399889628093,
+                "max_us": 14.960212707519531,
+                "stdev_us": 2.643234156466417,
+                "samples_us": [
+                  7.702399889628093,
+                  9.651947021484375,
+                  14.960212707519531,
+                  8.304853439331055,
+                  7.870826721191406,
+                  7.964266935984294,
+                  7.714880307515462
+                ]
+              },
+              "shape": [
+                1024,
+                4096
+              ],
+              "speedup_vs_eager": 1.7839147094403387,
+              "speedup_vs_compiled": 1.4087055189177284,
+              "stable": false
+            }
+          ],
+          "gpu_after": "NVIDIA GeForce RTX 5090, 39, 4783, 61, 171.15, 2700",
+          "elapsed_s": 4.76,
+          "artifact": "evidence/softmax/warps8/result.json"
+        },
+        {
+          "operator": "softmax",
+          "candidate": "warps16",
+          "candidate_sha256": "5e9c074ab7b60fca25abeb8dfd9289c5d12d2e32671097f43025520f7f8b5abc",
+          "state": "completed",
+          "gpu_before": "NVIDIA GeForce RTX 5090, 44, 3999, 57, 146.91, 2797",
+          "torch": "2.7.0+cu128",
+          "triton": "3.3.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA GeForce RTX 5090",
+          "timing_protocol": "v2-cuda-graph-30-ops-x10-replays-7-rotated-pairs",
+          "scope": "custom shapes, FP32 contiguous; shared GPU; CUDA Graph device execution, excludes Python launch and allocation; not official KernelBench score",
+          "correctness": {
+            "pass": true,
+            "cases": [
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 101,
+                "max_abs_error": 1.1175870895385742e-08,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 202,
+                "max_abs_error": 1.862645149230957e-09,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 303,
+                "max_abs_error": 5.960464477539063e-08,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 101,
+                "max_abs_error": 1.4901161193847656e-08,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 303,
+                "max_abs_error": 1.1920928955078125e-07,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 101,
+                "max_abs_error": 1.862645149230957e-09,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 303,
+                "max_abs_error": 1.1920928955078125e-07,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 101,
+                "max_abs_error": 4.656612873077393e-10,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 303,
+                "max_abs_error": 5.960464477539063e-08,
+                "pass": true
+              }
+            ],
+            "max_abs_error": 1.1920928955078125e-07,
+            "negative_control_rejected": true,
+            "rtol": 0.0001,
+            "atol": 1e-05
+          },
+          "measurements": [
+            {
+              "eager": {
+                "median_us": 2.251840035120646,
+                "min_us": 2.2504534324010215,
+                "max_us": 2.2603732347488403,
+                "stdev_us": 0.003445197995791992,
+                "samples_us": [
+                  2.2528000672658286,
+                  2.251840035120646,
+                  2.2603732347488403,
+                  2.250773310661316,
+                  2.2525866826375327,
+                  2.2504534324010215,
+                  2.250986695289612
+                ]
+              },
+              "compiled": {
+                "median_us": 1.5074132879575093,
+                "min_us": 1.5062399705251057,
+                "max_us": 1.5085867047309875,
+                "stdev_us": 0.0008771435730842058,
+                "samples_us": [
+                  1.5085867047309875,
+                  1.5062399705251057,
+                  1.5079466501871746,
+                  1.507200002670288,
+                  1.5074132879575093,
+                  1.5062399705251057,
+                  1.5078399578730266
+                ]
+              },
+              "candidate": {
+                "median_us": 1.6391467054684956,
+                "min_us": 1.6375466187795003,
+                "max_us": 1.6452266772588093,
+                "stdev_us": 0.0030547559526937543,
+                "samples_us": [
+                  1.6430933276812236,
+                  1.6452266772588093,
+                  1.6391467054684956,
+                  1.6437333822250366,
+                  1.6375466187795003,
+                  1.6383999586105347,
+                  1.6389333208401997
+                ]
+              },
+              "shape": [
+                256,
+                1024
+              ],
+              "speedup_vs_eager": 1.3737879761513063,
+              "speedup_vs_compiled": 0.9196329303097158,
+              "stable": true
+            },
+            {
+              "eager": {
+                "median_us": 13.7936004002889,
+                "min_us": 13.131093184153238,
+                "max_us": 14.33834711710612,
+                "stdev_us": 0.4250189399361895,
+                "samples_us": [
+                  13.131093184153238,
+                  13.7936004002889,
+                  13.806400299072266,
+                  13.140052954355875,
+                  13.846400578816732,
+                  14.33834711710612,
+                  13.640000025431315
+                ]
+              },
+              "compiled": {
+                "median_us": 11.300586859385172,
+                "min_us": 11.003626982371012,
+                "max_us": 11.745813687642416,
+                "stdev_us": 0.258556508937364,
+                "samples_us": [
+                  11.003626982371012,
+                  11.21333360671997,
+                  11.13098700841268,
+                  11.347520351409912,
+                  11.745813687642416,
+                  11.300586859385172,
+                  11.589546998341879
+                ]
+              },
+              "candidate": {
+                "median_us": 6.909013589223226,
+                "min_us": 6.899200280507405,
+                "max_us": 6.939413547515869,
+                "stdev_us": 0.015267950494818782,
+                "samples_us": [
+                  6.909013589223226,
+                  6.939413547515869,
+                  6.899200280507405,
+                  6.92138671875,
+                  6.922240257263184,
+                  6.900693575541179,
+                  6.899306774139404
+                ]
+              },
+              "shape": [
+                1024,
+                4096
+              ],
+              "speedup_vs_eager": 1.9964645057008352,
+              "speedup_vs_compiled": 1.635629560348815,
+              "stable": true
+            }
+          ],
+          "gpu_after": "NVIDIA GeForce RTX 5090, 70, 4783, 59, 162.13, 2625",
+          "elapsed_s": 23.06,
+          "artifact": "evidence/softmax/warps16/result.json"
+        },
+        {
+          "operator": "relu",
+          "candidate": "retest",
+          "candidate_sha256": "40500188626b83ceb03ab8a05286fa637e3e5493ffeeb6f044fa6c5f9d1d6397",
+          "state": "completed",
+          "gpu_before": "NVIDIA GeForce RTX 5090, 44, 3999, 54, 142.81, 2617",
+          "torch": "2.7.0+cu128",
+          "triton": "3.3.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA GeForce RTX 5090",
+          "timing_protocol": "v2-cuda-graph-30-ops-x10-replays-7-rotated-pairs",
+          "scope": "custom shapes, FP32 contiguous; shared GPU; CUDA Graph device execution, excludes Python launch and allocation; not official KernelBench score",
+          "correctness": {
+            "pass": true,
+            "cases": [
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              }
+            ],
+            "max_abs_error": 0.0,
+            "negative_control_rejected": true,
+            "rtol": 0.0001,
+            "atol": 1e-05
+          },
+          "measurements": [
+            {
+              "eager": {
+                "median_us": 2.1194666624069214,
+                "min_us": 2.116480072339376,
+                "max_us": 2.141866683959961,
+                "stdev_us": 0.008769993165031003,
+                "samples_us": [
+                  2.141866683959961,
+                  2.1248000860214233,
+                  2.118933399518331,
+                  2.1194666624069214,
+                  2.1232000986735025,
+                  2.1174399058024087,
+                  2.116480072339376
+                ]
+              },
+              "compiled": {
+                "median_us": 2.055786649386088,
+                "min_us": 2.0501333475112915,
+                "max_us": 2.0666666825612388,
+                "stdev_us": 0.005746749215348062,
+                "samples_us": [
+                  2.0615466435750327,
+                  2.055786649386088,
+                  2.0576000213623047,
+                  2.0666666825612388,
+                  2.0553600788116455,
+                  2.0501333475112915,
+                  2.0513067642847695
+                ]
+              },
+              "candidate": {
+                "median_us": 2.0565332969029746,
+                "min_us": 2.0502400398254395,
+                "max_us": 2.0576000213623047,
+                "stdev_us": 0.003222851924115779,
+                "samples_us": [
+                  2.0569600661595664,
+                  2.0565332969029746,
+                  2.0569600661595664,
+                  2.0576000213623047,
+                  2.0561067263285318,
+                  2.0502400398254395,
+                  2.0503467321395874
+                ]
+              },
+              "shape": [
+                1024,
+                1024
+              ],
+              "speedup_vs_eager": 1.0306016759362568,
+              "speedup_vs_compiled": 0.9996369387658294,
+              "stable": true
+            },
+            {
+              "eager": {
+                "median_us": 96.40458424886067,
+                "min_us": 88.05493036905925,
+                "max_us": 103.21184158325195,
+                "stdev_us": 6.140907869815451,
+                "samples_us": [
+                  88.05493036905925,
+                  103.21184158325195,
+                  102.12127685546875,
+                  99.24896240234375,
+                  96.40458424886067,
+                  95.7634162902832,
+                  88.06325276692708
+                ]
+              },
+              "compiled": {
+                "median_us": 97.56832122802734,
+                "min_us": 87.55264282226562,
+                "max_us": 134.28234100341797,
+                "stdev_us": 16.829102731702708,
+                "samples_us": [
+                  87.73877461751302,
+                  97.82933553059895,
+                  97.56832122802734,
+                  107.53247578938802,
+                  134.28234100341797,
+                  87.55264282226562,
+                  87.69546508789062
+                ]
+              },
+              "candidate": {
+                "median_us": 97.5001589457194,
+                "min_us": 88.6904525756836,
+                "max_us": 143.72661590576172,
+                "stdev_us": 18.287808982383897,
+                "samples_us": [
+                  88.6904525756836,
+                  102.25653330485027,
+                  106.51413599650066,
+                  143.72661590576172,
+                  97.5001589457194,
+                  95.37984212239583,
+                  95.71648279825847
+                ]
+              },
+              "shape": [
+                4096,
+                4096
+              ],
+              "speedup_vs_eager": 0.9887633547605942,
+              "speedup_vs_compiled": 1.0006990991916833,
+              "stable": false
+            }
+          ],
+          "gpu_after": "NVIDIA GeForce RTX 5090, 100, 5121, 59, 276.21, 2812",
+          "elapsed_s": 3.74,
+          "artifact": "evidence/relu/retest/result.json"
+        },
+        {
+          "operator": "softmax",
+          "candidate": "retest",
+          "candidate_sha256": "5e9c074ab7b60fca25abeb8dfd9289c5d12d2e32671097f43025520f7f8b5abc",
+          "state": "completed",
+          "gpu_before": "NVIDIA GeForce RTX 5090, 29, 4001, 55, 145.43, 2572",
+          "torch": "2.7.0+cu128",
+          "triton": "3.3.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA GeForce RTX 5090",
+          "timing_protocol": "v2-cuda-graph-30-ops-x10-replays-7-rotated-pairs",
+          "scope": "custom shapes, FP32 contiguous; shared GPU; CUDA Graph device execution, excludes Python launch and allocation; not official KernelBench score",
+          "correctness": {
+            "pass": true,
+            "cases": [
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 101,
+                "max_abs_error": 1.1175870895385742e-08,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 202,
+                "max_abs_error": 1.862645149230957e-09,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 303,
+                "max_abs_error": 5.960464477539063e-08,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 101,
+                "max_abs_error": 1.4901161193847656e-08,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 303,
+                "max_abs_error": 1.1920928955078125e-07,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 101,
+                "max_abs_error": 1.862645149230957e-09,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 303,
+                "max_abs_error": 1.1920928955078125e-07,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 101,
+                "max_abs_error": 4.656612873077393e-10,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 303,
+                "max_abs_error": 5.960464477539063e-08,
+                "pass": true
+              }
+            ],
+            "max_abs_error": 1.1920928955078125e-07,
+            "negative_control_rejected": true,
+            "rtol": 0.0001,
+            "atol": 1e-05
+          },
+          "measurements": [
+            {
+              "eager": {
+                "median_us": 2.253119945526123,
+                "min_us": 2.251413265864054,
+                "max_us": 2.258239984512329,
+                "stdev_us": 0.0027089980990473083,
+                "samples_us": [
+                  2.257600029309591,
+                  2.253333330154419,
+                  2.251413265864054,
+                  2.253119945526123,
+                  2.258239984512329,
+                  2.252053419748942,
+                  2.2528000672658286
+                ]
+              },
+              "compiled": {
+                "median_us": 1.5077333648999531,
+                "min_us": 1.502293348312378,
+                "max_us": 1.509226659933726,
+                "stdev_us": 0.002320429832446661,
+                "samples_us": [
+                  1.507200002670288,
+                  1.502293348312378,
+                  1.507200002670288,
+                  1.5079466501871746,
+                  1.509226659933726,
+                  1.5077333648999531,
+                  1.5090133746465046
+                ]
+              },
+              "candidate": {
+                "median_us": 1.6435199975967407,
+                "min_us": 1.6377600034077961,
+                "max_us": 1.6458666324615479,
+                "stdev_us": 0.0029292232717820256,
+                "samples_us": [
+                  1.6435199975967407,
+                  1.6445866227149963,
+                  1.6458666324615479,
+                  1.6391467054684956,
+                  1.6435199975967407,
+                  1.6426666577657063,
+                  1.6377600034077961
+                ]
+              },
+              "shape": [
+                256,
+                1024
+              ],
+              "speedup_vs_eager": 1.3709111838132655,
+              "speedup_vs_compiled": 0.9173806020642624,
+              "stable": true
+            },
+            {
+              "eager": {
+                "median_us": 13.149226506551107,
+                "min_us": 13.122773170471191,
+                "max_us": 13.813652992248535,
+                "stdev_us": 0.35794731733774926,
+                "samples_us": [
+                  13.149226506551107,
+                  13.122986952463785,
+                  13.122773170471191,
+                  13.133333524068197,
+                  13.813652992248535,
+                  13.787627220153809,
+                  13.802879651387533
+                ]
+              },
+              "compiled": {
+                "median_us": 10.484159787495932,
+                "min_us": 10.432960192362467,
+                "max_us": 11.215466658274332,
+                "stdev_us": 0.36160622542096177,
+                "samples_us": [
+                  10.484159787495932,
+                  10.466773509979248,
+                  10.537707010904947,
+                  10.432960192362467,
+                  10.445760091145834,
+                  11.215466658274332,
+                  11.207253138224283
+                ]
+              },
+              "candidate": {
+                "median_us": 6.943253676096599,
+                "min_us": 6.904533704121907,
+                "max_us": 6.9757866859436035,
+                "stdev_us": 0.022989608905247077,
+                "samples_us": [
+                  6.967146396636963,
+                  6.94421370824178,
+                  6.904533704121907,
+                  6.943253676096599,
+                  6.940373579661052,
+                  6.936533451080322,
+                  6.9757866859436035
+                ]
+              },
+              "shape": [
+                1024,
+                4096
+              ],
+              "speedup_vs_eager": 1.8938133503345396,
+              "speedup_vs_compiled": 1.5099779262839754,
+              "stable": true
+            }
+          ],
+          "gpu_after": "NVIDIA GeForce RTX 5090, 56, 4785, 56, 164.83, 2820",
+          "elapsed_s": 4.18,
+          "artifact": "evidence/softmax/retest/result.json"
+        },
+        {
+          "operator": "gelu",
+          "candidate": "retest",
+          "candidate_sha256": "40500188626b83ceb03ab8a05286fa637e3e5493ffeeb6f044fa6c5f9d1d6397",
+          "state": "completed",
+          "gpu_before": "NVIDIA GeForce RTX 5090, 46, 4001, 56, 152.01, 2805",
+          "torch": "2.7.0+cu128",
+          "triton": "3.3.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA GeForce RTX 5090",
+          "timing_protocol": "v2-cuda-graph-30-ops-x10-replays-7-rotated-pairs",
+          "scope": "custom shapes, FP32 contiguous; shared GPU; CUDA Graph device execution, excludes Python launch and allocation; not official KernelBench score",
+          "correctness": {
+            "pass": true,
+            "cases": [
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  0,
+                  33
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 101,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  1,
+                  1
+                ],
+                "seed": 303,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 101,
+                "max_abs_error": 6.51925802230835e-08,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  7,
+                  33
+                ],
+                "seed": 303,
+                "max_abs_error": 1.1920928955078125e-07,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 101,
+                "max_abs_error": 1.1920928955078125e-07,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  17,
+                  127
+                ],
+                "seed": 303,
+                "max_abs_error": 1.1920928955078125e-07,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 101,
+                "max_abs_error": 2.384185791015625e-07,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  32,
+                  1024
+                ],
+                "seed": 303,
+                "max_abs_error": 2.384185791015625e-07,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 101,
+                "max_abs_error": 1.1920928955078125e-07,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 202,
+                "max_abs_error": 0.0,
+                "pass": true
+              },
+              {
+                "shape": [
+                  2,
+                  4097
+                ],
+                "seed": 303,
+                "max_abs_error": 1.1920928955078125e-07,
+                "pass": true
+              }
+            ],
+            "max_abs_error": 2.384185791015625e-07,
+            "negative_control_rejected": true,
+            "rtol": 0.0001,
+            "atol": 1e-05
+          },
+          "measurements": [
+            {
+              "eager": {
+                "median_us": 17.563199996948242,
+                "min_us": 17.55093256632487,
+                "max_us": 17.578667004903156,
+                "stdev_us": 0.009690900109375183,
+                "samples_us": [
+                  17.566720644632976,
+                  17.556479771931965,
+                  17.563199996948242,
+                  17.55093256632487,
+                  17.558186848958332,
+                  17.578667004903156,
+                  17.572906812032063
+                ]
+              },
+              "compiled": {
+                "median_us": 2.2950400908788047,
+                "min_us": 2.2687999407450357,
+                "max_us": 2.3753599325815835,
+                "stdev_us": 0.03599119599381703,
+                "samples_us": [
+                  2.2986666361490884,
+                  2.2687999407450357,
+                  2.2707200050354004,
+                  2.2988800207773843,
+                  2.2843732436498008,
+                  2.2950400908788047,
+                  2.3753599325815835
+                ]
+              },
+              "candidate": {
+                "median_us": 2.5384533405303955,
+                "min_us": 2.5331199169158936,
+                "max_us": 2.6180267333984375,
+                "stdev_us": 0.031018462085686163,
+                "samples_us": [
+                  2.5331199169158936,
+                  2.5384533405303955,
+                  2.5339732567469277,
+                  2.5405865907669067,
+                  2.5367466608683267,
+                  2.6180267333984375,
+                  2.5656533241271973
+                ]
+              },
+              "shape": [
+                1024,
+                1024
+              ],
+              "speedup_vs_eager": 6.918858706805503,
+              "speedup_vs_compiled": 0.9041096222786073,
+              "stable": true
+            },
+            {
+              "eager": {
+                "median_us": 195.0970713297526,
+                "min_us": 173.69397481282553,
+                "max_us": 238.94752502441406,
+                "stdev_us": 20.666507087053372,
+                "samples_us": [
+                  191.48202260335287,
+                  184.69632466634116,
+                  173.69397481282553,
+                  195.0970713297526,
+                  206.23371124267578,
+                  197.8489557902018,
+                  238.94752502441406
+                ]
+              },
+              "compiled": {
+                "median_us": 21.645439465840656,
+                "min_us": 19.476906458536785,
+                "max_us": 29.856640497843426,
+                "stdev_us": 3.4676171172362724,
+                "samples_us": [
+                  20.521599451700848,
+                  20.456746419270832,
+                  19.476906458536785,
+                  22.292586962382,
+                  21.645439465840656,
+                  22.003199259440105,
+                  29.856640497843426
+                ]
+              },
+              "candidate": {
+                "median_us": 18.610560099283855,
+                "min_us": 17.433706919352215,
+                "max_us": 21.07317288716634,
+                "stdev_us": 1.2900092242927346,
+                "samples_us": [
+                  18.54954719543457,
+                  18.585386276245117,
+                  17.433706919352215,
+                  20.682239532470703,
+                  18.99338722229004,
+                  18.610560099283855,
+                  21.07317288716634
+                ]
+              },
+              "shape": [
+                2048,
+                4096
+              ],
+              "speedup_vs_eager": 10.48313808337558,
+              "speedup_vs_compiled": 1.1630729731059295,
+              "stable": false
+            }
+          ],
+          "gpu_after": "NVIDIA GeForce RTX 5090, 99, 4963, 59, 293.68, 2542",
+          "elapsed_s": 9.12,
+          "artifact": "evidence/gelu/retest/result.json"
+        }
+      ],
+      "events": [
+        {
+          "at": "2026-09-15T17:03:11.449871+00:00",
+          "text": "冻结 v2 计时协议；先完成三个朴素基线"
+        },
+        {
+          "at": "2026-09-15T17:03:11.748341+00:00",
+          "text": "开始 relu/naive"
+        },
+        {
+          "at": "2026-09-15T17:03:21.912023+00:00",
+          "text": "完成 relu/naive · completed"
+        },
+        {
+          "at": "2026-09-15T17:03:21.917933+00:00",
+          "text": "开始 softmax/naive"
+        },
+        {
+          "at": "2026-09-15T17:03:39.988796+00:00",
+          "text": "完成 softmax/naive · completed"
+        },
+        {
+          "at": "2026-09-15T17:03:39.995162+00:00",
+          "text": "开始 gelu/naive"
+        },
+        {
+          "at": "2026-09-15T17:03:59.378514+00:00",
+          "text": "完成 gelu/naive · completed"
+        },
+        {
+          "at": "2026-09-15T17:04:01.354314+00:00",
+          "text": "基线完成：pointwise 增大块，softmax 单独调整 warps"
+        },
+        {
+          "at": "2026-09-15T17:04:01.430770+00:00",
+          "text": "开始 relu/block256"
+        },
+        {
+          "at": "2026-09-15T17:04:12.394050+00:00",
+          "text": "完成 relu/block256 · completed"
+        },
+        {
+          "at": "2026-09-15T17:04:12.404281+00:00",
+          "text": "开始 relu/block1024"
+        },
+        {
+          "at": "2026-09-15T17:04:22.302230+00:00",
+          "text": "完成 relu/block1024 · completed"
+        },
+        {
+          "at": "2026-09-15T17:04:22.309223+00:00",
+          "text": "开始 gelu/block256"
+        },
+        {
+          "at": "2026-09-15T17:04:36.334625+00:00",
+          "text": "完成 gelu/block256 · completed"
+        },
+        {
+          "at": "2026-09-15T17:04:36.347283+00:00",
+          "text": "开始 gelu/block1024"
+        },
+        {
+          "at": "2026-09-15T17:04:56.540891+00:00",
+          "text": "完成 gelu/block1024 · completed"
+        },
+        {
+          "at": "2026-09-15T17:04:56.636450+00:00",
+          "text": "开始 softmax/warps8"
+        },
+        {
+          "at": "2026-09-15T17:05:05.732077+00:00",
+          "text": "完成 softmax/warps8 · completed"
+        },
+        {
+          "at": "2026-09-15T17:05:05.741679+00:00",
+          "text": "开始 softmax/warps16"
+        },
+        {
+          "at": "2026-09-15T17:05:32.827666+00:00",
+          "text": "完成 softmax/warps16 · completed"
+        },
+        {
+          "at": "2026-09-15T17:05:32.848000+00:00",
+          "text": "开始 relu/retest"
+        },
+        {
+          "at": "2026-09-15T17:05:41.975830+00:00",
+          "text": "完成 relu/retest · completed"
+        },
+        {
+          "at": "2026-09-15T17:05:41.988808+00:00",
+          "text": "开始 softmax/retest"
+        },
+        {
+          "at": "2026-09-15T17:05:52.504382+00:00",
+          "text": "完成 softmax/retest · completed"
+        },
+        {
+          "at": "2026-09-15T17:05:52.542561+00:00",
+          "text": "开始 gelu/retest"
+        },
+        {
+          "at": "2026-09-15T17:06:21.864880+00:00",
+          "text": "完成 gelu/retest · completed"
+        },
+        {
+          "at": "2026-09-15T17:06:21.880488+00:00",
+          "text": "本轮有界实验完成；结果是否稳定以逐形状复测为准"
+        }
+      ],
+      "scope": "KernelBench 原始 forward + 自定义规模；FP32 连续二维输入；CUDA Graph 设备计时；共享 RTX 5090；非官方榜单分数。",
+      "method": "研究者编写 Triton 候选，按测量反馈单变量迭代；本轮未启动自主模型搜索。",
+      "next": "对通过正确性验证的候选复测，再扩展隐藏形状与独立搜索对照。",
+      "selected": {
+        "relu": "block1024",
+        "softmax": "warps16",
+        "gelu": "block1024"
+      }
+    }
+  }
+}
