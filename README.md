@@ -2,6 +2,12 @@
 
 **在线阅读全站：[RSI 研究札记](https://asimfish.github.io/awesome_rsi/)** — 论文分类、全部中文解读、汇总洞察与研究专题。
 
+**全文献研究图谱** · 76 条收录，15 个分类，按四条研究主线展示各项工作的贡献。
+
+[![RSI 全文献研究图谱：思想与谱系、系统自改写、学习与反馈、验证与落地](assets/rsi-literature-map/overview.png)](assets/rsi-literature-map/overview.png)
+
+[查看完整大图](https://asimfish.github.io/awesome_rsi/assets/rsi-literature-map/overview.png) · [逐条来源与覆盖清单](assets/rsi-literature-map/coverage.json)
+
 [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
 ![papers](https://img.shields.io/badge/papers-65%2B6_classics-blue)
 ![reports](https://img.shields.io/badge/deep--dives-33-red)
