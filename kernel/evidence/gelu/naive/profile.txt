@@ -1,0 +1,21 @@
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                                                   Name    Self CPU %      Self CPU   CPU total %     CPU total  CPU time avg     Self CUDA   Self CUDA %    CUDA total  CUDA time avg    # of Calls  
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                                              aten::mul         5.02%     110.714us        92.90%       2.048ms     170.662us      28.448us        49.83%      30.848us       2.571us            12  
+void at::native::vectorized_elementwise_kernel<4, at...         0.00%       0.000us         0.00%       0.000us       0.000us      20.160us        35.31%      20.160us       2.240us             9  
+                                              aten::add         1.21%      26.691us         2.15%      47.345us       7.891us      14.976us        26.23%      14.976us       2.496us             6  
+void at::native::vectorized_elementwise_kernel<4, at...         0.00%       0.000us         0.00%       0.000us       0.000us       8.320us        14.57%       8.320us       2.773us             3  
+void at::native::vectorized_elementwise_kernel<4, at...         0.00%       0.000us         0.00%       0.000us       0.000us       8.288us        14.52%       8.288us       2.763us             3  
+                                             aten::tanh         0.61%      13.481us         1.07%      23.667us       7.889us       6.976us        12.22%       6.976us       2.325us             3  
+void at::native::vectorized_elementwise_kernel<4, at...         0.00%       0.000us         0.00%       0.000us       0.000us       6.976us        12.22%       6.976us       2.325us             3  
+                                              aten::pow         2.75%      60.574us         3.47%      76.529us      25.510us       6.689us        11.72%       6.689us       2.230us             3  
+void at::native::vectorized_elementwise_kernel<4, at...         0.00%       0.000us         0.00%       0.000us       0.000us       6.689us        11.72%       6.689us       2.230us             3  
+void at::native::vectorized_elementwise_kernel<4, at...         0.00%       0.000us         0.00%       0.000us       0.000us       6.656us        11.66%       6.656us       2.219us             3  
+                                Activity Buffer Request        84.74%       1.868ms        84.74%       1.868ms       1.868ms       2.400us         4.20%       2.400us       2.400us             1  
+                                       cudaLaunchKernel         5.16%     113.750us         5.16%     113.750us       4.740us       0.000us         0.00%       0.000us       0.000us            24  
+                                      aten::result_type         0.06%       1.272us         0.06%       1.272us       0.424us       0.000us         0.00%       0.000us       0.000us             3  
+                                               aten::to         0.04%       0.901us         0.04%       0.901us       0.300us       0.000us         0.00%       0.000us       0.000us             3  
+                                  cudaDeviceSynchronize         0.41%       9.084us         0.41%       9.084us       4.542us       0.000us         0.00%       0.000us       0.000us             2  
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+Self CPU time total: 2.205ms
+Self CUDA time total: 57.089us

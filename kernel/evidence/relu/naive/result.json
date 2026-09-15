@@ -1,0 +1,296 @@
+{
+  "operator": "relu",
+  "candidate": "candidate",
+  "candidate_sha256": "b6a471cb58ef0ba7cf22b07cd87a44436eb5527dbc4d765e33fdce532c0ca714",
+  "state": "completed",
+  "gpu_before": "NVIDIA GeForce RTX 5090, 21, 3997, 56, 143.70, 2595",
+  "torch": "2.7.0+cu128",
+  "triton": "3.3.0",
+  "cuda": "12.8",
+  "gpu": "NVIDIA GeForce RTX 5090",
+  "timing_protocol": "v2-cuda-graph-30-ops-x10-replays-7-rotated-pairs",
+  "scope": "custom shapes, FP32 contiguous; shared GPU; CUDA Graph device execution, excludes Python launch and allocation; not official KernelBench score",
+  "correctness": {
+    "pass": true,
+    "cases": [
+      {
+        "shape": [
+          0,
+          33
+        ],
+        "seed": 101,
+        "max_abs_error": 0.0,
+        "pass": true
+      },
+      {
+        "shape": [
+          0,
+          33
+        ],
+        "seed": 202,
+        "max_abs_error": 0.0,
+        "pass": true
+      },
+      {
+        "shape": [
+          0,
+          33
+        ],
+        "seed": 303,
+        "max_abs_error": 0.0,
+        "pass": true
+      },
+      {
+        "shape": [
+          1,
+          1
+        ],
+        "seed": 101,
+        "max_abs_error": 0.0,
+        "pass": true
+      },
+      {
+        "shape": [
+          1,
+          1
+        ],
+        "seed": 202,
+        "max_abs_error": 0.0,
+        "pass": true
+      },
+      {
+        "shape": [
+          1,
+          1
+        ],
+        "seed": 303,
+        "max_abs_error": 0.0,
+        "pass": true
+      },
+      {
+        "shape": [
+          7,
+          33
+        ],
+        "seed": 101,
+        "max_abs_error": 0.0,
+        "pass": true
+      },
+      {
+        "shape": [
+          7,
+          33
+        ],
+        "seed": 202,
+        "max_abs_error": 0.0,
+        "pass": true
+      },
+      {
+        "shape": [
+          7,
+          33
+        ],
+        "seed": 303,
+        "max_abs_error": 0.0,
+        "pass": true
+      },
+      {
+        "shape": [
+          17,
+          127
+        ],
+        "seed": 101,
+        "max_abs_error": 0.0,
+        "pass": true
+      },
+      {
+        "shape": [
+          17,
+          127
+        ],
+        "seed": 202,
+        "max_abs_error": 0.0,
+        "pass": true
+      },
+      {
+        "shape": [
+          17,
+          127
+        ],
+        "seed": 303,
+        "max_abs_error": 0.0,
+        "pass": true
+      },
+      {
+        "shape": [
+          32,
+          1024
+        ],
+        "seed": 101,
+        "max_abs_error": 0.0,
+        "pass": true
+      },
+      {
+        "shape": [
+          32,
+          1024
+        ],
+        "seed": 202,
+        "max_abs_error": 0.0,
+        "pass": true
+      },
+      {
+        "shape": [
+          32,
+          1024
+        ],
+        "seed": 303,
+        "max_abs_error": 0.0,
+        "pass": true
+      },
+      {
+        "shape": [
+          2,
+          4097
+        ],
+        "seed": 101,
+        "max_abs_error": 0.0,
+        "pass": true
+      },
+      {
+        "shape": [
+          2,
+          4097
+        ],
+        "seed": 202,
+        "max_abs_error": 0.0,
+        "pass": true
+      },
+      {
+        "shape": [
+          2,
+          4097
+        ],
+        "seed": 303,
+        "max_abs_error": 0.0,
+        "pass": true
+      }
+    ],
+    "max_abs_error": 0.0,
+    "negative_control_rejected": true,
+    "rtol": 0.0001,
+    "atol": 1e-05
+  },
+  "measurements": [
+    {
+      "eager": {
+        "median_us": 2.1423999468485513,
+        "min_us": 2.1158399184544883,
+        "max_us": 2.167253295580546,
+        "stdev_us": 0.02069571098039531,
+        "samples_us": [
+          2.167253295580546,
+          2.1530665953954062,
+          2.116053303082784,
+          2.1423999468485513,
+          2.1158399184544883,
+          2.151786684989929,
+          2.1205333868662515
+        ]
+      },
+      "compiled": {
+        "median_us": 2.0528000593185425,
+        "min_us": 2.0488532384236655,
+        "max_us": 2.0891733964284263,
+        "stdev_us": 0.017291176575324613,
+        "samples_us": [
+          2.0872533321380615,
+          2.0666666825612388,
+          2.0525866746902466,
+          2.0891733964284263,
+          2.0488532384236655,
+          2.0528000593185425,
+          2.0526933670043945
+        ]
+      },
+      "candidate": {
+        "median_us": 4.6803200244903564,
+        "min_us": 4.647786617279053,
+        "max_us": 4.713813463846843,
+        "stdev_us": 0.02207282482317984,
+        "samples_us": [
+          4.694826602935791,
+          4.713813463846843,
+          4.660799900690715,
+          4.682986736297607,
+          4.647786617279053,
+          4.6670933564503985,
+          4.6803200244903564
+        ]
+      },
+      "shape": [
+        1024,
+        1024
+      ],
+      "speedup_vs_eager": 0.45774646512165346,
+      "speedup_vs_compiled": 0.4386024990977136,
+      "stable": true
+    },
+    {
+      "eager": {
+        "median_us": 100.2403195699056,
+        "min_us": 88.01205317179362,
+        "max_us": 133.45152537027994,
+        "stdev_us": 15.504856549603204,
+        "samples_us": [
+          95.15605290730794,
+          103.50133260091145,
+          100.2403195699056,
+          133.45152537027994,
+          88.01205317179362,
+          88.11914443969727,
+          105.56010564168294
+        ]
+      },
+      "compiled": {
+        "median_us": 101.53216044108073,
+        "min_us": 95.01045227050781,
+        "max_us": 150.73802947998047,
+        "stdev_us": 19.680515473140638,
+        "samples_us": [
+          105.54005304972331,
+          106.62815729777019,
+          150.73802947998047,
+          96.57941182454427,
+          95.70901234944661,
+          95.01045227050781,
+          101.53216044108073
+        ]
+      },
+      "candidate": {
+        "median_us": 96.1135991414388,
+        "min_us": 87.66634623209636,
+        "max_us": 108.40405782063802,
+        "stdev_us": 6.318727969153278,
+        "samples_us": [
+          101.33589426676433,
+          96.1135991414388,
+          98.07647705078125,
+          95.92906951904297,
+          95.36821365356445,
+          87.66634623209636,
+          108.40405782063802
+        ]
+      },
+      "shape": [
+        4096,
+        4096
+      ],
+      "speedup_vs_eager": 1.0429358640746977,
+      "speedup_vs_compiled": 1.056376635024021,
+      "stable": false
+    }
+  ],
+  "gpu_after": "NVIDIA GeForce RTX 5090, 100, 5131, 59, 282.61, 2812",
+  "elapsed_s": 6.03
+}
