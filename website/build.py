@@ -18,6 +18,7 @@ def slug(s,sep):
  return re.sub(r'[^\w\-\u4e00-\u9fff]','',s.lower().replace(' ','-'))
 def target(href,source,page):
  if not href or href.startswith(('#','http:','https:','mailto:','data:')):return href
+ if href in ['papers.html','reports.html','reference.html','slides.html']:return href
  part=urlsplit(href);path=unquote(part.path)
  # Existing reports use both repository-relative and file-relative links.
  resolved=path if path.startswith(('papers/','reports/','report/','assets/')) else posixpath.normpath(str(Path(source).parent/path))
@@ -114,7 +115,7 @@ n_en=len(list((ROOT/'papers/en').glob('*.pdf')));n_classic=len([p for p in (ROOT
 topics='''<div class="cards"><article class="feature"><div class="eyebrow">专题 01 · 目标 / 经验 / 系统</div><h2><a href="bytedance/">字节三篇：自我改进的三个关口</a></h2><p>Aspire、S³Gym、HarnessDev。把目标形成、经验迁移与系统更新放在一起读。</p></article><article class="feature"><div class="eyebrow">专题 02 · 芯片设计</div><h2><a href="chip/">SILICON LOOP · RSI × 芯片</a></h2><p>RTL 改写、技能积累与验证反馈，附论文数据探索和加法器实验。</p></article></div>'''
 shell('研究专题','<div class="eyebrow">COLLECTIONS</div><h1>把相关研究，<br><em>放在一起读。</em></h1>'+topics,'topics.html',wide=True)
 home=f'''<div class="eyebrow">AWESOME RECURSIVE SELF-IMPROVEMENT</div><h1>AI 如何<br><em>改进自己？</em></h1><p class="lead">从哥德尔机到自进化 agent，追踪目标、经验、代码与评估的变化。一个可以按问题阅读的 RSI 研究资料库。</p><div class="actions"><a class="primary" href="chapter-1.html">开始阅读 →</a><a href="papers.html">浏览全部论文</a></div><div class="stats"><div><strong>{n_en+n_classic}</strong><span>英文 PDF（含 {n_classic} 篇经典）</span></div><div><strong>{n_zh}</strong><span>中文翻译</span></div><div><strong>{len(reports)}</strong><span>中文解读与笔记</span></div></div><h2>选择你的阅读路线</h2><div class="cards"><article class="feature"><div class="eyebrow">15 分钟 · 先看全貌</div><h3><a href="slides.html">35 页汇总演示</a></h3><p>浏览研究版图、代表方法与评估问题。</p></article><article class="feature"><div class="eyebrow">2 小时 · 抓住主线</div><h3><a href="insights.html">洞察与开放问题</a></h3><p>从“锚在哪”出发，再进入模型与评估器的共进化。</p></article><article class="feature"><div class="eyebrow">系统研读 · 逐篇展开</div><h3><a href="reports.html">全部中文解读</a></h3><p>按标题检索，阅读问题、机制、结果与局限。</p></article><article class="feature"><div class="eyebrow">查阅 · 随时回访</div><h3><a href="reference.html">术语与系统对照</a></h3><p>查询谱系、比较不同系统的改进对象和评估依据。</p></article></div><h2>研究专题</h2>{topics}<h2>研究地图</h2><a href="chapter-3.html"><img class="map" src="assets/fig2_taxonomy.svg" alt="递归自改进分类图：思想史、改进对象、时机与评估依据"></a><div class="callout"><h3>从论文结果到研究判断</h3><p>仓库围绕固定评估依据整理自改进研究。这个视角是一条阅读主线；各篇的实验条件、适用范围和反面结果，需结合原文理解。</p><a href="guide.html">查看完整仓库导览 →</a></div>'''
-shell('首页',home,'index.html',wide=True)
+article('递归自改进走到了哪一步？',(ROOT/'website/overview.md').read_text(),'README.md','index.html','全景综述 / 从结果到判断')
 for f in ['site.css','site.js']:shutil.copyfile(ROOT/'website'/f,OUT/f)
 (OUT/'.nojekyll').touch()
 (OUT/'build-info.json').write_text(json.dumps({'reports':len(reports),'english_pdfs':n_en,'classic_pdfs':n_classic,'chinese_pdfs':n_zh,'readme_chapters':len(sections)},indent=2))
