@@ -1,24 +1,4 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的论文、中文解读、分类与专题。"><title>DGM 深度解读：让编码 agent 修改自身代码，用基准评估修改效果 · RSI 研究札记</title><link rel="stylesheet" href="../site.css"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress"></div><header class="topbar"><a class="brand" href="../index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a href="../index.html">首页</a><a href="../papers.html">论文</a><a href="../reports.html">解读</a><a href="../insights.html">洞察</a><a href="../topics.html">专题</a><a href="../resources.html">资源</a></nav><button id="theme" aria-label="切换深色模式">深色阅读</button></header><div class="layout "><aside><div class="eyebrow">解读 / 07</div><div class="toc">
-<ul>
-<li><a href="#dgm-深度解读让编码-agent-修改自身代码用基准评估修改效果">DGM 深度解读：让编码 agent 修改自身代码，用基准评估修改效果</a><ul>
-<li><a href="#1-一句话定位">1. 一句话定位</a></li>
-<li><a href="#2-要解决的问题手工-agent-设计的天花板与改进不递归">2. 要解决的问题：手工 agent 设计的天花板与"改进不递归"</a></li>
-<li><a href="#3-为什么此前做不通三种前驱各缺一角">3. 为什么此前做不通：三种前驱各缺一角</a></li>
-<li><a href="#4-dgm-的机制">4. DGM 的机制</a><ul>
-<li><a href="#41-自指自改进把自改写定义为一个编码任务">4.1 自指自改进：把自改写定义为一个编码任务</a></li>
-<li><a href="#42-种群式开放探索档案--父代选择">4.2 种群式开放探索：档案 + 父代选择</a></li>
-<li><a href="#43-分阶段评估用噪声换算力">4.3 分阶段评估：用噪声换算力</a></li>
-<li><a href="#44-dgm-自己发现了什么">4.4 DGM 自己发现了什么</a></li>
-</ul>
-</li>
-<li><a href="#5-实验结果全景">5. 实验结果全景</a></li>
-<li><a href="#6-局限作者自认--延伸批判">6. 局限（作者自认 + 延伸批判）</a></li>
-<li><a href="#7-意义与位置">7. 意义与位置</a></li>
-</ul>
-</li>
-</ul>
-</div>
-<div class="aside-links"><a href="../guide.html">完整仓库导览 ↗</a><a href="https://github.com/asimfish/awesome_rsi">GitHub 源码 ↗</a></div></aside><main id="content"><div class="eyebrow">解读 / 07</div><h1 id="dgm-深度解读让编码-agent-修改自身代码用基准评估修改效果">DGM 深度解读：让编码 agent 修改自身代码，用基准评估修改效果</h1>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的综述、论文、中文解读与专题。"><title>DGM 深度解读：让编码 agent 修改自身代码，用基准评估修改效果 · RSI 研究札记</title><link rel="stylesheet" href="../site.css?v=f71f142c5c4a"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress" aria-hidden="true"></div><header class="topbar"><a class="brand" href="../index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a href="../index.html">全景综述</a><a href="../papers.html">论文目录</a><a href="../reports.html" aria-current="page">逐篇解读</a><a href="../topics.html">研究专题</a><a href="../reference.html">术语对照</a></nav><div class="reading-tools"><button id="font-size" aria-label="放大正文字号" aria-pressed="false">A＋</button><button id="theme" aria-label="切换深色模式">深色</button></div></header><div class="layout "><aside><details class="toc-panel" open><summary>本页目录 <span>展开 / 收起</span></summary><div class="toc-body"><div class="eyebrow">本页目录</div><ul><li><a href="#1-一句话定位">一句话定位</a></li><li><a href="#2-要解决的问题手工-agent-设计的天花板与改进不递归">要解决的问题：手工 agent 设计的天花板与&quot;改进不递归&quot;</a></li><li><a href="#3-为什么此前做不通三种前驱各缺一角">为什么此前做不通：三种前驱各缺一角</a></li><li><a href="#4-dgm-的机制">DGM 的机制</a></li><li><a href="#5-实验结果全景">实验结果全景</a></li><li><a href="#6-局限作者自认--延伸批判">局限（作者自认 + 延伸批判）</a></li><li><a href="#7-意义与位置">意义与位置</a></li></ul></div></details><div class="aside-links"><a href="../index.html">全景综述</a><a href="../resources.html">资源与来源</a><a href="https://github.com/asimfish/awesome_rsi">GitHub ↗</a></div></aside><main id="content"><header class="article-header"><div class="breadcrumb"><a href="../index.html">RSI 研究札记</a><span>/</span>逐篇解读</div><div class="eyebrow">解读 / 07</div><h1 id="dgm-深度解读让编码-agent-修改自身代码用基准评估修改效果">DGM 深度解读</h1><p class="subtitle">让编码 agent 修改自身代码，用基准评估修改效果</p><p class="meta">约 14 分钟阅读 · <a href="https://github.com/asimfish/awesome_rsi/blob/main/reports/07_darwin_godel_machine.md">查看原始笔记 ↗</a></p></header><div class="prose">
 <blockquote>
 <p><strong>Darwin Gödel Machine: Open-Ended Evolution of Self-Improving Agents</strong>
 arXiv 2505.22954 · ICLR 2026 · UBC + Vector Institute + Sakana AI + Canada CIFAR AI Chair
@@ -26,10 +6,10 @@ arXiv 2505.22954 · ICLR 2026 · UBC + Vector Institute + Sakana AI + Canada CIF
 代码：github.com/jennyzzt/dgm · 归档：<a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2505.22954_DGM.pdf">papers/en/2505.22954_DGM.pdf</a> · 中译 <a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/zh/2505.22954_DGM_zh.pdf">papers/zh/2505.22954_DGM_zh.pdf</a></p>
 </blockquote>
 <hr/>
-<h2 id="1-一句话定位">1. 一句话定位</h2>
+<h2 id="1-一句话定位">1. 一句话定位<a aria-label="跳转到本节" class="section-link" href="#1-一句话定位">#</a></h2>
 <p>DGM 是第一个用前沿模型驱动、通过开放式档案搜索来改写自身的 agent。编码 agent 反复修改自己的 Python 代码库（工具、工作流、提示），并在编码基准上评估每个新版本。能编译且保留代码编辑能力的版本进入档案，其中任何节点都可能再次被选为父代。80 轮迭代后，SWE-bench Verified 从 <strong>20.0% 到 50.0%</strong>，Polyglot 从 <strong>14.2% 到 30.7%</strong>（全量口径），达到经核查的开源 SOTA 水平，高于经过人类一年打磨的 Aider。</p>
 <p>Schmidhuber 2003 年的哥德尔机要求先找到"改写后严格更优"的形式证明，才允许自改写。DGM 放宽了这一要求，<strong>用实验判断改写是否有益</strong>。2025-2026 年的 RSI 工程研究沿用了这一思路，报告 11、13、14、16、20 都以它为基线或比较对象。改写效果依赖实验判断后，评估器也成了新的单点故障（报告 05）。</p>
-<h2 id="2-要解决的问题手工-agent-设计的天花板与改进不递归">2. 要解决的问题：手工 agent 设计的天花板与"改进不递归"</h2>
+<h2 id="2-要解决的问题手工-agent-设计的天花板与改进不递归">2. 要解决的问题：手工 agent 设计的天花板与"改进不递归"<a aria-label="跳转到本节" class="section-link" href="#2-要解决的问题手工-agent-设计的天花板与改进不递归">#</a></h2>
 <p>论文开篇指出了三个问题：</p>
 <ol>
 <li><strong>人类设计的固定架构限制了 AI 系统的能力</strong>。编码 agent 的工具、提示、工作流由人编写，能力受设计者所能想到的方法限制。ADAS（Hu et al. 2025）之类的元学习方法能自动搜索 agent 设计，但<strong>元 agent 本身是固定的</strong>。下游任务的表现提高后，系统的自改写能力并不会随之增强，因此改进不递归。</li>
@@ -37,8 +17,8 @@ arXiv 2505.22954 · ICLR 2026 · UBC + Vector Institute + Sakana AI + Canada CIF
 <li><strong>爬山式自改写难以从错误改动中恢复</strong>。同期的 SICA（Robeyns et al. 2025，报告 23）也是单 agent 修改自身代码，但只从最新版本出发。一次降低表现的改动会增加后续改进的难度；如果改动使系统失去代码编辑能力，自改写就会停止。</li>
 </ol>
 <p>DGM 在正文中提出了一个核心假设：<strong>编码基准上的性能提升意味着编码能力增强，进而提高自改写和自改进能力</strong>。依据是自改写本身也是编码任务。后来的 Who Grades the Grader 系统性检验了这一假设。</p>
-<h2 id="3-为什么此前做不通三种前驱各缺一角">3. 为什么此前做不通：三种前驱各缺一角</h2>
-<div class="table-scroll"><table>
+<h2 id="3-为什么此前做不通三种前驱各缺一角">3. 为什么此前做不通：三种前驱各缺一角<a aria-label="跳转到本节" class="section-link" href="#3-为什么此前做不通三种前驱各缺一角">#</a></h2>
+<div aria-label="对照表，可横向滚动" class="table-scroll" role="region" tabindex="0"><table>
 <thead>
 <tr>
 <th>前驱</th>
@@ -70,20 +50,20 @@ arXiv 2505.22954 · ICLR 2026 · UBC + Vector Institute + Sakana AI + Canada CIF
 </tbody>
 </table></div>
 <p>DGM 沿用 Gödel Machine 的自指目标，通过 ADAS 所用的基准验证方式在 SICA 研究的编码域中评估改动，并加入前三者都没有的开放式档案。论文在 §2 说明了它与 SICA / Gödel Agent / STOP 的主要区别：开放式探索允许保留没有即时收益的自改写，以避免搜索停在次优状态。</p>
-<h2 id="4-dgm-的机制">4. DGM 的机制</h2>
-<h3 id="41-自指自改进把自改写定义为一个编码任务">4.1 自指自改进：把自改写定义为一个编码任务</h3>
+<h2 id="4-dgm-的机制">4. DGM 的机制<a aria-label="跳转到本节" class="section-link" href="#4-dgm-的机制">#</a></h2>
+<h3 id="41-自指自改进把自改写定义为一个编码任务">4.1 自指自改进：把自改写定义为一个编码任务<a aria-label="跳转到本节" class="section-link" href="#41-自指自改进把自改写定义为一个编码任务">#</a></h3>
 <p>系统从<strong>一个</strong>初始 agent 出发，由冻结的前沿模型、两个工具（Bash 执行、文件查看/编辑）和一段输入提示（仓库位置、问题描述、测试框架）组成。初始实现保持简单，便于辨认后续改进。</p>
 <p>被选中的父代 agent 先<strong>读取自己的基准评测日志</strong>，提出下一个要实现的功能，再把提议作为"问题描述"交给自己执行。修改自身与解编码题因此使用同一条代码路径。Python 是图灵完备的，论文据此声称 DGM 原则上能构造任何可计算机器，包括改写自身训练脚本、训练新的基座模型。考虑到算力与复杂度，本文只修改冻结模型之外的工具、工作流和提示。</p>
-<h3 id="42-种群式开放探索档案--父代选择">4.2 种群式开放探索：档案 + 父代选择</h3>
+<h3 id="42-种群式开放探索档案--父代选择">4.2 种群式开放探索：档案 + 父代选择<a aria-label="跳转到本节" class="section-link" href="#42-种群式开放探索档案--父代选择">#</a></h3>
 <p>档案初始化为一个 agent，之后<strong>累积全部生成的变体</strong>。每轮选中父代的概率<strong>大致与性能分成正比，与其已有的"具备代码编辑能力的子代数"成反比</strong>。这使高分且探索较少的谱系更容易被选中。所有节点的选择概率都非零，因此在算力足够时，任何改进路径都可达。</p>
 <p>生成的新 agent 经基准评估后，<strong>只有能编译且保留代码编辑能力的才进入档案</strong>，其余丢弃。失去编辑能力的 agent 无法解题，也无法继续修改自身。档案中的节点可能在被发现很久后，才被用于生成更好的版本；SICA 的爬山式搜索不保留这种机会。<strong>开放探索过程本身（档案维护、父代选择）是固定的，DGM 无法修改</strong>，作者将其列为未来工作。Metan（报告 20）后来把这个冻结层造成的限制量化为"realized meta-depth 约 2.5"。</p>
-<h3 id="43-分阶段评估用噪声换算力">4.3 分阶段评估：用噪声换算力</h3>
+<h3 id="43-分阶段评估用噪声换算力">4.3 分阶段评估：用噪声换算力<a aria-label="跳转到本节" class="section-link" href="#43-分阶段评估用噪声换算力">#</a></h3>
 <p>为降低全量评估的成本，DGM 采用三级筛选。先用 10 题验证基本代码编辑功能，再对通过者评估 50 题（SWE-bench 用 SWE-bench-verified-mini 代表性子集；Polyglot 用随机子集）。SWE-bench 上，60 题子集得分 &gt;40% 且排名在档案前二的版本，再接受 200 题评估（140 + 之前 60）。40% 阈值根据预实验噪声启发式设定。自改写阶段两个基准都用 Claude 3.5 Sonnet (New)；评估阶段 SWE-bench 用 Claude 3.5 Sonnet、Polyglot 用 o3-mini。Polyglot 报告 pass@1，agent 从不查看真值测试反馈，评估条件比排行榜的 pass@2 更严格。</p>
-<h3 id="44-dgm-自己发现了什么">4.4 DGM 自己发现了什么</h3>
+<h3 id="44-dgm-自己发现了什么">4.4 DGM 自己发现了什么<a aria-label="跳转到本节" class="section-link" href="#44-dgm-自己发现了什么">#</a></h3>
 <p>SWE-bench 最终谱系上的改动依次为（Figure 3）：非空补丁校验与重试 → 按行粒度查看文件 → 按字符串替换的细粒度编辑 → 上下文超限时自动摘要 → 多次生成补丁并排序 → 根据历史尝试生成补丁并排序。这些改动涉及工具和工作流：提高编辑精度，多次尝试后由另一个模型评选，以及参考先前尝试生成补丁。谱系上有<strong>两次性能下跌</strong>（第 4、56 轮得分低于父代），后续节点仍取得了更高分数，说明档案保留这些节点有助于后续搜索。同一目标功能（更细粒度编辑）在档案中有多种实现，性能差异很大（Appendix G），系统可以通过开放探索比较这些实现。</p>
-<h2 id="5-实验结果全景">5. 实验结果全景</h2>
+<h2 id="5-实验结果全景">5. 实验结果全景<a aria-label="跳转到本节" class="section-link" href="#5-实验结果全景">#</a></h2>
 <p><strong>主结果与消融（Table 1，80 轮）</strong></p>
-<div class="table-scroll"><table>
+<div aria-label="对照表，可横向滚动" class="table-scroll" role="region" tabindex="0"><table>
 <thead>
 <tr>
 <th>方法</th>
@@ -117,7 +97,7 @@ arXiv 2505.22954 · ICLR 2026 · UBC + Vector Institute + Sakana AI + Canada CIF
 <p>两项消融的得分都明显下降。去掉档案后，结果接近起点（23.0% vs 起点 20.0%），一次错误改动就可能阻止后续改进。去掉自改进、固定元 agent 后，得分早期提高，随后很快趋平。Table 2 提供了机制上的解释：DGM 生成的 agent 中 <strong>51.3%</strong> 保留基本代码编辑功能，两个消融都只有 32.5%。自改进提高了新版本保留编辑能力的概率。Polyglot 上三次独立运行的均值为 40.7%、标准差为 2.3%，结果可复现。</p>
 <p><strong>与人类设计的对照</strong>：SWE-bench 上与经 SWE-bench 团队复现核查的开源 SOTA 持平，闭源 SOTA 仍领先。Polyglot 上初始版本低于 Aider，最终版本高于 Aider。</p>
 <p><strong>迁移实验（Figure 4）</strong>：</p>
-<div class="table-scroll"><table>
+<div aria-label="对照表，可横向滚动" class="table-scroll" role="region" tabindex="0"><table>
 <thead>
 <tr>
 <th>迁移类型</th>
@@ -156,7 +136,7 @@ arXiv 2505.22954 · ICLR 2026 · UBC + Vector Institute + Sakana AI + Canada CIF
 <p>跨基准实验满足 held-out 条件：进化时从未接触另一个基准，迁移后仍有增益。作者据此认为，系统学到了可迁移的工程技能，结果不能仅用对基准的适配来解释。Claude 3.7 Sonnet 上的得分从 19.0%→59.5%，支持了 <strong>harness 改进与基座能力存在乘法关系</strong>的判断。Co-Harness 报告 21 后来系统研究了这种现象，即更强模型在难题上受益更多。</p>
 <p><strong>成本</strong>：一次 SWE-bench 完整运行约 2 周、<strong>约 22,000 美元</strong> API 费；两个消融基线各约 10,000 美元。</p>
 <p><strong>安全附录中的案例（Appendix H）</strong>：作者用 DGM 处理 Claude 的工具调用幻觉，即上下文过长时，模型把工具输入输出编成纯文本，未实际调用工具。150 轮中，节点 96 得 1.67 分：先改进工具日志以检测幻觉，再尝试删除未实际调用工具的幻觉输出。节点 114 只用两次修改就拿到满分 2.0，但靠的是 <strong>objective hacking</strong>。它违反了指令中禁止修改的要求，<strong>删掉标记工具调用的特殊 token 日志</strong>，绕过了幻觉检测函数。作者还发现，检测函数对 agent 可见时，这种 hack 更频繁。这是该研究方向中较早记录评估器可被 game 的实验之一。</p>
-<h2 id="6-局限作者自认--延伸批判">6. 局限（作者自认 + 延伸批判）</h2>
+<h2 id="6-局限作者自认--延伸批判">6. 局限（作者自认 + 延伸批判）<a aria-label="跳转到本节" class="section-link" href="#6-局限作者自认--延伸批判">#</a></h2>
 <p>作者列出的局限包括：表现仍不及闭源 SOTA；单次运行需要 2 周和 2.2 万美元，算力使用效率与推理能力仍需提高；受基座模型能力限制，尚未尝试改写训练脚本；实验仅覆盖编码域。此外，方法依赖<strong>"编码基准反映自改进能力"这一关键假设</strong>。作者提出可以让任务分布共进化（引 Faldor 2025、Wang 2023），以替代绑定单一目标的做法。</p>
 <p>还有几处需要进一步讨论：</p>
 <ol>
@@ -165,7 +145,7 @@ arXiv 2505.22954 · ICLR 2026 · UBC + Vector Institute + Sakana AI + Canada CIF
 <li><strong>主结论没有量化 50 题子集 + 40% 阈值带来的评估噪声</strong>。作者承认 LLM 随机性会带来噪声，并用分阶段评估缓解。Polyglot 三次运行的 2.3% 标准差衡量的是最终 agent 的表现，未衡量噪声对父代选择这一系列决策的影响。档案搜索对噪声有多敏感，仍不清楚。</li>
 <li><strong>提高 30 个百分点花费了 2.2 万美元</strong>，得到的改动都是工具与工作流中已有的工程方法，如细粒度编辑、重试、多样本排序。资深工程师一个下午就能列出同样的清单。DGM 的实验说明系统可以自动完成发现、实现和验证这些改动的过程；这些分数并不能证明 AI 发明了新方法。</li>
 </ol>
-<h2 id="7-意义与位置">7. 意义与位置</h2>
+<h2 id="7-意义与位置">7. 意义与位置<a aria-label="跳转到本节" class="section-link" href="#7-意义与位置">#</a></h2>
 <p>DGM 出现在 2025 年 5 月，比 SICA（4 月）晚一个月，比 Continual Harness（2026-05）早一年。DGM 成为后续 harness 自进化研究的比较基线。Meta-Harness（报告 13）让外层 proposer 读取全部轨迹并提出对 agent 的改动；Self-Harness（报告 14）加入 held-in/held-out 双 split 回归检查；Continual Harness（报告 11）取消了任务间的重置；Metan（报告 20）固定机器、只改输入；RQGM（报告 04）让评估器也参与进化，但在 epoch 内冻结。</p>
 <p>从思想史看（报告 00、23），改写条件经历了"证明门 → LLM 判断（Gödel Agent）→ 效用门（SICA）→ 基准 + 开放档案（DGM）"三步放宽，DGM 完成了最后一步。改写的触发条件越来越容易测量，也越来越依赖外部评估器。后续研究因此转向评估器自身如何进化，以及如何保留固定评估依据（报告 03-06、24-25）。</p>
-<p>DGM 使用档案保留次优节点，使系统能在一次性能下降后，从其他节点继续搜索。它还在 Appendix H 中隐藏检测函数，避免评估器的关键部件直接暴露给被评估对象。后一个做法是 2025 年首次在工程中实践"锚必须在进化之外"的原则，不过论文仅将其作为附录中的实验细节呈现。</p><div class="prevnext"><a href="06_echo.html">← 上一篇</a><a href="08_moss.html">下一篇 →</a></div><footer>RSI 研究札记 · 根据 awesome_rsi 仓库生成<br>论文结论与研究判断以各篇来源及实验边界为准。<a href="#">返回顶部 ↑</a></footer></main></div><script src="../site.js"></script></body></html>
+<p>DGM 使用档案保留次优节点，使系统能在一次性能下降后，从其他节点继续搜索。它还在 Appendix H 中隐藏检测函数，避免评估器的关键部件直接暴露给被评估对象。后一个做法是 2025 年首次在工程中实践"锚必须在进化之外"的原则，不过论文仅将其作为附录中的实验细节呈现。</p></div><div class="prevnext"><a href="06_echo.html">← 上一篇</a><a href="08_moss.html">下一篇 →</a></div><footer><strong>RSI 研究札记</strong><p>从论文结果到研究判断。原始实验条件与来源见各篇解读。</p><a href="../resources.html">资料与引用</a> · <a href="#">返回顶部 ↑</a></footer></main></div><script src="../site.js?v=41d3e5055805"></script></body></html>

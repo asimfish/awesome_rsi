@@ -1,40 +1,15 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的论文、中文解读、分类与专题。"><title>Co-Harness 深度解读：交替改进 harness，并用生成的轨迹训练模型 · RSI 研究札记</title><link rel="stylesheet" href="../site.css"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress"></div><header class="topbar"><a class="brand" href="../index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a href="../index.html">首页</a><a href="../papers.html">论文</a><a href="../reports.html">解读</a><a href="../insights.html">洞察</a><a href="../topics.html">专题</a><a href="../resources.html">资源</a></nav><button id="theme" aria-label="切换深色模式">深色阅读</button></header><div class="layout "><aside><div class="eyebrow">解读 / 21</div><div class="toc">
-<ul>
-<li><a href="#co-harness-深度解读交替改进-harness并用生成的轨迹训练模型">Co-Harness 深度解读：交替改进 harness，并用生成的轨迹训练模型</a><ul>
-<li><a href="#1-一句话定位">1. 一句话定位</a></li>
-<li><a href="#2-要解决的问题">2. 要解决的问题</a></li>
-<li><a href="#3-为什么此前做不通三条线各差一块">3. 为什么此前做不通：三条线各差一块</a></li>
-<li><a href="#4-方法机制">4. 方法机制</a><ul>
-<li><a href="#41-双环结构algorithm-3">4.1 双环结构（Algorithm 3）</a></li>
-<li><a href="#42-harnesscritic-与失败归因分类法table-4">4.2 HarnessCritic 与失败归因分类法（Table 4）</a></li>
-<li><a href="#43-版本化注册表">4.3 版本化注册表</a></li>
-</ul>
-</li>
-<li><a href="#5-实验结果全景">5. 实验结果全景</a><ul>
-<li><a href="#51-设置">5.1 设置</a></li>
-<li><a href="#52-主结果table-6">5.2 主结果（Table 6）</a></li>
-<li><a href="#53-harness-debt-反向证据">5.3 Harness Debt 反向证据</a></li>
-<li><a href="#54-200-小时无人干预案例figure-7qwen3-8b--aime2422-个-harness-版本">5.4 200+ 小时无人干预案例（Figure 7，Qwen3-8B × AIME24，22 个 harness 版本）</a></li>
-</ul>
-</li>
-<li><a href="#6-局限">6. 局限</a></li>
-<li><a href="#7-意义与位置">7. 意义与位置</a></li>
-</ul>
-</li>
-</ul>
-</div>
-<div class="aside-links"><a href="../guide.html">完整仓库导览 ↗</a><a href="https://github.com/asimfish/awesome_rsi">GitHub 源码 ↗</a></div></aside><main id="content"><div class="eyebrow">解读 / 21</div><h1 id="co-harness-深度解读交替改进-harness并用生成的轨迹训练模型">Co-Harness 深度解读：交替改进 harness，并用生成的轨迹训练模型</h1>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的综述、论文、中文解读与专题。"><title>Co-Harness 深度解读：交替改进 harness，并用生成的轨迹训练模型 · RSI 研究札记</title><link rel="stylesheet" href="../site.css?v=f71f142c5c4a"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress" aria-hidden="true"></div><header class="topbar"><a class="brand" href="../index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a href="../index.html">全景综述</a><a href="../papers.html">论文目录</a><a href="../reports.html" aria-current="page">逐篇解读</a><a href="../topics.html">研究专题</a><a href="../reference.html">术语对照</a></nav><div class="reading-tools"><button id="font-size" aria-label="放大正文字号" aria-pressed="false">A＋</button><button id="theme" aria-label="切换深色模式">深色</button></div></header><div class="layout "><aside><details class="toc-panel" open><summary>本页目录 <span>展开 / 收起</span></summary><div class="toc-body"><div class="eyebrow">本页目录</div><ul><li><a href="#1-一句话定位">一句话定位</a></li><li><a href="#2-要解决的问题">要解决的问题</a></li><li><a href="#3-为什么此前做不通三条线各差一块">为什么此前做不通：三条线各差一块</a></li><li><a href="#4-方法机制">方法机制</a></li><li><a href="#5-实验结果全景">实验结果全景</a></li><li><a href="#6-局限">局限</a></li><li><a href="#7-意义与位置">意义与位置</a></li></ul></div></details><div class="aside-links"><a href="../index.html">全景综述</a><a href="../resources.html">资源与来源</a><a href="https://github.com/asimfish/awesome_rsi">GitHub ↗</a></div></aside><main id="content"><header class="article-header"><div class="breadcrumb"><a href="../index.html">RSI 研究札记</a><span>/</span>逐篇解读</div><div class="eyebrow">解读 / 21</div><h1 id="co-harness-深度解读交替改进-harness并用生成的轨迹训练模型">Co-Harness 深度解读</h1><p class="subtitle">交替改进 harness，并用生成的轨迹训练模型</p><p class="meta">约 15 分钟阅读 · <a href="https://github.com/asimfish/awesome_rsi/blob/main/reports/21_co_harness.md">查看原始笔记 ↗</a></p></header><div class="prose">
 <blockquote>
 <p><strong>Co-Harness: Co-Evolving Harness and Model for Self-Improving LLM Agents</strong>
 arXiv 2607.22688 v1（2026-07-17）· 美团 + Allen Institute for AI（Zhengyu Chen†、Teng Xiao†、Huaisheng Zhu、Yige Yuan、Luan Zhang、Jingang Wang；†同等贡献）
 归档：<a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2607.22688_CoHarness.pdf">papers/en/2607.22688_CoHarness.pdf</a> · 中译 <a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/zh/2607.22688_CoHarness_zh.pdf">papers/zh/2607.22688_CoHarness_zh.pdf</a></p>
 </blockquote>
 <hr/>
-<h2 id="1-一句话定位">1. 一句话定位</h2>
+<h2 id="1-一句话定位">1. 一句话定位<a aria-label="跳转到本节" class="section-link" href="#1-一句话定位">#</a></h2>
 <p>现有 agent 后训练流程只更新模型参数，将人工设计的 harness（prompt / 工具 / 技能 / 中间件 / 记忆）保持固定。harness 影响训练轨迹的质量，却未根据训练中观察到的失败更新。Co-Harness 交替优化两者：<strong>HarnessCritic</strong> 分析失败轨迹，按五类归因定位 harness 级失败模式，提出 diff，经局部验证后写入版本化注册表。再用改进后 harness 生成的高质量轨迹对模型进行 SFT，<strong>将有效的操作方法蒸馏进权重</strong>。</p>
 <p>两轮双环在 Qwen3-8B/32B × AIME24/25/HMMT25 上平均提高 <strong>+20.4 pp</strong>（58.5→78.9），比人工设计的静态 harness 高 <strong>+24.7 pp</strong>。一个 200+ 小时的无人干预案例从 32 秒就崩溃的配置开始，生成了 22 个 harness 版本，自行发现 ensemble 策略，并在检测到回归后自动回滚。</p>
 <p>本文实现了报告 10 所讨论的分层分工，在通用 LLM agent 后训练中结合文本层快环与权重层慢环。它与 Continual Harness（报告 11）的具身域共学习同为 2026 年的模型-harness 共进化系统。但论文自称"首个共进化框架"不成立，CH 早两个月已完成相应工作。</p>
-<h2 id="2-要解决的问题">2. 要解决的问题</h2>
+<h2 id="2-要解决的问题">2. 要解决的问题<a aria-label="跳转到本节" class="section-link" href="#2-要解决的问题">#</a></h2>
 <p>论文用 <strong>Harness Debt</strong> 描述 agent 训练时保持人工设计的 harness 不变所带来的问题：</p>
 <ol>
 <li><strong>harness 缺陷影响训练数据</strong>：工具 schema 错误、缺少重试逻辑或上下文溢出造成的失败，被当作模型失败用于训练，因而引入噪声；</li>
@@ -43,8 +18,8 @@ arXiv 2607.22688 v1（2026-07-17）· 美团 + Allen Institute for AI（Zhengyu 
 </ol>
 <p>Co-Harness 假设，<strong>harness 与模型应交替优化，并将 harness 改进蒸馏进权重</strong>。模型通过训练掌握相应能力后，就不再需要原有的辅助。同时，模型能力增强会暴露新的失败模式，为 harness 提供新的优化目标。</p>
 <p>§3.6 列出持续改进的三个条件。harness 更新必须改善<strong>轨迹的实质质量</strong>。模型更新必须让模型<strong>掌握改进后的能力</strong>，减少对外部辅助的依赖。模型增强后，还必须出现<strong>新的 harness 改进机会</strong>。任一条件不成立，双环就会退化为单环。</p>
-<h2 id="3-为什么此前做不通三条线各差一块">3. 为什么此前做不通：三条线各差一块</h2>
-<div class="table-scroll"><table>
+<h2 id="3-为什么此前做不通三条线各差一块">3. 为什么此前做不通：三条线各差一块<a aria-label="跳转到本节" class="section-link" href="#3-为什么此前做不通三条线各差一块">#</a></h2>
+<div aria-label="对照表，可横向滚动" class="table-scroll" role="region" tabindex="0"><table>
 <thead>
 <tr>
 <th>已有路线</th>
@@ -86,8 +61,8 @@ arXiv 2607.22688 v1（2026-07-17）· 美团 + Allen Institute for AI（Zhengyu 
 </tbody>
 </table></div>
 <p>此前尚未在通用 LLM agent 后训练中，<strong>根据失败改进 harness，再用改进后的 harness 训练模型</strong>。GEPA 修改 prompt，未训练模型；标准 RL 训练模型，但保持 harness 不变；Meta-Harness 修改 harness，未将改进蒸馏进权重。</p>
-<h2 id="4-方法机制">4. 方法机制</h2>
-<h3 id="41-双环结构algorithm-3">4.1 双环结构（Algorithm 3）</h3>
+<h2 id="4-方法机制">4. 方法机制<a aria-label="跳转到本节" class="section-link" href="#4-方法机制">#</a></h2>
+<h3 id="41-双环结构algorithm-3">4.1 双环结构（Algorithm 3）<a aria-label="跳转到本节" class="section-link" href="#41-双环结构algorithm-3">#</a></h3>
 <p><strong>Co-Harness Loop</strong>（每轮 K 次）：
 1. 在 (θ_t, φ_t) 下收集失败轨迹 F⁻_t；
 2. HarnessCritic C 生成归因集 A_t = C(F⁻_t, φ_t)；
@@ -95,8 +70,8 @@ arXiv 2607.22688 v1（2026-07-17）· 美团 + Allen Institute for AI（Zhengyu 
 4. 应用修改，得到候选 φ̃_t；
 5. <strong>Validate</strong>：目标失败模式改善（δ_in &gt; 0）且 held-out 无回归（δ_out ≥ 0）→ 提交注册表；否则拒绝修改。</p>
 <p><strong>Model Alignment Loop</strong>：用最优 harness φ*<em>t 收集轨迹 D_t，保留通过 verifier 的轨迹，用于 SFT：θ</em>{t+1} = argmax Σ log p_θ(τ|x)。</p>
-<h3 id="42-harnesscritic-与失败归因分类法table-4">4.2 HarnessCritic 与失败归因分类法（Table 4）</h3>
-<div class="table-scroll"><table>
+<h3 id="42-harnesscritic-与失败归因分类法table-4">4.2 HarnessCritic 与失败归因分类法（Table 4）<a aria-label="跳转到本节" class="section-link" href="#42-harnesscritic-与失败归因分类法table-4">#</a></h3>
+<div aria-label="对照表，可横向滚动" class="table-scroll" role="region" tabindex="0"><table>
 <thead>
 <tr>
 <th>根因</th>
@@ -139,13 +114,13 @@ arXiv 2607.22688 v1（2026-07-17）· 美团 + Allen Institute for AI（Zhengyu 
 </table></div>
 <p>每条失败生成一条结构化记录 {root cause, harness dim, severity, evidence, diff suggestion}。evidence 对应具体轨迹事件，diff 指定局部补丁目标，包括工具 schema 字段、中间件 hook 插入点或编排策略。<strong>聚合</strong>时，按复现率、严重度、字段路径一致性排序，将兼容的建议合并为单个 diff。diff <strong>只记录局部修改</strong>，列出变化的字段及新旧值，便于检查与回滚。</p>
 <p><strong>人工校验</strong>：三位专家参与标注，并由第三人仲裁，检查归因是否准确。归因为 harness 的定向修复提供语义依据；GEPA 式进化则只优化 prompt。</p>
-<h3 id="43-版本化注册表">4.3 版本化注册表</h3>
+<h3 id="43-版本化注册表">4.3 版本化注册表<a aria-label="跳转到本节" class="section-link" href="#43-版本化注册表">#</a></h3>
 <p>接受的补丁写入版本化 harness 注册表，保留审计记录并支持完整回滚。v20–v22 案例通过这一机制自动回滚。</p>
-<h2 id="5-实验结果全景">5. 实验结果全景</h2>
-<h3 id="51-设置">5.1 设置</h3>
+<h2 id="5-实验结果全景">5. 实验结果全景<a aria-label="跳转到本节" class="section-link" href="#5-实验结果全景">#</a></h2>
+<h3 id="51-设置">5.1 设置<a aria-label="跳转到本节" class="section-link" href="#51-设置">#</a></h3>
 <p>实验采用 Tool-Integrated Reasoning（TIR），agent 交替进行链式推理与 Python 工具调用，求解数学竞赛题。模型为 Qwen3-8B / Qwen3-32B，基准为 AIME24 / AIME25 / HMMT25，以人工设计的静态 harness 作对照。</p>
-<h3 id="52-主结果table-6">5.2 主结果（Table 6）</h3>
-<div class="table-scroll"><table>
+<h3 id="52-主结果table-6">5.2 主结果（Table 6）<a aria-label="跳转到本节" class="section-link" href="#52-主结果table-6">#</a></h3>
+<div aria-label="对照表，可横向滚动" class="table-scroll" role="region" tabindex="0"><table>
 <thead>
 <tr>
 <th>模型</th>
@@ -235,9 +210,9 @@ arXiv 2607.22688 v1（2026-07-17）· 美团 + Allen Institute for AI（Zhengyu 
 - <strong>较难基准上的收益更大</strong>：HMMT25 上 8B +20.1、32B +27.2；AIME24 的基线已较高，收益最小。在复杂多步推理中，运行框架的缺陷更容易导致失败。
 - <strong>更大模型在难题上受益更多</strong>：32B 在 HMMT25 上的增益为 +27.2，高于 AIME24 上的 +10.6。较强模型有更多已有能力可通过改进 harness 发挥出来。
 - <strong>8B 的后续增益较小</strong>：AIME24 上 R2（84.7）相较 R1（84.0）几乎没有提升。模型在该基准上的推理能力接近上限，剩余错误多来自模型内部，难以归因到 harness。</p>
-<h3 id="53-harness-debt-反向证据">5.3 Harness Debt 反向证据</h3>
+<h3 id="53-harness-debt-反向证据">5.3 Harness Debt 反向证据<a aria-label="跳转到本节" class="section-link" href="#53-harness-debt-反向证据">#</a></h3>
 <p>模型在补偿其弱点的运行框架下训练，可能产生依赖。实验中，每轮<strong>测试时的绝对精度都在上升</strong>（8B AIME25 56.9→66.7→78.3）。这些结果表明，模型学到了可迁移的推理技能，未形成对 harness 的依赖。</p>
-<h3 id="54-200-小时无人干预案例figure-7qwen3-8b--aime2422-个-harness-版本">5.4 200+ 小时无人干预案例（Figure 7，Qwen3-8B × AIME24，22 个 harness 版本）</h3>
+<h3 id="54-200-小时无人干预案例figure-7qwen3-8b--aime2422-个-harness-版本">5.4 200+ 小时无人干预案例（Figure 7，Qwen3-8B × AIME24，22 个 harness 版本）<a aria-label="跳转到本节" class="section-link" href="#54-200-小时无人干预案例figure-7qwen3-8b--aime2422-个-harness-版本">#</a></h3>
 <ul>
 <li><strong>初始配置</strong>：32 秒内因 vllm KV cache 错误崩溃。</li>
 <li><strong>Phase 1（init–v7）工程修复</strong>：将 ThreadPool 换成 ProcessPool，用 SIGKILL 清理，并开启 thinking。v3 首次完成 90 题，得分 <strong>59.6%</strong>（3.78 h）。</li>
@@ -246,7 +221,7 @@ arXiv 2607.22688 v1（2026-07-17）· 美团 + Allen Institute for AI（Zhengyu 
 <li><strong>v20–v22 回归</strong>：新增的领域专用 prompt 与 Qwen3 内部推理冲突，导致回归。系统<strong>自动检测到回归并回滚</strong>。</li>
 </ul>
 <p>崩溃率为 0%，过程覆盖三个优化阶段，全部 22 版均由 agent 生成。</p>
-<h2 id="6-局限">6. 局限</h2>
+<h2 id="6-局限">6. 局限<a aria-label="跳转到本节" class="section-link" href="#6-局限">#</a></h2>
 <ol>
 <li><strong>"首个共进化框架"的自称不成立</strong>：结论称 Co-Harness 是"first framework to co-evolve both"，但 Continual Harness（arXiv 2605.09998，2026-05-11）早两个月已在具身域完成模型-harness 共学习闭环，由 Refiner 改 harness，PRM/教师重标注/soft SFT 改权重。CH 先在具身域实现，Co-Harness 首次用于通用 LLM agent 后训练。</li>
 <li><strong>实验范围小于摘要所述范围</strong>：摘要讨论"automated AI research 的后训练"，实验则全部采用工具集成数学推理。数学答案可验证，奖励信号明确，harness 归因也相对容易。能否迁移到 verifier 较弱的研究任务，尚未得到证明。</li>
@@ -255,11 +230,11 @@ arXiv 2607.22688 v1（2026-07-17）· 美团 + Allen Institute for AI（Zhengyu 
 <li><strong>仍用固定基准评估</strong>：验证集分数是接受 diff 的唯一判据，评估器共进化的问题（报告 03-06）仍未处理。</li>
 <li><strong>只运行两轮</strong>：R2 在 8B AIME24 上已趋于饱和。没有数据说明更多轮是否继续提高表现，或产生另一种 Harness Debt，即 harness 越来越适配特定模型版本。</li>
 </ol>
-<h2 id="7-意义与位置">7. 意义与位置</h2>
+<h2 id="7-意义与位置">7. 意义与位置<a aria-label="跳转到本节" class="section-link" href="#7-意义与位置">#</a></h2>
 <p><strong>对报告 10 分层分工的实现</strong>：本文首次在通用 agent 上完整结合文本层快环（HarnessCritic diff，小时级）与权重层慢环（每轮 SFT）。它与 CH 的触发方式不同：CH 在 episode 内保留状态并在线提炼经验，Co-Harness 则按离线批次交替优化。</p>
 <p><strong>对报告 11 能力地板的补充数据</strong>：本文观察到更强模型在难题上受益更多，CH 则发现弱模型使用更强的运行框架后表现反而下降。这些结果对应的关系是：harness 收益随基座能力单调上升，低于最低能力要求时收益为负，接近能力上限时趋于饱和（8B AIME24 案例）。</p>
 <p><strong>对报告 13 Meta-Harness 的分工</strong>：Meta-Harness 让外层 coding agent 读取全部历史轨迹，自由改写 harness 代码，proposer 保持冻结。Co-Harness 用归因分类法将改动限制为局部 diff，并将收益蒸馏进权重。前者的搜索空间更大，后者的改动更易控制，且<strong>只有后者将能力保留在模型中，使其可脱离 harness 使用</strong>。Meta-Harness Discussion 提出进一步共进化 harness 与权重，Co-Harness 首次在通用域实现了这一设想。</p>
 <p><strong>对报告 14 Self-Harness</strong>：两者的接受条件结构相同（δ_in &gt; 0 且 δ_out ≥ 0 vs Δ_in ≥ 0 且 Δ_ho ≥ 0 且 max &gt; 0）。Self-Harness 不训练模型，Co-Harness 还会训练模型。Self-Harness 将 harness 作为最终优化产物，Co-Harness 将 harness 用于后续模型训练。</p>
 <p><strong>对报告 02 Anthropic 叙事的微观印证</strong>：系统在 200+ 小时内无人干预，从崩溃配置中恢复，并自行发现 ensemble 策略。这个案例展示了单次实验中"AI 改进 AI 训练基础设施"的可复现过程。按 Bostrom crossover（报告 00）的定义，可量化系统自身的贡献：22 版全部由 agent 生成。</p>
 <p><strong>对报告 08 MOSS</strong>：版本化注册表与回归回滚（v20–v22 案例）独立实现了与 MOSS 相似的检查机制。本文在文本/配置层使用了与生产系统相似的修改检查与撤销机制。</p>
-<p><strong>对报告 18 Prime Agent</strong>：Prime Agent 指出模型未接受操作 harness 的训练，Co-Harness 则训练模型掌握 harness 的行为。前者提出训练上的缺口，后者提供训练方法，对应 CH 关于"模型-harness 共学习将成主导路线"的预测。</p><div class="prevnext"><a href="20_metan.html">← 上一篇</a><a href="22_coevolution_survey.html">下一篇 →</a></div><footer>RSI 研究札记 · 根据 awesome_rsi 仓库生成<br>论文结论与研究判断以各篇来源及实验边界为准。<a href="#">返回顶部 ↑</a></footer></main></div><script src="../site.js"></script></body></html>
+<p><strong>对报告 18 Prime Agent</strong>：Prime Agent 指出模型未接受操作 harness 的训练，Co-Harness 则训练模型掌握 harness 的行为。前者提出训练上的缺口，后者提供训练方法，对应 CH 关于"模型-harness 共学习将成主导路线"的预测。</p></div><div class="prevnext"><a href="20_metan.html">← 上一篇</a><a href="22_coevolution_survey.html">下一篇 →</a></div><footer><strong>RSI 研究札记</strong><p>从论文结果到研究判断。原始实验条件与来源见各篇解读。</p><a href="../resources.html">资料与引用</a> · <a href="#">返回顶部 ↑</a></footer></main></div><script src="../site.js?v=41d3e5055805"></script></body></html>

@@ -1,24 +1,4 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的论文、中文解读、分类与专题。"><title>Who Grades the Grader 深度解读：任务分数无法验证自进化评估器是否有效 · RSI 研究札记</title><link rel="stylesheet" href="../site.css"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress"></div><header class="topbar"><a class="brand" href="../index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a href="../index.html">首页</a><a href="../papers.html">论文</a><a href="../reports.html">解读</a><a href="../insights.html">洞察</a><a href="../topics.html">专题</a><a href="../resources.html">资源</a></nav><button id="theme" aria-label="切换深色模式">深色阅读</button></header><div class="layout "><aside><div class="eyebrow">解读 / 05</div><div class="toc">
-<ul>
-<li><a href="#who-grades-the-grader-深度解读任务分数无法验证自进化评估器是否有效">Who Grades the Grader 深度解读：任务分数无法验证自进化评估器是否有效</a><ul>
-<li><a href="#1-一句话定位">1. 一句话定位</a></li>
-<li><a href="#2-要解决的问题稀疏锚定下的评估器缺失">2. 要解决的问题：稀疏锚定下的评估器缺失</a></li>
-<li><a href="#3-为什么此前做不通三条线各差一块">3. 为什么此前做不通：三条线各差一块</a></li>
-<li><a href="#4-方法机制">4. 方法机制</a><ul>
-<li><a href="#41-指标--缺陷检测算子的表达式树">4.1 指标 = 缺陷检测算子的表达式树</a></li>
-<li><a href="#42-指标循环感知--生长--选择--治理--审计">4.2 指标循环：感知 → 生长 → 选择 → 治理 → 审计</a></li>
-<li><a href="#43-与技能环共进化double-ratchet">4.3 与技能环共进化：Double Ratchet</a></li>
-<li><a href="#44-两个消融--一个独立终审">4.4 两个消融 + 一个独立终审</a></li>
-</ul>
-</li>
-<li><a href="#5-实验结果全景">5. 实验结果全景</a></li>
-<li><a href="#6-局限作者自认--延伸批判">6. 局限（作者自认 + 延伸批判）</a></li>
-<li><a href="#7-意义与位置">7. 意义与位置</a></li>
-</ul>
-</li>
-</ul>
-</div>
-<div class="aside-links"><a href="../guide.html">完整仓库导览 ↗</a><a href="https://github.com/asimfish/awesome_rsi">GitHub 源码 ↗</a></div></aside><main id="content"><div class="eyebrow">解读 / 05</div><h1 id="who-grades-the-grader-深度解读任务分数无法验证自进化评估器是否有效">Who Grades the Grader 深度解读：任务分数无法验证自进化评估器是否有效</h1>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的综述、论文、中文解读与专题。"><title>Who Grades the Grader 深度解读：任务分数无法验证自进化评估器是否有效 · RSI 研究札记</title><link rel="stylesheet" href="../site.css?v=f71f142c5c4a"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress" aria-hidden="true"></div><header class="topbar"><a class="brand" href="../index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a href="../index.html">全景综述</a><a href="../papers.html">论文目录</a><a href="../reports.html" aria-current="page">逐篇解读</a><a href="../topics.html">研究专题</a><a href="../reference.html">术语对照</a></nav><div class="reading-tools"><button id="font-size" aria-label="放大正文字号" aria-pressed="false">A＋</button><button id="theme" aria-label="切换深色模式">深色</button></div></header><div class="layout "><aside><details class="toc-panel" open><summary>本页目录 <span>展开 / 收起</span></summary><div class="toc-body"><div class="eyebrow">本页目录</div><ul><li><a href="#1-一句话定位">一句话定位</a></li><li><a href="#2-要解决的问题稀疏锚定下的评估器缺失">要解决的问题：稀疏锚定下的评估器缺失</a></li><li><a href="#3-为什么此前做不通三条线各差一块">为什么此前做不通：三条线各差一块</a></li><li><a href="#4-方法机制">方法机制</a></li><li><a href="#5-实验结果全景">实验结果全景</a></li><li><a href="#6-局限作者自认--延伸批判">局限（作者自认 + 延伸批判）</a></li><li><a href="#7-意义与位置">意义与位置</a></li></ul></div></details><div class="aside-links"><a href="../index.html">全景综述</a><a href="../resources.html">资源与来源</a><a href="https://github.com/asimfish/awesome_rsi">GitHub ↗</a></div></aside><main id="content"><header class="article-header"><div class="breadcrumb"><a href="../index.html">RSI 研究札记</a><span>/</span>逐篇解读</div><div class="eyebrow">解读 / 05</div><h1 id="who-grades-the-grader-深度解读任务分数无法验证自进化评估器是否有效">Who Grades the Grader 深度解读</h1><p class="subtitle">任务分数无法验证自进化评估器是否有效</p><p class="meta">约 21 分钟阅读 · <a href="https://github.com/asimfish/awesome_rsi/blob/main/reports/05_who_grades_the_grader.md">查看原始笔记 ↗</a></p></header><div class="prose">
 <blockquote>
 <p><strong>Who Grades the Grader? Co-Evolving Evaluation Metrics and Skills for Self-Improving LLM Agents</strong>
 arXiv 2607.12790v2（2026-07-30）· AWS Generative AI Innovation Center + HSBC Technology Center China
@@ -27,10 +7,10 @@ arXiv 2607.12790v2（2026-07-30）· AWS Generative AI Innovation Center + HSBC 
 同团队续作：EvalCEGAR（arXiv 2608.18744，报告 24）</p>
 </blockquote>
 <hr/>
-<h2 id="1-一句话定位">1. 一句话定位</h2>
+<h2 id="1-一句话定位">1. 一句话定位<a aria-label="跳转到本节" class="section-link" href="#1-一句话定位">#</a></h2>
 <p>自进化 agent 每轮都需要评估信号，判断本次尝试是否成功。代码基准由单元测试免费提供信号，部署系统则经常依靠人工：Claude 托管 agent 要求开发者编写结果 rubric，Codex Record &amp; Replay 需要人类演示。本文将评估指标表示为小型缺陷检测算子的表达式树，仅用十条带黄金参考的锚定样本提供稀疏监督，使指标随搜索进化。在 MBPP+ 上，指标与循环从未读取的锁定真值的一致性提升 +0.21（配对 p = 0.014），超过其内部包含的裸 LLM judge。</p>
 <p>去掉锚定守卫后，指标退化为全部放行，但用它训练的技能环仍能取得与正常指标相当的任务分数，在两个任务上更高。因此，下游任务表现无法验证自进化评估器是否有效。仅让 judge 与 policy 共进化，再报告 policy 的提升，也可能把全部放行的评分器误判为有效。</p>
-<h2 id="2-要解决的问题稀疏锚定下的评估器缺失">2. 要解决的问题：稀疏锚定下的评估器缺失</h2>
+<h2 id="2-要解决的问题稀疏锚定下的评估器缺失">2. 要解决的问题：稀疏锚定下的评估器缺失<a aria-label="跳转到本节" class="section-link" href="#2-要解决的问题稀疏锚定下的评估器缺失">#</a></h2>
 <p>论文采用以下设定：</p>
 <ol>
 <li><strong>搜索没有现成的评估器</strong>。已有的目标函数进化工作，都依赖被假定有效的下游指标，包括 CSE-Autoloss 进化损失、AutoML-Zero 进化学习算法、AlphaEvolve 进化程序。AlphaEvolve 明确要求进步必须能由机器评估。学习型评估器则依赖本文试图去掉的真值。这里仅用与十条锚定样本的一致性，以及无标注输出上的共识来选择指标。</li>
@@ -39,8 +19,8 @@ arXiv 2607.12790v2（2026-07-30）· AWS Generative AI Innovation Center + HSBC 
 <li><strong>裸 LLM judge 与被评 LLM 可能产生一致的错误</strong>。judge 和 solver 共享失败模式，即使尚未受到优化压力，也可能逐渐得出相同的错误判断。由于没有可检查的判据，外部难以发现这种变化。</li>
 </ol>
 <p>引言说明了两项前提。指标循环只进化给输出打分的函数，基准任务和参考在循环开始前就已固定，因此结果不会来自任务难度降低。进化指标的有效性通过它与锁定参考的一致性衡量。用该指标训练后的任务分数只能提供有限证据，因为全部放行的指标也能让技能环通过练习获得提升。</p>
-<h2 id="3-为什么此前做不通三条线各差一块">3. 为什么此前做不通：三条线各差一块</h2>
-<div class="table-scroll"><table>
+<h2 id="3-为什么此前做不通三条线各差一块">3. 为什么此前做不通：三条线各差一块<a aria-label="跳转到本节" class="section-link" href="#3-为什么此前做不通三条线各差一块">#</a></h2>
+<div aria-label="对照表，可横向滚动" class="table-scroll" role="region" tabindex="0"><table>
 <thead>
 <tr>
 <th>已有路线</th>
@@ -72,12 +52,12 @@ arXiv 2607.12790v2（2026-07-30）· AWS Generative AI Innovation Center + HSBC 
 </tbody>
 </table></div>
 <p>第二行解释了为何需要守卫。fitness 由外部真值给出时，退化候选会因低分被排除；fitness 来自内部一致性时，则需要额外规则识别退化。因此，后续消融需要区分守卫与生命周期管理各自的作用。</p>
-<h2 id="4-方法机制">4. 方法机制</h2>
-<h3 id="41-指标--缺陷检测算子的表达式树">4.1 指标 = 缺陷检测算子的表达式树</h3>
+<h2 id="4-方法机制">4. 方法机制<a aria-label="跳转到本节" class="section-link" href="#4-方法机制">#</a></h2>
+<h3 id="41-指标--缺陷检测算子的表达式树">4.1 指标 = 缺陷检测算子的表达式树<a aria-label="跳转到本节" class="section-link" href="#41-指标--缺陷检测算子的表达式树">#</a></h3>
 <p>一个 <strong>op</strong>（算子）是原子缺陷检测器 o(t, y, c) → {drawback, clean, abstain}，只检查一类失败，其余情况弃权。每个任务族先用几个覆盖明显失败的手写 op，也可以让 LLM 根据规格起草，随后通过生命周期管理扩充算子池。op 按成本分为三层：静态 op 解析产物，执行 op 运行产物（代码放进沙箱、SQL 在真实仓库执行），judge op 向 LLM 询问一个具体问题。每个任务族还保留一个不参与进化的根 op，用于验证代码能否解析、报告是否有标题等基本结构，并缓存解析结果。</p>
 <p>指标表达式用逻辑算子组合 op 判决。叶 op、析取（任一子节点发现缺陷即判为缺陷）、合取、否定、K-of-k 无权投票和加权阈值投票可以递归组成树。组合器不计入弃权的子节点；若子节点全部弃权，该节点也弃权。当且仅当根未发现缺陷时，输出通过。op 是 (t, y) 的纯函数，判决可以缓存，也能根据表达式字符串和注册 op 池完全复现指标。实际被选中的指标只使用了析取、合取和投票。</p>
 <p><strong>保持指标基本确定性是为了便于检查错误</strong>。裸 LLM judge 与被评 LLM 共享失败模式，可能在受到优化压力之前就产生一致的错误，且外部难以发现。组合有类型的检测器后，每片叶子只负责一类失败，并能说明触发原因。因此，后文的 rubric gaming 可以被定位到具体检查项。</p>
-<h3 id="42-指标循环感知--生长--选择--治理--审计">4.2 指标循环：感知 → 生长 → 选择 → 治理 → 审计</h3>
+<h3 id="42-指标循环感知--生长--选择--治理--审计">4.2 指标循环：感知 → 生长 → 选择 → 治理 → 审计<a aria-label="跳转到本节" class="section-link" href="#42-指标循环感知--生长--选择--治理--审计">#</a></h3>
 <p><strong>感知</strong>使用两种信号：misses 是当前指标放行、但软标签判为失败的 dev 样本；gaps 是 op 池全部弃权或判决不一致的 train 输出。系统按预先限定的任务失败类别聚类，为反复出现的每个簇生成有类型的 op 规格。</p>
 <p><strong>生长</strong>需要通过出生门：新 op 必须在所属簇中至少一半样本上触发，并在已知良好输出上保持 clean。由锚定 misses 生成的 op 已有锚数据支持，可直接进入 active 状态，参与选择。仅由无标注 gaps 生成的 op 先进入 shadow 状态，每轮记录判决，但不能被选中；只有判决能提高 dev 一致性后，才允许晋升。</p>
 <p><strong>选择</strong>时，LLM 组合器根据 op 目录、当前 gaps、精英表达式历史及其缺陷提出候选，并补充精英表达式变异、交叉产生的候选。按以下分数保留最优者：</p>
@@ -85,17 +65,17 @@ arXiv 2607.12790v2（2026-07-30）· AWS Generative AI Innovation Center + HSBC 
 <p>A_dev 表示与 dev 软标签的一致性；A_train 表示在无标注 train 输出上，与池中未弃权 op 的共识判决是否一致；C 表示表达式大小。共识项起正则作用，降低只记住十条 dev、却无法适应更广分布的指标得分。始终判失败的指标则会在 dev 上失分。选择还受两条守卫约束：没有可用 dev 意见的候选不可选，即失败时关闭；对全部输出都判通过、失败或弃权的候选，由有效性门排除。</p>
 <p>两个一致性项都通过加权限制退化。dev 一致性按召回加权：(2·r_fail + 1·r_pass)/3。漏掉一个缺陷的代价是误报的两倍，仅答对容易的一类无法获得满分。共识按可靠性加权，每个 op 的投票按 1 + κ·max(0, m_o) 缩放，m_o 是它在锚上的留一边际贡献。经锚验证的 op 获得更高权重，未经验证的则接近中性。否则，大量低成本合成、共享盲点的相关检测器可能共同决定错误的共识伪标签。</p>
 <p><strong>治理</strong>：每个 op 的 fitness 取它在当前表达式中的留一边际贡献。贡献非正的 op 在宽限期后退役，能提高 dev 一致性的 shadow 晋升。<strong>审计</strong>仅报告与锁定测试集的一致性，结果不反馈给循环。</p>
-<h3 id="43-与技能环共进化double-ratchet">4.3 与技能环共进化：Double Ratchet</h3>
+<h3 id="43-与技能环共进化double-ratchet">4.3 与技能环共进化：Double Ratchet<a aria-label="跳转到本节" class="section-link" href="#43-与技能环共进化double-ratchet">#</a></h3>
 <p>技能环采用已发表的 Ratchet（Zhang et al. 2026b，不作为本文贡献），由当前最优的进化指标为训练任务打分。两环按预先设定的课程交替运行：早期指标覆盖较差，因此分配的训练轮数最多；15/8/5/2 轮指标阶段分别与四个 25 轮技能阶段交替，技能预算与参考环相同。held-out 评估和回滚始终依据锁定测试集，进化指标不能访问。因此，指标受污染会拖慢技能学习，但不会影响测量依据。对照组使用相同技能环，直接获得真值指标或最佳可用 rubric。</p>
 <p>两类结果适用的保证不同。指标的合成、门控、选择和退役都不读取锁定集，因此有效性数字严格属于样本外结果。技能环则依据该集回滚，其任务通过率不具备同样的样本外性质。各实验臂使用完全相同的回滚方式，可以横向比较任务表现，但不能用这些分数认证指标。</p>
-<h3 id="44-两个消融--一个独立终审">4.4 两个消融 + 一个独立终审</h3>
+<h3 id="44-两个消融--一个独立终审">4.4 两个消融 + 一个独立终审<a aria-label="跳转到本节" class="section-link" href="#44-两个消融--一个独立终审">#</a></h3>
 <p>两个消融分别去掉一类安全部件，未采用因子设计。naive 臂关闭锚定守卫，包括失败即关闭、有效性门和技能环回滚，但保留全部检测器生命周期管理。这对应无锚 agent-judge 共进化中容易产生一致错误的配置。no-lifecycle 臂保留守卫，关闭出生门与按贡献退役的机制；所有合成检测器直接进入 active，且永不退役，用于考察指标池缺少管理时的表现。</p>
 <p><strong>独立终审</strong>在所有循环之外进行。更强的 LLM（Claude Opus 4.8，环内全部是 Opus 4.7）将每个最终输出与进化前基线成对比较，交换位置判断两次，两次一致才记为胜出。它模拟部署中保留的人工验收，结果不用于训练；梯度、胶囊、提示和选择决策均不读取终审结果。</p>
-<h2 id="5-实验结果全景">5. 实验结果全景</h2>
+<h2 id="5-实验结果全景">5. 实验结果全景<a aria-label="跳转到本节" class="section-link" href="#5-实验结果全景">#</a></h2>
 <p><strong>设置</strong>：实验包含三个任务族。MBPP+ 以隐藏单元测试为硬锚；Spider 2.0-Snow 是企业级 text-to-SQL 任务，以官方执行结果比对为锚。两者用于验证，真值精确，可以同时测量有效性与充分性。报告生成要求根据审计过的证据卡撰写分析师报告章节，是本文面向的目标任务；它没有黄金指标，仅有 RAQS rubric 和黄金演示作为部分参考信号。</p>
 <p>实验先让冻结 solver 采样五次，筛掉全部通过的题，再按通过率分层，构造较难的子集。split 分别为 60/10/40、59/10/40、73/10/48，dev 始终为十条。solver 只作单次直接 LLM 调用，不使用工具，也不迭代，因此绝对通过率无法与排行榜上的 agent 比较。每项实验使用三个 seed，报告峰值与最后十轮均值。后者事先固定，未经事后选择；指标相关结论另用配对 McNemar 精确检验。</p>
 <p><strong>指标有效性（本文的主张）</strong></p>
-<div class="table-scroll"><table>
+<div aria-label="对照表，可横向滚动" class="table-scroll" role="region" tabindex="0"><table>
 <thead>
 <tr>
 <th>任务</th>
@@ -132,7 +112,7 @@ arXiv 2607.12790v2（2026-07-30）· AWS Generative AI Innovation Center + HSBC 
 <p>生命周期管理的结果见 Table 1。出生门拒绝的检测器数量比准入的多几个数量级：MBPP+ 的一个 seed 中，998 个候选被拒，2 个准入。最终表达式只有 1-3 片叶子；目标函数从 0.16 升到 0.52 时，表达式从六个 op 减少到三个。全部九次运行的选择分数都单调不降，但 held-out 一致性并非如此；九次中有五次的末值低于中途峰值。这反映了优化十条代理样本后的泛化差距，因此锁定集只用于报告结果，不参与选择。</p>
 <p>减少锚数量的离线重放使用了 200 个分层子样本。四/六/八条锚的 held-out 一致性为 0.871/0.882/0.874，与十条锚的 0.854 相当。均值未下降，但方差增大。</p>
 <p><strong>守卫的作用及任务分数的局限（Table 2，报告生成任务的锚约束最弱、产生一致错误的压力最高）</strong></p>
-<div class="table-scroll"><table>
+<div aria-label="对照表，可横向滚动" class="table-scroll" role="region" tabindex="0"><table>
 <thead>
 <tr>
 <th>臂</th>
@@ -175,7 +155,7 @@ arXiv 2607.12790v2（2026-07-30）· AWS Generative AI Innovation Center + HSBC 
 <p>修复同时修改了两个部分：在胶囊门中加入识别词表的"数值擦除"检查，若注册指标有数值要求、附近却无数字，就判为缺陷；同时在失败提示中要求数值与标签一同出现。重跑后，擦除标签降到约 1%，rubric 分升到 0.850 ± 0.010。指标可读，因而能把失败定位到具体检查项。若奖励模型将同一 rubric 吸收到权重中，外部只能看到分数上涨，难以确定应修改哪条判据。</p>
 <p>终审本身也存在问题。流水线要求输出保留原始证据标签，通用 rubric 却不了解这一格式要求，将标签语法列为失败原因。因此，修复后的胜率几乎不变（0.122 → 0.126）。改用说明格式要求的任务感知 rubric，对同一批已存储输出重新判断后，胜率从 0.515 升到 0.770。若部署时只看通用终审结果，就会认为修复无效并将其回滚。</p>
 <p><strong>可检测性谱</strong>：各任务的结果与 solver 的失败能否被机械检测有关。Spider 的任务内受控对比中，第一版提示产生的失败多为编译错误，进化指标的 held-out 一致性达到 0.85。提示加入带类型的 schema 后，solver 基线提高了一半，剩余失败主要是执行正常但数值语义错误。确定性 op 无法识别这些错误，一致性降到 0.500，目标函数仍继续上升。方法和任务相同，变化的是失败分布。这提示了一个限制：solver 改进后，静态 op 能检测的失败会减少，剩余错误更依赖判断能力。</p>
-<h2 id="6-局限作者自认--延伸批判">6. 局限（作者自认 + 延伸批判）</h2>
+<h2 id="6-局限作者自认--延伸批判">6. 局限（作者自认 + 延伸批判）<a aria-label="跳转到本节" class="section-link" href="#6-局限作者自认--延伸批判">#</a></h2>
 <p>作者说明，实验用于研究机制，尚未验证扩大规模后的效果。实验覆盖三个任务族、一个模型家族、几百轮和几十条 held-out 样本，虽产生了 52,600 条项目级判决与 5,743 次出生门决策，仍有这些规模限制。教师质量固定，尚未测试弱教师会如何降低锚质量。McNemar 检验把三个 seed 汇集到同一个 40 条锁定集，只能对评分器作判断，不能据此得出任务层面的结论。峰值按锁定集 argmax 选取，因此偏乐观。</p>
 <p>Goodhart 修复按耦合改动报告，未分别运行只改检测器或只改提示的实验臂。任务感知 rubric 在阅读通用 judge 的判决理由后编写，只能用于诊断，不能视为独立确认。指导文本类技能也无法替代需要交互的能力，例如 Spider 的 schema 探索。针对语义失败的蜕变检测器已经构建，但尚未使用。</p>
 <p>还有以下问题：</p>
@@ -185,7 +165,7 @@ arXiv 2607.12790v2（2026-07-30）· AWS Generative AI Innovation Center + HSBC 
 <li><strong>充分性结果不足以证明高质量指标的必要性</strong>。一致性为 0.500 的指标也能保留全部提升，说明技能环对评分质量并不敏感。论文用分诊、门控和可修复性解释为何仍需进化评估器，但实验没有量化这三方面的收益。</li>
 <li><strong>可检测性随系统改进而降低，目前只由一个任务内对比支持</strong>。若这一判断成立，solver 越强，确定性算子能识别的失败就越少，方法最终仍需依赖 judge op 与外部审计。这也会重新引入论文开篇讨论的裸 LLM judge 问题。</li>
 </ol>
-<h2 id="7-意义与位置">7. 意义与位置</h2>
+<h2 id="7-意义与位置">7. 意义与位置<a aria-label="跳转到本节" class="section-link" href="#7-意义与位置">#</a></h2>
 <p>这篇发表于 2026-07 的论文检查了 RSI 研究中如何验证自改进。DGM（报告 07）假定基准提升能说明自改进能力提高，本文将其拆为充分性（进化评分器能否驱动训练）与有效性（评分器是否正确），并证明前者不蕴含后者。因此，评估器与策略共进化的研究还需说明锚在哪里，以及循环是否始终不读取它。本仓库据此在 §14 对照矩阵中增加"锚在哪"这一比较维度，并将其列入图 2 分类树；三份公开综述都没有这一一级维度。</p>
 <p>它为 EvoLM（报告 03）的 reward overoptimization 悖论提供了机制解释：静态 RM 判分更准，policy 却可能更差，因为 policy 会利用固定判据。同团队的后续工作 EvalCEGAR（报告 24）将锚上的碰撞对转为评估器的编写规格，进一步提高锚的利用效率。RHO（报告 25）则完全不用锚，采用自偏好优化，单轮提升 +0.19。本文的结论对应 RHO 多轮实验的两种可能结果：指标有效进化，或指标塌缩但任务分数仍提高。</p>
-<p>本文在 2026 年采用了三项安排来约束评估器进化。评估器由可读的检测器组合而成，每片叶子对应一类失败，因此 Goodhart 事件可以定位到具体检查项。验证 split 与选择 split 严格分开，每张表并列报告峰值和固定末轮结果，并区分有效性与充分性。系统之外另设不提供训练信号的终审，再检查终审本身；它发现了循环未识别的 gaming，也暴露了自身对格式要求的误判。</p><div class="prevnext"><a href="04_red_queen_godel_machine.html">← 上一篇</a><a href="06_echo.html">下一篇 →</a></div><footer>RSI 研究札记 · 根据 awesome_rsi 仓库生成<br>论文结论与研究判断以各篇来源及实验边界为准。<a href="#">返回顶部 ↑</a></footer></main></div><script src="../site.js"></script></body></html>
+<p>本文在 2026 年采用了三项安排来约束评估器进化。评估器由可读的检测器组合而成，每片叶子对应一类失败，因此 Goodhart 事件可以定位到具体检查项。验证 split 与选择 split 严格分开，每张表并列报告峰值和固定末轮结果，并区分有效性与充分性。系统之外另设不提供训练信号的终审，再检查终审本身；它发现了循环未识别的 gaming，也暴露了自身对格式要求的误判。</p></div><div class="prevnext"><a href="04_red_queen_godel_machine.html">← 上一篇</a><a href="06_echo.html">下一篇 →</a></div><footer><strong>RSI 研究札记</strong><p>从论文结果到研究判断。原始实验条件与来源见各篇解读。</p><a href="../resources.html">资料与引用</a> · <a href="#">返回顶部 ↑</a></footer></main></div><script src="../site.js?v=41d3e5055805"></script></body></html>

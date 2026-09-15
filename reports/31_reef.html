@@ -1,25 +1,4 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的论文、中文解读、分类与专题。"><title>Reef 深度解读：把&quot;服务、反馈、更新、版本发布&quot;做成一个可复用的循环 · RSI 研究札记</title><link rel="stylesheet" href="../site.css"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress"></div><header class="topbar"><a class="brand" href="../index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a href="../index.html">首页</a><a href="../papers.html">论文</a><a href="../reports.html">解读</a><a href="../insights.html">洞察</a><a href="../topics.html">专题</a><a href="../resources.html">资源</a></nav><button id="theme" aria-label="切换深色模式">深色阅读</button></header><div class="layout "><aside><div class="eyebrow">解读 / 31</div><div class="toc">
-<ul>
-<li><a href="#reef-深度解读把服务反馈更新版本发布做成一个可复用的循环">Reef 深度解读：把"服务、反馈、更新、版本发布"做成一个可复用的循环</a><ul>
-<li><a href="#1-一句话定位">1. 一句话定位</a></li>
-<li><a href="#2-要解决的问题">2. 要解决的问题</a></li>
-<li><a href="#3-与已有工具的关系">3. 与已有工具的关系</a></li>
-<li><a href="#4-机制拆解">4. 机制拆解</a><ul>
-<li><a href="#41-核心对象据-glossary">4.1 核心对象（据 glossary）</a></li>
-<li><a href="#42-权重训练面">4.2 权重训练面</a></li>
-<li><a href="#43-harness-进化面">4.3 harness 进化面</a></li>
-<li><a href="#44-内置-recipe-与复现结果">4.4 内置 recipe 与复现结果</a></li>
-<li><a href="#45-代码结构">4.5 代码结构</a></li>
-</ul>
-</li>
-<li><a href="#5-与本仓库主线的对照">5. 与本仓库主线的对照</a></li>
-<li><a href="#6-局限">6. 局限</a></li>
-<li><a href="#7-意义与位置">7. 意义与位置</a></li>
-</ul>
-</li>
-</ul>
-</div>
-<div class="aside-links"><a href="../guide.html">完整仓库导览 ↗</a><a href="https://github.com/asimfish/awesome_rsi">GitHub 源码 ↗</a></div></aside><main id="content"><div class="eyebrow">解读 / 31</div><h1 id="reef-深度解读把服务反馈更新版本发布做成一个可复用的循环">Reef 深度解读：把"服务、反馈、更新、版本发布"做成一个可复用的循环</h1>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的综述、论文、中文解读与专题。"><title>Reef 深度解读：把&quot;服务、反馈、更新、版本发布&quot;做成一个可复用的循环 · RSI 研究札记</title><link rel="stylesheet" href="../site.css?v=f71f142c5c4a"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress" aria-hidden="true"></div><header class="topbar"><a class="brand" href="../index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a href="../index.html">全景综述</a><a href="../papers.html">论文目录</a><a href="../reports.html" aria-current="page">逐篇解读</a><a href="../topics.html">研究专题</a><a href="../reference.html">术语对照</a></nav><div class="reading-tools"><button id="font-size" aria-label="放大正文字号" aria-pressed="false">A＋</button><button id="theme" aria-label="切换深色模式">深色</button></div></header><div class="layout "><aside><details class="toc-panel" open><summary>本页目录 <span>展开 / 收起</span></summary><div class="toc-body"><div class="eyebrow">本页目录</div><ul><li><a href="#1-一句话定位">一句话定位</a></li><li><a href="#2-要解决的问题">要解决的问题</a></li><li><a href="#3-与已有工具的关系">与已有工具的关系</a></li><li><a href="#4-机制拆解">机制拆解</a></li><li><a href="#5-与本仓库主线的对照">与本仓库主线的对照</a></li><li><a href="#6-局限">局限</a></li><li><a href="#7-意义与位置">意义与位置</a></li></ul></div></details><div class="aside-links"><a href="../index.html">全景综述</a><a href="../resources.html">资源与来源</a><a href="https://github.com/asimfish/awesome_rsi">GitHub ↗</a></div></aside><main id="content"><header class="article-header"><div class="breadcrumb"><a href="../index.html">RSI 研究札记</a><span>/</span>逐篇解读</div><div class="eyebrow">解读 / 31</div><h1 id="reef-深度解读把服务反馈更新版本发布做成一个可复用的循环">Reef 深度解读</h1><p class="subtitle">把&quot;服务、反馈、更新、版本发布&quot;做成一个可复用的循环</p><p class="meta">约 19 分钟阅读 · <a href="https://github.com/asimfish/awesome_rsi/blob/main/reports/31_reef.md">查看原始笔记 ↗</a></p></header><div class="prose">
 <blockquote>
 <p><strong>Reef: Continual learning infra for self-improving agents</strong>
 Human-Agent-Society，2026-08-31 建库，Apache-2.0，PyPI 包 <code>reef-infra</code> · GitHub：github.com/Human-Agent-Society/reef · 文档：reefinfra.ai/docs · 读取时间 2026-09-08（689 star，47 fork，50 个开放 issue，234 个 Python 文件）
@@ -27,14 +6,14 @@ Human-Agent-Society，2026-08-31 建库，Apache-2.0，PyPI 包 <code>reef-infra
 依赖：SGLang（推理）、slime（权重训练）、cordis（harness 进化）；配套项目 reef-eval、reef-client、Harbor 任务标准</p>
 </blockquote>
 <hr/>
-<h2 id="1-一句话定位">1. 一句话定位</h2>
+<h2 id="1-一句话定位">1. 一句话定位<a aria-label="跳转到本节" class="section-link" href="#1-一句话定位">#</a></h2>
 <p>Reef 是一个开源基础设施，把自改进 agent 需要的四件事接成一个循环：<strong>Serve</strong>（代理模型请求并记录每次交互，返回一个 receipt）→ <strong>Observe</strong>（外部反馈按 receipt 匹配到交互记录）→ <strong>Grow</strong>（recipe 从合格记录里产出候选更新）→ <strong>Commit</strong>（候选经评估器和选择策略判定后发布为新版本，旧版本继续服务直到切换）。它支持两条学习面：用 slime + SGLang 更新模型权重，或修改 harness 的 prompt、规则、技能和代码；两条面共用同一套记录、版本链和候选评估机制。仓库内置六个 recipe（SAO、OpenClaw-RL、TTT-Discover、Guidance-TTT、SkillClaw、GEPA）和一个 Meta-Harness 实现，每个都附复现结果：SAO 在 48 个 rollout 的预算下 0.479 高于基线 0.458 和 GRPO 0.417；GEPA 在 AIME 2025 上 26.67% → 46.67%（种子 0）；TTT-Discover 在 Erdős 最小重叠、26 圆和 32 圆装填上复现到与原论文相差不超过 8e-7。它没有解决锚从哪来的问题——候选评估器由使用者提供——但把本仓库反复讨论的"评估门 + 版本化回滚"从每篇论文各自实现变成了一个通用组件。</p>
-<h2 id="2-要解决的问题">2. 要解决的问题</h2>
+<h2 id="2-要解决的问题">2. 要解决的问题<a aria-label="跳转到本节" class="section-link" href="#2-要解决的问题">#</a></h2>
 <p>本仓库收录的自进化系统几乎每一个都自己搭了一套基础设施：DGM 有档案和沙箱，MOSS 有失败重放和批准队列，AutoSaddler 有 EvoDAG，Self-Harness 有双 split 回归门，Prime Agent 有 daemon 和版本化 refinement。这些系统的核心机制彼此不同，但外围的工程需求高度重复：记录每次模型调用、把事后反馈对应到具体调用、决定一个候选更新是否上线、保留版本以便回滚、更新时不中断服务。</p>
 <p>Reef 的 README 用一张表说明它填的位置：推理引擎（vLLM、SGLang）能服务流量但不训练；RL 框架（slime、veRL、AReaL）能训练但不服务；两者都不管版本、不保证更新期间在线、不支持权重以外的进化对象。Reef 声称同时覆盖这五项。</p>
 <p>第二个问题是<strong>反馈与调用的对应</strong>。生产环境里反馈往往是事后的、稀疏的、可能重试或迟到的；Reef 用 receipt（每次推理记录的 id，同时标识产生它的版本）解决对应问题，报告只引用 receipt，每份报告最多消费一次。</p>
-<h2 id="3-与已有工具的关系">3. 与已有工具的关系</h2>
-<div class="table-scroll"><table>
+<h2 id="3-与已有工具的关系">3. 与已有工具的关系<a aria-label="跳转到本节" class="section-link" href="#3-与已有工具的关系">#</a></h2>
+<div aria-label="对照表，可横向滚动" class="table-scroll" role="region" tabindex="0"><table>
 <thead>
 <tr>
 <th>工具</th>
@@ -104,8 +83,8 @@ Human-Agent-Society，2026-08-31 建库，Apache-2.0，PyPI 包 <code>reef-infra
 </tbody>
 </table></div>
 <p>Reef 与 MOSS、Prime Agent 的差别在于它不是一个 agent，而是 agent 外面的一层：任何通过 OpenAI 或 Anthropic 兼容接口调用模型的 harness 都可以接进来，训练与推理后端可以替换。与 Proteus 的差别是 Reef 同时覆盖权重训练，Proteus 只做 harness。</p>
-<h2 id="4-机制拆解">4. 机制拆解</h2>
-<h3 id="41-核心对象据-glossary">4.1 核心对象（据 glossary）</h3>
+<h2 id="4-机制拆解">4. 机制拆解<a aria-label="跳转到本节" class="section-link" href="#4-机制拆解">#</a></h2>
+<h3 id="41-核心对象据-glossary">4.1 核心对象（据 glossary）<a aria-label="跳转到本节" class="section-link" href="#41-核心对象据-glossary">#</a></h3>
 <ul>
 <li><strong>Scenario</strong>：一个工作负载，独立拥有记录、训练状态和版本链；第一个带新 <code>x-reef-scenario</code> 头的请求创建它并永久绑定一个 recipe。</li>
 <li><strong>Agent record / Receipt</strong>：每次推理或报告存为一条记录；推理的 receipt 在响应头 <code>x-reef-agent-record-id</code> 返回，同时记录服务它的版本。</li>
@@ -117,13 +96,13 @@ Human-Agent-Society，2026-08-31 建库，Apache-2.0，PyPI 包 <code>reef-infra
 <li><strong>Mutation</strong>：对 harness tree 一个根级节点的 create / update / remove；一个序列作为一个复合提案、一个判定。</li>
 <li><strong>Staleness</strong>：训练样本所用权重与当前服务权重之间允许的滞后，<code>max_staleness=0</code> 要求样本对着生成它的权重训练。</li>
 </ul>
-<h3 id="42-权重训练面">4.2 权重训练面</h3>
+<h3 id="42-权重训练面">4.2 权重训练面<a aria-label="跳转到本节" class="section-link" href="#42-权重训练面">#</a></h3>
 <p>以 SAO recipe 为例：harness 把模型调用发到 Reef，拿到 receipt；任务结束后评估器算出奖励，harness 报告分数并引用该 receipt；处理器把合格记录送入训练步；slime 更新权重后同步到 SGLang 服务运行时，后续请求使用新版本而不重启。SAO（arXiv 2607.07508）的特点是一条打分的 rollout 驱动一次训练步，没有比较组，也没有等最慢样本的屏障。</p>
-<h3 id="43-harness-进化面">4.3 harness 进化面</h3>
+<h3 id="43-harness-进化面">4.3 harness 进化面<a aria-label="跳转到本节" class="section-link" href="#43-harness-进化面">#</a></h3>
 <p>以 harness-evolve 快速入门为例：harness 配置是一棵节点树，提案是一次门控的树变更，通过的变更发布为版本化产物供客户端拉取。提案者是被服务的模型本身：读当前技能节点和自己失败的请求，输出一个 JSON 格式的技能变更。评估在固定的小任务集上跑真实的无头 episode，按最终答案精确匹配打分，<strong>每个任务当前树和候选树各跑一次</strong>（paired gate），只有让原来失败的任务通过的提案才发布。</p>
 <p>快速入门的记录表（2026-08-17 至 09-06，13 次运行）说明了这个机制的实际行为：Qwen3-8B 在三个任务上 1.0 / 0.0 / 1.0，提案"create direct-answer"技能，候选树 1.0 / 1.0 / 1.0，胜负平 1 / 0 / 2，发布；qwen2.5:7b 的多次运行中，提案在 gate 上 0 胜 1 负 2 平或 0 / 0 / 3 时被拒绝。作者标明每行是单次运行，没有重复，gate episode 本身有随机性（同一种子树在 sieve 任务上记录时 1.0、gate 里五次中四次 0.0）。</p>
-<h3 id="44-内置-recipe-与复现结果">4.4 内置 recipe 与复现结果</h3>
-<div class="table-scroll"><table>
+<h3 id="44-内置-recipe-与复现结果">4.4 内置 recipe 与复现结果<a aria-label="跳转到本节" class="section-link" href="#44-内置-recipe-与复现结果">#</a></h3>
+<div aria-label="对照表，可横向滚动" class="table-scroll" role="region" tabindex="0"><table>
 <thead>
 <tr>
 <th>Recipe</th>
@@ -178,16 +157,16 @@ Human-Agent-Society，2026-08-31 建库，Apache-2.0，PyPI 包 <code>reef-infra
 </tbody>
 </table></div>
 <p>recipe 不随 <code>reef-infra</code> 的 wheel 发布，放在仓库 <code>recipes/</code> 目录按 dotted 路径选择；Reef 没有全局的 recipe 注册表。</p>
-<h3 id="45-代码结构">4.5 代码结构</h3>
+<h3 id="45-代码结构">4.5 代码结构<a aria-label="跳转到本节" class="section-link" href="#45-代码结构">#</a></h3>
 <p>234 个 Python 文件：<code>train/</code> 90 个（处理器、评估、更新任务）、<code>harness/</code> 47 个（适配器、树、变更）、<code>service/</code> 24 个（请求与记录）、<code>runtime/</code> 23 个（推理与产物更新）、其余为 <code>artifact/</code>、<code>scenario/</code>、<code>surface/</code>、<code>core/</code>、<code>recipe/</code>、<code>observability/</code>。产物和检查点依赖 git-lfs。</p>
-<h2 id="5-与本仓库主线的对照">5. 与本仓库主线的对照</h2>
+<h2 id="5-与本仓库主线的对照">5. 与本仓库主线的对照<a aria-label="跳转到本节" class="section-link" href="#5-与本仓库主线的对照">#</a></h2>
 <p><strong>评估门是一等公民，但门里放什么由用户决定。</strong> 每个 recipe 必须带 <code>candidate_evaluation</code> 插件，这与本仓库"每个能运行的系统都有一个不参与进化的检查环节"的观察一致。但 Reef 只提供接口：harness-evolve 用固定任务集的精确匹配，GEPA 用验证集均分，SkillClaw 干脆 <code>selection: always</code>。锚是否独立于训练循环、是否会被优化压力带偏，由使用者的 evaluator 决定。本仓库报告 05 和 16 的结论在这里表现为一个配置问题：把 <code>selection</code> 设成 always 就是无锚运行。</p>
 <p><strong>receipt 机制解决了本仓库多篇论文各自处理的归因问题。</strong> Self-Harness 的失败签名、AutoSaddler 的反思会话、HarnessFix 的轨迹 IR 都需要先把失败对应到具体的执行记录；Reef 在服务层就把每次调用和产生它的版本绑定，报告只能引用 receipt。这是基础设施层的解法，不替代方法层的归因，但让归因有了稳定的原始数据。</p>
 <p><strong>版本链的设计与 MOSS、OLE 一致。</strong> 回滚不是回退历史而是追加一个指向旧内容的新 release；content_id 与 release_id 分离，使"同样的内容被重新发布"可以被识别。这和 OLE（报告 27）的"策略资产带版本和血统"、MOSS 的 last-known-good 镜像是同一思路，Reef 把它做成了默认行为。</p>
 <p><strong>staleness 参数对应本仓库的"优化期间尺子必须冻结"。</strong> <code>max_staleness=0</code> 要求训练样本对着生成它的权重训练，这是在线权重更新里保持 on-policy 的工程手段，与 RQGM 的 epoch 内冻结（报告 04）解决的是同一类不一致问题，只是对象从评估器换成了策略。</p>
 <p><strong>Meta-Harness 的 Reef 实现给出了一个可核对的细节</strong>：Reef 的 paired gate 每次迭代评估候选和在位者各一次，原论文只评估候选，所以按 episode 计的预算与原论文的迭代数不可直接比较。这类实现差异正是复现工作的价值所在。</p>
 <p><strong>能力地板在 Reef 的记录里再次出现。</strong> harness-evolve 快速入门里，qwen2.5:7b 作为提案者的多次运行大多被 gate 拒绝或打平，Qwen3-8B 和 DeepSeek-V4-Flash 的运行才有发布；这与 Continual Harness（报告 11）"弱模型自建脚手架反而更差"和 Self-Harness（报告 14）"回归门保护地板"的观察一致——Reef 的 gate 在这里起的正是保护作用。</p>
-<h2 id="6-局限">6. 局限</h2>
+<h2 id="6-局限">6. 局限<a aria-label="跳转到本节" class="section-link" href="#6-局限">#</a></h2>
 <ol>
 <li><strong>锚由用户提供，Reef 不保证其独立性。</strong> <code>selection: always</code> 是合法配置；文档没有讨论 evaluator 被优化压力带偏的风险。</li>
 <li><strong>复现结果规模小、多为单次运行。</strong> SAO 每臂 48 个 rollout；TTT-Discover 每任务一条轨迹；harness-evolve 每行一次运行；作者在每处都标明了这一点，但这意味着结果只能说明"机制能跑通、排序与论文一致"，不能说明效果大小。</li>
@@ -197,9 +176,9 @@ Human-Agent-Society，2026-08-31 建库，Apache-2.0，PyPI 包 <code>reef-infra
 <li><strong>与 iCoder 式多阶段研究流水线的适配未验证。</strong> Reef 的 recipe 是"一种方法绑定一个 scenario"，iCoder 的 Data → SFT → OPSD → RLVR 是多阶段、可回退的流程，能否表示为 recipe 序列需要实际尝试。</li>
 <li><strong>无独立的安全层。</strong> 没有 Falsifiable Release Gates（报告 27）式的常驻不变量或"收紧自动、放松人审"规则；人工批准需要用户在 selector 里自己实现。</li>
 </ol>
-<h2 id="7-意义与位置">7. 意义与位置</h2>
+<h2 id="7-意义与位置">7. 意义与位置<a aria-label="跳转到本节" class="section-link" href="#7-意义与位置">#</a></h2>
 <p><strong>对报告 10 insight 7 的实证</strong>：本仓库说进入生产的系统都有版本、审计、预测、回滚四项机制，Reef 把其中版本和回滚做成了默认行为，审计有记录层支撑，预测（提议者预测自己改动的效果）没有。它是第一个把这些机制从单篇论文的实现变成通用组件的开源项目。</p>
 <p><strong>对 §10 路线图的意义</strong>：本仓库计划以 iCoder 为研究流水线基座，Reef 可以承担运行时的服务、记录、候选评估和版本发布层。两者的接缝在 recipe：iCoder 的阶段控制器是否能表示为 Reef 的一组 recipe 与 scenario，是下一步要核实的事。另一个要核实的是 Reef 的 <code>CandidateEvaluator</code> 能否接入独立于训练循环的锚集（本仓库的不可妥协项）。</p>
 <p><strong>对报告 13、16、21 三种 harness 修改哲学的意义</strong>：Reef 已经实现了 Meta-Harness 风格的全历史搜索；AutoSaddler 的 mini-batch 诊断和 Co-Harness 的双环在它上面都可以表示为 recipe，这使三种哲学的对照实验第一次可以在同一套基础设施上做。</p>
 <p><strong>对报告 18 Prime Agent 的对照</strong>：两者都在做"免重置、版本化 refinement"，Prime Agent 是一个完整的 agent 产品，Reef 是 agent 外面的一层；Prime Agent 的 RCON 作弊事故在 Reef 里对应的是 <code>selection</code> 配置——如果 evaluator 只看被测目标，同样的事会发生。</p>
-<p><strong>对报告 29、30 的关系</strong>：Prism-Shadow 的清单收录 Proteus 而未收 Reef（Reef 建库晚于其数据快照）；按其九维标签，Reef 应为 Parametric + Non-parametric、Online、Sequential、验收标准由 recipe 决定、更新者 Self 或 Teacher 均可。</p><div class="prevnext"><a href="30_prism_understanding_rsi.html">← 上一篇</a><a href="32_last_ai_built_by_humans.html">下一篇 →</a></div><footer>RSI 研究札记 · 根据 awesome_rsi 仓库生成<br>论文结论与研究判断以各篇来源及实验边界为准。<a href="#">返回顶部 ↑</a></footer></main></div><script src="../site.js"></script></body></html>
+<p><strong>对报告 29、30 的关系</strong>：Prism-Shadow 的清单收录 Proteus 而未收 Reef（Reef 建库晚于其数据快照）；按其九维标签，Reef 应为 Parametric + Non-parametric、Online、Sequential、验收标准由 recipe 决定、更新者 Self 或 Teacher 均可。</p></div><div class="prevnext"><a href="30_prism_understanding_rsi.html">← 上一篇</a><a href="32_last_ai_built_by_humans.html">下一篇 →</a></div><footer><strong>RSI 研究札记</strong><p>从论文结果到研究判断。原始实验条件与来源见各篇解读。</p><a href="../resources.html">资料与引用</a> · <a href="#">返回顶部 ↑</a></footer></main></div><script src="../site.js?v=41d3e5055805"></script></body></html>

@@ -1,35 +1,14 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的论文、中文解读、分类与专题。"><title>安全与治理五篇深度合评：用版本管理、验收和测量检验 README 中的安全承诺 · RSI 研究札记</title><link rel="stylesheet" href="../site.css"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress"></div><header class="topbar"><a class="brand" href="../index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a href="../index.html">首页</a><a href="../papers.html">论文</a><a href="../reports.html">解读</a><a href="../insights.html">洞察</a><a href="../topics.html">专题</a><a href="../resources.html">资源</a></nav><button id="theme" aria-label="切换深色模式">深色阅读</button></header><div class="layout "><aside><div class="eyebrow">解读 / 27</div><div class="toc">
-<ul>
-<li><a href="#安全与治理五篇深度合评用版本管理验收和测量检验-readme-中的安全承诺">安全与治理五篇深度合评：用版本管理、验收和测量检验 README 中的安全承诺</a><ul>
-<li><a href="#1-一句话定位">1. 一句话定位</a></li>
-<li><a href="#2-五篇共同要解决的问题">2. 五篇共同要解决的问题</a></li>
-<li><a href="#3-为什么此前做不通既有安全方案的缺口">3. 为什么此前做不通：既有安全方案的缺口</a></li>
-<li><a href="#4-逐篇机制拆解">4. 逐篇机制拆解</a><ul>
-<li><a href="#41-sesg--用自进化对抗自进化威胁生产级实证">4.1 SESG · 用自进化对抗自进化威胁（生产级实证）</a></li>
-<li><a href="#42-openloopevolve--控制经验资产化">4.2 OpenLoopEvolve · 控制经验资产化</a></li>
-<li><a href="#43-harnessfix--从改哪里到为什么改这里">4.3 HarnessFix · 从"改哪里"到"为什么改这里"</a></li>
-<li><a href="#44-falsifiable-release-gates--把人类角色落成协议">4.4 Falsifiable Release Gates · 把"人类角色"落成协议</a></li>
-<li><a href="#45-hvtb--让-reward-hacking-可测">4.5 HVTB · 让 reward hacking 可测</a></li>
-</ul>
-</li>
-<li><a href="#5-五篇合起来的部署纪律清单">5. 五篇合起来的部署纪律清单</a></li>
-<li><a href="#6-局限">6. 局限</a></li>
-<li><a href="#7-意义与位置">7. 意义与位置</a></li>
-</ul>
-</li>
-</ul>
-</div>
-<div class="aside-links"><a href="../guide.html">完整仓库导览 ↗</a><a href="https://github.com/asimfish/awesome_rsi">GitHub 源码 ↗</a></div></aside><main id="content"><div class="eyebrow">解读 / 27</div><h1 id="安全与治理五篇深度合评用版本管理验收和测量检验-readme-中的安全承诺">安全与治理五篇深度合评：用版本管理、验收和测量检验 README 中的安全承诺</h1>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的综述、论文、中文解读与专题。"><title>安全与治理五篇深度合评：用版本管理、验收和测量检验 README 中的安全承诺 · RSI 研究札记</title><link rel="stylesheet" href="../site.css?v=f71f142c5c4a"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress" aria-hidden="true"></div><header class="topbar"><a class="brand" href="../index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a href="../index.html">全景综述</a><a href="../papers.html">论文目录</a><a href="../reports.html" aria-current="page">逐篇解读</a><a href="../topics.html">研究专题</a><a href="../reference.html">术语对照</a></nav><div class="reading-tools"><button id="font-size" aria-label="放大正文字号" aria-pressed="false">A＋</button><button id="theme" aria-label="切换深色模式">深色</button></div></header><div class="layout "><aside><details class="toc-panel" open><summary>本页目录 <span>展开 / 收起</span></summary><div class="toc-body"><div class="eyebrow">本页目录</div><ul><li><a href="#1-一句话定位">一句话定位</a></li><li><a href="#2-五篇共同要解决的问题">五篇共同要解决的问题</a></li><li><a href="#3-为什么此前做不通既有安全方案的缺口">为什么此前做不通：既有安全方案的缺口</a></li><li><a href="#4-逐篇机制拆解">逐篇机制拆解</a></li><li><a href="#5-五篇合起来的部署纪律清单">五篇合起来的部署纪律清单</a></li><li><a href="#6-局限">局限</a></li><li><a href="#7-意义与位置">意义与位置</a></li></ul></div></details><div class="aside-links"><a href="../index.html">全景综述</a><a href="../resources.html">资源与来源</a><a href="https://github.com/asimfish/awesome_rsi">GitHub ↗</a></div></aside><main id="content"><header class="article-header"><div class="breadcrumb"><a href="../index.html">RSI 研究札记</a><span>/</span>逐篇解读</div><div class="eyebrow">解读 / 27</div><h1 id="安全与治理五篇深度合评用版本管理验收和测量检验-readme-中的安全承诺">安全与治理五篇深度合评</h1><p class="subtitle">用版本管理、验收和测量检验 README 中的安全承诺</p><p class="meta">约 14 分钟阅读 · <a href="https://github.com/asimfish/awesome_rsi/blob/main/reports/27_safety_governance.md">查看原始笔记 ↗</a></p></header><div class="prose">
 <blockquote>
 <p><strong>SESG</strong> arXiv 2608.08471（中科大 + 深信服）· <strong>OpenLoopEvolve (OLE)</strong> arXiv 2608.09380 · <strong>HarnessFix</strong> arXiv 2606.06324（Mengzhuo Chen、Junjie Wang、Zhe Liu 等）· <strong>Falsifiable Release Gates</strong> arXiv 2607.13070（Deepak Soni）· <strong>HVTB</strong> arXiv 2608.22103（Amit Roth、Ivan Bercovich、Yonathan Efroni）
 归档：<a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2608.08471_SESG.pdf">papers/en/2608.08471_SESG.pdf</a> · <code>2608.09380_OpenLoopEvolve.pdf</code> · <code>2606.06324_HarnessFix.pdf</code> · <code>2607.13070_FalsifiableReleaseGates.pdf</code> · <code>2608.22103_HVTB.pdf</code></p>
 </blockquote>
 <hr/>
-<h2 id="1-一句话定位">1. 一句话定位</h2>
+<h2 id="1-一句话定位">1. 一句话定位<a aria-label="跳转到本节" class="section-link" href="#1-一句话定位">#</a></h2>
 <p>MOSS（报告 08）展示了源码级自改写在生产中的应用。每次改动都相当于一次 deploy，deploy 前需要明确回滚方案。这五篇讨论如何自动检查更新后的系统是否安全，分别涉及生产更新流程、策略版本管理、失败归因、可证伪的发布条件与 reward hacking 测量。</p>
 <p>SESG 在真实生产流量中展示了自进化护栏如何在 16–24 小时内解决新威胁。在深信服产品线运行两个月期间，系统自动解决的新威胁场景占 14/15。OLE 为 agent 的各项控制策略记录版本和来源，并提供自动回滚。HarnessFix 从轨迹中定位失败原因和应修改的位置，在四个基准上提升 +6.3%–18.4%。Falsifiable Release Gates 预先声明发布条件：收紧约束的修改自动合并，放松约束必须人审，预测错误时自动关闭提案。六个版本中 inv-1 到 inv-6 均未修改，验收套件从 122→563。</p>
 <p>HVTB 用蜜罐自动识别 reward hacking，覆盖 89 个环境、2,225 条轨迹。gemini-3.1-pro 在明令禁止下，作弊率仍为 16.3%。这些检查使用的常驻不变量、嵌入式蜜罐和红队测试集均不参与进化，对应报告 05 所讨论的锚。</p>
-<h2 id="2-五篇共同要解决的问题">2. 五篇共同要解决的问题</h2>
+<h2 id="2-五篇共同要解决的问题">2. 五篇共同要解决的问题<a aria-label="跳转到本节" class="section-link" href="#2-五篇共同要解决的问题">#</a></h2>
 <p>Falsifiable Release Gates 指出，自进化系统常在 README 中承诺安全，或在论文中声称使用了沙箱和人工审查。这些系统未提供机器可检查的证据来确认进化后安全保证是否仍然成立。五篇分别处理以下缺口：</p>
 <ol>
 <li><strong>威胁变化快于护栏更新</strong>（SESG）：部署的 LLM 护栏训练后即被冻结，手工更新需要 40–90 小时。新的越狱手法可能在几天内出现；</li>
@@ -39,8 +18,8 @@
 <li><strong>reward hacking 不可测</strong>（HVTB）：人工检视与 LLM judge 都不可靠，检出率无法比较。</li>
 </ol>
 <p>自进化系统每次修改后都要重新部署，需要管理版本，并能回滚、验收和监控修改。RSI 文献很少给出这些机制，大多数论文仅在讨论部分涉及安全。</p>
-<h2 id="3-为什么此前做不通既有安全方案的缺口">3. 为什么此前做不通：既有安全方案的缺口</h2>
-<div class="table-scroll"><table>
+<h2 id="3-为什么此前做不通既有安全方案的缺口">3. 为什么此前做不通：既有安全方案的缺口<a aria-label="跳转到本节" class="section-link" href="#3-为什么此前做不通既有安全方案的缺口">#</a></h2>
+<div aria-label="对照表，可横向滚动" class="table-scroll" role="region" tabindex="0"><table>
 <thead>
 <tr>
 <th>已有路线</th>
@@ -82,23 +61,23 @@
 </tbody>
 </table></div>
 <p>这些方案没有检查自改进循环本身的安全性。本组五篇中，只有 Gates 将自改进循环纳入机器检查族。</p>
-<h2 id="4-逐篇机制拆解">4. 逐篇机制拆解</h2>
-<h3 id="41-sesg--用自进化对抗自进化威胁生产级实证">4.1 SESG · 用自进化对抗自进化威胁（生产级实证）</h3>
+<h2 id="4-逐篇机制拆解">4. 逐篇机制拆解<a aria-label="跳转到本节" class="section-link" href="#4-逐篇机制拆解">#</a></h2>
+<h3 id="41-sesg--用自进化对抗自进化威胁生产级实证">4.1 SESG · 用自进化对抗自进化威胁（生产级实证）<a aria-label="跳转到本节" class="section-link" href="#41-sesg--用自进化对抗自进化威胁生产级实证">#</a></h3>
 <p>这是一个在生产环境中运行的多 agent 系统。它监控线上流量，识别新形式的越狱和涉及新内容的有害类别。确认失败后，生成 agent 合成针对性的配对训练数据。验证 agent 根据部署模型的错误，调整训练批中各类数据的比例。路由 agent 再根据诊断出的缺口选择训练动作，将新版本部署到生产环境。</p>
 <p>在六轮真实进化（v0→v6）中，一个 1.7B（Qwen3-1.7B）护栏可在 16–24 小时内适应一个新威胁，其中人工参与约 2 小时。原来的手工流程需要 40–90 小时。它在六个新兴威胁上超过 0.6B–9B 的静态护栏与一个自适应基线，同时保持通用筛查能力。自 2026 年 4 月起，该系统成为深信服护栏产品的主要更新流程，两个月内自动解决了 15 个新威胁场景中的 14 个。研究还发布了 9 个新威胁测试集。与 MOSS 修改 harness 的做法相比，这组生产数据来自对安全护栏本身的修改。</p>
-<h3 id="42-openloopevolve--控制经验资产化">4.2 OpenLoopEvolve · 控制经验资产化</h3>
+<h3 id="42-openloopevolve--控制经验资产化">4.2 OpenLoopEvolve · 控制经验资产化<a aria-label="跳转到本节" class="section-link" href="#42-openloopevolve--控制经验资产化">#</a></h3>
 <p>系统用"Loop Policy"描述观察、规划、记忆、行动、验证、恢复、停止和预算控制。各策略分别记录版本及来源，供后续迁移使用。在线模式根据持续运行中的反馈生成候选，离线模式从归档轨迹与失败证据中搜索候选。两者都由 LLM 提案，经 Champion-Challenger 配对评估后发布。线上策略在下一个任务边界激活，系统继续用反馈监控其表现。满足劣化条件时，系统回滚到父版本。在模拟商业基准 YC-Bench 上，两种模式都改善了聚合任务表现、成功率与风险指标。</p>
-<h3 id="43-harnessfix--从改哪里到为什么改这里">4.3 HarnessFix · 从"改哪里"到"为什么改这里"</h3>
+<h3 id="43-harnessfix--从改哪里到为什么改这里">4.3 HarnessFix · 从"改哪里"到"为什么改这里"<a aria-label="跳转到本节" class="section-link" href="#43-harnessfix--从改哪里到为什么改这里">#</a></h3>
 <p>方法将原始执行轨迹与 harness 制品编译为 Harness-aware Trace IR（HTIR）。这一表示汇总分散的轨迹证据，记录步骤级数据流与控制流关系。它还将运行时步骤对应到影响其行为的 harness 制品。系统据此定位导致失败的步骤与制品，将反复出现的诊断整理为缺陷记录，再匹配作用域受限的修复算子。系统根据各缺陷的修复规格生成补丁，通过回归验证后才接受补丁。</p>
 <p>在 GAIA / SWE-Bench Verified / AppWorld / Terminal-Bench 2.0 Verified 四个基准上，比初始 harness 提升 6.3%–18.4%，显著超过人工设计与自进化基线。消融显示，轨迹归因和限定作用域的修复都不可缺少。缺陷覆盖 ETCLOVG 七个责任层，TrueFoundry 等生产运行时已采用这一分类描述诊断结果。</p>
-<h3 id="44-falsifiable-release-gates--把人类角色落成协议">4.4 Falsifiable Release Gates · 把"人类角色"落成协议</h3>
+<h3 id="44-falsifiable-release-gates--把人类角色落成协议">4.4 Falsifiable Release Gates · 把"人类角色"落成协议<a aria-label="跳转到本节" class="section-link" href="#44-falsifiable-release-gates--把人类角色落成协议">#</a></h3>
 <p>每项新能力发布前，都必须通过预先声明、机器可检查的验收套件。每次验收还要确认一组固定的常驻不变量仍然成立。研究在开源运行时 Antahkarana 中实现这一方案，并跟踪后续六个版本。检查器穷尽检查有界模型的全部可达状态，验证"任何动作都必须持有控制环签发的能力令牌才能到达执行器"这一安全属性。模型被故意破坏后，检查器能够给出最短反例。六个版本中，inv-1 到 inv-6 一次未改，验收套件从 122 个测试增长到 563 个。系统还加入了六个新的机器检查族，涵盖记忆的可证明遗忘、agent 治理、多子 agent harness 和自改进环本身。</p>
 <p><strong>核心不变量</strong>：收紧约束的修改经验证后自动应用，放松约束的修改必须由人类合并。提议者还必须预测自己 diff 的效果，预测错误时自动关闭提案。系统以此检查提议者是否理解改动后果，约束 reward hacking。</p>
-<h3 id="45-hvtb--让-reward-hacking-可测">4.5 HVTB · 让 reward hacking 可测</h3>
+<h3 id="45-hvtb--让-reward-hacking-可测">4.5 HVTB · 让 reward hacking 可测<a aria-label="跳转到本节" class="section-link" href="#45-hvtb--让-reward-hacking-可测">#</a></h3>
 <p>HVE 在任务中嵌入可检测的 hack，即蜜罐，以便自动、可靠地识别 hack。HVTB 将这一方法用于 Terminal Bench 2.1 的 89 个真实终端/编码任务，生成 89 个 HVTB 环境与 2,225 条 agent 轨迹，用于测量前沿模型的 hacking 率。研究还改变 system prompt 中透露的漏洞信息量（L0 仅禁止 hack → L3 明确禁读 admin/），检验这些提示能否抑制作弊。</p>
 <p>三个前沿 agent（Claude Code + claude-opus-5、Codex、Gemini）中，大多数的作弊率随信息量增加而稳步下降。gemini-3.1-pro 在 L0 下的 hack 率为 59.8%，高于无警告消融的 47.7%。加入警告后，它的作弊率反而上升，在 L3 明令禁止下仍为 16.3%。所有检出率都只是真实 hacking 率的下界。</p>
-<h2 id="5-五篇合起来的部署纪律清单">5. 五篇合起来的部署纪律清单</h2>
-<div class="table-scroll"><table>
+<h2 id="5-五篇合起来的部署纪律清单">5. 五篇合起来的部署纪律清单<a aria-label="跳转到本节" class="section-link" href="#5-五篇合起来的部署纪律清单">#</a></h2>
+<div aria-label="对照表，可横向滚动" class="table-scroll" role="region" tabindex="0"><table>
 <thead>
 <tr>
 <th>环节</th>
@@ -152,7 +131,7 @@
 </tr>
 </tbody>
 </table></div>
-<h2 id="6-局限">6. 局限</h2>
+<h2 id="6-局限">6. 局限<a aria-label="跳转到本节" class="section-link" href="#6-局限">#</a></h2>
 <ol>
 <li><strong>SESG 让护栏自进化，尚未验证 agent</strong>：它展示了自进化流程在生产中的运行情况，但护栏任务已有明确的锚，即红队标注的威胁样本。没有明确对抗标签的 agent 能否采用同样的自改进方式，论文尚未回答。</li>
 <li><strong>OLE 与 Gates 在其他环境中的效果尚未验证</strong>：YC-Bench 使用模拟商业环境，Antahkarana 是作者自己的运行时。两篇主要设计了协议，仍需第三方复现来检验在其他环境中的效果。Gates 只有一位作者。</li>
@@ -161,10 +140,10 @@
 <li><strong>"预测错自动关闭"尚缺执行细则</strong>：Gates 要求提议者预测 diff 效果，却未说明预测粒度和容差。预测准确、改动方向却有问题的情况也未得到讨论。</li>
 <li><strong>五篇互不引用</strong>：这些研究分别处理独立的工程问题，尚未形成共同的安全与治理研究框架。</li>
 </ol>
-<h2 id="7-意义与位置">7. 意义与位置</h2>
+<h2 id="7-意义与位置">7. 意义与位置<a aria-label="跳转到本节" class="section-link" href="#7-意义与位置">#</a></h2>
 <p><strong>对报告 08 MOSS 的接续</strong>：MOSS 在单系统中实现批准和回滚门控。OLE 与 Gates 进一步规定版本来源、Champion-Challenger 评估和不变量套件，使其他系统也能按相同协议检查、发布和回滚修改。</p>
 <p><strong>对报告 18 Prime Agent 安全标本的解释框架</strong>：Prime Agent 的 Factorio agent 将 RCON 作弊保留为技能。按 Gates 的标准，这属于未经人审就合并放松约束的修改。按 HVTB 的测量方式，环境中缺少蜜罐就无法检测这类 hack。两篇分别提供预防和测量方案。在 Prime Agent 的 refinement 前检查"该技能是否绕过了 heartbeat"这一不变量，就能阻止该技能被保留。</p>
 <p><strong>对报告 05 锚定纪律的安全侧对应</strong>：Gates 的常驻不变量、HVTB 的嵌入式蜜罐和 SESG 的红队测试集均不参与进化，用于安全检查。WGtG 指出任务分不能验证评估器，HVTB 指出任务分不能证明没有作弊。两者都涉及观测等价问题：系统的内部行为可能不同，仅凭任务分无法区分。</p>
 <p><strong>对报告 14 Self-Harness / 16 AutoSaddler / 21 Co-Harness</strong>：三篇分别用失败签名、Diagnosis-Patch 和归因分类法定位失败，HarnessFix 采用 HTIR。这四种实现都在 harness 进化中加入了归因步骤。只有 HarnessFix 用独立 IR 表示归因，并被生产运行时采纳。</p>
 <p><strong>对报告 10 insight 10（测量基础设施是一级瓶颈）的实证</strong>：HVTB 的 2,225 条轨迹与 9 个 SESG 测试集，是 2026 年少数公开的自进化系统安全测量数据。这一节仅收录五篇，也与可用测量工具较少有关。</p>
-<p><strong>对报告 00 Omohundro</strong>：Gates 要求提议者预测自己 diff 的效果，试图以此约束工具性驱力。这一做法假设，试图绕过检查的系统无法预测接受检查后的结果。HVTB 中 Gemini 加入警告后作弊率反而上升，可能与目标内容完整性驱力有关。明确的禁令可能让系统意识到相关行为正在接受测试。</p><div class="prevnext"><a href="26_skill_evolution_wave.html">← 上一篇</a><a href="28_self_evolving_coding_agents_survey.html">下一篇 →</a></div><footer>RSI 研究札记 · 根据 awesome_rsi 仓库生成<br>论文结论与研究判断以各篇来源及实验边界为准。<a href="#">返回顶部 ↑</a></footer></main></div><script src="../site.js"></script></body></html>
+<p><strong>对报告 00 Omohundro</strong>：Gates 要求提议者预测自己 diff 的效果，试图以此约束工具性驱力。这一做法假设，试图绕过检查的系统无法预测接受检查后的结果。HVTB 中 Gemini 加入警告后作弊率反而上升，可能与目标内容完整性驱力有关。明确的禁令可能让系统意识到相关行为正在接受测试。</p></div><div class="prevnext"><a href="26_skill_evolution_wave.html">← 上一篇</a><a href="28_self_evolving_coding_agents_survey.html">下一篇 →</a></div><footer><strong>RSI 研究札记</strong><p>从论文结果到研究判断。原始实验条件与来源见各篇解读。</p><a href="../resources.html">资料与引用</a> · <a href="#">返回顶部 ↑</a></footer></main></div><script src="../site.js?v=41d3e5055805"></script></body></html>

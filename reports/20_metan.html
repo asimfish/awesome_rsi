@@ -1,30 +1,4 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的论文、中文解读、分类与专题。"><title>Metan（Metaⁿ）深度解读：固定元操作，通过递归扩展输入增加改进深度 · RSI 研究札记</title><link rel="stylesheet" href="../site.css"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress"></div><header class="topbar"><a class="brand" href="../index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a href="../index.html">首页</a><a href="../papers.html">论文</a><a href="../reports.html">解读</a><a href="../insights.html">洞察</a><a href="../topics.html">专题</a><a href="../resources.html">资源</a></nav><button id="theme" aria-label="切换深色模式">深色阅读</button></header><div class="layout "><aside><div class="eyebrow">解读 / 20</div><div class="toc">
-<ul>
-<li><a href="#metanmetaⁿ深度解读固定元操作通过递归扩展输入增加改进深度">Metan（Metaⁿ）深度解读：固定元操作，通过递归扩展输入增加改进深度</a><ul>
-<li><a href="#1-一句话定位">1. 一句话定位</a></li>
-<li><a href="#2-要解决的问题">2. 要解决的问题</a></li>
-<li><a href="#3-为什么此前做不通三条线各差一块">3. 为什么此前做不通：三条线各差一块</a></li>
-<li><a href="#4-方法机制">4. 方法机制</a><ul>
-<li><a href="#41-三种-meta-改进范式21figure-2">4.1 三种 meta 改进范式（§2.1，Figure 2）</a></li>
-<li><a href="#42-ω-的契约22">4.2 Ω 的契约（§2.2）</a></li>
-<li><a href="#43-深度由收敛决定">4.3 深度由收敛决定</a></li>
-<li><a href="#44-进化档案24">4.4 进化档案（§2.4）</a></li>
-</ul>
-</li>
-<li><a href="#5-实验结果全景">5. 实验结果全景</a><ul>
-<li><a href="#51-主结果table-12gemma-4-31b-it-与-gpt-52-双骨干seeds-424344">5.1 主结果（Table 1/2，Gemma 4 31B-IT 与 GPT-5.2 双骨干，seeds 42/43/44）</a></li>
-<li><a href="#52-arc-agi-2-是范畴性差距">5.2 ARC-AGI-2 是范畴性差距</a></li>
-<li><a href="#53-消融table-3co-bench">5.3 消融（Table 3，CO-Bench）</a></li>
-<li><a href="#54-角色自发分化33596-次-ω-发射的七类角色标注">5.4 角色自发分化（§3.3，596 次 Ω 发射的七类角色标注）</a></li>
-</ul>
-</li>
-<li><a href="#6-局限">6. 局限</a></li>
-<li><a href="#7-意义与位置">7. 意义与位置</a></li>
-</ul>
-</li>
-</ul>
-</div>
-<div class="aside-links"><a href="../guide.html">完整仓库导览 ↗</a><a href="https://github.com/asimfish/awesome_rsi">GitHub 源码 ↗</a></div></aside><main id="content"><div class="eyebrow">解读 / 20</div><h1 id="metanmetaⁿ深度解读固定元操作通过递归扩展输入增加改进深度">Metan（Metaⁿ）深度解读：固定元操作，通过递归扩展输入增加改进深度</h1>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的综述、论文、中文解读与专题。"><title>Metan（Metaⁿ）深度解读：固定元操作，通过递归扩展输入增加改进深度 · RSI 研究札记</title><link rel="stylesheet" href="../site.css?v=f71f142c5c4a"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress" aria-hidden="true"></div><header class="topbar"><a class="brand" href="../index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a href="../index.html">全景综述</a><a href="../papers.html">论文目录</a><a href="../reports.html" aria-current="page">逐篇解读</a><a href="../topics.html">研究专题</a><a href="../reference.html">术语对照</a></nav><div class="reading-tools"><button id="font-size" aria-label="放大正文字号" aria-pressed="false">A＋</button><button id="theme" aria-label="切换深色模式">深色</button></div></header><div class="layout "><aside><details class="toc-panel" open><summary>本页目录 <span>展开 / 收起</span></summary><div class="toc-body"><div class="eyebrow">本页目录</div><ul><li><a href="#1-一句话定位">一句话定位</a></li><li><a href="#2-要解决的问题">要解决的问题</a></li><li><a href="#3-为什么此前做不通三条线各差一块">为什么此前做不通：三条线各差一块</a></li><li><a href="#4-方法机制">方法机制</a></li><li><a href="#5-实验结果全景">实验结果全景</a></li><li><a href="#6-局限">局限</a></li><li><a href="#7-意义与位置">意义与位置</a></li></ul></div></details><div class="aside-links"><a href="../index.html">全景综述</a><a href="../resources.html">资源与来源</a><a href="https://github.com/asimfish/awesome_rsi">GitHub ↗</a></div></aside><main id="content"><header class="article-header"><div class="breadcrumb"><a href="../index.html">RSI 研究札记</a><span>/</span>逐篇解读</div><div class="eyebrow">解读 / 20</div><h1 id="metanmetaⁿ深度解读固定元操作通过递归扩展输入增加改进深度">Metan（Metaⁿ）深度解读</h1><p class="subtitle">固定元操作，通过递归扩展输入增加改进深度</p><p class="meta">约 14 分钟阅读 · <a href="https://github.com/asimfish/awesome_rsi/blob/main/reports/20_metan.md">查看原始笔记 ↗</a></p></header><div class="prose">
 <blockquote>
 <p><strong>Metaⁿ: Recursive Self-Improvement through Emergent Depth</strong>
 arXiv 2608.24735 v1（2026-08-25）· 明尼苏达大学 + 首尔国立大学（Zae Myung Kim、Young-Jun Lee、Seungyeon Jwa、Dongyeop Kang）
@@ -32,10 +6,10 @@ arXiv 2608.24735 v1（2026-08-25）· 明尼苏达大学 + 首尔国立大学（
 归档：<a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2608.24735_Metan.pdf">papers/en/2608.24735_Metan.pdf</a> · 中译 <a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/zh/2608.24735_Metan_zh.pdf">papers/zh/2608.24735_Metan_zh.pdf</a></p>
 </blockquote>
 <hr/>
-<h2 id="1-一句话定位">1. 一句话定位</h2>
+<h2 id="1-一句话定位">1. 一句话定位<a aria-label="跳转到本节" class="section-link" href="#1-一句话定位">#</a></h2>
 <p>现有自改进 agent 主要修改答案，产生答案的过程仍固定。加入 meta 层的系统会固定这一层（FunSearch / AlphaEvolve / ADAS，深度 1）；能修改自身的系统也必须保留部分编辑机制不变，以免破坏改进能力（Gödel Agent / DGM / HyperAgents，实现深度约 2.5）。Metan <strong>固定元操作 Ω，递归扩展其输入</strong>。Ω 反复读取下层求解栈的执行轨迹及对应代码，写出下一层的策略预处理与可调用 helper 库。Ω 保持不变，以避免修改操作本身引发失稳；每层输入严格增长，使系统能根据新增信息寻找改进机会。</p>
 <p>深度由收敛决定，实测停在 3–6，进化档案在层链上搜索。八个基准族上均领先：CO-Bench <strong>0.870 vs OpenEvolve 0.702</strong>、AlphaEvolve Math <strong>0.917 vs 0.726</strong>、ARC-AGI-2 <strong>0.331</strong>（OpenEvolve 0.003、Gödel Agent 0.054）。消融中，去掉递归后 <strong>−0.131</strong>；<strong>72% 的增益来自层间传递的上下文字符串</strong>，可调用代码占 15%，上下文条件化的贡献高于代码复用。本文针对 DGM 路线提出了替代方案，并首次用可测量的 <strong>meta 深度</strong>指标检验 Yudkowsky（报告 00）关于"每一级提升必须带来新的改进机会"的持续条件。</p>
-<h2 id="2-要解决的问题">2. 要解决的问题</h2>
+<h2 id="2-要解决的问题">2. 要解决的问题<a aria-label="跳转到本节" class="section-link" href="#2-要解决的问题">#</a></h2>
 <p>论文讨论改进深度与运行稳定性之间的限制：</p>
 <ul>
 <li><strong>固定 meta 层限制深度</strong>：如果这一层固定，系统只能在同一层面修改答案，深度为 1；</li>
@@ -43,8 +17,8 @@ arXiv 2608.24735 v1（2026-08-25）· 明尼苏达大学 + 首尔国立大学（
 </ul>
 <p>Yudkowsky（GISAI 2001）提出，单纯加快固定优化器无法维持递归改进，每一级提升都必须让系统发现或实现<strong>新的改进机会</strong>。Metan 尝试在<strong>保持改进者不变的前提下，让每一级发现新的机会</strong>。</p>
 <p>它让 Ω 的<strong>输入</strong>递归增长。第 d 层的 Ω 读取第 1..d−1 层的全部轨迹与代码，信息集严格大于上一层，可据此发现上一层无法观察到的模式。</p>
-<h2 id="3-为什么此前做不通三条线各差一块">3. 为什么此前做不通：三条线各差一块</h2>
-<div class="table-scroll"><table>
+<h2 id="3-为什么此前做不通三条线各差一块">3. 为什么此前做不通：三条线各差一块<a aria-label="跳转到本节" class="section-link" href="#3-为什么此前做不通三条线各差一块">#</a></h2>
+<div aria-label="对照表，可横向滚动" class="table-scroll" role="region" tabindex="0"><table>
 <thead>
 <tr>
 <th>已有路线</th>
@@ -86,26 +60,26 @@ arXiv 2608.24735 v1（2026-08-25）· 明尼苏达大学 + 首尔国立大学（
 </tbody>
 </table></div>
 <p>此前尚未将<strong>深度作为可测量、可消融的变量</strong>，讨论主要是"自指"vs"非自指"的定性区分。Metan 用 realized meta-depth 衡量深度，并通过逐层消融检验其贡献。</p>
-<h2 id="4-方法机制">4. 方法机制</h2>
-<h3 id="41-三种-meta-改进范式21figure-2">4.1 三种 meta 改进范式（§2.1，Figure 2）</h3>
+<h2 id="4-方法机制">4. 方法机制<a aria-label="跳转到本节" class="section-link" href="#4-方法机制">#</a></h2>
+<h3 id="41-三种-meta-改进范式21figure-2">4.1 三种 meta 改进范式（§2.1，Figure 2）<a aria-label="跳转到本节" class="section-link" href="#41-三种-meta-改进范式21figure-2">#</a></h3>
 <ol>
 <li><strong>手工单层 meta</strong>：固定的外部 meta 过程重写 agent，meta 机制自身不变，深度为 1。</li>
 <li><strong>自指单层 meta</strong>：agent 修改自己的源码，驱动层保持固定，深度约为 2.5。</li>
 <li><strong>递归 n 层 meta（本文）</strong>：嵌套执行 meta 过程。每层输出指导与库函数，这些代码又成为下一次 Ω 调用要分析的对象。</li>
 </ol>
-<h3 id="42-ω-的契约22">4.2 Ω 的契约（§2.2）</h3>
+<h3 id="42-ω-的契约22">4.2 Ω 的契约（§2.2）<a aria-label="跳转到本节" class="section-link" href="#42-ω-的契约22">#</a></h3>
 <p>Ω 的任务是读取下方系统的完整执行上下文，编写用于改进它的代码。每层输出两项内容：
 - <strong>pre_process 块</strong>：用 prompt 前缀指导求解策略，如"不要用 scipy""先做 X 再做 Y"；
 - <strong>helper 库 L(d)</strong>：可调用的 Python 函数，如在深度 2 输出 <code>fuzzy_match_label()</code>，在深度 3 添加 <code>reconcile_labels()</code>。</p>
 <p>Ω 还输出 rationale 块。从深度 3 起，轨迹摘要开始记录上一层的操作与效果，以及需要保留、修改或回滚的内容。</p>
 <p><strong>具体例子</strong>（CO-Bench assignment_problem）：单次 LLM 调用生成的脚本执行 import scipy，但沙箱没有 scipy，得分为 0。扁平自精炼循环会反复尝试同类导入。深度 2 的 Ω 同时检查 36 个任务的轨迹，发现多个任务因相似的依赖错误而失败，随后给出"不要用 scipy；这是 validate_output() 工具"的指导。深度 2 的求解器重写匈牙利算法，得分达到 1.0。深度 3 再读取新轨迹与深度 2 的代码，决定保留、修改还是覆盖。</p>
-<h3 id="43-深度由收敛决定">4.3 深度由收敛决定</h3>
+<h3 id="43-深度由收敛决定">4.3 深度由收敛决定<a aria-label="跳转到本节" class="section-link" href="#43-深度由收敛决定">#</a></h3>
 <p>系统不预设层数，Ω 找不到改进时停止。实测运行停在 <strong>3–6</strong>，原因是 Ω 找不到更多改进；当时尚未耗尽基座模型的推理能力，上下文也未被累积的层代码填满。</p>
-<h3 id="44-进化档案24">4.4 进化档案（§2.4）</h3>
+<h3 id="44-进化档案24">4.4 进化档案（§2.4）<a aria-label="跳转到本节" class="section-link" href="#44-进化档案24">#</a></h3>
 <p>多候选档案在层链上搜索，并报告两个估计量：<strong>archive-best</strong> 按任务选择最优链，<strong>best single chain</strong> 提交一条链。二者之差衡量按任务选择链带来的收益，实测为 0.06–0.07。在 <strong>consolidation mode</strong> 下，每个候选重点改进一个任务，档案逐步累积各任务上的成功候选。</p>
-<h2 id="5-实验结果全景">5. 实验结果全景</h2>
-<h3 id="51-主结果table-12gemma-4-31b-it-与-gpt-52-双骨干seeds-424344">5.1 主结果（Table 1/2，Gemma 4 31B-IT 与 GPT-5.2 双骨干，seeds 42/43/44）</h3>
-<div class="table-scroll"><table>
+<h2 id="5-实验结果全景">5. 实验结果全景<a aria-label="跳转到本节" class="section-link" href="#5-实验结果全景">#</a></h2>
+<h3 id="51-主结果table-12gemma-4-31b-it-与-gpt-52-双骨干seeds-424344">5.1 主结果（Table 1/2，Gemma 4 31B-IT 与 GPT-5.2 双骨干，seeds 42/43/44）<a aria-label="跳转到本节" class="section-link" href="#51-主结果table-12gemma-4-31b-it-与-gpt-52-双骨干seeds-424344">#</a></h3>
+<div aria-label="对照表，可横向滚动" class="table-scroll" role="region" tabindex="0"><table>
 <thead>
 <tr>
 <th>系统</th>
@@ -152,10 +126,10 @@ arXiv 2608.24735 v1（2026-08-25）· 明尼苏达大学 + 首尔国立大学（
 </tbody>
 </table></div>
 <p>八个基准族上均领先。在 CO-Bench 上使用 GPT-5.2 骨干时，相对 OpenEvolve 提高 <strong>+0.168</strong>，各 seed 区间不重叠。符号回归的四个域中也均领先。</p>
-<h3 id="52-arc-agi-2-是范畴性差距">5.2 ARC-AGI-2 是范畴性差距</h3>
+<h3 id="52-arc-agi-2-是范畴性差距">5.2 ARC-AGI-2 是范畴性差距<a aria-label="跳转到本节" class="section-link" href="#52-arc-agi-2-是范畴性差距">#</a></h3>
 <p>该基准在设计上限制依赖技能记忆解题。OpenEvolve 得分 0.003、Gödel Agent 得分 0.054，Metan 单链得分 0.123；使用<strong>完整 meta 栈，并通过档案跨任务组合原语后，达到 0.331</strong>。它是 held-out 上唯一得分非零的系统，某任务从 0.000→0.908。Ω 从轨迹中抽象出 transform 原语，档案再跨任务组合这些原语。</p>
-<h3 id="53-消融table-3co-bench">5.3 消融（Table 3，CO-Bench）</h3>
-<div class="table-scroll"><table>
+<h3 id="53-消融table-3co-bench">5.3 消融（Table 3，CO-Bench）<a aria-label="跳转到本节" class="section-link" href="#53-消融table-3co-bench">#</a></h3>
+<div aria-label="对照表，可横向滚动" class="table-scroll" role="region" tabindex="0"><table>
 <thead>
 <tr>
 <th>条件</th>
@@ -208,7 +182,7 @@ arXiv 2608.24735 v1（2026-08-25）· 明尼苏达大学 + 首尔国立大学（
 </table></div>
 <p><strong>层间上下文贡献了大部分递归增益</strong>：去掉层间上下文字符串所损失的增益约占 <strong>~72%</strong>，可调用代码库占 <strong>~15%</strong>，递归机制本身（beam、retry、inspiration）占 <strong>~13%</strong>。内层循环的能力上限越低，递归增益越大，与 §2.3 的预测一致。</p>
 <p><strong>vs 扁平替代</strong>：Gödel Agent 修正配置并使用 10× 预算后，在 GPT-5.2 CO-Bench 上停在 <strong>0.628</strong>，仍低于 Metan 0.870。在这组对比中，增加计算预算未能弥补架构差异。</p>
-<h3 id="54-角色自发分化33596-次-ω-发射的七类角色标注">5.4 角色自发分化（§3.3，596 次 Ω 发射的七类角色标注）</h3>
+<h3 id="54-角色自发分化33596-次-ω-发射的七类角色标注">5.4 角色自发分化（§3.3，596 次 Ω 发射的七类角色标注）<a aria-label="跳转到本节" class="section-link" href="#54-角色自发分化33596-次-ω-发射的七类角色标注">#</a></h3>
 <ul>
 <li><strong>rollback 角色</strong>在深度 2 的数量<strong>为零</strong>，两种底座、两位标注者的结果均如此。该角色在深度 3 出现（代码 55%、prompt 33%），纠错是唯一未在深度 2 出现的角色；</li>
 <li>战术原语在深度 3 占比达到峰值（45%），到深度 5 降至 17%，逐渐由专用库取代；</li>
@@ -216,7 +190,7 @@ arXiv 2608.24735 v1（2026-08-25）· 明尼苏达大学 + 首尔国立大学（
 <li><strong>prompt 模板未预设任何角色</strong>。</li>
 </ul>
 <p>具体轨迹中，<code>simulated_annealing</code> 首次出现在深度 2 的单个候选里，随后被 36 个 winner 中的 15 个采用，覆盖四个问题族。每条链在 d1→d2 时都提高了分数，均值为 +0.113。深度 2 的"greedy + local_search"使某任务从 0.0→0.759，深度 3 的"simulated_annealing with restarts"进一步推进到深度 4。部分任务到深度 5–6 才首次成功，包括深度 5 的 constrained_guillotine_cutting 和深度 6 的三个 matsci 任务。档案同时保留浅层 fallback 与深层成功的候选。</p>
-<h2 id="6-局限">6. 局限</h2>
+<h2 id="6-局限">6. 局限<a aria-label="跳转到本节" class="section-link" href="#6-局限">#</a></h2>
 <ol>
 <li><strong>所有层使用同一模型</strong>：作者用这一设置区分深度收益与模型能力收益，但没有测试强模型担任 Ω、弱模型担任 base 的部署场景。</li>
 <li><strong>只扩展输入是否满足 RSI 的定义</strong>：Bostrom（报告 00）的判据是，一次改进是否提升系统发现、验证或实现下一次改进的能力。Metan 的 Ω 自身没有增强，只是获得了更多输入。它避开了修改操作本身带来的稳定性问题，也缩小了这里的 RSI 范围：实验检验了<strong>保持改进者不变也能增加深度</strong>，并据此讨论 DGM 路线中自改写风险是否必要。</li>
@@ -225,10 +199,10 @@ arXiv 2608.24735 v1（2026-08-25）· 明尼苏达大学 + 首尔国立大学（
 <li><strong>深度 3 之后收益递减</strong>：按深度计算的均值在深度 3 达峰（0.726），到深度 6 降至 0.602。档案选择最优链，汇总结果未直接呈现这一变化。</li>
 <li><strong>成本较高</strong>：CO-Bench 上使用 17M token 达到 0.870，算力与 OpenEvolve 匹配，但绝对成本仍不低。</li>
 </ol>
-<h2 id="7-意义与位置">7. 意义与位置</h2>
+<h2 id="7-意义与位置">7. 意义与位置<a aria-label="跳转到本节" class="section-link" href="#7-意义与位置">#</a></h2>
 <p><strong>对报告 07 DGM 的正面批评</strong>：DGM 必须固定档案维护与父代选择来维持稳定，Metan 将其限制量化为"realized meta-depth 约 2.5"，并提出避免自改写风险的方案。两种方法代表了 2026 年 RSI 架构讨论中的一项分歧：DGM 通过修改自身实现 RSI，Metan 则认为增加改进深度并不需要承担这类风险。</p>
 <p><strong>对报告 00 Yudkowsky 持续条件的实证化</strong>：GISAI 要求每一级提升带来新的改进机会。Metan 由收敛决定深度，实测停在 3–6，记录了系统找不到更多改进机会时的层数。逐层增加输入则让每层获得新的分析材料，以满足这一持续条件。</p>
 <p><strong>对报告 23（Gödel Agent → SICA）</strong>：Gödel Agent 在 Metan 的实验中作为基线。修正配置并使用 10× 预算后，分数仍停在 0.628；实验同时直接测量了自指路线的实际深度上限。</p>
 <p><strong>与报告 10 insight 4 的闭环</strong>：Metan 测量了系统结构对自改写深度的限制，并完整实现了通过扩展输入来增加深度的方案。</p>
 <p><strong>与报告 09 WikiSkill / 报告 26 技能进化的接口</strong>：Ω 输出的 helper 库将经验整理为跨任务可用的技能，对应 librarian 角色。Metan 数据显示，代码转移只贡献 15%。在 Metan 的设置中，<strong>上下文条件化的贡献高于技能库复用</strong>。技能进化五篇都侧重优化技能库结构，这一结果限制了对该方向收益的预期。</p>
-<p><strong>对报告 13 Meta-Harness</strong>：两者都固定改进者：Meta-Harness 固定外部 proposer，Metan 固定 Ω。Meta-Harness 的 proposer 只运行一层，修改 harness；Metan 则递归调用 Ω。若让 Meta-Harness 的 proposer 读取此前修改 harness 的轨迹，并据此调整修改 harness 的方式，就接近 Metan 的递归设计。</p><div class="prevnext"><a href="19_icoder.html">← 上一篇</a><a href="21_co_harness.html">下一篇 →</a></div><footer>RSI 研究札记 · 根据 awesome_rsi 仓库生成<br>论文结论与研究判断以各篇来源及实验边界为准。<a href="#">返回顶部 ↑</a></footer></main></div><script src="../site.js"></script></body></html>
+<p><strong>对报告 13 Meta-Harness</strong>：两者都固定改进者：Meta-Harness 固定外部 proposer，Metan 固定 Ω。Meta-Harness 的 proposer 只运行一层，修改 harness；Metan 则递归调用 Ω。若让 Meta-Harness 的 proposer 读取此前修改 harness 的轨迹，并据此调整修改 harness 的方式，就接近 Metan 的递归设计。</p></div><div class="prevnext"><a href="19_icoder.html">← 上一篇</a><a href="21_co_harness.html">下一篇 →</a></div><footer><strong>RSI 研究札记</strong><p>从论文结果到研究判断。原始实验条件与来源见各篇解读。</p><a href="../resources.html">资料与引用</a> · <a href="#">返回顶部 ↑</a></footer></main></div><script src="../site.js?v=41d3e5055805"></script></body></html>

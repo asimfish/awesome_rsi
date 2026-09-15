@@ -1,28 +1,14 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的论文、中文解读、分类与专题。"><title>字节三篇合读 · RSI 研究札记</title><link rel="stylesheet" href="../site.css"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress"></div><header class="topbar"><a class="brand" href="../index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a href="../index.html">首页</a><a href="../papers.html">论文</a><a href="../reports.html">解读</a><a href="../insights.html">洞察</a><a href="../topics.html">专题</a><a href="../resources.html">资源</a></nav><button id="theme" aria-label="切换深色模式">深色阅读</button></header><div class="layout "><aside><div class="eyebrow">长文阅读</div><div class="toc">
-<ul>
-<li><a href="#从目标到经验再到系统字节三篇-self-developing-agents-合读">从目标到经验再到系统：字节三篇 Self-Developing Agents 合读</a><ul>
-<li><a href="#1-一句话定位">1. 一句话定位</a></li>
-<li><a href="#2-共同问题改进目标和判断依据由谁提供">2. 共同问题：改进目标和判断依据由谁提供</a></li>
-<li><a href="#3-分工三个基准不能互相替代">3. 分工：三个基准不能互相替代</a></li>
-<li><a href="#4-方法机制读论文时应追踪哪些变量">4. 方法机制：读论文时应追踪哪些变量</a></li>
-<li><a href="#5-关键证据局部收益能否留下来">5. 关键证据：局部收益能否留下来</a></li>
-<li><a href="#6-局限与解释边界">6. 局限与解释边界</a></li>
-<li><a href="#7-在本仓库中的位置">7. 在本仓库中的位置</a></li>
-</ul>
-</li>
-</ul>
-</div>
-<div class="aside-links"><a href="../guide.html">完整仓库导览 ↗</a><a href="https://github.com/asimfish/awesome_rsi">GitHub 源码 ↗</a></div></aside><main id="content"><div class="eyebrow">长文阅读</div><h1 id="从目标到经验再到系统字节三篇-self-developing-agents-合读">从目标到经验再到系统：字节三篇 Self-Developing Agents 合读</h1>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的综述、论文、中文解读与专题。"><title>字节三篇合读 · RSI 研究札记</title><link rel="stylesheet" href="../site.css?v=f71f142c5c4a"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress" aria-hidden="true"></div><header class="topbar"><a class="brand" href="../index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a href="../index.html">全景综述</a><a href="../papers.html">论文目录</a><a href="../reports.html">逐篇解读</a><a href="../topics.html" aria-current="page">研究专题</a><a href="../reference.html">术语对照</a></nav><div class="reading-tools"><button id="font-size" aria-label="放大正文字号" aria-pressed="false">A＋</button><button id="theme" aria-label="切换深色模式">深色</button></div></header><div class="layout "><aside><details class="toc-panel" open><summary>本页目录 <span>展开 / 收起</span></summary><div class="toc-body"><div class="eyebrow">本页目录</div><ul><li><a href="#从目标到经验再到系统字节三篇-self-developing-agents-合读">从目标到经验再到系统：字节三篇 Self-Developing Agents 合读</a></li><li><a href="#1-一句话定位">一句话定位</a></li><li><a href="#2-共同问题改进目标和判断依据由谁提供">共同问题：改进目标和判断依据由谁提供</a></li><li><a href="#3-分工三个基准不能互相替代">分工：三个基准不能互相替代</a></li><li><a href="#4-方法机制读论文时应追踪哪些变量">方法机制：读论文时应追踪哪些变量</a></li><li><a href="#5-关键证据局部收益能否留下来">关键证据：局部收益能否留下来</a></li><li><a href="#6-局限与解释边界">局限与解释边界</a></li><li><a href="#7-在本仓库中的位置">在本仓库中的位置</a></li></ul></div></details><div class="aside-links"><a href="../index.html">全景综述</a><a href="../resources.html">资源与来源</a><a href="https://github.com/asimfish/awesome_rsi">GitHub ↗</a></div></aside><main id="content"><header class="article-header"><div class="breadcrumb"><a href="../index.html">RSI 研究札记</a><span>/</span>研究资料</div><div class="eyebrow">长文阅读</div><h1 id="从目标到经验再到系统字节三篇-self-developing-agents-合读">从目标到经验再到系统</h1><p class="subtitle">字节三篇 Self-Developing Agents 合读</p><p class="meta">约 7 分钟阅读 · <a href="https://github.com/asimfish/awesome_rsi/blob/main/report/bytedance-self-developing/research.md">查看原始笔记 ↗</a></p></header><div class="reading-note"><strong>配套论文</strong><p><strong>Aspire</strong> · <a href="https://arxiv.org/abs/2608.31111">论文原文</a> · <a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/zh/2608.31111_Aspire_zh.pdf">中文 PDF</a></p><p><strong>S³Gym</strong> · <a href="https://arxiv.org/abs/2608.31100">论文原文</a> · <a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/zh/2608.31100_S3Gym_zh.pdf">中文 PDF</a></p><p><strong>HarnessDev</strong> · <a href="https://arxiv.org/abs/2609.01437">论文原文</a> · <a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/zh/2609.01437_HarnessDev_zh.pdf">中文 PDF</a></p></div><div class="prose">
 <blockquote>
 <p>论文版本：Aspire 2608.31111v1、S³Gym 2608.31100v1、HarnessDev 2609.01437v1。联合项目：ByteDance Seed × TokenWave，与高校及其他机构合作。以下数字来自论文正文与表格；未运行论文实验。<a href="./">专题首页</a> · <a href="./">论文与中译下载</a></p>
 </blockquote>
-<h2 id="1-一句话定位">1. 一句话定位</h2>
+<h2 id="1-一句话定位">1. 一句话定位<a aria-label="跳转到本节" class="section-link" href="#1-一句话定位">#</a></h2>
 <p>这组三篇基准论文分别检验 agent 能否选择有效的学习目标、从交互经验中获得可迁移的策略，以及把改进保存在可运行的 harness 中。Aspire 用六类能力目标和 520 道隐藏专家题考察目标选择；S³Gym 在七个文本游戏中比较经验利用方式；HarnessDev 的 64 次相邻版本切换中，可见反馈与留出集的变化方向仅 34 次一致。它们共同提示：完成更新循环与获得可靠能力提升，需要分别验证。数字来源为 Aspire §3、S³Gym §3、HarnessDev §4.3。</p>
-<h2 id="2-共同问题改进目标和判断依据由谁提供">2. 共同问题：改进目标和判断依据由谁提供</h2>
+<h2 id="2-共同问题改进目标和判断依据由谁提供">2. 共同问题：改进目标和判断依据由谁提供<a aria-label="跳转到本节" class="section-link" href="#2-共同问题改进目标和判断依据由谁提供">#</a></h2>
 <p>已有自改进工作常从明确任务、固定奖励和现成执行框架出发。在这样的环境里，模型可以优化一个人已定义好的目标。真实部署还要求系统解释模糊需求、判断经验是否有用，并把有效改变保留到下一次任务。这三种能力不能仅凭最终任务得分来区分。</p>
 <p>Aspire 隐藏下游评测，让 agent 自行选择数据、更新手段与验证信号。S³Gym 提供可以探索的环境，同时把正式评估放在更严格的条件下。HarnessDev 直接将生成的执行框架作为评测对象，记录冻结版本，再让它执行下游任务。三者分别移动了原先由人固定的一部分边界，但正式测量仍依赖专家题、环境验证器或留出任务。</p>
-<h2 id="3-分工三个基准不能互相替代">3. 分工：三个基准不能互相替代</h2>
-<div class="table-scroll"><table>
+<h2 id="3-分工三个基准不能互相替代">3. 分工：三个基准不能互相替代<a aria-label="跳转到本节" class="section-link" href="#3-分工三个基准不能互相替代">#</a></h2>
+<div aria-label="对照表，可横向滚动" class="table-scroll" role="region" tabindex="0"><table>
 <thead>
 <tr>
 <th>研究</th>
@@ -53,12 +39,12 @@
 </tbody>
 </table></div>
 <p>这是一套互补的诊断视角。Aspire 的隐藏题成绩不能推出游戏中的经验学习能力，S³Gym 的成绩也不能证明 harness 能跨执行模型迁移。尤其不能把项目页“闭环 RSI”的研究方向当作已实现系统的实证结论。</p>
-<h2 id="4-方法机制读论文时应追踪哪些变量">4. 方法机制：读论文时应追踪哪些变量</h2>
+<h2 id="4-方法机制读论文时应追踪哪些变量">4. 方法机制：读论文时应追踪哪些变量<a aria-label="跳转到本节" class="section-link" href="#4-方法机制读论文时应追踪哪些变量">#</a></h2>
 <p><strong>Aspire：目标的具体化。</strong> 输入是宽泛的自然语言能力目标，正式下游任务不向 agent 展示。系统允许权重更新与 harness 更新。读实验时应区分生成检查点、得到合格检查点、超过未改进基线，以及达到保留门槛；前一个事件发生不蕴含后一个事件。内部自测分数只说明选定的代理目标被优化，隐藏专家题才回答目标是否选对。</p>
 <p><strong>S³Gym：经验的表达与使用。</strong> History ICL 将原始交互历史放回上下文；Summary Memory 把经验压缩为可复用的文字；Training 则通过参数更新改变策略。摘要可能减少冗余，也可能丢掉状态相关的细节。因此“更紧凑的记忆”并不自动等于“更好的记忆”。论文同时报告不同成绩汇总指标；比较时必须保持指标一致。上下文方法与单独的训练实验不应被解读为同预算条件下的统一排名。</p>
 <p><strong>HarnessDev：创建、冻结、执行。</strong> 创建者从较弱但可运行的初始框架出发，构造完整 harness；演化阶段读取下游反馈并修改它。创建者和执行者是不同角色，固定执行模型的实验用于检查收益对运行模型的依赖。演化结束后，所有正式版本在 630 个 SWE-Pro 留出任务上评测，结果不反馈给创建者，也不参与它的停止和最终版本选择。</p>
-<h2 id="5-关键证据局部收益能否留下来">5. 关键证据：局部收益能否留下来</h2>
-<div class="table-scroll"><table>
+<h2 id="5-关键证据局部收益能否留下来">5. 关键证据：局部收益能否留下来<a aria-label="跳转到本节" class="section-link" href="#5-关键证据局部收益能否留下来">#</a></h2>
+<div aria-label="对照表，可横向滚动" class="table-scroll" role="region" tabindex="0"><table>
 <thead>
 <tr>
 <th>证据</th>
@@ -95,7 +81,7 @@
 </tbody>
 </table></div>
 <p>HarnessDev 表 6 的固定 Gemini 执行模型实验尤其值得单列。下表保留论文报告的百分点变化，四条轨迹均从各自的初始 harness 开始。</p>
-<div class="table-scroll"><table>
+<div aria-label="对照表，可横向滚动" class="table-scroll" role="region" tabindex="0"><table>
 <thead>
 <tr>
 <th>创建者</th>
@@ -127,7 +113,7 @@
 </tbody>
 </table></div>
 <p>可见反馈组合分是 SWE-Pro-100 与 Terminal-Bench-89 的等权平均，留出分只来自 SWE-Pro-630。两列不是相同任务上的同一指标，不能将它们相减解释成精确的“过拟合损失”。它们支持的判断是：可见改善并不保证留出改善。表内增量按论文报告值呈现，因此可能与已四舍五入的端点相减略有差异。</p>
-<h2 id="6-局限与解释边界">6. 局限与解释边界</h2>
+<h2 id="6-局限与解释边界">6. 局限与解释边界<a aria-label="跳转到本节" class="section-link" href="#6-局限与解释边界">#</a></h2>
 <ol>
 <li><strong>作者实验范围：</strong>HarnessDev 演化评测集中于代码任务，独立留出结果来自 SWE-Pro。创建阶段的多领域覆盖不能充当演化阶段的多领域证据。</li>
 <li><strong>作者实验范围：</strong>HarnessDev 报告九条单次演化轨迹，不能把相邻版本当作互相独立的重复实验。53.1% 不能直接推广为所有系统的概率。</li>
@@ -135,9 +121,9 @@
 <li><strong>本专题判断：</strong>外部评估仍是三篇研究测量能力变化的依据。隐藏目标、保留验证器与固定留出集降低了部分偏差，但不足以证明开放世界中的长期自我评估已经可靠。</li>
 <li><strong>本专题判断：</strong>论文中的模型版本、预算、反馈协议都会影响结果。本专题整理已报告的证据，不对未测试的模型或后续版本做性能承诺。</li>
 </ol>
-<h2 id="7-在本仓库中的位置">7. 在本仓库中的位置</h2>
+<h2 id="7-在本仓库中的位置">7. 在本仓库中的位置<a aria-label="跳转到本节" class="section-link" href="#7-在本仓库中的位置">#</a></h2>
 <p>与<a href="../reports/05_who_grades_the_grader.html">报告 05：Who Grades the Grader</a>相连：S³Gym 将“自评是否有用”进一步落到未来决策，不能只看自评本身的正确率。</p>
 <p>与<a href="../reports/13_meta_harness.html">报告 13：Meta-Harness</a>相连：HarnessDev 提供另一种评测视角，既看框架能否生成，也看冻结后能否泛化及其对执行模型的依赖。</p>
 <p>与<a href="../reports/14_self_harness.html">报告 14：Self-Harness</a>相连：前者将回归验证用于接受修改，HarnessDev 的后验留出测试则揭示没有参与选择的信息如何改变对版本优劣的判断。这两种验证位置应在阅读时区分。</p>
 <p>与<a href="../reports/26_skill_evolution_wave.html">报告 26：技能进化</a>相连：S³Gym 说明压缩经验可能有益，也可能损失决策所需细节，技能提炼的价值应在后续任务上验证。</p>
-<p>与<a href="../reports/10_synthesis_insights.html">报告 10：汇总洞察</a>相连：这组三篇补充了“锚在哪”的问题。除了外部评估依据，还要追踪 agent 选择什么目标、经验经过何种变换、最终保留哪个版本。专题据此建议采用四列实验记录：内部指标、独立指标、所选版本与执行模型，分别记录收益和退化。</p><footer>RSI 研究札记 · 根据 awesome_rsi 仓库生成<br>论文结论与研究判断以各篇来源及实验边界为准。<a href="#">返回顶部 ↑</a></footer></main></div><script src="../site.js"></script></body></html>
+<p>与<a href="../reports/10_synthesis_insights.html">报告 10：汇总洞察</a>相连：这组三篇补充了“锚在哪”的问题。除了外部评估依据，还要追踪 agent 选择什么目标、经验经过何种变换、最终保留哪个版本。专题据此建议采用四列实验记录：内部指标、独立指标、所选版本与执行模型，分别记录收益和退化。</p></div><footer><strong>RSI 研究札记</strong><p>从论文结果到研究判断。原始实验条件与来源见各篇解读。</p><a href="../resources.html">资料与引用</a> · <a href="#">返回顶部 ↑</a></footer></main></div><script src="../site.js?v=41d3e5055805"></script></body></html>
