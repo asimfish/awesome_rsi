@@ -2,6 +2,11 @@
 
 从哥德尔机到自进化 agent：一次跨论文的综合判断。
 
+<figure class="overview-figure">
+<a href="assets/rsi-overview/overview.png" aria-label="打开 RSI 综述图原图"><img src="assets/rsi-overview/overview.png" alt="RSI 研究全景：确定目标、提出与实施修改、检验候选、保留有效版本构成概念循环；独立评估依据用于检验候选。Aspire、S³Gym、HarnessDev 分别考察目标选择、经验学习和版本选择。局部收益已有证据，持续提升下一次改进的能力仍待证明。" width="1536" height="1024"></a>
+<figcaption>一图理解本文：改哪里、如何验证、哪些进展仍待证明。箭头表示综合概念框架，各方法覆盖的环节不同。<a href="assets/rsi-overview/overview.png">查看大图 ↗</a></figcaption>
+</figure>
+
 ## 先说结论
 
 **这些研究已经展示了 AI 改进自身某些组件的能力，但尚不足以证明系统能够自主、持续地提升“做下一次改进”的能力。** 改写代码、优化提示、积累技能和更新权重，都可能带来真实收益；能否选择正确目标、识别有害更新，并把收益保留到新任务，仍是更难的部分。
