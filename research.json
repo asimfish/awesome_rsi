@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "published_at": "2026-09-15T17:07:00.011397+00:00",
+  "published_at": "2026-09-15T17:08:14.359633+00:00",
   "interval_s": 60,
   "stale_after_s": 180,
   "workers": {
@@ -11,95 +11,19 @@
     "chip": {
       "schema": 1,
       "project": "chip",
-      "run_id": "physical-001",
+      "run_id": "physical-002",
       "state": "running",
       "stage": "placement-routing",
-      "current": "baseline-r2",
-      "started_at": "2026-09-15T17:06:09.952726+00:00",
-      "updated_at": "2026-09-15T17:06:58.866596+00:00",
-      "completed": 3,
+      "current": "baseline-r1",
+      "started_at": "2026-09-15T17:08:12.400575+00:00",
+      "updated_at": "2026-09-15T17:08:12.408047+00:00",
+      "completed": 0,
       "planned": 6,
-      "results": [
-        {
-          "variant": "baseline",
-          "repeat": 1,
-          "name": "baseline-r1",
-          "state": "completed",
-          "elapsed_s": 13.18,
-          "artifact": "physical/baseline-r1/result.json",
-          "delay_ns": 0.52194,
-          "unrouted_same_tool_ns": 0.52194,
-          "area_um2": 254.562,
-          "adp": 132.86609028,
-          "cell_count": 233,
-          "connectivity_unchanged": true,
-          "route_drc": 0,
-          "wire_length_um": 7664,
-          "spef_sha256": "99f61db58f5be7901aebcb436f9a55bca0df84b3d8f734577735b94a460a06b6"
-        },
-        {
-          "variant": "seed",
-          "repeat": 1,
-          "name": "seed-r1",
-          "state": "completed",
-          "elapsed_s": 12.57,
-          "artifact": "physical/seed-r1/result.json",
-          "delay_ns": 0.531788,
-          "unrouted_same_tool_ns": 0.531788,
-          "area_um2": 239.932,
-          "adp": 127.592958416,
-          "cell_count": 216,
-          "connectivity_unchanged": true,
-          "route_drc": 0,
-          "wire_length_um": 7188,
-          "spef_sha256": "0bb4fe6f9a7b84c7812d660218b7f8d53def92d9522c6657b086e5e2161ac118"
-        },
-        {
-          "variant": "candidate-03",
-          "repeat": 1,
-          "name": "candidate-03-r1",
-          "state": "completed",
-          "elapsed_s": 17.83,
-          "artifact": "physical/candidate-03-r1/result.json",
-          "delay_ns": 0.42254,
-          "unrouted_same_tool_ns": 0.42254,
-          "area_um2": 283.29,
-          "adp": 119.70135660000001,
-          "cell_count": 221,
-          "connectivity_unchanged": true,
-          "route_drc": 0,
-          "wire_length_um": 8041,
-          "spef_sha256": "20f2aabc1c9e8c2573278e096425a39bce1f96479afc9412b5fd024d259b9cb2"
-        }
-      ],
+      "results": [],
       "events": [
         {
-          "at": "2026-09-15T17:06:09.980460+00:00",
+          "at": "2026-09-15T17:08:12.408053+00:00",
           "text": "开始布局布线 baseline-r1"
-        },
-        {
-          "at": "2026-09-15T17:06:23.219519+00:00",
-          "text": "完成 baseline-r1 · completed"
-        },
-        {
-          "at": "2026-09-15T17:06:23.230552+00:00",
-          "text": "开始布局布线 seed-r1"
-        },
-        {
-          "at": "2026-09-15T17:06:39.137736+00:00",
-          "text": "完成 seed-r1 · completed"
-        },
-        {
-          "at": "2026-09-15T17:06:39.168950+00:00",
-          "text": "开始布局布线 candidate-03-r1"
-        },
-        {
-          "at": "2026-09-15T17:06:58.847604+00:00",
-          "text": "完成 candidate-03-r1 · completed"
-        },
-        {
-          "at": "2026-09-15T17:06:58.866609+00:00",
-          "text": "开始布局布线 baseline-r2"
         }
       ],
       "scope": "Nangate45 TT；相同 60×60 µm die / 50×50 µm core；固定映射单元，无重综合；OpenROAD 布局、详细布线、OpenRCX 寄生提取。未做晶圆厂签核或功耗分析。",
