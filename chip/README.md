@@ -19,6 +19,8 @@
 
 [本轮结果与局限](live/results.md) · [代码与证据归档](live/research-bundle.zip)
 
-论文数据、布尔演示与真实 EDA 实验分别标注。芯片图和机制播放仍是概念示意。页面每 30 秒读取真实状态，实验停止后显示已结束。页面本身不调用模型或 EDA。
+论文数据、布尔演示与真实 EDA 实验分别标注。论文机制播放是概念示意；“我们的设计”区来自实际 RTL、综合网表和 STA 报告，不是物理版图。页面每 30 秒读取真实状态，实验停止后显示已结束。页面本身不调用模型或 EDA。
 
 服务器区显示真实 CPU、内存、磁盘和逐卡 GPU 状态，由独立用户级定时器每 5 分钟发布到 server-data 分支；网页每 60 秒读取。[监控说明](live/server-monitor.md)。
+
+[我们的设计图](https://asimfish.github.io/awesome_rsi/scenes.html#design)支持原始 / 种子 / C03 对比、RTL 源码检查、完整标准单元网表、关键路径及 RSI 实验闭环。支持缩放、关键路径高亮和 SVG 下载。[图示来源与边界](live/design-guide.md)。
