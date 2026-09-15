@@ -6,13 +6,13 @@
   "state": "running",
   "stage": "generating",
   "started_at": "2026-09-15T14:28:50.007317+00:00",
-  "updated_at": "2026-09-15T14:29:49.459261+00:00",
+  "updated_at": "2026-09-15T14:30:17.510878+00:00",
   "budget": 4,
-  "completed": 2,
-  "api_calls": 5,
+  "completed": 3,
+  "api_calls": 7,
   "tokens": {
-    "prompt": 9640,
-    "completion": 6591
+    "prompt": 14944,
+    "completion": 10085
   },
   "model": "deepseek-v4-pro",
   "candidates": [
@@ -68,6 +68,36 @@
       "adp_gain_pct": -27.658,
       "area_gain_pct": 10.449,
       "delay_gain_pct": -42.554
+    },
+    {
+      "sha256": "d8a7b0bb9b215e3adf635f5ab3d291fa8c464547daddf80879d5dd12bbb38f07",
+      "formal": "pass",
+      "status": "evaluated",
+      "formal_seconds": 0.24,
+      "synthesis_seconds": 0.537,
+      "area_um2": 283.29,
+      "cells": 221,
+      "timing_seconds": 0.148,
+      "delay_ns": 0.459069,
+      "adp": 130.04965701,
+      "id": "candidate-03",
+      "rationale": "在现有4位分组直接授权基础上，通过层次化组选择信号减少高位索引逻辑，并复用组有效信号生成授权，降低面积和延迟。",
+      "strategy": "层次化组选择与授权生成，复用组有效信号，优化索引编码。",
+      "usage": {
+        "prompt_tokens": 4289,
+        "completion_tokens": 3395,
+        "total_tokens": 7684,
+        "prompt_tokens_details": {
+          "cached_tokens": 256
+        },
+        "prompt_cache_hit_tokens": 256,
+        "prompt_cache_miss_tokens": 4033
+      },
+      "accepted": true,
+      "parent": "seed",
+      "adp_gain_pct": 9.238,
+      "area_gain_pct": -11.285,
+      "delay_gain_pct": 18.442
     }
   ],
   "events": [
@@ -135,6 +165,36 @@
       "at": "2026-09-15T14:29:49.445126+00:00",
       "stage": "generating",
       "text": "候选 3/4：模型读取当前优胜与 3 条经验，生成等价 RTL。"
+    },
+    {
+      "at": "2026-09-15T14:30:14.317648+00:00",
+      "stage": "formal",
+      "text": "候选 3/4：检查所有输入的功能等价"
+    },
+    {
+      "at": "2026-09-15T14:30:14.569287+00:00",
+      "stage": "synthesis",
+      "text": "候选 3/4：综合并映射标准单元"
+    },
+    {
+      "at": "2026-09-15T14:30:15.129158+00:00",
+      "stage": "timing",
+      "text": "候选 3/4：计算最坏路径延迟"
+    },
+    {
+      "at": "2026-09-15T14:30:15.309046+00:00",
+      "stage": "selection",
+      "text": "候选 3/4：晋升为当前优胜。 ADP 相对原始基线改善 9.24%。"
+    },
+    {
+      "at": "2026-09-15T14:30:15.315547+00:00",
+      "stage": "learning",
+      "text": "候选 3/4：根据真实验证结果提炼经验。"
+    },
+    {
+      "at": "2026-09-15T14:30:17.495070+00:00",
+      "stage": "generating",
+      "text": "候选 4/4：模型读取当前优胜与 4 条经验，生成等价 RTL。"
     }
   ],
   "memory": [
@@ -154,6 +214,12 @@
       "from_candidate": "candidate-02",
       "lesson": "已验证事实：面积 227.962 µm²（相对基线变化 -10.45%）；延迟 0.802404 ns（变化 +42.55%）；ADP 改善 -27.66%。 未晋升。 候选策略（模型自述）：基于分组有效信号的直接授权生成，复用OR归约，优化索引编码。",
       "model_reflection_status": "归档，未经独立核实，不回流"
+    },
+    {
+      "version": 3,
+      "from_candidate": "candidate-03",
+      "lesson": "已验证事实：面积 283.290 µm²（相对基线变化 +11.29%）；延迟 0.459069 ns（变化 -18.44%）；ADP 改善 +9.24%。 已晋升。 候选策略（模型自述）：层次化组选择与授权生成，复用组有效信号，优化索引编码。",
+      "model_reflection_status": "归档，未经独立核实，不回流"
     }
   ],
   "baseline": {
@@ -171,24 +237,34 @@
     "label": "原始开源基线"
   },
   "best": {
-    "sha256": "0228e1cc41e396db1b80fe15e9089104887491983e5fae94fbfc8134135e60b2",
+    "sha256": "d8a7b0bb9b215e3adf635f5ab3d291fa8c464547daddf80879d5dd12bbb38f07",
     "formal": "pass",
     "status": "evaluated",
-    "formal_seconds": 0.201,
-    "synthesis_seconds": 0.486,
-    "area_um2": 239.932,
-    "cells": 216,
-    "timing_seconds": 0.145,
-    "delay_ns": 0.571606,
-    "adp": 137.14657079,
-    "id": "seed",
-    "label": "研究者引导种子",
-    "author": "researcher",
+    "formal_seconds": 0.24,
+    "synthesis_seconds": 0.537,
+    "area_um2": 283.29,
+    "cells": 221,
+    "timing_seconds": 0.148,
+    "delay_ns": 0.459069,
+    "adp": 130.04965701,
+    "id": "candidate-03",
+    "rationale": "在现有4位分组直接授权基础上，通过层次化组选择信号减少高位索引逻辑，并复用组有效信号生成授权，降低面积和延迟。",
+    "strategy": "层次化组选择与授权生成，复用组有效信号，优化索引编码。",
+    "usage": {
+      "prompt_tokens": 4289,
+      "completion_tokens": 3395,
+      "total_tokens": 7684,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 4033
+    },
     "accepted": true,
-    "parent": "baseline",
-    "adp_gain_pct": 4.285,
-    "area_gain_pct": 5.747,
-    "delay_gain_pct": -1.551
+    "parent": "seed",
+    "adp_gain_pct": 9.238,
+    "area_gain_pct": -11.285,
+    "delay_gain_pct": 18.442
   },
   "scope": "Nangate45 TT · 综合后、布局布线前 · 不含布线寄生与功耗",
   "source_url": "https://raw.githubusercontent.com/alexforencich/verilog-axis/48ff7a7e2ef782cf778d47910cf85835c64b1bce/rtl/priority_encoder.v",
@@ -213,5 +289,5 @@
     "delay_gain_pct": -1.551
   },
   "researcher_intervention": "首轮失败后由研究者测试直接 grant 与分组结构；4 位分组种子已改善 ADP。此轮检验模型在研究者种子之上的继续优化，不能把种子收益归因于自主 RSI。",
-  "heartbeat_at": "2026-09-15T14:30:00.120373+00:00"
+  "heartbeat_at": "2026-09-15T14:30:31.004521+00:00"
 }
