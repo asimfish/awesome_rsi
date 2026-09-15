@@ -1,6 +1,6 @@
 """Build the complete RSI reading site. Usage: python website/build.py OUTPUT_DIR"""
 from pathlib import Path
-import sys,re,html,posixpath,json,shutil
+import sys,re,html,posixpath,json,shutil,hashlib
 from urllib.parse import urlsplit,unquote
 import markdown
 from bs4 import BeautifulSoup
@@ -55,9 +55,10 @@ def render(text,source,page):
 
 def shell(title,body,page,toc='',kind='阅读',wide=False):
  prefix='../'*(len(Path(page).parts)-1)
+ js_version=hashlib.sha256((ROOT/'website/site.js').read_bytes()).hexdigest()[:12]
  nav=[('index.html','首页'),('papers.html','论文'),('reports.html','解读'),('insights.html','洞察'),('topics.html','专题'),('resources.html','资源')]
  navhtml=''.join(f'<a href="{prefix}{u}"'+(' aria-current="page"' if page==u else '')+f'>{t}</a>' for u,t in nav)
- doc=f'''<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的论文、中文解读、分类与专题。"><title>{html.escape(title)} · RSI 研究札记</title><link rel="stylesheet" href="{prefix}site.css"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress"></div><header class="topbar"><a class="brand" href="{prefix}index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航">{navhtml}</nav><button id="theme" aria-label="切换深色模式">深色阅读</button></header><div class="layout {'wide' if wide else ''}"><aside><div class="eyebrow">{kind}</div>{toc or '<p>从论文到方法，<br>从方法到评估。</p>'}<div class="aside-links"><a href="{prefix}guide.html">完整仓库导览 ↗</a><a href="https://github.com/asimfish/awesome_rsi">GitHub 源码 ↗</a></div></aside><main id="content">{body}<footer>RSI 研究札记 · 根据 awesome_rsi 仓库生成<br>论文结论与研究判断以各篇来源及实验边界为准。<a href="#">返回顶部 ↑</a></footer></main></div><script src="{prefix}site.js"></script></body></html>'''
+ doc=f'''<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的论文、中文解读、分类与专题。"><title>{html.escape(title)} · RSI 研究札记</title><link rel="stylesheet" href="{prefix}site.css"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress"></div><header class="topbar"><a class="brand" href="{prefix}index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航">{navhtml}</nav><button id="theme" aria-label="切换深色模式">深色阅读</button></header><div class="layout {'wide' if wide else ''}"><aside><div class="eyebrow">{kind}</div>{toc or '<p>从论文到方法，<br>从方法到评估。</p>'}<div class="aside-links"><a href="{prefix}guide.html">完整仓库导览 ↗</a><a href="https://github.com/asimfish/awesome_rsi">GitHub 源码 ↗</a></div></aside><main id="content">{body}<footer>RSI 研究札记 · 根据 awesome_rsi 仓库生成<br>论文结论与研究判断以各篇来源及实验边界为准。<a href="#">返回顶部 ↑</a></footer></main></div><script src="{prefix}site.js?v={js_version}"></script></body></html>'''
  dest=OUT/page;dest.parent.mkdir(parents=True,exist_ok=True);dest.write_text(doc)
 
 def article(title,text,source,page,kind='长文阅读',extra=''):
@@ -138,10 +139,5 @@ for name in ['index.html','blog.css','blog.js']:
  shutil.copyfile(ROOT/'report/bytedance-self-developing'/name,dst)
 p=OUT/'bytedance/index.html'
 p.write_text(p.read_text().replace('https://asimfish.github.io/awesome_rsi/">芯片专题','https://asimfish.github.io/awesome_rsi/chip/">芯片专题'))
-# Old chip home fragment links keep their destination after the new site takes over /.
-chip_page=OUT/'chip/index.html'
-if chip_page.exists():
- anchors=[n['id'] for n in BeautifulSoup(chip_page.read_text(),'html.parser').select('[id]')]
- home=BeautifulSoup((OUT/'index.html').read_text(),'html.parser')
- home.body['data-legacy-chip-anchors']=json.dumps(anchors)
- (OUT/'index.html').write_text(str(home))
+
+article('递归自改进走到了哪一步？',(ROOT/'website/overview.md').read_text(),'README.md','overview.html','全景综述 / 从结果到判断')

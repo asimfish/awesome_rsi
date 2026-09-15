@@ -21,3 +21,5 @@ python website/verify.py /tmp/rsi-site
 ## 发布
 
 先提交并推送源文件，再将构建输出复制到 `gh-pages` 的独立 worktree，检查差异后提交并推送。不要清空发布目录：其中可能有独立维护的专题。发布后核实首页、论文检索、代表性解读和两个专题均可访问。
+
+全景综述固定地址：https://asimfish.github.io/awesome_rsi/overview.html 。首页不再根据旧芯片锚点自动跳转；芯片专题始终从 `/chip/` 进入。

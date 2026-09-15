@@ -1,6 +1,4 @@
 (() => {
- const oldAnchors=document.body.dataset.legacyChipAnchors;
- if(oldAnchors&&location.hash){try{if(JSON.parse(oldAnchors).includes(decodeURIComponent(location.hash.slice(1)))){location.replace('chip/'+location.hash);return}}catch(_){}}
 
  const toggle=document.querySelector('#theme');
  let dark=false;try{dark=localStorage.getItem('rsi-theme')==='dark'}catch(_){}
