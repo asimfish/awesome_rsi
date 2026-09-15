@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "published_at": "2026-09-15T17:20:44.220219+00:00",
+  "published_at": "2026-09-15T17:21:01.023855+00:00",
   "interval_s": 60,
   "stale_after_s": 180,
   "workers": {
@@ -187,7 +187,7 @@
       "run_id": "kernel-002",
       "state": "completed",
       "started_at": "2026-09-15T17:03:11.449859+00:00",
-      "updated_at": "2026-09-15T17:06:21.880474+00:00",
+      "updated_at": "2026-09-15T17:21:00.759600+00:00",
       "stage": "review",
       "current": "",
       "completed": 12,
@@ -3870,7 +3870,7 @@
       ],
       "scope": "KernelBench 原始 forward + 自定义规模；FP32 连续二维输入；CUDA Graph 设备计时；共享 RTX 5090；非官方榜单分数。",
       "method": "研究者编写 Triton 候选，按测量反馈单变量迭代；本轮未启动自主模型搜索。",
-      "next": "对通过正确性验证的候选复测，再扩展隐藏形状与独立搜索对照。",
+      "next": "复测已完成；下一步扩展独立尺寸验证与形状分派，再做固定预算的有/无经验记忆搜索对照。",
       "selected": {
         "relu": "block1024",
         "softmax": "warps16",
