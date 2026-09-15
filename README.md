@@ -1,5 +1,7 @@
 # Awesome Recursive Self-Improvement (RSI)
 
+**在线阅读全站：[RSI 研究札记](https://asimfish.github.io/awesome_rsi/)** — 论文分类、全部中文解读、汇总洞察与研究专题。
+
 [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
 ![papers](https://img.shields.io/badge/papers-65%2B6_classics-blue)
 ![reports](https://img.shields.io/badge/deep--dives-33-red)
