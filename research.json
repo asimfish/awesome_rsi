@@ -3,13 +3,13 @@
     "physical_robustness": {
       "schema": 1,
       "run_id": "physical-003",
-      "state": "running",
+      "state": "completed",
       "started_at": "2026-09-16T02:45:01.854730+00:00",
-      "updated_at": "2026-09-16T02:47:09.711087+00:00",
-      "current": "die60-seed-r2",
-      "completed": 13,
+      "updated_at": "2026-09-16T02:47:55.146741+00:00",
+      "current": "",
+      "completed": 18,
       "planned": 18,
-      "stage": "placement-routing",
+      "stage": "review",
       "results": [
         {
           "name": "die50-baseline-r1",
@@ -283,6 +283,111 @@
           "cell_count": 233,
           "wire_length_um": 7664,
           "spef_sha256": "87cb5416b5dd031d7b04f361035906326599f905f3c7e36d3c173187d136cf42"
+        },
+        {
+          "name": "die60-seed-r2",
+          "variant": "seed",
+          "repeat": 2,
+          "die_um": 60,
+          "core_um": 50,
+          "started_at": "2026-09-16T02:47:00.521230+00:00",
+          "finished_at": "2026-09-16T02:47:10.748996+00:00",
+          "elapsed_s": 10.23,
+          "state": "completed",
+          "artifact": "die60-seed-r2/result.json",
+          "delay_ns": 0.594357,
+          "unrouted_same_tool_ns": 0.531788,
+          "area_um2": 239.932,
+          "adp": 142.605263724,
+          "connectivity_unchanged": true,
+          "route_drc": 0,
+          "cell_count": 216,
+          "wire_length_um": 7188,
+          "spef_sha256": "6683f0e8bb01427ce70c795965b44ec5ee200fd889caa6c349ee882a190a2385"
+        },
+        {
+          "name": "die60-candidate-03-r2",
+          "variant": "candidate-03",
+          "repeat": 2,
+          "die_um": 60,
+          "core_um": 50,
+          "started_at": "2026-09-16T02:47:10.808803+00:00",
+          "finished_at": "2026-09-16T02:47:20.056236+00:00",
+          "elapsed_s": 9.25,
+          "state": "completed",
+          "artifact": "die60-candidate-03-r2/result.json",
+          "delay_ns": 0.490613,
+          "unrouted_same_tool_ns": 0.42254,
+          "area_um2": 283.29,
+          "adp": 138.98575677000002,
+          "connectivity_unchanged": true,
+          "route_drc": 0,
+          "cell_count": 221,
+          "wire_length_um": 8041,
+          "spef_sha256": "2bcc73239c8a485346577491609a213ce7319cabef203f82d55275d81ca668cb"
+        },
+        {
+          "name": "die70-baseline-r2",
+          "variant": "baseline",
+          "repeat": 2,
+          "die_um": 70,
+          "core_um": 60,
+          "started_at": "2026-09-16T02:47:20.112825+00:00",
+          "finished_at": "2026-09-16T02:47:35.475399+00:00",
+          "elapsed_s": 15.36,
+          "state": "completed",
+          "artifact": "die70-baseline-r2/result.json",
+          "delay_ns": 0.61522,
+          "unrouted_same_tool_ns": 0.52194,
+          "area_um2": 254.562,
+          "adp": 156.61163364,
+          "connectivity_unchanged": true,
+          "route_drc": 0,
+          "cell_count": 233,
+          "wire_length_um": 8462,
+          "spef_sha256": "35ab81be15bd190f762e556aebcc212e04dfcfdc5ac0ef269997788949c06ae5"
+        },
+        {
+          "name": "die70-seed-r2",
+          "variant": "seed",
+          "repeat": 2,
+          "die_um": 70,
+          "core_um": 60,
+          "started_at": "2026-09-16T02:47:35.533401+00:00",
+          "finished_at": "2026-09-16T02:47:45.779628+00:00",
+          "elapsed_s": 10.25,
+          "state": "completed",
+          "artifact": "die70-seed-r2/result.json",
+          "delay_ns": 0.603342,
+          "unrouted_same_tool_ns": 0.531788,
+          "area_um2": 239.932,
+          "adp": 144.761052744,
+          "connectivity_unchanged": true,
+          "route_drc": 0,
+          "cell_count": 216,
+          "wire_length_um": 7931,
+          "spef_sha256": "77ae73909843ab61240ddc90ba4a56c8f2593b65a3fbca1255b6b8fb139a3cae"
+        },
+        {
+          "name": "die70-candidate-03-r2",
+          "variant": "candidate-03",
+          "repeat": 2,
+          "die_um": 70,
+          "core_um": 60,
+          "started_at": "2026-09-16T02:47:45.852627+00:00",
+          "finished_at": "2026-09-16T02:47:55.095727+00:00",
+          "elapsed_s": 9.24,
+          "state": "completed",
+          "artifact": "die70-candidate-03-r2/result.json",
+          "delay_ns": 0.49518,
+          "unrouted_same_tool_ns": 0.42254,
+          "area_um2": 283.29,
+          "adp": 140.2795422,
+          "connectivity_unchanged": true,
+          "route_drc": 0,
+          "cell_count": 221,
+          "wire_length_um": 8505,
+          "spef_sha256": "66bad66fda8d1a2694246b9396d57897c1a2ca26ca06f6ae92cf6a0cf480247c"
         }
       ],
       "events": [
@@ -425,18 +530,118 @@
           "at": "2026-09-16T02:47:00.507340+00:00",
           "stage": "placement-routing",
           "text": "开始 die60-seed-r2"
+        },
+        {
+          "at": "2026-09-16T02:47:10.777471+00:00",
+          "stage": "measurement",
+          "text": "完成 die60-seed-r2 · completed"
+        },
+        {
+          "at": "2026-09-16T02:47:10.791802+00:00",
+          "stage": "placement-routing",
+          "text": "开始 die60-candidate-03-r2"
+        },
+        {
+          "at": "2026-09-16T02:47:20.080113+00:00",
+          "stage": "measurement",
+          "text": "完成 die60-candidate-03-r2 · completed"
+        },
+        {
+          "at": "2026-09-16T02:47:20.092004+00:00",
+          "stage": "placement-routing",
+          "text": "开始 die70-baseline-r2"
+        },
+        {
+          "at": "2026-09-16T02:47:35.504238+00:00",
+          "stage": "measurement",
+          "text": "完成 die70-baseline-r2 · completed"
+        },
+        {
+          "at": "2026-09-16T02:47:35.518619+00:00",
+          "stage": "placement-routing",
+          "text": "开始 die70-seed-r2"
+        },
+        {
+          "at": "2026-09-16T02:47:45.823307+00:00",
+          "stage": "measurement",
+          "text": "完成 die70-seed-r2 · completed"
+        },
+        {
+          "at": "2026-09-16T02:47:45.838150+00:00",
+          "stage": "placement-routing",
+          "text": "开始 die70-candidate-03-r2"
+        },
+        {
+          "at": "2026-09-16T02:47:55.135407+00:00",
+          "stage": "measurement",
+          "text": "完成 die70-candidate-03-r2 · completed"
+        },
+        {
+          "at": "2026-09-16T02:47:55.146748+00:00",
+          "stage": "review",
+          "text": "本轮结束；保留全部尺寸与失败记录，进入配对比较。"
         }
       ],
       "method": "C03 的布线后 ADP 收益在预先指定的 50、60、70 µm 芯片边长下是否都存在？",
-      "summary": null
+      "summary": {
+        "pairs": [
+          {
+            "die_um": 50,
+            "repeat": 1,
+            "gain_vs_baseline_pct": 5.12448331360379,
+            "gain_vs_seed_pct": 1.3118794895121133,
+            "delay_gain_pct": 14.745662470534116
+          },
+          {
+            "die_um": 50,
+            "repeat": 2,
+            "gain_vs_baseline_pct": 5.12448331360379,
+            "gain_vs_seed_pct": 1.3118794895121133,
+            "delay_gain_pct": 14.745662470534116
+          },
+          {
+            "die_um": 60,
+            "repeat": 1,
+            "gain_vs_baseline_pct": 10.413722573284778,
+            "gain_vs_seed_pct": 2.538129981657067,
+            "delay_gain_pct": 19.498528171486896
+          },
+          {
+            "die_um": 60,
+            "repeat": 2,
+            "gain_vs_baseline_pct": 10.413722573284778,
+            "gain_vs_seed_pct": 2.538129981657067,
+            "delay_gain_pct": 19.498528171486896
+          },
+          {
+            "die_um": 70,
+            "repeat": 1,
+            "gain_vs_baseline_pct": 10.42840245032004,
+            "gain_vs_seed_pct": 3.09579853078662,
+            "delay_gain_pct": 19.511719384935468
+          },
+          {
+            "die_um": 70,
+            "repeat": 2,
+            "gain_vs_baseline_pct": 10.42840245032004,
+            "gain_vs_seed_pct": 3.09579853078662,
+            "delay_gain_pct": 19.511719384935468
+          }
+        ],
+        "min_gain_pct": 5.12448331360379,
+        "max_gain_pct": 10.42840245032004,
+        "all_configurations_improve": true,
+        "repeat_readings_equal": true,
+        "limits": "三个预先指定的 floorplan 设置；重复用于确定性检查，不是独立随机种子，不作统计置信区间或 RSI 因果优势推断。"
+      }
     }
   },
   "schema": 1,
-  "published_at": "2026-09-16T02:47:10.230518+00:00",
+  "published_at": "2026-09-16T02:48:13.235645+00:00",
   "interval_s": 60,
   "stale_after_s": 180,
   "workers": {
-    "chip": 2,
+    "chip": 0,
     "kernel": 0
   },
   "projects": {
