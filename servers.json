@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-09-19T06:49:12.152444+00:00",
+  "updated_at": "2026-09-19T06:54:15.382946+00:00",
   "collection_interval_s": 300,
   "stale_after_s": 900,
   "node": {
@@ -8,39 +8,39 @@
     "cpu": {
       "model": "AMD Ryzen Threadripper 7960X 24-Cores",
       "logical_cpus": 48,
-      "util_pct": 14.0,
+      "util_pct": 10.7,
       "sample_seconds": 1,
       "load": [
-        7.63720703125,
-        9.58154296875,
-        10.12744140625
+        10.12890625,
+        10.8037109375,
+        10.5556640625
       ]
     },
     "memory": {
       "total_bytes": 269723279360,
-      "used_bytes": 139280171008,
-      "available_bytes": 130443108352,
-      "used_pct": 51.6,
+      "used_bytes": 137012473856,
+      "available_bytes": 132710805504,
+      "used_pct": 50.8,
       "swap_total_bytes": 137438945280,
-      "swap_used_bytes": 67469230080
+      "swap_used_bytes": 67425714176
     },
     "disks": [
       {
         "label": "系统盘",
         "total_bytes": 4030803197952,
-        "used_bytes": 3748925526016,
-        "available_bytes": 77047525376,
+        "used_bytes": 3748780187648,
+        "available_bytes": 77192863744,
         "used_pct": 98.0
       },
       {
         "label": "实验存储",
-        "total_bytes": 29204750139392,
-        "used_bytes": 14272212631552,
-        "available_bytes": 14932537507840,
+        "total_bytes": 29204749484032,
+        "used_bytes": 14272223772672,
+        "available_bytes": 14932525711360,
         "used_pct": 48.9
       }
     ],
-    "uptime_seconds": 931109,
+    "uptime_seconds": 931412,
     "gpus": {
       "status": "ok",
       "cards": [
@@ -48,10 +48,10 @@
           "index": 0,
           "model": "NVIDIA GeForce RTX 5090",
           "util_pct": 1.0,
-          "memory_used_mib": 519.0,
+          "memory_used_mib": 520.0,
           "memory_total_mib": 32607.0,
           "temperature_c": 36.0,
-          "power_w": 24.06,
+          "power_w": 23.36,
           "power_limit_w": 575.0,
           "project_compute_processes": 0,
           "other_compute_processes": 0
@@ -59,11 +59,11 @@
         {
           "index": 1,
           "model": "NVIDIA GeForce RTX 5090",
-          "util_pct": 37.0,
+          "util_pct": 2.0,
           "memory_used_mib": 7198.0,
           "memory_total_mib": 32607.0,
           "temperature_c": 45.0,
-          "power_w": 113.44,
+          "power_w": 121.53,
           "power_limit_w": 575.0,
           "project_compute_processes": 0,
           "other_compute_processes": 1
@@ -95,15 +95,6 @@
     "note": "资源指标为整机共享资源；任务标签仅标识本项目。模型通过远程 API 调用，当前 RTL 评估使用 CPU。"
   },
   "history": [
-    {
-      "at": "2026-09-19T03:51:51.174726+00:00",
-      "cpu_pct": 29.8,
-      "memory_pct": 50.8,
-      "gpu_pct": [
-        1.0,
-        37.0
-      ]
-    },
     {
       "at": "2026-09-19T03:56:52.115926+00:00",
       "cpu_pct": 22.5,
@@ -417,6 +408,15 @@
       "gpu_pct": [
         1.0,
         37.0
+      ]
+    },
+    {
+      "at": "2026-09-19T06:54:15.382946+00:00",
+      "cpu_pct": 10.7,
+      "memory_pct": 50.8,
+      "gpu_pct": [
+        1.0,
+        2.0
       ]
     }
   ]
