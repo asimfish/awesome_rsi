@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-07T15:02:58.090794+00:00",
+  "updated_at": "2026-10-07T15:17:58.558255+00:00",
   "collection_interval_s": 300,
   "stale_after_s": 900,
   "node": {
@@ -8,65 +8,65 @@
     "cpu": {
       "model": "AMD Ryzen Threadripper 7960X 24-Cores",
       "logical_cpus": 48,
-      "util_pct": 88.4,
+      "util_pct": 48.4,
       "sample_seconds": 1,
       "load": [
-        34.34326171875,
-        30.9755859375,
-        29.6162109375
+        36.61083984375,
+        43.4306640625,
+        38.1923828125
       ]
     },
     "memory": {
       "total_bytes": 269723271168,
-      "used_bytes": 223159017472,
-      "available_bytes": 46564253696,
-      "used_pct": 82.7,
+      "used_bytes": 229197516800,
+      "available_bytes": 40525754368,
+      "used_pct": 85.0,
       "swap_total_bytes": 137438945280,
-      "swap_used_bytes": 137438703616
+      "swap_used_bytes": 137438838784
     },
     "disks": [
       {
         "label": "系统盘",
         "total_bytes": 4030803197952,
-        "used_bytes": 3823500500992,
-        "available_bytes": 2472550400,
+        "used_bytes": 3823851282432,
+        "available_bytes": 2121768960,
         "used_pct": 99.9
       },
       {
         "label": "实验存储",
-        "total_bytes": 28955144880128,
-        "used_bytes": 22067430031360,
-        "available_bytes": 6887714848768,
+        "total_bytes": 28955099136000,
+        "used_bytes": 22068067303424,
+        "available_bytes": 6887031832576,
         "used_pct": 76.2
       }
     ],
-    "uptime_seconds": 1508264,
+    "uptime_seconds": 1509164,
     "gpus": {
       "status": "ok",
       "cards": [
         {
           "index": 0,
           "model": "NVIDIA GeForce RTX 5090",
-          "util_pct": 19.0,
-          "memory_used_mib": 412.0,
+          "util_pct": 20.0,
+          "memory_used_mib": 8142.0,
           "memory_total_mib": 32607.0,
-          "temperature_c": 42.0,
-          "power_w": 37.01,
+          "temperature_c": 43.0,
+          "power_w": 82.21,
           "power_limit_w": 575.0,
           "project_compute_processes": 0,
-          "other_compute_processes": 0
+          "other_compute_processes": 1
         },
         {
           "index": 1,
           "model": "NVIDIA GeForce RTX 5090",
           "util_pct": 1.0,
-          "memory_used_mib": 12745.0,
+          "memory_used_mib": 13012.0,
           "memory_total_mib": 32607.0,
-          "temperature_c": 37.0,
-          "power_w": 32.81,
+          "temperature_c": 45.0,
+          "power_w": 40.25,
           "power_limit_w": 575.0,
           "project_compute_processes": 0,
-          "other_compute_processes": 1
+          "other_compute_processes": 2
         }
       ]
     }
@@ -95,33 +95,6 @@
     "note": "资源指标为整机共享资源；任务标签仅标识本项目。模型通过远程 API 调用，当前 RTL 评估使用 CPU。"
   },
   "history": [
-    {
-      "at": "2026-10-07T12:06:48.127663+00:00",
-      "cpu_pct": 30.8,
-      "memory_pct": 76.4,
-      "gpu_pct": [
-        2.0,
-        1.0
-      ]
-    },
-    {
-      "at": "2026-10-07T12:11:48.674187+00:00",
-      "cpu_pct": 22.5,
-      "memory_pct": 70.3,
-      "gpu_pct": [
-        19.0,
-        0.0
-      ]
-    },
-    {
-      "at": "2026-10-07T12:16:48.748020+00:00",
-      "cpu_pct": 20.9,
-      "memory_pct": 73.6,
-      "gpu_pct": [
-        80.0,
-        0.0
-      ]
-    },
     {
       "at": "2026-10-07T12:21:53.550938+00:00",
       "cpu_pct": 22.7,
@@ -416,6 +389,33 @@
       "memory_pct": 82.7,
       "gpu_pct": [
         19.0,
+        1.0
+      ]
+    },
+    {
+      "at": "2026-10-07T15:07:57.974407+00:00",
+      "cpu_pct": 46.7,
+      "memory_pct": 78.8,
+      "gpu_pct": [
+        13.0,
+        5.0
+      ]
+    },
+    {
+      "at": "2026-10-07T15:12:58.198048+00:00",
+      "cpu_pct": 41.6,
+      "memory_pct": 82.8,
+      "gpu_pct": [
+        36.0,
+        44.0
+      ]
+    },
+    {
+      "at": "2026-10-07T15:17:58.558255+00:00",
+      "cpu_pct": 48.4,
+      "memory_pct": 85.0,
+      "gpu_pct": [
+        20.0,
         1.0
       ]
     }
