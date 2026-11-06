@@ -137,8 +137,8 @@
 <div class="eyebrow">Recursive Self-Improvement · 深度调研</div>
 <h1>RSI 全景：<br/>哥德尔机到评估器共进化</h1>
 <p style="font-size:20px; color:var(--ink-soft); margin-top:26px; line-height:1.7;">
-      32 份解读 · 71 篇英文 PDF · 69 篇中译 · 19 项 2026 下半年新工作<br/>
-<span style="color:var(--ink-faint); font-size:16px;">Lilian Weng harness 工程 / Anthropic《When AI builds itself》/ 六篇 RSI 论文 / WikiSkill / Continual Harness / 趋势与 insight</span>
+      33 份解读 · §4 共 105 条 · 71 篇英文 PDF · 69 篇中译 · 2026-11-06 新增 29 项<br/>
+<span style="color:var(--ink-faint); font-size:16px;">Lilian Weng harness 工程 / Anthropic《When AI builds itself》/ 六篇 RSI 论文 / WikiSkill / Continual Harness / 趋势与 insight / 9–11 月新证据</span>
 </p>
 <div style="margin-top:44px; display:flex; gap:14px;">
 <span class="tag red" style="font-size:14px; padding:6px 16px;">评估侧 · EvoLM / RQGM / WGtG</span>
@@ -146,7 +146,7 @@
 <span class="tag gold" style="font-size:14px; padding:6px 16px;">框架侧 · DGM / MOSS</span>
 <span class="tag green" style="font-size:14px; padding:6px 16px;">知识侧 · WikiSkill</span>
 </div>
-<p style="position:absolute; bottom:56px; font-size:14px; color:var(--ink-faint);">2026-08-31 · awesome_rsi 仓库汇总报告 · 配套 32 份深度解读（七节结构，8.3 万字）与中英双语 PDF</p>
+<p style="position:absolute; bottom:56px; font-size:14px; color:var(--ink-faint);">2026-08-31 首版 · 2026-11-06 更新 · awesome_rsi 仓库汇总报告 · 配套 33 份解读（约 9.8 万字；报告 32 为摘要级笔记）与中英双语 PDF</p>
 </div>
 </section>
 <!-- S2 三个结论 -->
@@ -184,7 +184,7 @@
 <!-- S3 材料地图 -->
 <section class="slide" data-n="3">
 <div class="eyebrow">调研范围</div>
-<h2>材料概览<span class="en">32 份深度解读 + 71 篇英文 PDF + 69 篇中译 + 19 项扫描</span></h2>
+<h2>材料概览<span class="en">33 份解读 + 71 篇英文 PDF + 69 篇中译 + 19 项扫描 + 29 项新增（§4 共 105 条）</span></h2>
 <p class="sub" style="margin-bottom:10px;">材料覆盖定义、分类框架、工业数据、方法细节与 2026 下半年进展。</p>
 <div class="slide-body">
 <table class="dense" style="font-size:12.3px;">
@@ -200,6 +200,7 @@
 <tr><td><span class="tag gold">谱系扩编 ×9</span></td><td>三份综述（TMLR · 共进化 · 编码域）· Meta-Harness · Self-Harness · EnvHarness · AutoSaddler · MetaCaster · Prime Agent</td><td>三张分类图（S20-S21）+ 六个 harness 自进化系统：锚的三种形态与去锚后负收益（S22-S23）</td></tr>
 <tr><td><span class="tag red">工业实证 ×1</span></td><td>iCoder-27B 技术报告（SJTU/NUS/DP Tech）</td><td>AI 主导交付 release-ready 模型：五层 prior 门控 + 失败驱动配方（S24，后续开发基座）</td></tr>
 <tr><td><span class="tag green">趋势扫描</span></td><td>2026 年 6-8 月：19 篇新论文（PDF 全入库；Metan / Co-Harness / 共进化综述精读 S25，EvalCEGAR vs RHO 对照 S26）+ 9 工业 + 7 基准 + 8 治理</td><td>EvalCEGAR / SCORE / Metan / skill 研究 / Sol 训 Luna / AI4AI-Bench / IFP 23 条……</td></tr>
+<tr><td><span class="tag red">2026-11-06 新增 ×29</span></td><td>24 篇 2026 年 9–11 月新论文 + 路线图待补的 Mendel Gödel Machine · SEAL · ReasoningBank · FinEvo-Bench · GDPevo（暂只链接原文）</td><td>§4 共 105 条；README §6.3 六条新证据（S35）+ 新增条目在 §4 各小节的分布（S36）</td></tr>
 </table>
 </div>
 <div class="footer"><span>RSI 全景调研 2026-08</span><span>03</span></div>
@@ -1162,7 +1163,7 @@
 </div>
 <div class="card" style="border-left:4px solid var(--blue);">
 <h3>《万字长文带你读懂 RSI》（报告 30）</h3>
-<p style="font-size:13.4px;">定义 A(t+1) = U(A(t), τ, f)，比 Bostrom 判据宽：带记忆的 agent 都算。五组维度里有两个本仓库没单列的：<b>进化结构</b>（链 / 树 / 图；Mendel GM 用跨分支对照把 Polyglot 从 77.9% 提到 93.2%）和<b>更新者</b>（自身 / 教师 / 联合，对应 Self-Harness 与 Meta-Harness 之分）。FinEvo-Bench 的状态重置对照组是测"知识积累"的正面例子。全文不讨论评估器被优化压力带偏。</p>
+<p style="font-size:13.4px;">定义 A(t+1) = U(A(t), τ, f)，比 Bostrom 判据宽：带记忆的 agent 都算。五组维度里有两个本仓库没单列的：<b>进化结构</b>（链 / 树 / 图；Mendel GM 用跨分支对照把 Polyglot 从 50.8% 提到 93.2%，同起点的 HGM 为 77.9%）和<b>更新者</b>（自身 / 教师 / 联合，对应 Self-Harness 与 Meta-Harness 之分）。FinEvo-Bench 的状态重置对照组是测"知识积累"的正面例子。全文不讨论评估器被优化压力带偏。</p>
 </div>
 </div>
 <div class="col">
@@ -1173,8 +1174,8 @@
 <div class="card" style="background:#F6EFE9;">
 <h3>对本仓库的三点修正</h3>
 <ul style="font-size:13.4px;">
-<li>分类图加两个维度：进化结构、更新者；对照矩阵加"验收标准"一列</li>
-<li>增加基准一节；补 Mendel GM、ReasoningBank、SEAL、FinEvo-Bench、GDPevo</li>
+<li>分类图加两个维度：进化结构、更新者（仍待加入）；对照矩阵加"验收标准"一列</li>
+<li>增加基准一节（已有 §4.15）；补 Mendel GM、ReasoningBank、SEAL、FinEvo-Bench、GDPevo（2026-11-06 已补入 §4.4 / §4.7 / §4.6 / §4.15）</li>
 <li>Reef 把评估门做成组件，但 selection: always 即无锚运行，锚从哪来仍是用户的事；路线图上它可接 iCoder 的运行时层，接缝在 recipe</li>
 </ul>
 </div>
@@ -1183,15 +1184,59 @@
 </div>
 <div class="footer"><span>报告 29 · 30 · 31 · README §4.14 / §11</span><span>34</span></div>
 </section>
-<!-- S35 仓库导览 -->
+<!-- S35 2026 年 9–11 月的新证据 -->
 <section class="slide" data-n="35">
+<div class="eyebrow">2026-11-06 更新 · README §6.3</div>
+<h2>2026 年 9–11 月的新证据<span class="en">24 篇新论文 · 六条观察</span></h2>
+<p class="sub" style="margin-bottom:10px;">2026-11-06 补入的 24 篇 9–11 月新论文对 README §6.1 十条发现的补充和修正。数字均出自所引论文的摘要；insight 编号按 README §6.1。</p>
+<div class="slide-body">
+<table class="dense" style="font-size:13px;">
+<tr><th style="width:25%;">结论</th><th style="width:47%;">关键数字</th><th style="width:12%;">arXiv</th><th>insight</th></tr>
+<tr><td><b>① harness 进化在搜索集上的增益有相当一部分来自过拟合或测试时计算</b></td><td>HDA：过拟合和测试时扩展平均占增益的 54% 和 14%。Winner's Curse：选择集为 16 题时，贪心循环的选择集分数比留出准确率高 13 到 20 分。90 篇自称 RSI 的研究中，只有 22% 审计了两次以上完整循环的重跑。</td><td>2610.22466<br/>2610.09239<br/>2610.27610</td><td><span class="tag gold">补充</span>insight 2 · 10</td></tr>
+<tr><td><b>② 评估器共进化仍依赖锚，任务分数不能用来验证评估器</b></td><td>2610.11464 去掉锚定守卫后验证器退化为全部放行，用它训练技能的效果不变。VeriEvolve 每轮内冻结评估器、只在轮间修订，GLM-5.2 的外部验证成功数从 6/30 提到 18/30。</td><td>2610.11464<br/>2610.29005</td><td><span class="tag green">支持</span>insight 1 · 3</td></tr>
+<tr><td><b>③ harness 与权重联合进化开始给出分工判据</b></td><td>Self-HPO 交替执行 harness 搜索和 RL，Qwen3.5-35B-A3B 平均解决率从 57.8% 提到 64.8%。Harness Ceiling 让 harness 进化处理过程失败、权重训练处理内容失败，Qwen3.5-4B 留出分数从 0.16 提到 0.30 后，LoRA 在原 harness 下再加 +0.13。</td><td>2610.22791<br/>2610.11655</td><td><span class="tag blue">对应</span>开放问题 4 · §10 权重更新方式</td></tr>
+<tr><td><b>④ 接受门本身会丢失保护，安全研究开始追踪跨代传递</b></td><td>Masked Erosion 的 411 个改进循环中，同等成本下 20 题批次让每个 harness 保持受保护，40 题批次的六个 harness 全部失去保护。2609.17817 的投毒基准在改用干净基准继续进化后污染常常仍然保留。RSI Control 中六个前沿模型都完成了相当比例的隐蔽任务。</td><td>2610.38392<br/>2609.17817<br/>2610.27735</td><td><span class="tag gold">补充</span>insight 7</td></tr>
+<tr><td><b>⑤ 自动 AI 研究出现可与官方模型对照的端到端结果，宏观反馈环仍被估计为不足以自我维持</b></td><td>Athanor 中四个 agent 用 104 小时把 Qwen3-4B-Base 的留出分数从 9.2 提到 48.2（官方 Instruct 为 47.9）。RSI Arena 中基准提升与人类偏好提升之间没有明确关联。2609.15802 把净加速写成各反馈环弹性的乘积，粗略校准后认为当前反馈环不足以产生自我维持的加速。</td><td>2610.21055<br/>2610.33624<br/>2609.15802</td><td><span class="tag green">一致</span>insight 8 · 9</td></tr>
+<tr><td><b>⑥ 技能和自修改的跨任务迁移有限</b></td><td>训练任务上有提升的 21 个技能只有 5 个在测试任务上保留全部提升，3 个完全不保留。公开的 Darwin Gödel Machine 日志的 145 次修改中没有发现针对目标失败的修复优势。</td><td>2609.39148<br/>2610.14662</td><td><span class="tag red">加条件</span>insight 5</td></tr>
+</table>
+<p style="font-size:12.5px; color:var(--ink-faint); margin-top:10px; line-height:1.55;">README §6.1 insight：1 评估器决定能力上限 · 2 去掉循环外评估依据后系统退化 · 3 优化期间固定评估标准 · 5 技能可以跨模型迁移 · 7 生产系统有版本、审计、预测、回滚 · 8 微观产出增加，没有公司报告整体研发节奏翻倍 · 9 替代弹性 σ · 10 测量工具本身成为瓶颈</p>
+</div>
+<div class="footer"><span>README §6.3 · §4 中 2026-11-06 新增条目</span><span>35</span></div>
+</section>
+<!-- S36 新增条目分布 -->
+<section class="slide" data-n="36">
+<div class="eyebrow">2026-11-06 更新 · README §4</div>
+<h2>29 项新增条目在 §4 的分布<span class="en">§4 共 105 条</span></h2>
+<p class="sub" style="margin-bottom:10px;">24 篇 2026 年 9–11 月的新论文，加上路线图中待补的条目（标 <span class="tag gold">路线图</span>）。新条目暂只链接原文。</p>
+<div class="slide-body">
+<table class="dense" style="font-size:13.6px;">
+<tr><th style="width:31%;">§4 小节</th><th>新增条目</th></tr>
+<tr><td>4.3 Surveys</td><td>Safety in Self-Evolving Agents: A Survey</td></tr>
+<tr><td>4.4 Framework Side</td><td>Mendel Gödel Machine <span class="tag gold">路线图</span> · AIDE² · IDM · VERSE</td></tr>
+<tr><td>4.5 Evaluator Side</td><td>Who Verifies the Verifier? · VeriEvolve</td></tr>
+<tr><td>4.6 Model Side</td><td>SEAL <span class="tag gold">路线图</span> · Harness Ceiling · Self-HPO</td></tr>
+<tr><td>4.7 Knowledge Side</td><td>ReasoningBank <span class="tag gold">路线图</span> · Do Self-Evolving Skills Generalize to Held-Out Tasks? · Skill<sup>∞</sup></td></tr>
+<tr><td>4.8 Online Side</td><td>Exo</td></tr>
+<tr><td>4.9 Harness Engineering (2026)</td><td>RRSI · HDA</td></tr>
+<tr><td>4.10 Autonomous Research &amp; Industrial Evidence</td><td>Athanor · LM2LM</td></tr>
+<tr><td>4.11 Safety &amp; Governance</td><td>Trusting Trust Revisited · RSI Control · Masked Erosion</td></tr>
+<tr><td>4.13 Macro Debate &amp; Measurement</td><td>Economics of RSI · Winner's Curse · Does Failure Feedback Direct Agent Self-Modification? · RSI 研究审计</td></tr>
+<tr><td>4.14 Open-Source Systems &amp; Infrastructure</td><td>RSIGym</td></tr>
+<tr><td>4.15 Self-Improvement Benchmarks</td><td>GDPevo <span class="tag gold">路线图</span> · FinEvo-Bench <span class="tag gold">路线图</span> · RSI Arena</td></tr>
+</table>
+<p style="font-size:14px; color:var(--ink-soft); margin-top:14px;">英文 PDF、super_translate 中译和全文解读待补。README §10 列出的精读候选：Athanor（§4.10）、HDA 与 RRSI（§4.9）、RSI Control 与 Masked Erosion（§4.11）、RSI 研究审计（§4.13）。</p>
+</div>
+<div class="footer"><span>README §4 · §10 · §12 2026-11-06</span><span>36</span></div>
+</section>
+<!-- S37 仓库导览 -->
+<section class="slide" data-n="37">
 <div class="eyebrow">交付物</div>
 <h2>仓库导览<span class="en">awesome_rsi/</span></h2>
 <div class="slide-body" style="padding-top:6px;">
 <div class="cols">
 <div class="col">
 <div class="card">
-<h3>reports/ · 32 份深度解读（七节结构，9.8 万字）</h3>
+<h3>reports/ · 33 份解读（00–31 七节结构，9.8 万字）</h3>
 <ul style="font-size:12.8px; line-height:1.45;">
 <li>00 起源前史（Good → Bostrom）· 23 桥接史（Gödel Agent → SICA）</li>
 <li>01 Weng harness 总纲 · 02 Anthropic《When AI builds itself》</li>
@@ -1200,7 +1245,7 @@
 <li>10 汇总 insight（本 PPT 的长文版）</li>
 <li>12-18 谱系扩编七篇 · 19 iCoder（后续开发基础）</li>
 <li>20-22 Metan · Co-Harness · 共进化综述 · 24-25 EvalCEGAR vs RHO · 28 编码域综述</li>
-<li>26-27 合评：技能进化五篇 · 安全治理五篇 · 29-31 Prism-Shadow 清单与长文 · Reef 基础设施</li>
+<li>26-27 合评：技能进化五篇 · 安全治理五篇 · 29-31 Prism-Shadow 清单与长文 · Reef 基础设施 · 32 The Last AI（摘要级笔记）</li>
 </ul>
 </div>
 <div class="card">
@@ -1221,14 +1266,14 @@
 <h3>本调研的主要结论</h3>
 <p style="font-size:15.5px; line-height:1.7;">执行已基本自动化，评估标准正转成技能；<b>锚仍需人工生产</b>。能否低成本生产不可 game 的 ground truth，决定 RSI 的速度。</p>
 </div>
-<p style="font-size:12.5px; color:var(--ink-faint); margin-top:10px;">2026-09-03（首版 2026-08-31）· 材料截至 2026-08-31 · 写作遵循 anti-defensive-writing / 说人话规范：直接陈述、保留数字与限定条件、不加表演性铺垫</p>
+<p style="font-size:12.5px; color:var(--ink-faint); margin-top:10px;">2026-11-06 更新（首版 2026-08-31）· 材料截至 2026-11-06 · 2026-11-06 新增的 29 条暂只链接原文，未归档 PDF 与中译 · 写作遵循 anti-defensive-writing / 说人话规范：直接陈述、保留数字与限定条件、不加表演性铺垫</p>
 </div>
 </div>
 </div>
-<div class="footer"><span>RSI 全景调研 2026-08</span><span>35 / 35</span></div>
+<div class="footer"><span>RSI 全景调研 2026-08</span><span>37 / 37</span></div>
 </section>
 </div>
-<div id="hud"><span id="cur">1</span> / 35</div>
+<div id="hud"><span id="cur">1</span> / 37</div>
 <div class="kbd-hint">← → 翻页 · Home/End 首尾 · P 打印</div>
 <script>
 (function(){

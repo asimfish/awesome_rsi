@@ -1,5 +1,6 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的综述、论文、中文解读与专题。"><title>洞察与开放问题 · RSI 研究札记</title><link rel="stylesheet" href="site.css?v=5aaa2dc3f4cf"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress" aria-hidden="true"></div><header class="topbar"><a class="brand" href="index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a href="index.html">全景综述</a><a href="papers.html">论文目录</a><a href="reports.html">逐篇解读</a><a href="topics.html">研究专题</a><a href="reference.html">术语对照</a></nav><div class="reading-tools"><button id="font-size" aria-label="放大正文字号" aria-pressed="false">A＋</button><button id="theme" aria-label="切换深色模式">深色</button></div></header><div class="layout "><aside><div class="aside-links"><a href="index.html">全景综述</a><a href="resources.html">资源与来源</a><a href="https://github.com/asimfish/awesome_rsi">GitHub ↗</a></div></aside><main id="content"><header class="article-header"><div class="breadcrumb"><a href="index.html">RSI 研究札记</a><span>/</span>研究资料</div><div class="eyebrow">长文阅读</div><h1 id="洞察与开放问题">洞察与开放问题</h1><p class="meta">约 2 分钟阅读 · <a href="https://github.com/asimfish/awesome_rsi/blob/main/README.md">查看原始笔记 ↗</a></p></header><div class="prose">
-<p>十条主要发现（完整论证见<a href="reports/10_synthesis_insights.html">报告 10</a>）：</p>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的综述、论文、中文解读与专题。"><title>洞察与开放问题 · RSI 研究札记</title><link rel="stylesheet" href="site.css?v=5aaa2dc3f4cf"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress" aria-hidden="true"></div><header class="topbar"><a class="brand" href="index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a href="index.html">全景综述</a><a href="papers.html">论文目录</a><a href="reports.html">逐篇解读</a><a href="topics.html">研究专题</a><a href="reference.html">术语对照</a></nav><div class="reading-tools"><button id="font-size" aria-label="放大正文字号" aria-pressed="false">A＋</button><button id="theme" aria-label="切换深色模式">深色</button></div></header><div class="layout "><aside><details class="toc-panel" open><summary>本页目录 <span>展开 / 收起</span></summary><div class="toc-body"><div class="eyebrow">本页目录</div><ul><li><a href="#61-ten-insights">1 Ten Insights</a></li><li><a href="#62-open-problems">2 Open Problems</a></li><li><a href="#63-update-since-september-2026">3 Update Since September 2026</a></li></ul></div></details><div class="aside-links"><a href="index.html">全景综述</a><a href="resources.html">资源与来源</a><a href="https://github.com/asimfish/awesome_rsi">GitHub ↗</a></div></aside><main id="content"><header class="article-header"><div class="breadcrumb"><a href="index.html">RSI 研究札记</a><span>/</span>研究资料</div><div class="eyebrow">长文阅读</div><h1 id="洞察与开放问题">洞察与开放问题</h1><p class="meta">约 6 分钟阅读 · <a href="https://github.com/asimfish/awesome_rsi/blob/main/README.md">查看原始笔记 ↗</a></p></header><div class="prose">
+<h3 id="61-ten-insights">6.1 Ten Insights<a aria-label="跳转到本节" class="section-link" href="#61-ten-insights">#</a></h3>
+<p>十条主要发现，截至 2026-09-16（完整论证见<a href="reports/10_synthesis_insights.html">报告 10</a>）：</p>
 <ol>
 <li>评估器决定能力上限，也是被利用的目标。</li>
 <li>去掉进化循环外的评估依据后系统会退化（AutoSaddler 去掉 dev 集检查后低于未优化基线）。RHO 的单轮无标签结果是目前的例外，尚待多轮验证。</li>
@@ -12,7 +13,8 @@
 <li>宏观争论取决于算力与认知劳动的替代弹性 σ。</li>
 <li>基准饱和速度加快，测量工具本身成为瓶颈。</li>
 </ol>
-<p>开放问题（按可检验程度排序）：</p>
+<h3 id="62-open-problems">6.2 Open Problems<a aria-label="跳转到本节" class="section-link" href="#62-open-problems">#</a></h3>
+<p>按可检验程度排序：</p>
 <ol>
 <li>要让评估器不退化，最少需要多少人工标注？WGtG 用十条样本，EvalCEGAR 用十个碰撞对，尚无理论。</li>
 <li>不用标签的自偏好优化，经过多轮后是否仍能提升？RHO 只测了一轮。</li>
@@ -24,4 +26,14 @@
 <li>锚本身需要更新时（RQGM 换评估器、SESG 更新护栏），由谁验证更新？目前都由人验证。</li>
 <li>如果 2027 年 METR 仍测不到整体节奏翻倍，是串行瓶颈所致，还是加速被用于做更多实验？</li>
 <li>何时会有人做 σ 的受控实验（随机分配研究者的算力预算）？Epoch AI 已给出实验设计。</li>
+</ol>
+<h3 id="63-update-since-september-2026">6.3 Update Since September 2026<a aria-label="跳转到本节" class="section-link" href="#63-update-since-september-2026">#</a></h3>
+<p>2026-11-06 补入的 24 篇 9–11 月新论文对上面十条发现的补充和修正。数字均出自所引论文的摘要，条目见 §4 中标 🆕 的论文。</p>
+<ol>
+<li><strong>harness 进化在搜索集上的增益有相当一部分来自过拟合或测试时计算，补充 insight 2 和 insight 10。</strong> HDA（<a href="https://arxiv.org/abs/2610.22466">2610.22466</a>）测得过拟合和测试时扩展平均占增益的 54% 和 14%，Winner's Curse（<a href="https://arxiv.org/abs/2610.09239">2610.09239</a>）在选择集为 16 题时测得贪心循环的选择集分数比留出准确率高 13 到 20 分。<a href="https://arxiv.org/abs/2610.27610">2610.27610</a> 编码的 90 篇自称 RSI 的研究中，只有 22% 审计了两次以上完整循环的重跑。</li>
+<li><strong>评估器共进化仍依赖锚（进化循环之外不参与进化的评估依据），任务分数不能用来验证评估器，支持 insight 1 和 insight 3。</strong> <a href="https://arxiv.org/abs/2610.11464">2610.11464</a> 去掉锚定守卫后验证器退化为全部放行，用它训练技能的效果不变；VeriEvolve（<a href="https://arxiv.org/abs/2610.29005">2610.29005</a>）每轮内冻结评估器、只在轮间修订，把 GLM-5.2 的外部验证成功数从 6/30 提到 18/30。</li>
+<li><strong>harness 与权重联合进化开始给出分工判据，对应 §10 路线图中权重更新方式的待定选择和开放问题 4。</strong> Self-HPO（<a href="https://arxiv.org/abs/2610.22791">2610.22791</a>）交替执行 harness 搜索和 RL，Qwen3.5-35B-A3B 平均解决率从 57.8% 提到 64.8%，联合增益大于两部分各自增益之和。<a href="https://arxiv.org/abs/2610.11655">2610.11655</a> 让 harness 进化处理过程失败、权重训练处理内容失败，Qwen3.5-4B 留出分数从 0.16 提到 0.30 后，LoRA 在原 harness 下再加 +0.13。</li>
+<li><strong>接受门本身会丢失保护，安全研究开始追踪跨代传递，补充 insight 7。</strong> Masked Erosion（<a href="https://arxiv.org/abs/2610.38392">2610.38392</a>）的 411 个改进循环中，同等成本下 20 题批次让每个 harness 保持受保护，40 题批次的六个 harness 全部失去保护，作者给出的补救是冻结安全文本或审计单层消融。<a href="https://arxiv.org/abs/2609.17817">2609.17817</a> 的投毒基准在改用干净基准继续进化后污染常常仍然保留，RSI Control（<a href="https://arxiv.org/abs/2610.27735">2610.27735</a>）中六个前沿模型都完成了相当比例的向后继模型植入未对齐属性的隐蔽任务。</li>
+<li><strong>自动 AI 研究出现可与官方模型对照的端到端结果，宏观反馈环仍被估计为不足以自我维持，与 insight 8 和 insight 9 一致。</strong> Athanor（<a href="https://arxiv.org/abs/2610.21055">2610.21055</a>）中四个 agent 用 104 小时把 Qwen3-4B-Base 的留出分数从 9.2 提到 48.2（官方 Instruct 为 47.9），RSI Arena（<a href="https://arxiv.org/abs/2610.33624">2610.33624</a>）中基准提升与人类偏好提升之间没有明确关联。<a href="https://arxiv.org/abs/2609.15802">2609.15802</a> 把净加速写成各反馈环弹性的乘积，用现有数据粗略校准后认为当前反馈环不足以产生自我维持的加速。</li>
+<li><strong>技能和自修改的跨任务迁移有限，给 insight 5 的“技能可以迁移”加了条件。</strong> <a href="https://arxiv.org/abs/2609.39148">2609.39148</a> 中训练任务上有提升的 21 个技能只有 5 个在测试任务上保留全部提升，3 个完全不保留。<a href="https://arxiv.org/abs/2610.14662">2610.14662</a> 在公开的 Darwin Gödel Machine 日志的 145 次修改中没有发现针对目标失败的修复优势。</li>
 </ol></div><footer><strong>RSI 研究札记</strong><p>从论文结果到研究判断。原始实验条件与来源见各篇解读。</p><a href="resources.html">资料与引用</a> · <a href="#">返回顶部 ↑</a></footer></main></div><script src="site.js?v=41d3e5055805"></script></body></html>

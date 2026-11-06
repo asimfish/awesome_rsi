@@ -1,23 +1,26 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的综述、论文、中文解读与专题。"><title>仓库与构建 · RSI 研究札记</title><link rel="stylesheet" href="site.css?v=5aaa2dc3f4cf"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress" aria-hidden="true"></div><header class="topbar"><a class="brand" href="index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a href="index.html">全景综述</a><a href="papers.html">论文目录</a><a href="reports.html">逐篇解读</a><a href="topics.html">研究专题</a><a href="reference.html">术语对照</a></nav><div class="reading-tools"><button id="font-size" aria-label="放大正文字号" aria-pressed="false">A＋</button><button id="theme" aria-label="切换深色模式">深色</button></div></header><div class="layout "><aside><div class="aside-links"><a href="index.html">全景综述</a><a href="resources.html">资源与来源</a><a href="https://github.com/asimfish/awesome_rsi">GitHub ↗</a></div></aside><main id="content"><header class="article-header"><div class="breadcrumb"><a href="index.html">RSI 研究札记</a><span>/</span>研究资料</div><div class="eyebrow">长文阅读</div><h1 id="仓库与构建">仓库与构建</h1><p class="meta">约 3 分钟阅读 · <a href="https://github.com/asimfish/awesome_rsi/blob/main/README.md">查看原始笔记 ↗</a></p></header><div class="prose">
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的综述、论文、中文解读与专题。"><title>仓库与构建 · RSI 研究札记</title><link rel="stylesheet" href="site.css?v=5aaa2dc3f4cf"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress" aria-hidden="true"></div><header class="topbar"><a class="brand" href="index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a href="index.html">全景综述</a><a href="papers.html">论文目录</a><a href="reports.html">逐篇解读</a><a href="topics.html">研究专题</a><a href="reference.html">术语对照</a></nav><div class="reading-tools"><button id="font-size" aria-label="放大正文字号" aria-pressed="false">A＋</button><button id="theme" aria-label="切换深色模式">深色</button></div></header><div class="layout "><aside><div class="aside-links"><a href="index.html">全景综述</a><a href="resources.html">资源与来源</a><a href="https://github.com/asimfish/awesome_rsi">GitHub ↗</a></div></aside><main id="content"><header class="article-header"><div class="breadcrumb"><a href="index.html">RSI 研究札记</a><span>/</span>研究资料</div><div class="eyebrow">长文阅读</div><h1 id="仓库与构建">仓库与构建</h1><p class="meta">约 4 分钟阅读 · <a href="https://github.com/asimfish/awesome_rsi/blob/main/README.md">查看原始笔记 ↗</a></p></header><div class="prose">
 <pre><code>awesome_rsi/
-├── README.md · CONTRIBUTING.md
+├── README.md · CONTRIBUTING.md · LICENSE
 ├── report/
-│   ├── awesome_rsi_slides.html / .pdf        # 35 页汇总 PPT（方向键翻页，P 键打印）
-│   └── awesome_rsi_full_report.html / .pdf   # 167 页全文合订（32 份解读 + 封面 + 目录 + 两图）
-├── reports/                                  # 32 份解读 00–31（索引见 §5）
+│   ├── awesome_rsi_slides.html / .pdf        # 37 页汇总 PPT（方向键翻页，P 键打印）
+│   ├── awesome_rsi_full_report.html / .pdf   # 169 页全文合订（解读 00–32 + 封面 + 目录 + 两图）
+│   └── bytedance-self-developing/            # 字节 Self-Developing Agents 专题（合读 + 中英文 PDF）
+├── reports/                                  # 33 份解读 00–32（索引见 §5）
 ├── papers/
 │   ├── en/                                   # 65 篇英文原版 PDF（arXiv + iCoder 技术报告）
-│   ├── zh/                                   # 64 篇中文翻译 PDF；The Last AI 待译
+│   ├── zh/                                   # 64 篇中文翻译 PDF（另 5 篇经典中译在 classics/）；The Last AI 待译
 │   └── classics/                             # 6 篇起源经典（Good 1965 为扫描件无文本层，其余 5 篇含中译）
 ├── assets/
 │   ├── fig1_timeline.svg · fig2_taxonomy.svg # 两张图（另有 _dark 变体供 PPT）
+│   ├── rsi-literature-map/                   # 首页全文献研究图谱 + 逐条覆盖清单
 │   ├── fulltext/                             # 论文提取全文（解读撰写底稿）
 │   └── trends_research_raw.md                # 2026H2 趋势扫描笔记
 ├── scripts/
 │   ├── make_figures.py                       # 生成两张图
 │   ├── build_full_report.py                  # pandoc 合订 reports/*.md → HTML → Chrome PDF
 │   └── translate_batch5.sh                   # 批量中译（三条可并行队列）
-└── logs/                                     # 翻译日志
+├── website/                                  # 阅读网站生成器（build.py → gh-pages）
+└── logs/                                     # 翻译与打磨日志
 </code></pre>
 <p>重建产物：<code>python3 scripts/make_figures.py</code> 重新生成两图；<code>python3 scripts/build_full_report.py --pdf</code> 重建全文报告；slides PDF 用 Chrome headless <code>--print-to-pdf</code> 生成。</p>
 <p>翻译管线：中文 PDF 由 <a href="https://github.com/asimfish/super_translate">super_translate</a> 生成，流程为冻结公式和图表等结构对象、注入术语表、按原坐标替换文本、QA 审计和确定性修复。后端为 DeepSeek API，逐篇带翻译缓存。翻译保留原版式与页码，术语和公式以英文原版为准。批量脚本见 <code>scripts/translate_batch5.sh</code>。</p></div><footer><strong>RSI 研究札记</strong><p>从论文结果到研究判断。原始实验条件与来源见各篇解读。</p><a href="resources.html">资料与引用</a> · <a href="#">返回顶部 ↑</a></footer></main></div><script src="site.js?v=41d3e5055805"></script></body></html>
