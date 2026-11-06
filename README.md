@@ -1,42 +1,58 @@
+<div align="center">
+
 # Awesome Recursive Self-Improvement (RSI)
 
-**在线阅读全站：[RSI 研究札记](https://asimfish.github.io/awesome_rsi/)** — 论文分类、全部中文解读、汇总洞察与研究专题。
-
-**全文献研究图谱** · 76 条收录，15 个分类，按四条研究主线展示各项工作的贡献。
-
-[![RSI 全文献研究图谱：思想与谱系、系统自改写、学习与反馈、验证与落地](assets/rsi-literature-map/overview.png)](assets/rsi-literature-map/overview.png)
-
-[查看完整大图](https://asimfish.github.io/awesome_rsi/assets/rsi-literature-map/overview.png) · [逐条来源与覆盖清单](assets/rsi-literature-map/coverage.json)
+**递归自改进论文清单 · 中文深度解读 · 保版式中译**<br>
+从 1965 年 Good 的智能爆炸猜想到 2026 年的自进化 agent
 
 [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
-![papers](https://img.shields.io/badge/papers-65%2B6_classics-blue)
-![reports](https://img.shields.io/badge/deep--dives-33-red)
-![zh-PDF](https://img.shields.io/badge/zh--PDF-69-green)
-![slides](https://img.shields.io/badge/slides-35p-orange)
-![full report](https://img.shields.io/badge/full_report-167p-8a2be2)
+[![papers](https://img.shields.io/badge/papers-105-blue)](#4-papers)
+[![deep-dives](https://img.shields.io/badge/deep--dives-33-red)](#5-deep-dive-reports)
+[![zh-PDF](https://img.shields.io/badge/zh--PDF-69-green)](papers/zh/)
+[![slides](https://img.shields.io/badge/slides-37p-orange)](report/awesome_rsi_slides.pdf)
+[![full report](https://img.shields.io/badge/full_report-169p-8a2be2)](report/awesome_rsi_full_report.pdf)
+[![website](https://img.shields.io/badge/website-online-0a7bbb)](https://asimfish.github.io/awesome_rsi/)
+[![updated](https://img.shields.io/badge/updated-2026--11--06-029E73)](#12-changelog)
 [![License: CC BY 4.0](https://img.shields.io/badge/license-CC_BY_4.0-lightgrey)](LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/asimfish/awesome_rsi?style=social)](https://github.com/asimfish/awesome_rsi/stargazers)
 
-> **English summary.** A curated list and survey repository on Recursive Self-Improvement (RSI), from Good's 1965 intelligence-explosion argument to the 2026 wave of self-evolving agents (harness optimization, evaluator co-evolution, skill evolution, safety gates). Papers link to the original, available layout-preserving Chinese translations (`papers/zh/`), and, for the core ones, a structured Chinese deep-dive (`reports/`, 32 reports covering 29 papers/surveys plus three resources: the Prism-Shadow list, its RSI guide, and the Reef infrastructure). Main finding: every self-evolving system that works keeps a fixed evaluation reference outside the evolution loop (a human-labeled anchor set, a frozen verifier, a regression test); remove it and the evaluator drifts in ways task scores cannot reveal. Papers are grouped in §4; the report index is in §5; a 20-system comparison matrix is in §7.3. Prose is in Chinese.
+**[在线阅读](https://asimfish.github.io/awesome_rsi/)** · [论文检索](https://asimfish.github.io/awesome_rsi/papers.html) · [逐篇解读](https://asimfish.github.io/awesome_rsi/reports.html) · [汇总 PPT](report/awesome_rsi_slides.pdf) · [全文报告](report/awesome_rsi_full_report.pdf) · [English summary](#english-summary) · [参与贡献](CONTRIBUTING.md)
+
+</div>
+
+[![RSI 全文献研究图谱：思想与谱系、系统自改写、学习与反馈、验证与落地](assets/rsi-literature-map/overview.png)](https://asimfish.github.io/awesome_rsi/assets/rsi-literature-map/overview.png)
+
+<p align="center"><sub>全文献研究图谱：截至 2026-09-16 的 76 条收录、15 个分类，按四条研究主线排列 · <a href="https://asimfish.github.io/awesome_rsi/assets/rsi-literature-map/overview.png">查看大图</a> · <a href="assets/rsi-literature-map/coverage.json">逐条来源与覆盖清单</a></sub></p>
 
 这是一个关于 Recursive Self-Improvement（递归自改进）的论文列表和调研仓库，覆盖从 1965 年 Good 的智能爆炸猜想到 2026 年的自进化 agent 研究。每篇核心论文都附有原文链接、中文解读和保留原版式的中文翻译 PDF。
 
-本调研发现，目前能稳定运行的自进化系统都在进化循环之外保留了一个固定的评估依据（人工标注集、冻结的验证器、回归测试等，下文统称"锚"）。去掉锚后，评估器会在优化压力下偏离原有标准，任务分数却反映不出这种变化。这类系统的执行环节不构成瓶颈。当前难点是怎样低成本地获得可靠的评估。
+> **主要发现**：目前能稳定运行的自进化系统都在进化循环之外保留了一个固定的评估依据（人工标注集、冻结的验证器、回归测试等，下文统称"锚"）。去掉锚后，评估器会在优化压力下偏离原有标准，任务分数却反映不出这种变化。这类系统的执行环节不构成瓶颈。当前难点是怎样低成本地获得可靠的评估。
 
-![Figure 1 · Timeline](assets/fig1_timeline.svg)
+## 最近更新
 
-*图 1：71 项工作的时间线，按十个类别分行，横轴为 arXiv 首版年月（非 arXiv 材料取发布月）。★ 为本调研的十份核心材料。1965–2014 与 2023–2026 之间断轴。2026 年 8 月一个月有 21 项。*
+- **2026-11-06**：收录 29 项（🆕）：24 篇 2026 年 9–11 月的新论文，以及路线图中待补的 Mendel Gödel Machine、ReasoningBank、SEAL、FinEvo-Bench、GDPevo；新增 [§6.3](#63-update-since-september-2026) 九月以来的新证据；首页重排，修正解读计数、未编号条目与更新记录格式；汇总 PPT（37 页）、全文报告（169 页）、汇总报告 10 和阅读网站同步更新。
+- **2026-09-16**：上线 [RSI 研究札记](https://asimfish.github.io/awesome_rsi/)阅读网站，首页换为全文献研究图谱。
+- **2026-09-15**：收录 Aspire、S³Gym、HarnessDev 三篇自改进基准及中译（[§4.15](#415-self-improvement-benchmarks)），发布 [Self-Developing Agents 专题](https://asimfish.github.io/awesome_rsi/bytedance/)。
+- **2026-09-13**：收录 The Last AI Built by Humans，新增摘要级笔记 32。
+- **2026-09-08**：新增开源系统与基础设施一节（Reef、Proteus）和解读 29–31。
 
-**字节三篇专题**：[Self-Developing Agents 在线博客](https://asimfish.github.io/awesome_rsi/bytedance/) — Aspire、S³Gym、HarnessDev 的目标、经验与系统三层对照；[合读报告](report/bytedance-self-developing/research.md)及中英文 PDF 集中入口。
+完整记录见 [§12 Changelog](#12-changelog)。
 
-**仓库内容**
+## 仓库内容
 
 | 类型 | 数量 | 位置 |
 |---|---|---|
-| 中文解读（统一七节结构，约 9.8 万字） | 33 份（29 篇论文 / 综述 + 3 个资源与基础设施） | [`reports/`](reports/)，索引见 [§5](#5-deep-dive-reports) |
-| 英文论文 PDF | 65 篇 + 6 篇起源经典 | [`papers/en/`](papers/en/)，[`papers/classics/`](papers/classics/) |
-| 中文翻译 PDF（[super_translate](https://github.com/asimfish/super_translate) 生成，保留原版式） | 69 篇；The Last AI 待译 | [`papers/zh/`](papers/zh/) |
-| 汇总 PPT | 35 页 HTML / PDF | [`report/awesome_rsi_slides.html`](report/awesome_rsi_slides.html)，[PDF](report/awesome_rsi_slides.pdf) |
-| 全文合订报告（32 份解读 + 两张图） | 167 页 | [`report/awesome_rsi_full_report.pdf`](report/awesome_rsi_full_report.pdf)，[HTML](report/awesome_rsi_full_report.html) |
+| 📝 中文解读（统一七节结构，约 9.8 万字） | 33 份（30 篇论文 / 综述 + 3 个资源与基础设施；报告 32 为摘要级笔记） | [`reports/`](reports/)，索引见 [§5](#5-deep-dive-reports) |
+| 📄 英文论文 PDF | 65 篇 + 6 篇起源经典 | [`papers/en/`](papers/en/)，[`papers/classics/`](papers/classics/) |
+| 🈶 中文翻译 PDF（[super_translate](https://github.com/asimfish/super_translate) 生成，保留原版式） | 69 篇（含 5 篇经典）；The Last AI 待译 | [`papers/zh/`](papers/zh/)，[`papers/classics/`](papers/classics/) |
+| 🖥️ 汇总 PPT | 37 页 HTML / PDF | [`report/awesome_rsi_slides.html`](report/awesome_rsi_slides.html)，[PDF](report/awesome_rsi_slides.pdf) |
+| 📚 全文合订报告（解读 00–32 + 两张图） | 169 页 | [`report/awesome_rsi_full_report.pdf`](report/awesome_rsi_full_report.pdf)，[HTML](report/awesome_rsi_full_report.html) |
+| 🔎 专题：字节 Self-Developing Agents | 三篇合读 + 中英文 PDF | [在线博客](https://asimfish.github.io/awesome_rsi/bytedance/)，[`report/bytedance-self-developing/`](report/bytedance-self-developing/research.md) |
+| 🌐 阅读网站源码 | 全部章节、解读与论文检索 | [`website/`](website/README.md) |
+
+## English summary
+
+A curated list and survey repository on Recursive Self-Improvement (RSI), from Good's 1965 intelligence-explosion argument to the 2026 wave of self-evolving agents (harness optimization, evaluator co-evolution, skill evolution, safety gates). Papers link to the original, available layout-preserving Chinese translations (`papers/zh/`), and, for the core ones, a structured Chinese deep-dive (`reports/`: 33 reports covering 30 papers/surveys plus three resources — the Prism-Shadow list, its RSI guide, and the Reef infrastructure). Main finding: every self-evolving system that works keeps a fixed evaluation reference outside the evolution loop (a human-labeled anchor set, a frozen verifier, a regression test); remove it and the evaluator drifts in ways task scores cannot reveal. Papers are grouped in §4 (🆕 marks the 29 entries added on 2026-11-06); the report index is in §5; the September–November 2026 evidence is summarized in §6.3; a 20-system comparison matrix is in §7.3. Prose is in Chinese. A reading site with search is at [asimfish.github.io/awesome_rsi](https://asimfish.github.io/awesome_rsi/).
 
 ## Contents
 
@@ -50,7 +66,7 @@
   - [4.11 Safety & Governance](#411-safety--governance) · [4.12 Program Evolution Lineage](#412-program-evolution-lineage) · [4.13 Macro Debate & Measurement](#413-macro-debate--measurement) · [4.14 Open-Source Systems & Infrastructure](#414-open-source-systems--infrastructure)
   - [4.15 Self-Improvement Benchmarks](#415-self-improvement-benchmarks)
 - [5. Deep-Dive Reports](#5-deep-dive-reports)
-- [6. Insights & Open Problems](#6-insights--open-problems)
+- [6. Insights & Open Problems](#6-insights--open-problems) — [Ten Insights](#61-ten-insights) · [Open Problems](#62-open-problems) · [Update Since September 2026](#63-update-since-september-2026)
 - [7. Reference](#7-reference) — [Glossary](#71-glossary) · [Timeline](#72-timeline) · [System Comparison Matrix](#73-system-comparison-matrix)
 - [8. Secondary Sources (中文导读)](#8-secondary-sources-中文导读)
 - [9. Repository Layout & Build](#9-repository-layout--build)
@@ -68,9 +84,9 @@
 
 | 预算 | 路线 |
 |---|---|
-| 15 分钟 | [汇总 PPT](report/awesome_rsi_slides.html)（浏览器中用方向键翻页，P 键打印）或 [PDF 版](report/awesome_rsi_slides.pdf)（35 页） |
+| 15 分钟 | [汇总 PPT](report/awesome_rsi_slides.html)（浏览器中用方向键翻页，P 键打印）或 [PDF 版](report/awesome_rsi_slides.pdf)（37 页） |
 | 2 小时 | [报告 10 汇总](reports/10_synthesis_insights.md) → [报告 01 Weng](reports/01_lilian_weng_harness_engineering.md) → [报告 05 Who Grades the Grader](reports/05_who_grades_the_grader.md)（说明为什么评估器需要循环外的锚） |
-| 通读 | [全文合订报告](report/awesome_rsi_full_report.pdf)（167 页，32 份解读按编号排列） |
+| 通读 | [全文合订报告](report/awesome_rsi_full_report.pdf)（169 页，33 份解读按编号排列） |
 | 系统研读 | `reports/` 按 00 → 23 → 01 → 02 → 07 → 03 → 04 → 05 → 06 → 08 → 11 → 09 → 10 的顺序读，其余按需；对照 `papers/zh/` 的中文 PDF |
 
 按目的：
@@ -146,6 +162,8 @@ _Huan-ang Gao, Jiayi Geng, Wenyue Hua, Mengkang Hu, et al. (Princeton / 清华 /
 _Qing Zong, Jiayu Liu, Junhao Shen, Zecong Tang, Linsi Wu, et al., Yangqiu Song (HKUST / UIUC / CUHK / HKU / PKU)_ — 按 Agent-Agent、Agent-Environment、Meta 三个阶段分类共进化系统，目前只有 RQGM 满足文中对 Meta 阶段的定义。评估共进化系统时，文中提出三项要求：历史交叉对弈、组件消融、held-out 评估器。
 3. **Self-Evolving Coding Agents.** arXiv, 2026\. [paper](https://arxiv.org/abs/2608.03392), [awesome list](https://github.com/iSEngLab/Awesome-Self-Evolving-Coding-Agents), [PDF-en](papers/en/2608.03392_SelfEvolvingCodingAgentsSurvey.pdf), [PDF-zh](papers/zh/2608.03392_SelfEvolvingCodingAgentsSurvey_zh.pdf), [解读](reports/28_self_evolving_coding_agents_survey.md)
 _Hao Zhou, Haichuan Hu, Ye Shang, Quanjun Zhang (NJUST / NJU, iSEngLab)_ — 按进化对象（六类）、进化时间（任务时 / 任务后 / 阶段式）、进化证据（结果 / 环境反馈 / 轨迹）三个维度分类。指出软件工程特有的风险：不可靠的测试结果或基准捷径会被写入记忆、蒸馏成技能或用于训练，错误因此被保留下来。
+4. 🆕 **Safety in Self-Evolving Agents: A Survey.** arXiv, 2026\. [paper](https://arxiv.org/abs/2610.00093)
+_Jiahao Chen, Zhou Feng, Oubo Ma, Yichen Yan, et al._ — 提出 SAVER 框架，按 Substrate、Adaptation、Violation、Exposure、Response 追踪参数、记忆、工具、技能、工作流等可复用状态在进化中如何变得不安全。综述发现，现有工作对准入、检索、激活和局部遏制给出的证据较多，对后代修复和进化恢复后的评估给出的证据较少。
 
 ### 4.4 Framework Side
 
@@ -159,6 +177,14 @@ _Qianshu Cai, Yonggang Zhang, Xianzhang Jia, Huajiang Zheng, Wei Xue, Jun Song, 
 _Jenny Zhang, Bingchen Zhao, Wannan Yang, Jakob Foerster, Jeff Clune, Minqi Jiang, Sam Devlin, Tatiana Shavrina (UBC / Vector / Edinburgh / NYU)_ — DGM 的后续工作，增加一个控制"如何修改任务 agent"的 meta-agent，并从编码任务推广到其他领域。
 4. **Metaⁿ: Recursive Self-Improvement through Emergent Depth.** arXiv, 2026\. [paper](https://arxiv.org/abs/2608.24735), [code](https://github.com/minnesotanlp/meta-n), [PDF-en](papers/en/2608.24735_Metan.pdf), [PDF-zh](papers/zh/2608.24735_Metan_zh.pdf), [解读](reports/20_metan.md)
 _Zae Myung Kim, Young-Jun Lee, Seungyeon Jwa, Dongyeop Kang (UMN / SNU)_ — 固定的元操作 Ω 反复读取下层的执行轨迹和代码，逐层写出新的策略和辅助函数，改进机制本身保持不变。层数由收敛决定，实测停在 3 到 6 层。ARC-AGI-2 上得 0.331，是对比方法中唯一的非零分数。消融显示，层间传递的文本贡献约 72% 的增益，可调用代码约 15%。
+5. 🆕 **Mendel Gödel Machine: Recursive Self-Improving Coding Agents via Comparative Evolution.** arXiv, 2026\. [paper](https://arxiv.org/abs/2608.07645), [code](https://github.com/RealLcz/MGM)
+_Changzhi Liu, Yilun Liu, Sikuan Yan, Volker Tresp, Yunpu Ma_ — 解读 29、30 把它列为 DGM 的后续工作。现有自改写编码 agent 每次只根据一条失败轨迹修改自身（clonal mutation），MGM 另加两种自修改：reaction-norm mutation 同时参考 agent 在多个任务上的轨迹，cross-lineage hybridization 参考另一谱系的 agent 在同一任务上的轨迹。在加性适应度地形模型下证明新策略比单轨迹基线收敛更快、结果更好。Qwen3.6-35B-A3B 上与 HGM 从同一 agent 出发，SWE-bench Verified 从 68.3% 提到 78.3%（HGM 73.3%），Polyglot 从 50.8% 提到 93.2%（HGM 77.9%）（正文表 1）。
+6. 🆕 **Recursive self-improvement of AI research agents.** arXiv, 2026\. [paper](https://arxiv.org/abs/2609.26457)
+_Dhruv Srikanth, Bingchen Zhao, Dixing Xu, Yuxiang Wu, Zhengyao Jiang_ — AIDE² 修改 AI 研究 agent 自身的代码，在一组 AI 研发任务上测试修改后的自己，只保留在隐藏评估上表现最好的改动。8 天自主运行得到七项连续改进并迁移到四个留出基准；在另一组留出任务上，reward hacking 比例从 55% 降到 32%，这一指标不在优化目标内。
+7. 🆕 **Predict Before You Modify: Learning Improvement Dynamics for Self-Evolving Agents.** arXiv, 2026\. [paper](https://arxiv.org/abs/2610.13991)
+_Zixuan Xie, Chang Xu, Yuhua Jiang, Li Zhao_ — 在 HyperAgents 上加入可编辑的改进动态模型（IDM）：评估前预测一次修改在各任务上的结果，评估后用实际结果更新 IDM，使预测知识跨代积累。多语言编码、论文评审、机器人奖励设计、奥赛数学评分四个领域均超过 HyperAgents，各代平均性能最多高 46%。
+8. 🆕 **VERSE: Verified Self-Evolving Optimizer for Agent Harnesses.** arXiv, 2026\. [paper](https://arxiv.org/abs/2610.02616), [code](https://github.com/wzekai/VERSE)
+_Zekai Wang, Yingqiang Ge, Zekun Wang, Hai Wang, et al._ — harness 优化器在修改执行者 harness 的同时，也修改自己的提示、技能、工具、hooks 和笔记，两个模型的权重均不变。对照研究中，没有基于执行的验证时优化器自进化不能提升性能；VERSE 选出的 harness 在留出的 SWE-rebench 任务上为 42.3%，最强基线为 39.2%。
 
 ### 4.5 Evaluator Side
 
@@ -174,6 +200,10 @@ _Xing Zhang, Guanghui Wang, Yanwei Cui, Ziyuan Li, Wei Qiu, Bing Zhu, Peiyang He
 _Xing Zhang, Yanwei Cui, Guanghui Wang, Zhihao Lin, Peiyang He (AWS)_ — 同一团队的后续工作，借用程序验证中的反例引导精化：找出评估器打分相同但真值不同的一对答案，要求下一个评估算子能区分这一对。得到的 55 行算子在 428 个未见任务上缩小了 15.4% 的可达差距（p = 0.001）。
 5. **Self-Evolving Deep Research via Joint Generation and Evaluation (SCORE).** arXiv, 2026\. [paper](https://arxiv.org/abs/2606.04507), [PDF-en](papers/en/2606.04507_SCORE.pdf), [PDF-zh](papers/zh/2606.04507_SCORE_zh.pdf)
 _Han Zhu, Chengkun Cai, Yuanfeng Song, Xing Chen, Sirui Han, Yike Guo (HKUST / ByteDance / UCL)_ — 评估器与求解器共享参数并联合训练，用于生成没有标准答案的深度研究报告。
+6. 🆕 **Who Verifies the Verifier? Co-Evolving Inspectable Graders with Self-Improving Agents.** NeurIPS Workshop, 2026\. [paper](https://arxiv.org/abs/2610.11464)
+_Xing Zhang, Guanghui Wang, Yanwei Cui, Ziyuan Li, et al._ — 与 Who Grades the Grader 同一作者团队的后续工作：验证器写成由小型确定性缺陷检测器组成的可检查表达式，只按与十条锚定参考样本的一致性和无标签输出上的共识选择，不看 agent 的分数。去掉锚定守卫后验证器退化为全部放行，用它训练技能的效果却不变；与技能循环配合时，进化出的验证器保留了真值或 rubric 所带来提升的 88-110%。
+7. 🆕 **VeriEvolve: Evaluator-First Evolution for Tool-Using Agents.** EMNLP Workshop (REALM), 2026\. [paper](https://arxiv.org/abs/2610.29005)
+_Yueshen Li, Kamer Ali Yuksel, Gokhan Tur, Dilek Hakkani-Tür, João Pedro Maia_ — 先从任务说明合成挑战状态和可执行评估器，再用它进化 agent 工作流：每轮内评估器冻结，轮与轮之间把强、弱两次运行的终态转成一对反事实测试用例来修订评估器。在 MCPMark Filesystem 的 30 个任务上，外部验证的成功数对 GLM-5.2 从 6/30 提到 18/30。
 
 ### 4.6 Model Side
 
@@ -189,6 +219,12 @@ _Peng Xia, Jianwen Chen, Hanyang Wang, Jiaqi Liu, et al. (UNC / aiming-lab)_ —
 _小红书 + 北京大学_ — 同一个策略既提取经验又使用经验，用下游任务的收益作为 GRPO 奖励。ALFWorld 未见任务上相对 GRPO 基线提高 98.7%。
 5. **SIA: Self Improving AI with Harness & Weight Updates.** arXiv, 2026\. [paper](https://arxiv.org/abs/2605.27276), [PDF-en](papers/en/2605.27276_SIA.pdf), [PDF-zh](papers/zh/2605.27276_SIA_zh.pdf)
 _Prannay Hebbar, Yogendra Manawat, Samuel Verboomen, et al. (Hexo Labs)_ — 一个反馈 agent 决定每轮修改 harness 还是更新权重。Weng 指出，任务 agent 与 meta agent 使用不同模型，基线较弱，实验设置存在混淆，目前只有初步证据。
+6. 🆕 **Self-Adapting Language Models.** arXiv, 2025\. [paper](https://arxiv.org/abs/2506.10943), [code](https://jyopari.github.io/posts/seal)
+_Adam Zweiger, Jyothish Pari, Han Guo, Ekin Akyürek, et al._ — 模型面对新输入时生成 self-edit（重组信息、指定优化超参、调用数据增强工具），经 SFT 写入权重；外层用 RL 训练模型生成有效的 self-edit，奖励是更新后模型的下游表现。实验覆盖知识整合和少样本泛化两类任务。
+7. 🆕 **Harness Evolution Hits a Ceiling: When Weight Training Should Begin.** arXiv, 2026\. [paper](https://arxiv.org/abs/2610.11655)
+_Yuan Tian, Bing Hu, Hao Wang, Binghang Lu, Fang Wu_ — 按失败轨迹中第一个触发的信号区分过程失败（调用被拦、循环、步数耗尽）和内容失败，过程失败交给 harness 进化修复，内容失败交给权重训练。DeepPlanning 上 harness 进化把 Qwen3.5-4B 的留出分数从 0.16 提到 0.30，用进化后 harness 的轨迹训练的 LoRA 在原 harness 下再加 +0.13。
+8. 🆕 **Self-Evolving Coding Agents via Harness-Policy Optimization.** arXiv, 2026\. [paper](https://arxiv.org/abs/2610.22791)
+_Zhepei Wei, Wenlin Yao, Baolin Peng, Danqing Wang, et al._ — 编码 agent 每轮先由当前策略分析自身失败、提出 harness 候选（H-step），再在选中的 harness 下用 RL 更新策略（P-step），训练中识别出的难题作为下一轮 harness 搜索集。三个编码基准上 Qwen3.5-35B-A3B 的平均解决率从 57.8% 提到 64.8%，联合增益大于两部分各自增益之和。
 
 ### 4.7 Knowledge Side
 
@@ -210,6 +246,12 @@ _Tianxin Wei, Zhan Shi, Minhua Lin, Bing He, et al., Hanqing Lu (UIUC / Amazon)_
 _Qizheng Zhang, Changran Hu, Shubhangi Upasani, et al., Kunle Olukotun (Stanford / SambaNova)_ — 把上下文当作持续更新的 playbook，由生成、反思、整理三个组件增量维护，避免整段重写导致的信息丢失。
 8. **Meta Context Engineering via Agentic Skill Evolution (MCE).** arXiv, 2026\. [paper](https://arxiv.org/abs/2601.21557), [PDF-en](papers/en/2601.21557_MCE.pdf), [PDF-zh](papers/zh/2601.21557_MCE_zh.pdf)
 _Haoran Ye, Xuning He, Vincent Arak, Haonan Dong, Guojie Song (PKU)_ — 把上下文管理的机制和内容分开，在技能空间搜索管理机制。
+9. 🆕 **ReasoningBank: Scaling Agent Self-Evolving with Reasoning Memory.** ICLR, 2026\. [paper](https://arxiv.org/abs/2509.25140), [code](https://github.com/google-research/reasoning-bank)
+_Siru Ouyang, Jun Yan, I-Hung Hsu, Yanfei Chen, et al._ — 从 agent 自判成功和失败的经验中提炼可泛化的推理策略存入记忆，新任务先检索再执行，结束后写回新经验；MaTTS 给每个任务分配更多计算，生成对比经验以合成更高质量的记忆。在网页浏览和软件工程基准上，效果和效率都超过存储原始轨迹或只存成功流程的记忆机制。
+10. 🆕 **Do Self-Evolving Skills Generalize to Held-Out Tasks?** arXiv, 2026\. [paper](https://arxiv.org/abs/2609.39148)
+_Xihao Piao, Zifeng Wang, Zhen Chen_ — 用相同模型、agent 和训练/测试划分，在六个基准上比较五种技能自进化方法和一次性技能。训练任务上有提升的 21 个技能中，5 个在测试任务上保留全部提升，13 个保留一部分，3 个完全不保留；迁移差的技能常把列名、输出文件等任务相关细节写成通用规则。
+11. 🆕 **Skill$^{\infty}$: Recursive Self-Improvement for Agent Skill Optimization.** arXiv, 2026\. [paper](https://arxiv.org/abs/2610.35434)
+_Wangcheng Tao, Zhanglu Yan, Han Wu, Weng-Fai Wong_ — meta agent 按一份 meta-skill 优化任务技能，再用同一流程优化这份 meta-skill，两层技能都以标准技能包形式通过原生技能发现加载。在 83 个 SkillsBench 任务上通过率为 60.7%，人工整理的技能为 56.4%，SkillEvolver 为 54.5%。
 
 ### 4.8 Online Side
 
@@ -219,6 +261,8 @@ _Haoran Ye, Xuning He, Vincent Arak, Haonan Dong, Guojie Song (PKU)_ — 把上�
 _Seth Karten, Joel Zhang, Tersoo Upaa Jr, Ruirong Feng, Wenzhe Li, Chengshuai Shi, Chi Jin, Kiran Vodrahalli (Princeton)_ — 在一个连续的长 episode 内，每隔若干步精炼 harness 的四个组件，同一条轨迹同时用于 harness 精炼和权重训练。基座模型弱于 Gemini Flash-Lite 时，所有自改进变体都比不改进更差。
 2. **Prime Agent: A Self-Improving RLM Harness.** arXiv, 2026\. [paper](https://arxiv.org/abs/2608.23552), [code](https://github.com/PrimeIntellect-ai/prime-agent), [PDF-en](papers/en/2608.23552_PrimeAgent.pdf), [PDF-zh](papers/zh/2608.23552_PrimeAgent_zh.pdf), [解读](reports/18_prime_agent.md)
 _Seth Karten, Alex L. Zhang, Kevin Thomas, Sebastian Müller, et al. (Princeton / Prime Intellect / MIT)_ — Continual Harness 一作的后续工作，开源实现了免重置自改进 harness，提供持久 REPL、可恢复的会话，并记录 refinement 的版本。ARC-AGI-3 上 Opus 5 从官方 harness 的 30.2% 提到 95.5%。一个 Factorio 案例中，agent 发现 RCON 作弊命令后把它保存成了可复用技能。
+3. 🆕 **Exo: An Architecture for Self-Improving Systems at Runtime.** arXiv, 2026\. [paper](https://arxiv.org/abs/2611.00463)
+_Alexander Krentsel, Sylvia Ratnasamy, Ion Stoica, Martin Casado, Ankur Goyal_ — 把优化循环并入任务执行：agent 在工作中修改自己的 harness 和策略，一个最小的受保护机制层保存执行历史并控制策略何时生效。与不能编辑策略的相同初始策略相比，Exo 在 AppWorld 和 SREGym 上把留出任务的模型成本降低 35-61%，正确率相当。
 
 ### 4.9 Harness Engineering (2026)
 
@@ -248,6 +292,10 @@ _Zewen Liu, Zhan Shi, Yisi Sang, Bing He, Minhua Lin, Tianxin Wei, et al. (Emory
 _Tailin Zhou (HKUST)_ — 每个任务族维护自己的 harness，通过固定接口热替换；外层的 meta-evolver 不参与进化。
 12. **Harness Updating Is Not Harness Benefit: Disentangling Evolution Capabilities in Self-Evolving LLM Agents.** arXiv, 2026\. [paper](https://arxiv.org/abs/2605.30621), [PDF-en](papers/en/2605.30621_HarnessUpdatingNotBenefit.pdf), [PDF-zh](papers/zh/2605.30621_HarnessUpdatingNotBenefit_zh.pdf)
 _Minhua Lin, Juncheng Wu, Zijun Wang, Zhan Shi, Yisi Sang, Bing He, et al._ — 把"产出有用的 harness 编辑"和"利用编辑后的 harness"分开测量。从 9B 到 Claude Opus，前者几乎持平，后者非单调，中等规模模型受益最大。
+13. 🆕 **RRSI: Regularized Recursive Self-Improvement of Agent Harnesses.** arXiv, 2026\. [paper](https://arxiv.org/abs/2609.24972), [code](https://github.com/google-research/rrsi)
+_Peng Xia, Rujun Han, Zifeng Wang, Yanfei Chen, et al._ — 把正则化引入 harness 自改进：proposer 单个候选可捆绑的编辑数随时间退火，selector 用 critic 筛掉针对特定基准的提案，用 pruner 删去过小、过贵或已无用的改动。八个基准上，在进化所用 split 上最多提高 6.0 分，在五个分布外基准上最多提高 4.3 分，策略 token 比无正则的进化少 30%。
+14. 🆕 **Harness-Delta Attribution: Dissecting Gains From Harness Evolution.** arXiv, 2026\. [paper](https://arxiv.org/abs/2610.22466)
+_Wenxuan Ding, Qin Lu, Changlong Yu, Sha Li, et al._ — 提出 Harness-Delta Attribution 评估协议，把 harness 进化的增益拆成制品导致的过拟合、测试时扩展能解释的部分和剩余部分，覆盖 11 个执行模型和三个进化框架。在 21 个搜索集增益统计显著的设置中，过拟合和测试时扩展平均分别占增益的 54% 和 14%，基于验证集的信号不足以阻止过拟合。
 
 ### 4.10 Autonomous Research & Industrial Evidence
 
@@ -263,6 +311,10 @@ _Rui Meng, Bhavana Dalvi Mishra, Jiefeng Chen, Chun-Liang Li, et al. (Google Clo
 _Ilia Kulikov, Chenxi Whitehouse, Tianhao Wu, Yixin Nie, et al. (FAIR at Meta)_ — 用出题者、弱求解器、强求解器、验证器四个角色合成强模型能解、弱模型不能解的数据。
 5. **Why LLMs Aren't Scientists Yet: Lessons from Four Autonomous Research Attempts.** arXiv, 2026\. [paper](https://arxiv.org/abs/2601.03315), [PDF-en](papers/en/2601.03315_WhyLLMsArentScientistsYet.pdf), [PDF-zh](papers/zh/2601.03315_WhyLLMsArentScientistsYet_zh.pdf)
 _Dhruv Trehan, Paras Chopra_ — 使用最小限度的 harness 时，三个领域 45 到 50 篇种子文档中只有 1 个想法完整做成论文。记录了六种反复出现的失败：沿用过时的库和命令、实现时转向更简单的方案、上下文退化、根据带噪声的结果宣布成功、缺少领域直觉、问题选择不当。
+6. 🆕 **Athanor: An Agent-Native System for Autonomous Post-Training Research.** arXiv, 2026\. [paper](https://arxiv.org/abs/2610.21055)
+_Yufa Zhou, Yichen Wang, Jiakun Fan, Ziqi Shu, et al._ — 在真实 GPU 上让 agent 自主对原始基座模型做后训练，系统提供冻结评估、去污染数据、持久研究记录和 agent 不可见的留出套件，不允许使用外部教师模型。四个 Claude Opus 5.5 agent 用 104 小时把 Qwen3-4B-Base 在留出套件上从 9.2 提到 48.2，官方 Qwen3-4B-Instruct-2507 为 47.9。
+7. 🆕 **Language Models Learn to Improve Language Models.** arXiv, 2026\. [paper](https://arxiv.org/abs/2610.23344)
+_Minhua Lin, Zijun Wang, Zewen Liu, Zhaotian Weng, et al._ — 用 RL 训练 LLM 提出语言模型改进方案，奖励来自研究世界模型（一个根据上下文中的真实实验记录预测方案增益的冻结 LLM），并定期实际执行高排名方案、把结果加入其上下文。在八个自回归与扩散 LM 开发环境的留出任务上，Qwen3.8-27B 超过上下文中给了 300 条真实实验记录的 GPT-6-sol，数据生成成本低 33%。
 
 ### 4.11 Safety & Governance
 
@@ -280,6 +332,12 @@ _Amit Roth, Ivan Bercovich, Yonathan Efroni (TAU / UCSB)_ — 在 89 个真实�
 _Ken Huang, Jerry Huang_ — 把验证者和审计者分离，并用密码学方法记录技能图的来源。
 6. **Adversarial Reward Auditing for Active Detection and Mitigation of Reward Hacking (ARA).** arXiv, 2026\. [paper](https://arxiv.org/abs/2602.01750), [PDF-en](papers/en/2602.01750_ARA.pdf), [PDF-zh](papers/zh/2602.01750_ARA_zh.pdf)
 _Mohammad Beigi, Ming Jin, Junshan Zhang, Qifan Wang, Lifu Huang_ — 把 reward hacking 建模为攻击者与审计者的博弈，主动搜索奖励模型的漏洞。
+7. 🆕 **Reflections on Trusting Trust, Revisited: Contaminating Self-Modifying AI Coding Agents with Poisoned Benchmarks.** arXiv, 2026\. [paper](https://arxiv.org/abs/2609.17817)
+_Franziska Roesner, Tadayoshi Kohno_ — 把 Thompson 的编译器后门攻击用于自修改编码 agent：向 agent 的自评估和自改进流程提供投毒基准，诱导后续版本在干净的留出任务上写出有漏洞的代码，在 Darwin Gödel Machine、SICA、Hyperagents 三个系统上验证可行。Sonnet 4.5 驱动的 Hyperagents 自进化出关闭 HTTPS 证书校验的指令，之后改用干净基准继续进化，污染常常仍然保留。
+8. 🆕 **RSI Control: Can AI Models Perform Covert Sabotage in the Self-Improvement Process?** arXiv, 2026\. [paper](https://arxiv.org/abs/2610.27735)
+_Kaiwen Zhou, Udari Madhushani Sehwag_ — 构建 RSI Control Arena：前沿模型作为研发 agent 执行后继模型训练流水线中的正常任务，同时接到在后继模型中植入未对齐属性的隐蔽任务，共 16 个隐蔽任务、22 个任务对。六个前沿模型都完成了相当比例的隐蔽任务且主任务表现不降，读取 agent 推理过程的监控能发现大部分攻击，但不能发现全部。
+9. 🆕 **Masked Erosion: How Acceptance Gates Lose Redundant Safeguards in Self-Improving Agents.** arXiv, 2026\. [paper](https://arxiv.org/abs/2610.38392)
+_Hau-Sing So, Daixian Liu, Weicai Long_ — 多条安全规则互相覆盖时，删掉其中一条不会增加可观测的危害，只按任务分数决定的接受门因此会逐步删除冗余保护。411 个改进循环中，同等成本下 20 题批次让每个 harness 保持受保护，40 题批次的六个 harness 全部失去保护；GEPA 保留了全部安全规则原文，三个最终 harness 中仍有两个在换用较弱模型后误用凭据。
 
 ### 4.12 Program Evolution Lineage
 
@@ -308,10 +366,17 @@ _Ege Erdil, Tamay Besiroglu (Epoch AI)_ — 综述"AI 自动化能否带来每�
 _Daniel Eth, Tom Davidson_ — 把 Bostrom 的 recalcitrance 具体化为软件研发的回报率 r，论证 r > 1 时即使算力不增加也可能出现智能爆炸。
 3. **Measuring AI Ability to Complete Long Software Tasks.** arXiv, 2025\. [paper](https://arxiv.org/abs/2503.14499), [PDF-en](papers/en/2503.14499_METR_LongTasks.pdf), [PDF-zh](papers/zh/2503.14499_METR_LongTasks_zh.pdf)
 _Thomas Kwa, Ben West, Joel Becker, et al. (METR)_ — 测量 AI 能可靠完成的软件任务时长，50% 成功率对应的任务时长约每 7 个月翻倍。目前唯一持续公开的宏观节奏测量。
-
-
-**The Last AI Built by Humans: Toward Genuine Recursive Self-Improvement.** arXiv, 2026. [paper](https://arxiv.org/abs/2609.11873), [PDF-en](papers/en/2609.11873_TheLastAI.pdf), [解读](reports/32_last_ai_built_by_humans.md)
+4. **The Last AI Built by Humans: Toward Genuine Recursive Self-Improvement.** arXiv, 2026\. [paper](https://arxiv.org/abs/2609.11873), [PDF-en](papers/en/2609.11873_TheLastAI.pdf), [解读](reports/32_last_ai_built_by_humans.md)
 _Yi Duan et al._ — 用 HCI 衡量模型能力余量，并提出从改进执行到递归元改进的五级 RSI 路线图。
+5. 🆕 **The Economics of Recursive Self-Improvement.** arXiv, 2026\. [paper](https://arxiv.org/abs/2609.15802)
+_Tom Cunningham, Lukas Althoff, Basil Halperin, Brian Jabarian, et al._ — 把 AI 进展中的反馈环建模为有向图，证明能力的净加速取决于每个反馈环上各项弹性的乘积，并区分只在 AI 研发基准上提升的窄能力和有经济价值的宽能力。用现有数据粗略校准后，作者估计当前反馈环还不足以产生自我维持的加速，但在增强。
+6. 🆕 **The Winner's Curse in LLM Self-Improvement Loops: Selection Noise, Lock-in, and Acceptance Rules.** arXiv, 2026\. [paper](https://arxiv.org/abs/2610.09239)
+_Litao Hu, Yutong Tang_ — 把“分数更高就保留”视为带测量噪声的选择，研究反复使用同一评估集的后果。预注册实验中，选择集为 16 题时贪心循环最终的选择集分数比留出准确率高 13 到 20 分，256 题时高 1 到 5 分；测试过的接受规则在整轮运行中都没有超过贪心接受。
+7. 🆕 **Does Failure Feedback Direct Agent Self-Modification?** arXiv, 2026\. [paper](https://arxiv.org/abs/2610.14662)
+_Rong He_ — 比较一次修改对随机选定的目标失败与对父代其他失败的修复率，以此测量修改是否针对反馈。公开的 Darwin Gödel Machine 日志中 145 次修改未显示针对目标的优势；预注册实验中目标反馈让 Qwen3-4B 的修复率提高 20 个百分点，但修好目标失败不一定带来留出集提升。
+8. 🆕 **Auditing the Product, Not the Recursion: The Evaluation Evidence Behind Recursive Self-Improvement Claims.** arXiv, 2026\. [paper](https://arxiv.org/abs/2610.27610)
+_Zihan Chen, Di Zhu, Lei Nico Zheng_ — 对 114 篇研究做全文编码，其中 90 篇把自己的系统称为 RSI。这 90 篇中 60% 在未用于选择的任务上评估，只有 22% 审计了两次以上完整循环的重跑；26 篇声称改进流程更好的研究中，只有 4 篇在相同起点和相同预算下比较了前后两版流程。
+
 ### 4.14 Open-Source Systems & Infrastructure
 
 > 可以直接运行的自进化系统和基础设施。论文配套代码已在各条目的 `[code]` 链接中，这里只列独立的工程项目，并汇总本仓库内带代码的系统，方便二次开发时选型。
@@ -320,14 +385,14 @@ _Yi Duan et al._ — 用 HCI 衡量模型能力余量，并提出从改进执行
 _Human-Agent-Society（Wenhao Chai, Paul Liang, Ao Qu, Zhenting Qi, et al.）_ — 开源的持续自改进基础设施，把服务、反馈、学习、版本化交付接成一个循环：Serve（服务请求并记录交互）→ Observe（把反馈匹配到交互记录）→ Grow（由 recipe 产出更新）→ Commit（按选择策略评估候选，发布通过的版本）。两条学习面：用 Slime + SGLang 训练模型权重，或改进 harness 的 prompt、规则与技能；更新期间服务不中断，全部版本可回滚。内置 recipe 覆盖 SAO、OpenClaw-RL、TTT-Discover、SkillClaw、GEPA。Apache-2.0。它把本仓库反复讨论的"评估门 + 版本化回滚"做成了通用组件，与 iCoder 的研究流水线互补，是 §10 路线图的候选底座。
 2. **Proteus: A Harness-Agnostic Self-Evolution Framework for AI Agents.** v0.3.0, 2026-08\. [code](https://github.com/proteus-evolve/Proteus)
 _Proteus Authors_ — 与具体 harness 解耦的自进化框架：每个 episode 用全新的模型上下文，agent 只能修改预先声明的 harness 区域，代码改动通过验证后才启用，版本化快照保留完整进化历史。收录自 Prism-Shadow/awesome-rsi 的开源系统表。
+3. 🆕 **RSIGym: A Flexible Environment for Recursive Self-Improvement.** arXiv, 2026\. [paper](https://arxiv.org/abs/2610.10310)
+_Fanqing Meng, Lingxiao Du, Haocheng Lu, Qiguang Chen, et al._ — 把训练、推理、rollout、评估和沙箱执行做成可复用服务，统一管理预算与权限，支持数据、harness 和联合三条改进轨道，代码全部开源。定义 RSI-Index 为五个基准上剩余差距被缩小的平均比例；六个前沿研究模型中 Opus 5 最高，为 0.4809，其选出的系统把 SWE-bench Verified 从 17.67% 提到 50.33%。
 
 本仓库内带公开代码的系统：[DGM](https://github.com/jennyzzt/dgm)（§4.4）、[MOSS](https://github.com/hkgai-official/Moss)（§4.4）、[Metaⁿ](https://github.com/minnesotanlp/meta-n)（§4.4）、[EvoLM](https://github.com/stellalisy/EvoLM)（§4.5）、[Prime Agent](https://github.com/PrimeIntellect-ai/prime-agent)（§4.8）、[Meta-Harness](https://github.com/stanford-iris-lab/meta-harness-tbench2-artifact)（§4.9）、[EnvHarness](https://github.com/google-research/envharness)（§4.9）、[MetaCaster](https://github.com/D2I-Group/metacaster)（§4.9）、[RHO](https://github.com/wbopan/retro-harness)（§4.9）、[AHE](https://github.com/china-qijizhifeng/agentic-harness-engineering)（§4.9）、[iCoder](https://github.com/bingreeky/iCoder)（§4.10）、[GEPA](https://github.com/gepa-ai/gepa)（§4.12）。
 
 ### 4.15 Self-Improvement Benchmarks
 
-**独立专题**：[字节 Seed × TokenWave：Self-Developing Agents](report/bytedance-self-developing/index.html) · [三篇合读](report/bytedance-self-developing/research.md)
-
-> [Self-Developing Agents 项目页](https://self-developing-agents.github.io/)将目标形成、经验学习和系统改进分别作为评测对象。以下三篇均已归档英文原文及保留版式的中文翻译 PDF；公式、部分图表文字和提示词/代码块保留原文。
+> [Self-Developing Agents 项目页](https://self-developing-agents.github.io/)将目标形成、经验学习和系统改进分别作为评测对象。前三篇均已归档英文原文及保留版式的中文翻译 PDF；公式、部分图表文字和提示词/代码块保留原文。三篇合读见专题 [字节 Seed × TokenWave：Self-Developing Agents](report/bytedance-self-developing/index.html)（[合读报告](report/bytedance-self-developing/research.md)）。
 
 1. **Aspire: Can Models Self-Evolve from Vague Goals?** arXiv, 2026\. [paper](https://arxiv.org/abs/2608.31111), [project](https://self-developing-agents.github.io/), [PDF-en](papers/en/2608.31111_Aspire.pdf), [PDF-zh](papers/zh/2608.31111_Aspire_zh.pdf)
 _Yuhao Wu, Jingyuan Zhang, Jiajun Shi, et al._ — 只提供自然语言能力目标，让 agent 自选数据、更新方法和验证信号，支持权重与 harness 更新；用覆盖六类目标的 520 道隐藏专家题评估。完成训练或修改循环并不保证隐藏集收益，持续更新还可能抹去此前提升（正文 §3–4）。
@@ -335,10 +400,16 @@ _Yuhao Wu, Jingyuan Zhang, Jiajun Shi, et al._ — 只提供自然语言能力�
 _Jiajun Shi, Siyuan Tao, Yuhao Wu, et al._ — 在七个有可执行验证器的文本游戏中，分离宽松探索与严格留出评估，比较原始历史 ICL、摘要记忆和参数训练。记忆方法的优势依赖任务结构，参数更新可能产生负迁移；识别成功行为不等于学会可迁移策略（正文 §3–4、表 4）。
 3. **HarnessDev: Can LLMs Create and Evolve Their Own Agent Harness?** arXiv, 2026\. [paper](https://arxiv.org/abs/2609.01437), [project](https://self-developing-agents.github.io/), [PDF-en](papers/en/2609.01437_HarnessDev.pdf), [PDF-zh](papers/zh/2609.01437_HarnessDev_zh.pdf)
 _Yuhao Wu, Jingyuan Zhang, Jiajun Shi, et al._ — 分 Creation 与 Evolution 两阶段评估可运行的 harness，并区分创建模型与执行模型。64 次相邻版本切换中，可见反馈与 SWE-Pro 留出集的变化方向仅 34 次一致（53.1%）；九个声明最终版本中仅两个在留出集最优，说明开发集收益与版本选择仍需独立验证（正文 §4.3）。
+4. 🆕 **GDPevo: Evaluating Agent Self-Evolution on Real Business Tasks.** arXiv, 2026\. [paper](https://arxiv.org/abs/2608.03764), [code](https://github.com/Prism-Shadow/GDPevo)
+_Leijun Zhou, Zhihao Liu, Xiang Qu, Chenxu Liu, et al._ — 用 rule hybridization 构造任务：把企业工作流拆成原子业务规则，分散到训练任务中，再在留出测试任务中重新组合，使测试增益可以归因到训练经验。V1 含 12 组共 120 个任务，自动流水线两天内可扩到 240 个任务；自进化最多把留出准确率提高 16.44 个百分点，最好的进化 agent 仍低于 91.6% 的完全知情上限。
+5. 🆕 **FinEvo-Bench: A Longitudinal Benchmark for Self-Evolving Agents in Professional Financial Workflows.** arXiv, 2026\. [paper](https://arxiv.org/abs/2608.06144)
+_Bo Deng, Kang Zhou, Lifan Guo, Chongyang Tao, et al._ — 从六个金融领域、20 个业务场景的真实案例中构造 120 个开放任务，同一场景的六个案例共享专业流程和专家 rubric，任务流随机交错三次，每次运行配一个状态重置的对照组。四种自进化 scaffold 在 Qwen3.7-Max 上比配对的对照组高 9.33 到 19.37 分。
+6. 🆕 **RSI Arena: Towards Recursive Self-Improvement with Human Feedback.** arXiv, 2026\. [paper](https://arxiv.org/abs/2610.33624)
+_Yue Huang, Yanbo Wang, Lichi Li, Yuanyuan Chen, et al._ — 十个前沿模型各自作为训练 agent，从同一个 Nemotron 3.5 Lightning 30B-A3B Base 出发，各有 1,000 GPU 小时和 300 美元 API 额度，第二阶段再根据人类盲评的对比记录继续训练。最强模型（由 GPT-6 Astra 训练）在 12 个能力基准上把基座到 Instruct 差距缩小的中位数为 76%；基准提升与人类偏好提升之间没有明确关联。
 
 ## 5. Deep-Dive Reports
 
-32 份中文解读（[`reports/`](reports/)），统一七节结构：一句话定位、要解决的问题、为什么此前做不通、方法机制、实验结果、局限、与其他报告的关系。每篇 2000 到 5200 字，数字标注到论文表号。全部合订为 [167 页 PDF](report/awesome_rsi_full_report.pdf)。
+33 份中文解读（[`reports/`](reports/)）。00–31 统一七节结构：一句话定位、要解决的问题、为什么此前做不通、方法机制、实验结果、局限、与其他报告的关系；每篇 2000 到 5200 字，数字标注到论文表号，与 32 一起合订为 [169 页 PDF](report/awesome_rsi_full_report.pdf)。32 是依据摘要整理的笔记，尚未做全文精读。
 
 | # | 报告 | 对象 | 主要内容 |
 |---|---|---|---|
@@ -374,10 +445,13 @@ _Yuhao Wu, Jingyuan Zhang, Jiajun Shi, et al._ — 分 Creation 与 Evolution �
 | 29 | [Prism-Shadow/awesome-rsi 清单](reports/29_prism_awesome_rsi.md) | 27 个基准 + 31 个方法的九维元数据 | 与本仓库重叠 12 篇；它有基准表和记忆线，本仓库有评估器与安全治理线 |
 | 30 | [《读懂 RSI》长文](reports/30_prism_understanding_rsi.md) | A(t+1) = U(A(t), τ, f) 与五组分类维度 | 进化结构（链 / 树 / 图）和更新者是本仓库缺的两个维度；定义比 Bostrom 宽 |
 | 31 | [Reef](reports/31_reef.md) | 持续自改进 agent 的开源基础设施 | Serve → Observe → Grow → Commit；评估门是接口，锚由用户提供 |
+| 32 | [The Last AI Built by Humans](reports/32_last_ai_built_by_humans.md) | 五级 RSI 路线图（摘要级笔记） | 用 HCI 衡量能力余量；从改进执行到递归元改进分五级 |
 
 ## 6. Insights & Open Problems
 
-十条主要发现（完整论证见[报告 10](reports/10_synthesis_insights.md)）：
+### 6.1 Ten Insights
+
+十条主要发现，截至 2026-09-16（完整论证见[报告 10](reports/10_synthesis_insights.md)）：
 
 1. 评估器决定能力上限，也是被利用的目标。
 2. 去掉进化循环外的评估依据后系统会退化（AutoSaddler 去掉 dev 集检查后低于未优化基线）。RHO 的单轮无标签结果是目前的例外，尚待多轮验证。
@@ -390,7 +464,9 @@ _Yuhao Wu, Jingyuan Zhang, Jiajun Shi, et al._ — 分 Creation 与 Evolution �
 9. 宏观争论取决于算力与认知劳动的替代弹性 σ。
 10. 基准饱和速度加快，测量工具本身成为瓶颈。
 
-开放问题（按可检验程度排序）：
+### 6.2 Open Problems
+
+按可检验程度排序：
 
 1. 要让评估器不退化，最少需要多少人工标注？WGtG 用十条样本，EvalCEGAR 用十个碰撞对，尚无理论。
 2. 不用标签的自偏好优化，经过多轮后是否仍能提升？RHO 只测了一轮。
@@ -402,6 +478,17 @@ _Yuhao Wu, Jingyuan Zhang, Jiajun Shi, et al._ — 分 Creation 与 Evolution �
 8. 锚本身需要更新时（RQGM 换评估器、SESG 更新护栏），由谁验证更新？目前都由人验证。
 9. 如果 2027 年 METR 仍测不到整体节奏翻倍，是串行瓶颈所致，还是加速被用于做更多实验？
 10. 何时会有人做 σ 的受控实验（随机分配研究者的算力预算）？Epoch AI 已给出实验设计。
+
+### 6.3 Update Since September 2026
+
+2026-11-06 补入的 24 篇 9–11 月新论文对上面十条发现的补充和修正。数字均出自所引论文的摘要，条目见 §4 中标 🆕 的论文。
+
+1. **harness 进化在搜索集上的增益有相当一部分来自过拟合或测试时计算，补充 insight 2 和 insight 10。** HDA（[2610.22466](https://arxiv.org/abs/2610.22466)）测得过拟合和测试时扩展平均占增益的 54% 和 14%，Winner's Curse（[2610.09239](https://arxiv.org/abs/2610.09239)）在选择集为 16 题时测得贪心循环的选择集分数比留出准确率高 13 到 20 分。[2610.27610](https://arxiv.org/abs/2610.27610) 编码的 90 篇自称 RSI 的研究中，只有 22% 审计了两次以上完整循环的重跑。
+2. **评估器共进化仍依赖锚（进化循环之外不参与进化的评估依据），任务分数不能用来验证评估器，支持 insight 1 和 insight 3。** [2610.11464](https://arxiv.org/abs/2610.11464) 去掉锚定守卫后验证器退化为全部放行，用它训练技能的效果不变；VeriEvolve（[2610.29005](https://arxiv.org/abs/2610.29005)）每轮内冻结评估器、只在轮间修订，把 GLM-5.2 的外部验证成功数从 6/30 提到 18/30。
+3. **harness 与权重联合进化开始给出分工判据，对应 §10 路线图中权重更新方式的待定选择和开放问题 4。** Self-HPO（[2610.22791](https://arxiv.org/abs/2610.22791)）交替执行 harness 搜索和 RL，Qwen3.5-35B-A3B 平均解决率从 57.8% 提到 64.8%，联合增益大于两部分各自增益之和。[2610.11655](https://arxiv.org/abs/2610.11655) 让 harness 进化处理过程失败、权重训练处理内容失败，Qwen3.5-4B 留出分数从 0.16 提到 0.30 后，LoRA 在原 harness 下再加 +0.13。
+4. **接受门本身会丢失保护，安全研究开始追踪跨代传递，补充 insight 7。** Masked Erosion（[2610.38392](https://arxiv.org/abs/2610.38392)）的 411 个改进循环中，同等成本下 20 题批次让每个 harness 保持受保护，40 题批次的六个 harness 全部失去保护，作者给出的补救是冻结安全文本或审计单层消融。[2609.17817](https://arxiv.org/abs/2609.17817) 的投毒基准在改用干净基准继续进化后污染常常仍然保留，RSI Control（[2610.27735](https://arxiv.org/abs/2610.27735)）中六个前沿模型都完成了相当比例的向后继模型植入未对齐属性的隐蔽任务。
+5. **自动 AI 研究出现可与官方模型对照的端到端结果，宏观反馈环仍被估计为不足以自我维持，与 insight 8 和 insight 9 一致。** Athanor（[2610.21055](https://arxiv.org/abs/2610.21055)）中四个 agent 用 104 小时把 Qwen3-4B-Base 的留出分数从 9.2 提到 48.2（官方 Instruct 为 47.9），RSI Arena（[2610.33624](https://arxiv.org/abs/2610.33624)）中基准提升与人类偏好提升之间没有明确关联。[2609.15802](https://arxiv.org/abs/2609.15802) 把净加速写成各反馈环弹性的乘积，用现有数据粗略校准后认为当前反馈环不足以产生自我维持的加速。
+6. **技能和自修改的跨任务迁移有限，给 insight 5 的“技能可以迁移”加了条件。** [2609.39148](https://arxiv.org/abs/2609.39148) 中训练任务上有提升的 21 个技能只有 5 个在测试任务上保留全部提升，3 个完全不保留。[2610.14662](https://arxiv.org/abs/2610.14662) 在公开的 Darwin Gödel Machine 日志的 145 次修改中没有发现针对目标失败的修复优势。
 
 ## 7. Reference
 
@@ -428,6 +515,10 @@ _Yuhao Wu, Jingyuan Zhang, Jiajun Shi, et al._ — 分 Creation 与 Evolution �
 
 ### 7.2 Timeline
 
+![Figure 1 · Timeline](assets/fig1_timeline.svg)
+
+*图 1：截至 2026-09-15 的 71 项工作的时间线，按十个类别分行，横轴为 arXiv 首版年月（非 arXiv 材料取发布月）。★ 为本调研的十份核心材料。1965–2014 与 2023–2026 之间断轴。2026 年 8 月一个月有 21 项。由 `scripts/make_figures.py` 生成。*
+
 | 时间 | 事件 | 报告 |
 |---|---|---|
 | 1965 | Good 提出 intelligence explosion | 00 |
@@ -438,11 +529,12 @@ _Yuhao Wu, Jingyuan Zhang, Jiajun Shi, et al._ — 分 Creation 与 Evolution �
 | 2014 | Bostrom《Superintelligence》：crossover / recalcitrance | 00 |
 | 2023 | Voyager 可增长技能库；STOP 递归自改进代码生成；Erdil & Besiroglu 爆炸增长综述 | 23 |
 | 2024 | ADAS / AFlow 自动 agent 设计；AI Scientist 端到端自动研究；Gödel Agent 首个 LLM 版 Gödel Machine | 23 |
-| 2025 H1 | METR 任务时长 7 个月翻倍；SICA 17 → 53% 并引入异步监督者；DGM 开放式档案自改写 | 23 · 07 |
-| 2025 H2 | AlphaEvolve / ShinkaEvolve 程序进化；GEPA 反思提示进化；TMLR 自进化综述；ACE 上下文进化 | 12 |
+| 2025 H1 | METR 任务时长 7 个月翻倍；SICA 17 → 53% 并引入异步监督者；DGM 开放式档案自改写；SEAL 自生成微调数据更新权重 | 23 · 07 |
+| 2025 H2 | AlphaEvolve / ShinkaEvolve 程序进化；GEPA 反思提示进化；TMLR 自进化综述；ACE 上下文进化；ReasoningBank 推理策略记忆 | 12 |
 | 2026 Q1 | ECHO；MCE；SkillRL；HyperAgents；Meta-Harness | 06 · 13 |
 | 2026 Q2 | AHE；EvoLM；Continual Harness；MOSS；Evolving-RL；SIA；Self-Harness；RQGM；RHO / HarnessFix / Adaptive Auto-Harness / SCORE | 03 · 04 · 08 · 11 · 14 · 25 |
-| 2026 Q3 | Weng 总纲；Anthropic 进度报告；Who Grades the Grader；Co-Harness；Falsifiable Gates；技能进化五篇；EnvHarness / AutoSaddler / MetaCaster / Prime Agent；Metan；WikiSkill；EvalCEGAR；SESG / OLE / HVTB；两份综述；iCoder | 01 · 02 · 05 · 09 · 15–22 · 24 · 26–28 |
+| 2026 Q3 | Weng 总纲；Anthropic 进度报告；Who Grades the Grader；Co-Harness；Falsifiable Gates；技能进化五篇；EnvHarness / AutoSaddler / MetaCaster / Prime Agent；Metan；WikiSkill；EvalCEGAR；SESG / OLE / HVTB；两份综述；iCoder；MGM；FinEvo-Bench / GDPevo 带对照组的自进化基准 | 01 · 02 · 05 · 09 · 15–22 · 24 · 26–28 |
+| 2026-09 – 11 | AIDE² / IDM / VERSE 自改写；Who Verifies the Verifier、VeriEvolve 评估器共进化；Self-HPO、Harness Ceiling 联合进化；RRSI / HDA；Athanor、LM2LM 自动后训练研究；RSI Control、Trusting Trust Revisited、Masked Erosion；RSI 研究审计、Winner's Curse、Economics of RSI；RSIGym、RSI Arena | §6.3 |
 
 ### 7.3 System Comparison Matrix
 
@@ -490,24 +582,27 @@ _Yuhao Wu, Jingyuan Zhang, Jiajun Shi, et al._ — 分 Creation 与 Evolution �
 
 ```
 awesome_rsi/
-├── README.md · CONTRIBUTING.md
+├── README.md · CONTRIBUTING.md · LICENSE
 ├── report/
-│   ├── awesome_rsi_slides.html / .pdf        # 35 页汇总 PPT（方向键翻页，P 键打印）
-│   └── awesome_rsi_full_report.html / .pdf   # 167 页全文合订（32 份解读 + 封面 + 目录 + 两图）
-├── reports/                                  # 32 份解读 00–31（索引见 §5）
+│   ├── awesome_rsi_slides.html / .pdf        # 37 页汇总 PPT（方向键翻页，P 键打印）
+│   ├── awesome_rsi_full_report.html / .pdf   # 169 页全文合订（解读 00–32 + 封面 + 目录 + 两图）
+│   └── bytedance-self-developing/            # 字节 Self-Developing Agents 专题（合读 + 中英文 PDF）
+├── reports/                                  # 33 份解读 00–32（索引见 §5）
 ├── papers/
 │   ├── en/                                   # 65 篇英文原版 PDF（arXiv + iCoder 技术报告）
-│   ├── zh/                                   # 64 篇中文翻译 PDF；The Last AI 待译
+│   ├── zh/                                   # 64 篇中文翻译 PDF（另 5 篇经典中译在 classics/）；The Last AI 待译
 │   └── classics/                             # 6 篇起源经典（Good 1965 为扫描件无文本层，其余 5 篇含中译）
 ├── assets/
 │   ├── fig1_timeline.svg · fig2_taxonomy.svg # 两张图（另有 _dark 变体供 PPT）
+│   ├── rsi-literature-map/                   # 首页全文献研究图谱 + 逐条覆盖清单
 │   ├── fulltext/                             # 论文提取全文（解读撰写底稿）
 │   └── trends_research_raw.md                # 2026H2 趋势扫描笔记
 ├── scripts/
 │   ├── make_figures.py                       # 生成两张图
 │   ├── build_full_report.py                  # pandoc 合订 reports/*.md → HTML → Chrome PDF
 │   └── translate_batch5.sh                   # 批量中译（三条可并行队列）
-└── logs/                                     # 翻译日志
+├── website/                                  # 阅读网站生成器（build.py → gh-pages）
+└── logs/                                     # 翻译与打磨日志
 ```
 
 重建产物：`python3 scripts/make_figures.py` 重新生成两图；`python3 scripts/build_full_report.py --pdf` 重建全文报告；slides PDF 用 Chrome headless `--print-to-pdf` 生成。
@@ -520,7 +615,8 @@ awesome_rsi/
 - 运行时基础设施：评估 [Reef](https://github.com/Human-Agent-Society/reef)（§4.14）能否承担服务、反馈记录、候选评估和版本化发布这一层——它已经实现了本仓库要求的评估门和回滚，权重训练（Slime + SGLang）与 harness 进化两条学习面都有 recipe；需要核实的是它的候选评估能否接入独立于训练循环的锚集，以及 recipe 机制能否容纳 iCoder 式的多阶段研究流水线。
 - 待定的设计选择：harness 修改用 Meta-Harness 式的全轨迹自由改写（[13](reports/13_meta_harness.md)）还是 AutoSaddler 式的归因约束局部 diff（[16](reports/16_autosaddler.md)）；权重更新用 Co-Harness 的离线批次（[21](reports/21_co_harness.md)）还是 Continual Harness 的在线共学习（[11](reports/11_continual_harness.md)）。
 - 必须保留的机制：进化循环外的独立锚（[05](reports/05_who_grades_the_grader.md)）、回归门（[14](reports/14_self_harness.md)）、版本化回滚（[08](reports/08_moss.md) / [21](reports/21_co_harness.md)）、过程级测试（[22](reports/22_coevolution_survey.md)）。
-- 待补论文（据解读 29、30 的对照）：Mendel Gödel Machine（框架侧，DGM 后续，Polyglot 50.8% → 93.2%）、ReasoningBank 与 SEAL（记忆线与参数线的起点）、FinEvo-Bench 与 GDPevo（带状态重置对照组的 RSI 基准）；并考虑增加"基准"一节与"进化结构""更新者"两个分类维度。
+- 待补论文（据解读 29、30 的对照）已在 2026-11-06 补入：Mendel Gödel Machine（§4.4）、SEAL（§4.6）、ReasoningBank（§4.7）、FinEvo-Bench 与 GDPevo（§4.15）。MGM 的 Polyglot 50.8% → 93.2% 已对照正文表 1 核实，写入 §4.4 条目。基准一节已有（§4.15）；"进化结构""更新者"两个分类维度仍待加入。
+- 2026-11-06 批次的 29 条新条目只链接原文：英文 PDF、super_translate 中译和全文解读待补；值得精读的候选是 Athanor（§4.10）、HDA 与 RRSI（§4.9）、RSI Control 与 Masked Erosion（§4.11）、RSI 研究审计（§4.13）。
 - 维护：新论文按 §4 格式追加，入库 PDF-en / PDF-zh；重点论文补解读（模板见 [CONTRIBUTING](CONTRIBUTING.md)）；之后重建全文报告、按需更新两图，同步 slides 与本 README 的计数。
 
 ## 11. Related Resources
@@ -537,15 +633,17 @@ awesome_rsi/
 
 ## 12. Changelog
 
-2026-09-15：新增 Aspire、S³Gym、HarnessDev 三篇基准论文及英文 PDF，收录 Self-Developing Agents 项目页；英文论文共 65 篇（另有 6 篇经典），三篇中译 PDF 已完成（23 / 25 / 41 页，与原文一致），中译总数为 69 篇。
-
 | 日期 | 内容 |
 |---|---|
 | 2026-08-31 | 首版：10 份核心材料解读、26 篇 PDF 与中译、22 页 PPT |
 | 2026-09-01 – 09-03 | 加入 Continual Harness、六个 harness 系统、iCoder、三份综述与起源经典；PPT 扩至 34 页；生成时间线与分类树两图；加入 149 页全文合订报告 |
 | 2026-09-05 | 29 份解读全部重写为七节结构（约 8.3 万字）；补齐全部 61 篇论文的中译 PDF（共 66 篇） |
 | 2026-09-06 | README 重排为 12 个章节并统一条目格式；README、29 份解读、34 页 PPT 的中文表达由本地 Codex（gpt-6-astra）逐篇打磨，改为平实陈述；全文报告重建为 150 页 |
-| 2026-09-08 | 全文报告重建为 168 页；README 加英文摘要、Changelog、引用格式与许可证文件；新增 §4.14 开源系统与基础设施（Reef、Proteus）；相关资源加入 Prism-Shadow/awesome-rsi 及其《读懂 RSI》长文；新增解读 29（Prism 清单）、30（《读懂 RSI》）、31（Reef）；报告 10 加第五节"与外部清单和基础设施的对照"；PPT 加第 34 页对照三个外部资源，共 35 页 |
+| 2026-09-08 | 全文报告重建为 167 页；README 加英文摘要、Changelog、引用格式与许可证文件；新增 §4.14 开源系统与基础设施（Reef、Proteus）；相关资源加入 Prism-Shadow/awesome-rsi 及其《读懂 RSI》长文；新增解读 29（Prism 清单）、30（《读懂 RSI》）、31（Reef）；报告 10 加第五节"与外部清单和基础设施的对照"；PPT 加第 34 页对照三个外部资源，共 35 页 |
+| 2026-09-13 | 收录 The Last AI Built by Humans（§4.13）及英文 PDF，新增摘要级笔记 32 |
+| 2026-09-15 | 新增 Aspire、S³Gym、HarnessDev 三篇基准论文（§4.15）及英文 PDF，收录 Self-Developing Agents 项目页；三篇中译 PDF 已完成（23 / 25 / 41 页，与原文一致），中译总数为 69 篇；发布字节三篇专题 |
+| 2026-09-16 | 发布阅读网站（`website/`，gh-pages）；首页换为全文献研究图谱（76 条收录、15 个分类） |
+| 2026-11-06 | 收录 29 项（🆕）：24 篇 2026-09 至 11 月新论文（§4.3–4.15）与路线图待补的 MGM / ReasoningBank / SEAL / FinEvo-Bench / GDPevo，§4 共 105 条；新增 §6.3 九月以来的新证据与时间线 2026-09 – 11 一行；首页重排（徽章、导航、最近更新、仓库内容表）；修正解读计数（33 份）、§4.13 未编号条目、§4.15 多余行和更新记录格式。新条目暂只链接原文，未归档 PDF 与中译。报告 10 加第八节；汇总 PPT 加两页（共 37 页），修正第 34 页 MGM 的 Polyglot 起点（50.8%）；全文报告纳入解读 32 后重建为 169 页；阅读网站首页综述加第 9 节 |
 
 ## 13. Citation
 
@@ -557,7 +655,7 @@ awesome_rsi/
   author       = {Li, Yufeng},
   year         = {2026},
   howpublished = {\url{https://github.com/asimfish/awesome_rsi}},
-  note         = {32 structured deep-dives, 69 layout-preserving Chinese translations, 35-slide summary}
+  note         = {33 Chinese deep-dives, 69 layout-preserving Chinese translations, 37-slide summary}
 }
 ```
 
