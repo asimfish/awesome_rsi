@@ -2,7 +2,7 @@
 """Build the consolidated full-text report: all reports/*.md -> report/awesome_rsi_full_report.html (+ PDF via Chrome).
 Usage: python3 scripts/build_full_report.py [--pdf]
 """
-import subprocess, pathlib, re, sys, glob, datetime
+import subprocess, pathlib, re, sys, glob, datetime, os, shutil
 
 REPO = pathlib.Path(__file__).resolve().parent.parent
 files = sorted((REPO/"reports").glob("*.md"))
@@ -67,7 +67,7 @@ doc = f"""<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>�
 <div class="cover">
   <div class="t1">递归自改进（Recursive Self-Improvement）<br>调研全文报告</div>
   <div class="t2">从 Good 1965 的智能爆炸猜想到 2026 年的评估器共进化与 harness 优化：{len(files)} 份解读报告合订<br>主要结论：能稳定运行的自进化系统都在进化循环之外保留了一个不参与进化的评估依据；写代码和跑实验已基本自动化，决定做什么实验仍由人主导</div>
-  <div class="meta">构建日期：{today}（首版 2026-08-31）<br>材料范围：Lilian Weng《Harness Engineering for Self-Improvement》· Anthropic《When AI builds itself》· EvoLM · Red Queen Gödel Machine · Who Grades the Grader · ECHO · Darwin Gödel Machine · MOSS · WikiSkill · Continual Harness · A Survey of Self-Evolving Agents（TMLR）· Meta-Harness · Self-Harness · EnvHarness · AutoSaddler · MetaCaster · Prime Agent · iCoder · Metan · Co-Harness · Co-Evolution in Agentic Systems · Gödel Agent · SICA · EvalCEGAR · RHO · 技能进化五篇 · 安全治理五篇 · Self-Evolving Coding Agents 综述 · Prism-Shadow/awesome-rsi 清单与《读懂 RSI》长文 · Reef 基础设施；前史：Good 1965 · Vinge 1993 · GISAI 2001 · Gödel Machine 2003 · Omohundro 2008 · Chalmers 2010 · IEM 2013 · Superintelligence 2014<br>配套材料：{n_en} 篇英文 PDF + {n_cl} 篇起源经典 · {n_zh + n_clzh} 篇中译 PDF（中译覆盖以 papers/zh/ 与 papers/classics/ 中实际文件为准） · 汇总 PPT（report/awesome_rsi_slides.html / .pdf）· 图 1 时间线 / 图 2 分类树（assets/）<br>仓库：github.com/asimfish/awesome_rsi</div>
+  <div class="meta">构建日期：{today}（首版 2026-08-31）<br>材料范围：Lilian Weng《Harness Engineering for Self-Improvement》· Anthropic《When AI builds itself》· EvoLM · Red Queen Gödel Machine · Who Grades the Grader · ECHO · Darwin Gödel Machine · MOSS · WikiSkill · Continual Harness · A Survey of Self-Evolving Agents（TMLR）· Meta-Harness · Self-Harness · EnvHarness · AutoSaddler · MetaCaster · Prime Agent · iCoder · Metan · Co-Harness · Co-Evolution in Agentic Systems · Gödel Agent · SICA · EvalCEGAR · RHO · 技能进化五篇 · 安全治理五篇 · Self-Evolving Coding Agents 综述 · Prism-Shadow/awesome-rsi 清单与《读懂 RSI》长文 · Reef 基础设施 · The Last AI Built by Humans（摘要级笔记）；前史：Good 1965 · Vinge 1993 · GISAI 2001 · Gödel Machine 2003 · Omohundro 2008 · Chalmers 2010 · IEM 2013 · Superintelligence 2014<br>配套材料：{n_en} 篇英文 PDF + {n_cl} 篇起源经典 · {n_zh + n_clzh} 篇中译 PDF（中译覆盖以 papers/zh/ 与 papers/classics/ 中实际文件为准） · 汇总 PPT（report/awesome_rsi_slides.html / .pdf）· 图 1 时间线 / 图 2 分类树（assets/）<br>仓库：github.com/asimfish/awesome_rsi</div>
 </div>
 <div class="toc"><h1 class="first" style="page-break-before:avoid">目录</h1><ol>{toc_html}</ol></div>
 {fig_html}
@@ -80,7 +80,13 @@ out.write_text(doc, encoding="utf-8")
 print("written:", out, len(doc.encode()), "bytes, chapters:", len(files))
 
 if "--pdf" in sys.argv:
-    chrome = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+    mac = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+    chrome = (os.environ.get("CHROME_BIN") or shutil.which("google-chrome") or shutil.which("chromium")
+              or shutil.which("chromium-browser") or mac)
     pdf = REPO/"report/awesome_rsi_full_report.pdf"
-    subprocess.run(["timeout","-k","5","300",chrome,"--headless=new","--disable-gpu","--no-pdf-header-footer",f"--print-to-pdf={pdf}",f"file://{out}"], capture_output=True)
-    print("pdf:", pdf, pdf.stat().st_size if pdf.exists() else "MISSING")
+    before = pdf.stat().st_mtime if pdf.exists() else 0
+    extra = ["--no-sandbox"] if hasattr(os, "geteuid") and os.geteuid() == 0 else []  # Chrome refuses to run as root otherwise
+    r = subprocess.run(["timeout","-k","5","300",chrome,"--headless=new","--disable-gpu",*extra,"--no-pdf-header-footer",f"--print-to-pdf={pdf}",f"file://{out}"], capture_output=True, text=True)
+    if not pdf.exists() or pdf.stat().st_mtime <= before:
+        sys.exit(f"PDF not written (chrome exit {r.returncode}): {r.stderr.strip()[-400:]}")
+    print("pdf:", pdf, pdf.stat().st_size)

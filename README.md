@@ -9,8 +9,8 @@
 [![papers](https://img.shields.io/badge/papers-105-blue)](#4-papers)
 [![deep-dives](https://img.shields.io/badge/deep--dives-33-red)](#5-deep-dive-reports)
 [![zh-PDF](https://img.shields.io/badge/zh--PDF-69-green)](papers/zh/)
-[![slides](https://img.shields.io/badge/slides-35p-orange)](report/awesome_rsi_slides.pdf)
-[![full report](https://img.shields.io/badge/full_report-167p-8a2be2)](report/awesome_rsi_full_report.pdf)
+[![slides](https://img.shields.io/badge/slides-37p-orange)](report/awesome_rsi_slides.pdf)
+[![full report](https://img.shields.io/badge/full_report-169p-8a2be2)](report/awesome_rsi_full_report.pdf)
 [![website](https://img.shields.io/badge/website-online-0a7bbb)](https://asimfish.github.io/awesome_rsi/)
 [![updated](https://img.shields.io/badge/updated-2026--11--06-029E73)](#12-changelog)
 [![License: CC BY 4.0](https://img.shields.io/badge/license-CC_BY_4.0-lightgrey)](LICENSE)
@@ -30,7 +30,7 @@
 
 ## 最近更新
 
-- **2026-11-06**：收录 29 项（🆕）：24 篇 2026 年 9–11 月的新论文，以及路线图中待补的 Mendel Gödel Machine、ReasoningBank、SEAL、FinEvo-Bench、GDPevo；新增 [§6.3](#63-update-since-september-2026) 九月以来的新证据；首页重排，修正解读计数、未编号条目与更新记录格式。
+- **2026-11-06**：收录 29 项（🆕）：24 篇 2026 年 9–11 月的新论文，以及路线图中待补的 Mendel Gödel Machine、ReasoningBank、SEAL、FinEvo-Bench、GDPevo；新增 [§6.3](#63-update-since-september-2026) 九月以来的新证据；首页重排，修正解读计数、未编号条目与更新记录格式；汇总 PPT（37 页）、全文报告（169 页）、汇总报告 10 和阅读网站同步更新。
 - **2026-09-16**：上线 [RSI 研究札记](https://asimfish.github.io/awesome_rsi/)阅读网站，首页换为全文献研究图谱。
 - **2026-09-15**：收录 Aspire、S³Gym、HarnessDev 三篇自改进基准及中译（[§4.15](#415-self-improvement-benchmarks)），发布 [Self-Developing Agents 专题](https://asimfish.github.io/awesome_rsi/bytedance/)。
 - **2026-09-13**：收录 The Last AI Built by Humans，新增摘要级笔记 32。
@@ -45,8 +45,8 @@
 | 📝 中文解读（统一七节结构，约 9.8 万字） | 33 份（30 篇论文 / 综述 + 3 个资源与基础设施；报告 32 为摘要级笔记） | [`reports/`](reports/)，索引见 [§5](#5-deep-dive-reports) |
 | 📄 英文论文 PDF | 65 篇 + 6 篇起源经典 | [`papers/en/`](papers/en/)，[`papers/classics/`](papers/classics/) |
 | 🈶 中文翻译 PDF（[super_translate](https://github.com/asimfish/super_translate) 生成，保留原版式） | 69 篇（含 5 篇经典）；The Last AI 待译 | [`papers/zh/`](papers/zh/)，[`papers/classics/`](papers/classics/) |
-| 🖥️ 汇总 PPT | 35 页 HTML / PDF | [`report/awesome_rsi_slides.html`](report/awesome_rsi_slides.html)，[PDF](report/awesome_rsi_slides.pdf) |
-| 📚 全文合订报告（解读 00–31 + 两张图） | 167 页 | [`report/awesome_rsi_full_report.pdf`](report/awesome_rsi_full_report.pdf)，[HTML](report/awesome_rsi_full_report.html) |
+| 🖥️ 汇总 PPT | 37 页 HTML / PDF | [`report/awesome_rsi_slides.html`](report/awesome_rsi_slides.html)，[PDF](report/awesome_rsi_slides.pdf) |
+| 📚 全文合订报告（解读 00–32 + 两张图） | 169 页 | [`report/awesome_rsi_full_report.pdf`](report/awesome_rsi_full_report.pdf)，[HTML](report/awesome_rsi_full_report.html) |
 | 🔎 专题：字节 Self-Developing Agents | 三篇合读 + 中英文 PDF | [在线博客](https://asimfish.github.io/awesome_rsi/bytedance/)，[`report/bytedance-self-developing/`](report/bytedance-self-developing/research.md) |
 | 🌐 阅读网站源码 | 全部章节、解读与论文检索 | [`website/`](website/README.md) |
 
@@ -84,9 +84,9 @@ A curated list and survey repository on Recursive Self-Improvement (RSI), from G
 
 | 预算 | 路线 |
 |---|---|
-| 15 分钟 | [汇总 PPT](report/awesome_rsi_slides.html)（浏览器中用方向键翻页，P 键打印）或 [PDF 版](report/awesome_rsi_slides.pdf)（35 页） |
+| 15 分钟 | [汇总 PPT](report/awesome_rsi_slides.html)（浏览器中用方向键翻页，P 键打印）或 [PDF 版](report/awesome_rsi_slides.pdf)（37 页） |
 | 2 小时 | [报告 10 汇总](reports/10_synthesis_insights.md) → [报告 01 Weng](reports/01_lilian_weng_harness_engineering.md) → [报告 05 Who Grades the Grader](reports/05_who_grades_the_grader.md)（说明为什么评估器需要循环外的锚） |
-| 通读 | [全文合订报告](report/awesome_rsi_full_report.pdf)（167 页，32 份解读按编号排列） |
+| 通读 | [全文合订报告](report/awesome_rsi_full_report.pdf)（169 页，33 份解读按编号排列） |
 | 系统研读 | `reports/` 按 00 → 23 → 01 → 02 → 07 → 03 → 04 → 05 → 06 → 08 → 11 → 09 → 10 的顺序读，其余按需；对照 `papers/zh/` 的中文 PDF |
 
 按目的：
@@ -178,7 +178,7 @@ _Jenny Zhang, Bingchen Zhao, Wannan Yang, Jakob Foerster, Jeff Clune, Minqi Jian
 4. **Metaⁿ: Recursive Self-Improvement through Emergent Depth.** arXiv, 2026\. [paper](https://arxiv.org/abs/2608.24735), [code](https://github.com/minnesotanlp/meta-n), [PDF-en](papers/en/2608.24735_Metan.pdf), [PDF-zh](papers/zh/2608.24735_Metan_zh.pdf), [解读](reports/20_metan.md)
 _Zae Myung Kim, Young-Jun Lee, Seungyeon Jwa, Dongyeop Kang (UMN / SNU)_ — 固定的元操作 Ω 反复读取下层的执行轨迹和代码，逐层写出新的策略和辅助函数，改进机制本身保持不变。层数由收敛决定，实测停在 3 到 6 层。ARC-AGI-2 上得 0.331，是对比方法中唯一的非零分数。消融显示，层间传递的文本贡献约 72% 的增益，可调用代码约 15%。
 5. 🆕 **Mendel Gödel Machine: Recursive Self-Improving Coding Agents via Comparative Evolution.** arXiv, 2026\. [paper](https://arxiv.org/abs/2608.07645), [code](https://github.com/RealLcz/MGM)
-_Changzhi Liu, Yilun Liu, Sikuan Yan, Volker Tresp, Yunpu Ma_ — 解读 29、30 把它列为 DGM 的后续工作。现有自改写编码 agent 每次只根据一条失败轨迹修改自身（clonal mutation），MGM 另加两种自修改：reaction-norm mutation 同时参考 agent 在多个任务上的轨迹，cross-lineage hybridization 参考另一谱系的 agent 在同一任务上的轨迹。在加性适应度地形模型下证明新策略比单轨迹基线收敛更快、结果更好，SWE-bench 和 Polyglot 上性能、效率和泛化均有提升。
+_Changzhi Liu, Yilun Liu, Sikuan Yan, Volker Tresp, Yunpu Ma_ — 解读 29、30 把它列为 DGM 的后续工作。现有自改写编码 agent 每次只根据一条失败轨迹修改自身（clonal mutation），MGM 另加两种自修改：reaction-norm mutation 同时参考 agent 在多个任务上的轨迹，cross-lineage hybridization 参考另一谱系的 agent 在同一任务上的轨迹。在加性适应度地形模型下证明新策略比单轨迹基线收敛更快、结果更好。Qwen3.6-35B-A3B 上与 HGM 从同一 agent 出发，SWE-bench Verified 从 68.3% 提到 78.3%（HGM 73.3%），Polyglot 从 50.8% 提到 93.2%（HGM 77.9%）（正文表 1）。
 6. 🆕 **Recursive self-improvement of AI research agents.** arXiv, 2026\. [paper](https://arxiv.org/abs/2609.26457)
 _Dhruv Srikanth, Bingchen Zhao, Dixing Xu, Yuxiang Wu, Zhengyao Jiang_ — AIDE² 修改 AI 研究 agent 自身的代码，在一组 AI 研发任务上测试修改后的自己，只保留在隐藏评估上表现最好的改动。8 天自主运行得到七项连续改进并迁移到四个留出基准；在另一组留出任务上，reward hacking 比例从 55% 降到 32%，这一指标不在优化目标内。
 7. 🆕 **Predict Before You Modify: Learning Improvement Dynamics for Self-Evolving Agents.** arXiv, 2026\. [paper](https://arxiv.org/abs/2610.13991)
@@ -409,7 +409,7 @@ _Yue Huang, Yanbo Wang, Lichi Li, Yuanyuan Chen, et al._ — 十个前沿模型�
 
 ## 5. Deep-Dive Reports
 
-33 份中文解读（[`reports/`](reports/)）。00–31 统一七节结构：一句话定位、要解决的问题、为什么此前做不通、方法机制、实验结果、局限、与其他报告的关系；每篇 2000 到 5200 字，数字标注到论文表号，合订为 [167 页 PDF](report/awesome_rsi_full_report.pdf)。32 是依据摘要整理的笔记，尚未做全文精读，未进合订本。
+33 份中文解读（[`reports/`](reports/)）。00–31 统一七节结构：一句话定位、要解决的问题、为什么此前做不通、方法机制、实验结果、局限、与其他报告的关系；每篇 2000 到 5200 字，数字标注到论文表号，与 32 一起合订为 [169 页 PDF](report/awesome_rsi_full_report.pdf)。32 是依据摘要整理的笔记，尚未做全文精读。
 
 | # | 报告 | 对象 | 主要内容 |
 |---|---|---|---|
@@ -584,8 +584,8 @@ _Yue Huang, Yanbo Wang, Lichi Li, Yuanyuan Chen, et al._ — 十个前沿模型�
 awesome_rsi/
 ├── README.md · CONTRIBUTING.md · LICENSE
 ├── report/
-│   ├── awesome_rsi_slides.html / .pdf        # 35 页汇总 PPT（方向键翻页，P 键打印）
-│   ├── awesome_rsi_full_report.html / .pdf   # 167 页全文合订（解读 00–31 + 封面 + 目录 + 两图）
+│   ├── awesome_rsi_slides.html / .pdf        # 37 页汇总 PPT（方向键翻页，P 键打印）
+│   ├── awesome_rsi_full_report.html / .pdf   # 169 页全文合订（解读 00–32 + 封面 + 目录 + 两图）
 │   └── bytedance-self-developing/            # 字节 Self-Developing Agents 专题（合读 + 中英文 PDF）
 ├── reports/                                  # 33 份解读 00–32（索引见 §5）
 ├── papers/
@@ -615,7 +615,7 @@ awesome_rsi/
 - 运行时基础设施：评估 [Reef](https://github.com/Human-Agent-Society/reef)（§4.14）能否承担服务、反馈记录、候选评估和版本化发布这一层——它已经实现了本仓库要求的评估门和回滚，权重训练（Slime + SGLang）与 harness 进化两条学习面都有 recipe；需要核实的是它的候选评估能否接入独立于训练循环的锚集，以及 recipe 机制能否容纳 iCoder 式的多阶段研究流水线。
 - 待定的设计选择：harness 修改用 Meta-Harness 式的全轨迹自由改写（[13](reports/13_meta_harness.md)）还是 AutoSaddler 式的归因约束局部 diff（[16](reports/16_autosaddler.md)）；权重更新用 Co-Harness 的离线批次（[21](reports/21_co_harness.md)）还是 Continual Harness 的在线共学习（[11](reports/11_continual_harness.md)）。
 - 必须保留的机制：进化循环外的独立锚（[05](reports/05_who_grades_the_grader.md)）、回归门（[14](reports/14_self_harness.md)）、版本化回滚（[08](reports/08_moss.md) / [21](reports/21_co_harness.md)）、过程级测试（[22](reports/22_coevolution_survey.md)）。
-- 待补论文（据解读 29、30 的对照）已在 2026-11-06 补入：Mendel Gödel Machine（§4.4）、SEAL（§4.6）、ReasoningBank（§4.7）、FinEvo-Bench 与 GDPevo（§4.15）。MGM 的 "Polyglot 50.8% → 93.2%" 不在其摘要中，写入条目前需对照正文核实。基准一节已有（§4.15）；"进化结构""更新者"两个分类维度仍待加入。
+- 待补论文（据解读 29、30 的对照）已在 2026-11-06 补入：Mendel Gödel Machine（§4.4）、SEAL（§4.6）、ReasoningBank（§4.7）、FinEvo-Bench 与 GDPevo（§4.15）。MGM 的 Polyglot 50.8% → 93.2% 已对照正文表 1 核实，写入 §4.4 条目。基准一节已有（§4.15）；"进化结构""更新者"两个分类维度仍待加入。
 - 2026-11-06 批次的 29 条新条目只链接原文：英文 PDF、super_translate 中译和全文解读待补；值得精读的候选是 Athanor（§4.10）、HDA 与 RRSI（§4.9）、RSI Control 与 Masked Erosion（§4.11）、RSI 研究审计（§4.13）。
 - 维护：新论文按 §4 格式追加，入库 PDF-en / PDF-zh；重点论文补解读（模板见 [CONTRIBUTING](CONTRIBUTING.md)）；之后重建全文报告、按需更新两图，同步 slides 与本 README 的计数。
 
@@ -643,7 +643,7 @@ awesome_rsi/
 | 2026-09-13 | 收录 The Last AI Built by Humans（§4.13）及英文 PDF，新增摘要级笔记 32 |
 | 2026-09-15 | 新增 Aspire、S³Gym、HarnessDev 三篇基准论文（§4.15）及英文 PDF，收录 Self-Developing Agents 项目页；三篇中译 PDF 已完成（23 / 25 / 41 页，与原文一致），中译总数为 69 篇；发布字节三篇专题 |
 | 2026-09-16 | 发布阅读网站（`website/`，gh-pages）；首页换为全文献研究图谱（76 条收录、15 个分类） |
-| 2026-11-06 | 收录 29 项（🆕）：24 篇 2026-09 至 11 月新论文（§4.3–4.15）与路线图待补的 MGM / ReasoningBank / SEAL / FinEvo-Bench / GDPevo，§4 共 105 条；新增 §6.3 九月以来的新证据与时间线 2026-09 – 11 一行；首页重排（徽章、导航、最近更新、仓库内容表）；修正解读计数（33 份）、§4.13 未编号条目、§4.15 多余行和更新记录格式。新条目暂只链接原文，未归档 PDF 与中译 |
+| 2026-11-06 | 收录 29 项（🆕）：24 篇 2026-09 至 11 月新论文（§4.3–4.15）与路线图待补的 MGM / ReasoningBank / SEAL / FinEvo-Bench / GDPevo，§4 共 105 条；新增 §6.3 九月以来的新证据与时间线 2026-09 – 11 一行；首页重排（徽章、导航、最近更新、仓库内容表）；修正解读计数（33 份）、§4.13 未编号条目、§4.15 多余行和更新记录格式。新条目暂只链接原文，未归档 PDF 与中译。报告 10 加第八节；汇总 PPT 加两页（共 37 页），修正第 34 页 MGM 的 Polyglot 起点（50.8%）；全文报告纳入解读 32 后重建为 169 页；阅读网站首页综述加第 9 节 |
 
 ## 13. Citation
 
@@ -655,7 +655,7 @@ awesome_rsi/
   author       = {Li, Yufeng},
   year         = {2026},
   howpublished = {\url{https://github.com/asimfish/awesome_rsi}},
-  note         = {33 Chinese deep-dives, 69 layout-preserving Chinese translations, 35-slide summary}
+  note         = {33 Chinese deep-dives, 69 layout-preserving Chinese translations, 37-slide summary}
 }
 ```
 
