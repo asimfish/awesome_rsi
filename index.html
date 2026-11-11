@@ -1,138 +1,1010 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Awesome RSI：递归自改进研究的综述、论文、中文解读与专题。"><title>递归自改进走到了哪一步？ · RSI 研究札记</title><link rel="stylesheet" href="site.css?v=5aaa2dc3f4cf"></head><body><a class="skip" href="#content">跳到正文</a><div id="progress" aria-hidden="true"></div><header class="topbar"><a class="brand" href="index.html">RSI <span>研究札记</span></a><nav aria-label="全站导航"><a href="index.html" aria-current="page">全景综述</a><a href="papers.html">论文目录</a><a href="reports.html">逐篇解读</a><a href="topics.html">研究专题</a><a href="reference.html">术语对照</a></nav><div class="reading-tools"><button id="font-size" aria-label="放大正文字号" aria-pressed="false">A＋</button><button id="theme" aria-label="切换深色模式">深色</button></div></header><div class="layout "><aside><details class="toc-panel" open><summary>本页目录 <span>展开 / 收起</span></summary><div class="toc-body"><div class="eyebrow">本页目录</div><ul><li><a href="#先说结论">先说结论</a></li><li><a href="#1-什么样的改进才算递归">什么样的改进才算“递归”？</a></li><li><a href="#2-技术路线很多核心是改进落在哪里">技术路线很多，核心是改进落在哪里</a></li><li><a href="#3-最清楚的进展执行框架确实可以被优化">最清楚的进展：执行框架确实可以被优化</a></li><li><a href="#4-最重要的瓶颈分数上涨不一定说明改进判断正确">最重要的瓶颈：分数上涨，不一定说明改进判断正确</a></li><li><a href="#5-字节三篇补充了什么目标经验和版本选择">字节三篇补充了什么：目标、经验和版本选择</a></li><li><a href="#6-经验能积累但积累方式决定它是否有用">经验能积累，但积累方式决定它是否有用</a></li><li><a href="#7-从实验到生产还缺什么">从实验到生产，还缺什么？</a></li><li><a href="#8-下一步最值得回答的五个问题">下一步最值得回答的五个问题</a></li><li><a href="#9-2026-年-911-月的新证据">2026 年 9–11 月的新证据</a></li><li><a href="#按问题继续阅读">按问题继续阅读</a></li></ul></div></details><div class="aside-links"><a href="index.html">全景综述</a><a href="resources.html">资源与来源</a><a href="https://github.com/asimfish/awesome_rsi">GitHub ↗</a></div></aside><main id="content"><header class="article-header"><div class="breadcrumb"><a href="index.html">RSI 研究札记</a><span>/</span>全景综述</div><div class="eyebrow">全景综述 / 从结果到判断</div><h1 id="递归自改进走到了哪一步">递归自改进走到了哪一步？</h1><p class="meta">约 13 分钟阅读 · <a href="https://github.com/asimfish/awesome_rsi/blob/main/website/overview.md">查看原始笔记 ↗</a></p></header><div class="reading-note"><strong>这篇文章回答什么？</strong><p>哪些自改进已经有效，哪些结果还不能证明持续进步，以及下一步该如何验证。</p><div><a href="#先说结论">先看核心结论 ↓</a><a href="papers.html">查找具体论文 →</a></div></div><div class="prose">
-<p>从哥德尔机到自进化 agent：一次跨论文的综合判断。</p>
-<figure class="overview-figure">
-<a aria-label="打开全部文献研究图谱原图" href="assets/rsi-literature-map/overview.png"><img alt="全部文献研究图谱：76 条收录、15 个分类。思想与谱系包括思想起源、早期桥接、程序进化和综述；系统自改写包括框架、harness 工程与在线适应；学习与反馈包括知识技能、模型权重与评估器；验证与落地包括安全治理、自主研究、宏观测量、工程基础设施和字节三篇基准。每条文献均标注名称和贡献。" height="1086" src="assets/rsi-literature-map/overview.png" width="1448"/></a>
-<figcaption>全部文献研究图谱：截至 2026-09-16 的 76 条收录、15 个分类，含经典文献和 2 个独立工程项目。连线表示主题归属。2026-11-06 又补入 29 条，论文目录中标 🆕。<a href="assets/rsi-literature-map/overview.png">点击查看大图 ↗</a> · <a href="papers.html">查找原文与翻译</a></figcaption>
-</figure>
-<h2 id="先说结论">先说结论<a aria-label="跳转到本节" class="section-link" href="#先说结论">#</a></h2>
-<p><strong>这些研究已经展示了 AI 改进自身某些组件的能力，但尚不足以证明系统能够自主、持续地提升“做下一次改进”的能力。</strong> 改写代码、优化提示、积累技能和更新权重，都可能带来真实收益；能否选择正确目标、识别有害更新，并把收益保留到新任务，仍是更难的部分。</p>
-<p>把整个仓库放在一起看，可以提炼出三条主线：</p>
-<ul>
-<li><strong>可修改的范围在扩大。</strong> 从提示与记忆，扩展到工具、执行框架、模型参数，以及产生反馈的评估器。</li>
-<li><strong>改进是否真实，越来越难由一个分数判断。</strong> 系统既可能学会任务，也可能学会迎合评分标准；开发集进步不必然迁移到未见任务。</li>
-<li><strong>研究正从“能不能修改”转向“该修改什么、哪些修改值得留下”。</strong> 字节三篇基准将目标形成、经验学习和执行框架改进分别拿出来测量，补上了只看最终成绩时容易遗漏的环节。</li>
-</ul>
-<p>这是基于仓库所收录工作的综合判断，而非领域中所有方法都适用的定理。下面沿着这三条线说明证据与分歧。</p>
-<h2 id="1-什么样的改进才算递归">1. 什么样的改进才算“递归”？<a aria-label="跳转到本节" class="section-link" href="#1-什么样的改进才算递归">#</a></h2>
-<p>让模型回答得更好、让 agent 修改自己的代码，以及让系统更擅长发现和实施下一次改进，是三个不同强度的命题。</p>
-<p>宽泛用法把“利用轨迹和反馈更新自身，并在后续任务中使用”称为自改进；更严格的 RSI 讨论还要求：<strong>一次提升能够改善后续改进的机制或能力</strong>。因此，保存了一条有用记忆，并不能单独证明递归自改进已经成立。</p>
-<p>这一区分解释了为什么看似矛盾的说法可以同时成立：已有系统能够自改进，但开放式、持续的递归加速仍缺乏充分实证。Good 的正反馈设想和哥德尔机的形式化框架提供了问题定义；今天的工程方法主要通过实验反馈，尝试近似解决“这次修改是否值得接受”。<a href="reports/00_origins_1965_2014.html">思想史解读</a> · <a href="reports/23_godel_agent_to_sica.html">Gödel Agent 到 SICA</a></p>
-<h2 id="2-技术路线很多核心是改进落在哪里">2. 技术路线很多，核心是改进落在哪里<a aria-label="跳转到本节" class="section-link" href="#2-技术路线很多核心是改进落在哪里">#</a></h2>
-<div aria-label="对照表，可横向滚动" class="table-scroll" role="region" tabindex="0"><table>
-<thead>
-<tr>
-<th>改进对象</th>
-<th>代表工作</th>
-<th>能解决什么</th>
-<th>新增的困难</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>提示、记忆与技能</td>
-<td>WikiSkill、ACE、SkillCommit、HyperSkill</td>
-<td>将交互经验用于后续任务，更新成本较低</td>
-<td>信息压缩会丢掉细节；技能可能依赖具体模型或场景</td>
-</tr>
-<tr>
-<td>harness 与源码</td>
-<td>DGM、Meta-Harness、Self-Harness、MOSS</td>
-<td>修改工具调用、控制流程与运行机制</td>
-<td>补丁可能过拟合开发任务，或引入其他路径的回归</td>
-</tr>
-<tr>
-<td>模型参数</td>
-<td>EvoLM、ECHO、Co-Harness</td>
-<td>将学习结果写入参数，减少对外部上下文的依赖</td>
-<td>训练成本、负迁移与遗忘；反馈分布会随策略变化</td>
-</tr>
-<tr>
-<td>环境与接口</td>
-<td>EnvHarness、Continual Harness 的在线设定</td>
-<td>改善经验获取，或在不中断任务的条件下适应</td>
-<td>环境与验证条件的变化可能干扰效果归因</td>
-</tr>
-<tr>
-<td>评估机制</td>
-<td>RQGM、Who Grades the Grader、EvalCEGAR</td>
-<td>让反馈跟上策略变化，发现原评估器区分不了的行为</td>
-<td>谁来检查改进后的评估器，成为新的问题</td>
-</tr>
-</tbody>
-</table></div>
-<p>这些路线可以组合。系统可以先在上下文中探索，把经验整理成技能，再通过训练吸收其中稳定有效的部分；结构性运行故障则可能需要修改源码。这里没有一条适用于所有任务的固定顺序，重要的是区分每层的收益、成本和接受条件。<a href="reports/01_lilian_weng_harness_engineering.html">harness 总纲</a> · <a href="reports/21_co_harness.html">Co-Harness</a></p>
-<h2 id="3-最清楚的进展执行框架确实可以被优化">3. 最清楚的进展：执行框架确实可以被优化<a aria-label="跳转到本节" class="section-link" href="#3-最清楚的进展执行框架确实可以被优化">#</a></h2>
-<p>DGM 用经验评测筛选代码修改，展示了通过搜索自身 agent 实现来提高任务成绩的可能性。Meta-Harness 进一步让外部模型读取执行轨迹、诊断问题并修改 harness；Self-Harness 则研究模型修改自己框架时，回归检查能提供多少保护。</p>
-<p>这组工作的价值在于：能力变化不只来自更换基础模型。相同模型如何获得上下文、调用工具、处理失败和决定停止，也会影响结果。但“框架可以优化”与“任意框架改动都值得保留”之间，还有一个选择问题。</p>
-<div aria-label="对照表，可横向滚动" class="table-scroll" role="region" tabindex="0"><table>
-<thead>
-<tr>
-<th>作者报告的实验</th>
-<th>观察</th>
-<th>更稳妥的解读</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>DGM：SWE-bench 从 20% 到 50%</td>
-<td>搜索 agent 源码能够改善任务结果</td>
-<td>支持受基准约束的代码自改进，不等于无限递归</td>
-</tr>
-<tr>
-<td>Self-Harness：九个模型—基准组合均提升</td>
-<td>带验证条件的自改写可以有效</td>
-<td>模型能力需要与修改范围、接受规则一起评价</td>
-</tr>
-<tr>
-<td>AutoSaddler：去掉 dev 检查后为 50.6，低于未优化的 53.0</td>
-<td>自动更新可能造成退化</td>
-<td>接受机制是方法的一部分，不能只比较提案能力</td>
-</tr>
-</tbody>
-</table></div>
-<p>这些是不同实验设置下的结果，不能合成跨论文排行榜。<a href="reports/07_darwin_godel_machine.html">DGM</a> · <a href="reports/13_meta_harness.html">Meta-Harness</a> · <a href="reports/14_self_harness.html">Self-Harness</a> · <a href="reports/16_autosaddler.html">AutoSaddler</a></p>
-<h2 id="4-最重要的瓶颈分数上涨不一定说明改进判断正确">4. 最重要的瓶颈：分数上涨，不一定说明改进判断正确<a aria-label="跳转到本节" class="section-link" href="#4-最重要的瓶颈分数上涨不一定说明改进判断正确">#</a></h2>
-<p>一个系统可以同时修改解题策略和评价策略的规则。这看起来更自主，却也让分数的含义发生变化。Who Grades the Grader 的关键反例是：评估器退化后，用它训练的技能仍可能获得不错的任务分数。<strong>任务分数本身不足以证明评估器可靠。</strong></p>
-<p>仓库用“锚”指代进化循环之外、不随候选一起优化的评估依据，例如人工标注样本、冻结验证器或独立留出任务。它们帮助区分系统确实变好与评分标准发生漂移。但反复拿同一验证集选择候选，也会降低其独立性；最终测试、开发反馈和晋升检查需要分清。</p>
-<p>也不能将这一经验直接写成“没有外部标签就不可能改进”。RHO 报告了基于自偏好的单轮收益，这说明无标签反馈可能有效；它尚不能回答多轮更新能否长期保持收益。因此，更值得检验的命题是：<strong>如何验证改进真实、可迁移并能持续，而不是仅要求循环成功运行。</strong> <a href="reports/05_who_grades_the_grader.html">Who Grades the Grader</a> · <a href="reports/04_red_queen_godel_machine.html">RQGM</a> · <a href="reports/25_rho.html">RHO</a></p>
-<h2 id="5-字节三篇补充了什么目标经验和版本选择">5. 字节三篇补充了什么：目标、经验和版本选择<a aria-label="跳转到本节" class="section-link" href="#5-字节三篇补充了什么目标经验和版本选择">#</a></h2>
-<p>Aspire 将评测任务隐藏，只给 agent 宽泛的能力目标。它要自己决定学习哪些数据、如何更新、如何自测。S³Gym 区分宽松探索与严格评测，检查交互历史、摘要记忆和参数学习是否改善后续决策。HarnessDev 则冻结生成的 harness，再观察它在留出任务上的表现。</p>
-<p>它们把“自改进是否成功”分解成三个可检验的问题：目标选对了吗？经验变成策略了吗？最终留下的是有效版本吗？</p>
-<p>HarnessDev 的反面数据尤其直接：64 次相邻版本切换中，可见反馈与留出集变化方向仅 34 次一致；九条轨迹中，只有两条声明的最终版本在留出集上最优。固定 Gemini 执行模型的四条轨迹，可见反馈均提高，但三条的留出集成绩下降。</p>
-<p>这里可见反馈是两个基准的组合分，留出分只来自 SWE-Pro，不能把两列相减当作精确的“过拟合损失”。这些结果支持的判断是：<strong>能产生候选、能观察到局部进步、能挑选可泛化的版本，是不同能力。</strong> <a href="bytedance/">字节三篇完整专题</a></p>
-<h2 id="6-经验能积累但积累方式决定它是否有用">6. 经验能积累，但积累方式决定它是否有用<a aria-label="跳转到本节" class="section-link" href="#6-经验能积累但积累方式决定它是否有用">#</a></h2>
-<p>WikiSkill 将证据与干预分开：知识记录持续保留，技能候选则经过验证后才采用，也可以撤回。技能进化研究进一步讨论如何组织、检索、合并和删除经验，而不只是不断追加历史。</p>
-<p>S³Gym 提醒我们，摘要并非总优于原始历史。可压缩成通用规则的任务可能受益于摘要；依赖精确状态的任务则可能因压缩丢掉关键信息。跨模型技能迁移也可能保留有用流程，或把某个模型特有的绕行办法带给另一个模型。</p>
-<p>因此，“拥有记忆库”还不是充分证据。需要观察经验在新任务中是否被正确使用，并与不保留经验、保留原始历史等对照比较。长期记录的价值也包括保存失败原因，避免系统重复提出已经被否决的更新。<a href="reports/09_wikiskill.html">WikiSkill</a> · <a href="reports/26_skill_evolution_wave.html">技能进化五篇</a></p>
-<h2 id="7-从实验到生产还缺什么">7. 从实验到生产，还缺什么？<a aria-label="跳转到本节" class="section-link" href="#7-从实验到生产还缺什么">#</a></h2>
-<p>生产系统关心的不只是最高分，还包括失败时能否恢复、修改能否解释，以及服务是否持续可用。MOSS 的源码更新流程和 Reef 的运行基础设施，将候选评估、版本记录与回滚变成了系统的一部分。</p>
-<p>这解决的是执行和管理问题，不能替使用者定义正确目标。评估门即使做成了组件，门里使用什么指标、覆盖哪些失败、谁有权放宽约束，仍需单独决定。芯片设计是一个具体例子：优化时延或面积之前，要先守住功能正确性；工具给出的局部指标还要结合工艺、约束和验证范围解释。<a href="reports/08_moss.html">MOSS</a> · <a href="reports/31_reef.html">Reef</a> · <a href="chip/">芯片专题</a></p>
-<p>同样，某一步实验加速或代码产出增加，不能直接推出整个研究过程按同样比例加速。方向选择、真实实验、外部反馈和最终判断，仍可能决定端到端速度。产业证据与论文基准应分开阅读，也应区分作者披露与独立验证。<a href="reports/02_anthropic_when_ai_builds_itself.html">产业进度解读</a></p>
-<h2 id="8-下一步最值得回答的五个问题">8. 下一步最值得回答的五个问题<a aria-label="跳转到本节" class="section-link" href="#8-下一步最值得回答的五个问题">#</a></h2>
-<ol>
-<li><strong>怎样选择目标？</strong> 当任务和评分不再由人明确给出，系统能否构建与真实需求一致的代理目标？</li>
-<li><strong>最少需要多少独立评估？</strong> 在有限标注和测试预算下，如何及时发现评估器漂移或有害修改？</li>
-<li><strong>经验何时能够迁移？</strong> 哪些知识应保留原始记录，哪些可以压缩成技能，哪些值得写入参数？</li>
-<li><strong>如何选择和保留版本？</strong> 当开发反馈与真实效果不一致，停止条件、回滚规则和候选选择怎样设计？</li>
-<li><strong>改进机制本身有没有变强？</strong> 必须把“多尝试了几轮”与“更擅长发现下一次改进”分开测量，才能讨论更严格的递归自改进。</li>
-</ol>
-<p>这几条问题把仓库中的模型、harness、技能、评估和治理研究连在了一起。已有结果让局部自改进成为可研究的工程问题；持续、可验证的改进能力，则仍需要更好的实验来建立证据。</p>
-<h2 id="9-2026-年-911-月的新证据">9. 2026 年 9–11 月的新证据<a aria-label="跳转到本节" class="section-link" href="#9-2026-年-911-月的新证据">#</a></h2>
-<p>2026-11-06 仓库补入 24 篇 9–11 月的新论文和 5 篇路线图中待补的工作（<a href="papers.html">论文目录</a>中标 🆕）。新论文大多指向上面第 4 节的判断：分数上涨需要独立核对。下面六条按证据整理，数字均出自所引论文的摘要。</p>
-<ol>
-<li><strong>harness 进化在搜索集上的增益有相当一部分来自过拟合或测试时计算，补充 insight 2 和 insight 10。</strong> HDA（<a href="https://arxiv.org/abs/2610.22466">2610.22466</a>）测得过拟合和测试时扩展平均占增益的 54% 和 14%，Winner's Curse（<a href="https://arxiv.org/abs/2610.09239">2610.09239</a>）在选择集为 16 题时测得贪心循环的选择集分数比留出准确率高 13 到 20 分。<a href="https://arxiv.org/abs/2610.27610">2610.27610</a> 编码的 90 篇自称 RSI 的研究中，只有 22% 审计了两次以上完整循环的重跑。</li>
-<li><strong>评估器共进化仍依赖锚（进化循环之外不参与进化的评估依据），任务分数不能用来验证评估器，支持 insight 1 和 insight 3。</strong> <a href="https://arxiv.org/abs/2610.11464">2610.11464</a> 去掉锚定守卫后验证器退化为全部放行，用它训练技能的效果不变；VeriEvolve（<a href="https://arxiv.org/abs/2610.29005">2610.29005</a>）每轮内冻结评估器、只在轮间修订，把 GLM-5.2 的外部验证成功数从 6/30 提到 18/30。</li>
-<li><strong>harness 与权重联合进化开始给出分工判据，对应 §10 路线图中权重更新方式的待定选择和开放问题 4。</strong> Self-HPO（<a href="https://arxiv.org/abs/2610.22791">2610.22791</a>）交替执行 harness 搜索和 RL，Qwen3.5-35B-A3B 平均解决率从 57.8% 提到 64.8%，联合增益大于两部分各自增益之和。<a href="https://arxiv.org/abs/2610.11655">2610.11655</a> 让 harness 进化处理过程失败、权重训练处理内容失败，Qwen3.5-4B 留出分数从 0.16 提到 0.30 后，LoRA 在原 harness 下再加 +0.13。</li>
-<li><strong>接受门本身会丢失保护，安全研究开始追踪跨代传递，补充 insight 7。</strong> Masked Erosion（<a href="https://arxiv.org/abs/2610.38392">2610.38392</a>）的 411 个改进循环中，同等成本下 20 题批次让每个 harness 保持受保护，40 题批次的六个 harness 全部失去保护，作者给出的补救是冻结安全文本或审计单层消融。<a href="https://arxiv.org/abs/2609.17817">2609.17817</a> 的投毒基准在改用干净基准继续进化后污染常常仍然保留，RSI Control（<a href="https://arxiv.org/abs/2610.27735">2610.27735</a>）中六个前沿模型都完成了相当比例的向后继模型植入未对齐属性的隐蔽任务。</li>
-<li><strong>自动 AI 研究出现可与官方模型对照的端到端结果，宏观反馈环仍被估计为不足以自我维持，与 insight 8 和 insight 9 一致。</strong> Athanor（<a href="https://arxiv.org/abs/2610.21055">2610.21055</a>）中四个 agent 用 104 小时把 Qwen3-4B-Base 的留出分数从 9.2 提到 48.2（官方 Instruct 为 47.9），RSI Arena（<a href="https://arxiv.org/abs/2610.33624">2610.33624</a>）中基准提升与人类偏好提升之间没有明确关联。<a href="https://arxiv.org/abs/2609.15802">2609.15802</a> 把净加速写成各反馈环弹性的乘积，用现有数据粗略校准后认为当前反馈环不足以产生自我维持的加速。</li>
-<li><strong>技能和自修改的跨任务迁移有限，给 insight 5 的“技能可以迁移”加了条件。</strong> <a href="https://arxiv.org/abs/2609.39148">2609.39148</a> 中训练任务上有提升的 21 个技能只有 5 个在测试任务上保留全部提升，3 个完全不保留。<a href="https://arxiv.org/abs/2610.14662">2610.14662</a> 在公开的 Darwin Gödel Machine 日志的 145 次修改中没有发现针对目标失败的修复优势。</li>
-</ol>
-<p>完整对照见<a href="reports/10_synthesis_insights.html">汇总洞察第八节</a>。</p>
-<h2 id="按问题继续阅读">按问题继续阅读<a aria-label="跳转到本节" class="section-link" href="#按问题继续阅读">#</a></h2>
-<ul>
-<li><strong>想看整体证据与更多分歧：</strong><a href="reports/10_synthesis_insights.html">完整汇总洞察</a>。旧报告中较强的概括，应结合本文列出的反例与实验边界理解。</li>
-<li><strong>想了解某一类方法：</strong><a href="papers.html">论文分类</a>，按对象和研究方向浏览。</li>
-<li><strong>想逐篇检查机制与实验：</strong><a href="reports.html">全部中文解读</a>。</li>
-<li><strong>想比较系统或查术语：</strong><a href="reference.html">术语与系统对照</a>。</li>
-<li><strong>想先快速浏览：</strong><a href="slides.html">37 页汇总演示</a>。</li>
-</ul></div><footer><strong>RSI 研究札记</strong><p>从论文结果到研究判断。原始实验条件与来源见各篇解读。</p><a href="resources.html">资料与引用</a> · <a href="#">返回顶部 ↑</a></footer></main></div><script src="site.js?v=41d3e5055805"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Self-improving agents, evolving evaluators, skills, and harnesses.">
+<meta name="color-scheme" content="light">
+<title>Awesome Recursive Self-Improvement</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/library.css">
+</head>
+<body style="--accent: #355e91">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header"><div class="header-inner">
+<a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">↻</span>Recursive SI</a>
+<nav aria-label="Main navigation"><a href="index.html#library">Library</a><a href="guide.html">Reading guide</a><a href="https://github.com/asimfish/awesome_rsi">GitHub <span aria-hidden="true">↗</span></a></nav>
+</div></header>
+<main id="main">
+<section class="hero" aria-labelledby="hero-title">
+  <div class="hero-copy"><p class="eyebrow">A research collection / 02</p><h1 id="hero-title">Study the loop.<br>Trace the change.</h1><p class="lead">Explore how AI systems revise their code, feedback, weights, and memory. A curated collection of research, evaluation methods, and open-source systems.</p><div class="hero-actions"><a class="primary-link" href="#library">Explore the library ↓</a><a href="guide.html">Follow the reading guide →</a></div></div>
+  <div class="collection-stats" aria-label="Collection overview"><div><strong>107</strong><span>curated references</span></div><div><strong>10</strong><span>research areas</span></div><p>Collection snapshot<br><time datetime="2026-11-06">2026-11-06</time></p></div>
+</section>
+<figure class="overview"><picture><source media="(max-width: 540px)" srcset="assets/overview-mobile.svg"><img src="assets/overview.svg" width="1100" height="300" alt="Propose a change, evaluate the candidate, retain a useful revision, and use feedback for the next cycle."></picture></figure>
+<section class="library" id="library" aria-labelledby="library-title">
+<aside class="topic-panel js-only"><p class="eyebrow">Browse by topic</p><div class="categories" role="group" aria-label="Research topics"><button type="button" class="category active" data-category="" aria-pressed="true"><span>All topics</span><span>107</span></button><button type="button" class="category" data-category="Foundations &amp; surveys" aria-pressed="false"><span>Foundations &amp; surveys</span><span>14</span></button><button type="button" class="category" data-category="Agent code &amp; harnesses" aria-pressed="false"><span>Agent code &amp; harnesses</span><span>19</span></button><button type="button" class="category" data-category="Evaluators &amp; feedback" aria-pressed="false"><span>Evaluators &amp; feedback</span><span>7</span></button><button type="button" class="category" data-category="Model training" aria-pressed="false"><span>Model training</span><span>8</span></button><button type="button" class="category" data-category="Memory &amp; skills" aria-pressed="false"><span>Memory &amp; skills</span><span>12</span></button><button type="button" class="category" data-category="Online adaptation" aria-pressed="false"><span>Online adaptation</span><span>5</span></button><button type="button" class="category" data-category="Program &amp; workflow search" aria-pressed="false"><span>Program &amp; workflow search</span><span>6</span></button><button type="button" class="category" data-category="Autonomous research" aria-pressed="false"><span>Autonomous research</span><span>9</span></button><button type="button" class="category" data-category="Safety &amp; measurement" aria-pressed="false"><span>Safety &amp; measurement</span><span>24</span></button><button type="button" class="category" data-category="Tools &amp; infrastructure" aria-pressed="false"><span>Tools &amp; infrastructure</span><span>3</span></button></div><p class="sidebar-note">One collection, several ways in.<br><a href="guide.html">Find your reading route →</a></p></aside>
+<div class="library-main">
+<div class="section-heading"><div><p class="eyebrow">The collection</p><h2 id="library-title">Research library</h2></div><button id="share" class="text-button js-only" type="button">Copy filter link ↗</button></div>
+<div class="controls js-only">
+<label class="search-label" for="search">Search the collection</label><div class="search-wrap"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Search titles, authors, topics…" autocomplete="off" aria-keyshortcuts="/"><kbd aria-hidden="true">/</kbd></div>
+<div class="filter-row"><label>Year<select id="year"><option value="">All years</option><option>2026</option><option>2025</option><option>2024</option><option>2023</option><option>2014</option><option>2013</option><option>2010</option><option>2008</option><option>2003</option><option>2001</option><option>1993</option><option>1965</option></select></label><label>Resource<select id="kind"><option value="">All resources</option><option>Article</option><option>Benchmark</option><option>Book</option><option>Paper</option><option>Survey</option><option>Tool</option></select></label><label>Sort<select id="sort"><option value="recommended">Reading order</option><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="title">Title A–Z</option></select></label></div>
+<div class="toggle-row"><label><input type="checkbox" id="core"> Core readings <span>10</span></label><label><input type="checkbox" id="code"> With code</label><label><input type="checkbox" id="saved"> Saved <span id="saved-count">0</span></label><button id="reset" type="button" class="text-button">Reset filters</button></div>
+</div>
+<div class="results-bar"><p id="result-count" role="status" aria-live="polite">107 references</p><p id="active-topic">All topics</p></div>
+<noscript><p>All references are listed below. Enable JavaScript for search, filters, and saved readings.</p></noscript>
+<div id="papers"><article class="paper" id="rsi-001" data-id="rsi-001">
+  <div class="paper-top"><span class="paper-meta">2026 / Lil&#x27;Log / Article</span>
+  <span class='core-label'>Core reading</span></div>
+  <h3><a href="https://lilianweng.github.io/posts/2026-07-04-harness/">Harness Engineering for Self-Improvement</a></h3>
+  <p class="authors">Lilian Weng</p>
+  <p class='summary'>An overview of optimizing prompts, context, workflows, agent code, and the improvement mechanism itself.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://lilianweng.github.io/posts/2026-07-04-harness/">Article<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-001" aria-pressed="false" aria-label="Save: Harness Engineering for Self-Improvement">Save</button></div>
+  <p class="tags">Core Readings</p>
+</article><article class="paper" id="rsi-002" data-id="rsi-002">
+  <div class="paper-top"><span class="paper-meta">2026 / Anthropic Institute / Article</span>
+  <span class='core-label'>Core reading</span></div>
+  <h3><a href="https://www.anthropic.com/institute/recursive-self-improvement">When AI Builds Itself: Anthropic&#x27;s Progress toward Recursive Self-Improvement</a></h3>
+  <p class="authors">Marina Favaro, Jack Clark</p>
+  <p class='summary'>An industry account of AI-assisted engineering and research, with a distinction between executing experiments and choosing them.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://www.anthropic.com/institute/recursive-self-improvement">Article<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-002" aria-pressed="false" aria-label="Save: When AI Builds Itself: Anthropic&#x27;s Progress toward Recursive Self-Improvement">Save</button></div>
+  <p class="tags">Core Readings</p>
+</article><article class="paper" id="rsi-003" data-id="rsi-003">
+  <div class="paper-top"><span class="paper-meta">1965 / Advances in Computers Vol. 6 / Paper</span>
+  </div>
+  <h3><a href="http://incompleteideas.net/papers/Good65ultraintelligent.pdf">Speculations Concerning the First Ultraintelligent Machine</a></h3>
+  <p class="authors">Irving John Good</p>
+  <p class='summary'>The original positive-feedback argument: a sufficiently capable machine could help design a more capable successor.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="http://incompleteideas.net/papers/Good65ultraintelligent.pdf">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/classics/1965_Good_UltraintelligentMachine.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-003" aria-pressed="false" aria-label="Save: Speculations Concerning the First Ultraintelligent Machine">Save</button></div>
+  <p class="tags">Origins (1965–2014)</p>
+</article><article class="paper" id="rsi-004" data-id="rsi-004">
+  <div class="paper-top"><span class="paper-meta">2001 / Singularity Institute / Paper</span>
+  </div>
+  <h3><a href="https://web.archive.org/web/20120805130100/singularity.org/files/GISAI.html">General Intelligence and Seed AI 2.3</a></h3>
+  <p class="authors">Eliezer Yudkowsky</p>
+  <p class='summary'>Examines the abilities and continuing opportunities needed for a seed AI to improve itself.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://web.archive.org/web/20120805130100/singularity.org/files/GISAI.html">Archive<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/classics/2001_Yudkowsky_GISAI.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-004" aria-pressed="false" aria-label="Save: General Intelligence and Seed AI 2.3">Save</button></div>
+  <p class="tags">Origins (1965–2014)</p>
+</article><article class="paper" id="rsi-005" data-id="rsi-005">
+  <div class="paper-top"><span class="paper-meta">2003 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/cs/0309048">Gödel Machines: Self-Referential Universal Problem Solvers Making Provably Optimal Self-Improvements</a></h3>
+  <p class="authors">Jürgen Schmidhuber</p>
+  <p class='summary'>A formal system that permits self-modification after proving an increase in expected utility.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/cs/0309048">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/classics/2003_Schmidhuber_GoedelMachines.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-005" aria-pressed="false" aria-label="Save: Gödel Machines: Self-Referential Universal Problem Solvers Making Provably Optimal Self-Improvements">Save</button></div>
+  <p class="tags">Origins (1965–2014)</p>
+</article><article class="paper" id="rsi-006" data-id="rsi-006">
+  <div class="paper-top"><span class="paper-meta">2014 / Oxford University Press / Book</span>
+  </div>
+  <h3><a href="https://global.oup.com/academic/product/superintelligence-9780199678112">Superintelligence: Paths, Dangers, Strategies</a></h3>
+  <p class="authors">Nick Bostrom</p>
+  <p class='summary'>Develops a framework for optimization power, resistance to improvement, and recursive capability growth.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://global.oup.com/academic/product/superintelligence-9780199678112">Book<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-006" aria-pressed="false" aria-label="Save: Superintelligence: Paths, Dangers, Strategies">Save</button></div>
+  <p class="tags">Origins (1965–2014)</p>
+</article><article class="paper" id="rsi-007" data-id="rsi-007">
+  <div class="paper-top"><span class="paper-meta">1993 / VISION-21 Symposium / Paper</span>
+  </div>
+  <h3><a href="https://edoras.sdsu.edu/~vinge/misc/singularity.html">The Coming Technological Singularity: How to Survive in the Post-Human Era</a></h3>
+  <p class="authors">Vernor Vinge</p>
+  <p class='summary'>Explores several possible routes to intelligence beyond human capabilities.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://edoras.sdsu.edu/~vinge/misc/singularity.html">Essay<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-007" aria-pressed="false" aria-label="Save: The Coming Technological Singularity: How to Survive in the Post-Human Era">Save</button></div>
+  <p class="tags">Origins (1965–2014)</p>
+</article><article class="paper" id="rsi-008" data-id="rsi-008">
+  <div class="paper-top"><span class="paper-meta">2008 / AGI-08 / Paper</span>
+  </div>
+  <h3><a href="https://selfawaresystems.com/wp-content/uploads/2008/01/ai_drives_final.pdf">The Basic AI Drives</a></h3>
+  <p class="authors">Stephen M. Omohundro</p>
+  <p class='summary'>Analyzes instrumental incentives such as resource acquisition, self-preservation, and goal preservation.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://selfawaresystems.com/wp-content/uploads/2008/01/ai_drives_final.pdf">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/classics/2008_Omohundro_BasicAIDrives.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-008" aria-pressed="false" aria-label="Save: The Basic AI Drives">Save</button></div>
+  <p class="tags">Origins (1965–2014)</p>
+</article><article class="paper" id="rsi-009" data-id="rsi-009">
+  <div class="paper-top"><span class="paper-meta">2010 / Journal of Consciousness Studies / Paper</span>
+  </div>
+  <h3><a href="http://consc.net/papers/singularity.pdf">The Singularity: A Philosophical Analysis</a></h3>
+  <p class="authors">David J. Chalmers</p>
+  <p class='summary'>Separates the premises of intelligence-explosion arguments and examines potential limiting factors.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="http://consc.net/papers/singularity.pdf">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/classics/2010_Chalmers_Singularity.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-009" aria-pressed="false" aria-label="Save: The Singularity: A Philosophical Analysis">Save</button></div>
+  <p class="tags">Origins (1965–2014)</p>
+</article><article class="paper" id="rsi-010" data-id="rsi-010">
+  <div class="paper-top"><span class="paper-meta">2013 / MIRI Technical Report / Paper</span>
+  </div>
+  <h3><a href="https://intelligence.org/files/IEM.pdf">Intelligence Explosion Microeconomics</a></h3>
+  <p class="authors">Eliezer Yudkowsky</p>
+  <p class='summary'>Studies returns to reinvesting cognitive capability and resistance to further improvement.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://intelligence.org/files/IEM.pdf">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/classics/2013_Yudkowsky_IEM.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-010" aria-pressed="false" aria-label="Save: Intelligence Explosion Microeconomics">Save</button></div>
+  <p class="tags">Origins (1965–2014)</p>
+</article><article class="paper" id="rsi-011" data-id="rsi-011">
+  <div class="paper-top"><span class="paper-meta">2023 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2305.16291">Voyager: An Open-Ended Embodied Agent with Large Language Models</a></h3>
+  <p class="authors">Guanzhi Wang, Yuqi Xie, Yunfan Jiang, Ajay Mandlekar, et al. (NVIDIA / Caltech / Stanford)</p>
+  <p class='summary'>Builds a growing library of executable skills through interaction in Minecraft.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2305.16291">Paper<span aria-hidden="true"> ↗</span></a><a href="https://github.com/MineDojo/Voyager">Code<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2305.16291_Voyager.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-011" aria-pressed="false" aria-label="Save: Voyager: An Open-Ended Embodied Agent with Large Language Models">Save</button></div>
+  <p class="tags">Bridge (2023–2025)</p>
+</article><article class="paper" id="rsi-012" data-id="rsi-012">
+  <div class="paper-top"><span class="paper-meta">2024 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2410.04444">Gödel Agent: A Self-Referential Agent Framework for Recursively Self-Improvement</a></h3>
+  <p class="authors">Xunjian Yin, Xinyi Wang, Liangming Pan, Li Lin, Xiaojun Wan, William Yang Wang (PKU / UCSB)</p>
+  <p class='summary'>Uses an LLM to inspect and modify an agent&#x27;s own implementation during execution.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2410.04444">Paper<span aria-hidden="true"> ↗</span></a><a href="https://github.com/Arvid-pku/Godel_Agent">Code<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2410.04444_GodelAgent.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-012" aria-pressed="false" aria-label="Save: Gödel Agent: A Self-Referential Agent Framework for Recursively Self-Improvement">Save</button></div>
+  <p class="tags">Bridge (2023–2025)</p>
+</article><article class="paper" id="rsi-013" data-id="rsi-013">
+  <div class="paper-top"><span class="paper-meta">2025 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2504.15228">A Self-Improving Coding Agent (SICA)</a></h3>
+  <p class="authors">Maxime Robeyns, Martin Szummer, Laurence Aitchison (Bristol / iGent AI)</p>
+  <p class='summary'>Lets a coding agent revise its own code, with explicit utility, a version archive, and asynchronous supervision.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2504.15228">Paper<span aria-hidden="true"> ↗</span></a><a href="https://github.com/MaximeRobeyns/self_improving_coding_agent">Code<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2504.15228_SICA.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-013" aria-pressed="false" aria-label="Save: A Self-Improving Coding Agent (SICA)">Save</button></div>
+  <p class="tags">Bridge (2023–2025)</p>
+</article><article class="paper" id="rsi-014" data-id="rsi-014">
+  <div class="paper-top"><span class="paper-meta">2026 / TMLR / Survey</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2507.21046">A Survey of Self-Evolving Agents: What, When, How, and Where to Evolve on the Path to Artificial Super Intelligence</a></h3>
+  <p class="authors">Huan-ang Gao, Jiayi Geng, Wenyue Hua, Mengkang Hu, et al.</p>
+  <p class='summary'>Organizes self-evolving agents by what, when, how, and where they change.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2507.21046">Paper<span aria-hidden="true"> ↗</span></a><a href="https://github.com/CharlesQ9/Self-Evolving-Agents">Code<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2507.21046_SelfEvolvingAgentsSurvey.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-014" aria-pressed="false" aria-label="Save: A Survey of Self-Evolving Agents: What, When, How, and Where to Evolve on the Path to Artificial Super Intelligence">Save</button></div>
+  <p class="tags">Surveys</p>
+</article><article class="paper" id="rsi-015" data-id="rsi-015">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Survey</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2608.10299">Co-Evolution in Agentic Systems: Toward Self-Directed Evolution Beyond Human Design</a></h3>
+  <p class="authors">Qing Zong, Jiayu Liu, Junhao Shen, Zecong Tang, Linsi Wu, et al., Yangqiu Song (HKUST / UIUC / CUHK / HKU / PKU)</p>
+  <p class='summary'>Surveys interactions among evolving agents, environments, and improvement mechanisms.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2608.10299">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2608.10299_CoEvolutionSurvey.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-015" aria-pressed="false" aria-label="Save: Co-Evolution in Agentic Systems: Toward Self-Directed Evolution Beyond Human Design">Save</button></div>
+  <p class="tags">Surveys</p>
+</article><article class="paper" id="rsi-016" data-id="rsi-016">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Survey</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2608.03392">Self-Evolving Coding Agents</a></h3>
+  <p class="authors">Hao Zhou, Haichuan Hu, Ye Shang, Quanjun Zhang (NJUST / NJU, iSEngLab)</p>
+  <p class='summary'>Surveys evolution targets, timing, and evidence in coding agents, including risks from unreliable tests.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2608.03392">Paper<span aria-hidden="true"> ↗</span></a><a href="https://github.com/iSEngLab/Awesome-Self-Evolving-Coding-Agents">Collection<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2608.03392_SelfEvolvingCodingAgentsSurvey.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-016" aria-pressed="false" aria-label="Save: Self-Evolving Coding Agents">Save</button></div>
+  <p class="tags">Surveys</p>
+</article><article class="paper" id="rsi-075" data-id="rsi-075">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Survey</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2610.00093">Safety in Self-Evolving Agents: A Survey</a></h3>
+  <p class="authors">Jiahao Chen, Zhou Feng, Oubo Ma, Yichen Yan, et al.</p>
+  <p class='summary'>Surveys how reusable agent state can become unsafe as models, memory, tools, skills, and workflows evolve.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2610.00093">Paper<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-075" aria-pressed="false" aria-label="Save: Safety in Self-Evolving Agents: A Survey">Save</button></div>
+  <p class="tags">Surveys</p>
+</article><article class="paper" id="rsi-017" data-id="rsi-017">
+  <div class="paper-top"><span class="paper-meta">2026 / ICLR / Paper</span>
+  <span class='core-label'>Core reading</span></div>
+  <h3><a href="https://arxiv.org/abs/2505.22954">Darwin Gödel Machine: Open-Ended Evolution of Self-Improving Agents</a></h3>
+  <p class="authors">Jenny Zhang, Shengran Hu, Cong Lu, Robert Lange, Jeff Clune</p>
+  <p class='summary'>Searches an archive of self-modifying coding agents using empirical evaluation.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2505.22954">Paper<span aria-hidden="true"> ↗</span></a><a href="https://github.com/jennyzzt/dgm">Code<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2505.22954_DGM.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-017" aria-pressed="false" aria-label="Save: Darwin Gödel Machine: Open-Ended Evolution of Self-Improving Agents">Save</button></div>
+  <p class="tags">Framework</p>
+</article><article class="paper" id="rsi-018" data-id="rsi-018">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  <span class='core-label'>Core reading</span></div>
+  <h3><a href="https://arxiv.org/abs/2605.22794">MOSS: Self-Evolution through Source-Level Rewriting in Autonomous Agent Systems</a></h3>
+  <p class="authors">Qianshu Cai, Yonggang Zhang, Xianzhang Jia, Huajiang Zheng, Wei Xue, Jun Song, Xinmei Tian, Yike Guo (USTC / HKGAI / HKUST / HKBU)</p>
+  <p class='summary'>Uses production failure records to propose source-code changes, with isolated replay, approval, and rollback.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2605.22794">Paper<span aria-hidden="true"> ↗</span></a><a href="https://github.com/hkgai-official/Moss">Code<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2605.22794_MOSS.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-018" aria-pressed="false" aria-label="Save: MOSS: Self-Evolution through Source-Level Rewriting in Autonomous Agent Systems">Save</button></div>
+  <p class="tags">Framework</p>
+</article><article class="paper" id="rsi-019" data-id="rsi-019">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2603.19461">HyperAgents</a></h3>
+  <p class="authors">Jenny Zhang, Bingchen Zhao, Wannan Yang, Jakob Foerster, Jeff Clune, Minqi Jiang, Sam Devlin, Tatiana Shavrina (UBC / Vector / Edinburgh / NYU)</p>
+  <p class='summary'>Adds a meta-agent that controls how a task agent is modified.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2603.19461">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2603.19461_Hyperagents.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-019" aria-pressed="false" aria-label="Save: HyperAgents">Save</button></div>
+  <p class="tags">Framework</p>
+</article><article class="paper" id="rsi-020" data-id="rsi-020">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2608.24735">Metaⁿ: Recursive Self-Improvement through Emergent Depth</a></h3>
+  <p class="authors">Zae Myung Kim, Young-Jun Lee, Seungyeon Jwa, Dongyeop Kang (UMN / SNU)</p>
+  <p class='summary'>Applies a fixed meta-operation repeatedly to traces and code, creating successive improvement layers.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2608.24735">Paper<span aria-hidden="true"> ↗</span></a><a href="https://github.com/minnesotanlp/meta-n">Code<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2608.24735_Metan.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-020" aria-pressed="false" aria-label="Save: Metaⁿ: Recursive Self-Improvement through Emergent Depth">Save</button></div>
+  <p class="tags">Framework</p>
+</article><article class="paper" id="rsi-076" data-id="rsi-076">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2608.07645">Mendel Gödel Machine: Recursive Self-Improving Coding Agents via Comparative Evolution</a></h3>
+  <p class="authors">Changzhi Liu, Yilun Liu, Sikuan Yan, Volker Tresp, Yunpu Ma</p>
+  <p class='summary'>Uses comparisons across tasks and agent lineages to guide mutations in self-improving coding agents.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2608.07645">Paper<span aria-hidden="true"> ↗</span></a><a href="https://github.com/RealLcz/MGM">Code<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-076" aria-pressed="false" aria-label="Save: Mendel Gödel Machine: Recursive Self-Improving Coding Agents via Comparative Evolution">Save</button></div>
+  <p class="tags">Framework Side</p>
+</article><article class="paper" id="rsi-077" data-id="rsi-077">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2609.26457">Recursive self-improvement of AI research agents</a></h3>
+  <p class="authors">Dhruv Srikanth, Bingchen Zhao, Dixing Xu, Yuxiang Wu, Zhengyao Jiang</p>
+  <p class='summary'>Studies research agents that revise their own code and select changes using hidden evaluation tasks.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2609.26457">Paper<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-077" aria-pressed="false" aria-label="Save: Recursive self-improvement of AI research agents">Save</button></div>
+  <p class="tags">Framework Side</p>
+</article><article class="paper" id="rsi-078" data-id="rsi-078">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2610.13991">Predict Before You Modify: Learning Improvement Dynamics for Self-Evolving Agents</a></h3>
+  <p class="authors">Zixuan Xie, Chang Xu, Yuhua Jiang, Li Zhao</p>
+  <p class='summary'>Learns a persistent model of improvement dynamics to predict the effects of candidate agent modifications.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2610.13991">Paper<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-078" aria-pressed="false" aria-label="Save: Predict Before You Modify: Learning Improvement Dynamics for Self-Evolving Agents">Save</button></div>
+  <p class="tags">Framework Side</p>
+</article><article class="paper" id="rsi-079" data-id="rsi-079">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2610.02616">VERSE: Verified Self-Evolving Optimizer for Agent Harnesses</a></h3>
+  <p class="authors">Zekai Wang, Yingqiang Ge, Zekun Wang, Hai Wang, et al.</p>
+  <p class='summary'>Evolves an agent harness and its optimizer while checking candidate changes through execution.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2610.02616">Paper<span aria-hidden="true"> ↗</span></a><a href="https://github.com/wzekai/VERSE">Code<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-079" aria-pressed="false" aria-label="Save: VERSE: Verified Self-Evolving Optimizer for Agent Harnesses">Save</button></div>
+  <p class="tags">Framework Side</p>
+</article><article class="paper" id="rsi-021" data-id="rsi-021">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  <span class='core-label'>Core reading</span></div>
+  <h3><a href="https://arxiv.org/abs/2605.03871">EvoLM: Self-Evolving Language Models through Co-Evolved Discriminative Rubrics</a></h3>
+  <p class="authors">Shuyue Stella Li, Rui Xin, Teng Xiao, Yike Wang, Rulin Shao, et al., Yulia Tsvetkov (UW / AI2)</p>
+  <p class='summary'>Alternates policy learning with the evolution of discriminative evaluation rubrics.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2605.03871">Paper<span aria-hidden="true"> ↗</span></a><a href="https://github.com/stellalisy/EvoLM">Code<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2605.03871_EvoLM.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-021" aria-pressed="false" aria-label="Save: EvoLM: Self-Evolving Language Models through Co-Evolved Discriminative Rubrics">Save</button></div>
+  <p class="tags">Evaluator</p>
+</article><article class="paper" id="rsi-022" data-id="rsi-022">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  <span class='core-label'>Core reading</span></div>
+  <h3><a href="https://arxiv.org/abs/2606.26294">The Red Queen Gödel Machine: Co-Evolving Agents and Their Evaluators</a></h3>
+  <p class="authors">Alex Iacob, Andrej Jovanović, William F. Shen, et al., Nicholas D. Lane (Cambridge / NVIDIA / Flower Labs)</p>
+  <p class='summary'>Co-evolves agents and evaluators, checking candidate evaluators against human-labeled reference data.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2606.26294">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2606.26294_RQGM.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-022" aria-pressed="false" aria-label="Save: The Red Queen Gödel Machine: Co-Evolving Agents and Their Evaluators">Save</button></div>
+  <p class="tags">Evaluator</p>
+</article><article class="paper" id="rsi-023" data-id="rsi-023">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  <span class='core-label'>Core reading</span></div>
+  <h3><a href="https://arxiv.org/abs/2607.12790">Who Grades the Grader? Co-Evolving Evaluation Metrics and Skills for Self-Improving LLM Agents</a></h3>
+  <p class="authors">Xing Zhang, Guanghui Wang, Yanwei Cui, Ziyuan Li, Wei Qiu, Bing Zhu, Peiyang He (AWS / HSBC)</p>
+  <p class='summary'>Studies how evolving evaluation metrics can drift even when downstream task scores remain high.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2607.12790">Paper<span aria-hidden="true"> ↗</span></a><a href="https://github.com/amazon-science/Self-Evolving-Agents-Double-Ratchet">Code<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2607.12790_WhoGradesTheGrader.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-023" aria-pressed="false" aria-label="Save: Who Grades the Grader? Co-Evolving Evaluation Metrics and Skills for Self-Improving LLM Agents">Save</button></div>
+  <p class="tags">Evaluator</p>
+</article><article class="paper" id="rsi-024" data-id="rsi-024">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2608.18744">Metrics That Write Themselves: Evolving an Evaluator from Its Own Blind Spots (EvalCEGAR)</a></h3>
+  <p class="authors">Xing Zhang, Yanwei Cui, Guanghui Wang, Zhihao Lin, Peiyang He (AWS)</p>
+  <p class='summary'>Refines evaluation operators using answer pairs that receive the same score despite different reference outcomes.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2608.18744">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2608.18744_EvalCEGAR.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-024" aria-pressed="false" aria-label="Save: Metrics That Write Themselves: Evolving an Evaluator from Its Own Blind Spots (EvalCEGAR)">Save</button></div>
+  <p class="tags">Evaluator</p>
+</article><article class="paper" id="rsi-025" data-id="rsi-025">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2606.04507">Self-Evolving Deep Research via Joint Generation and Evaluation (SCORE)</a></h3>
+  <p class="authors">Han Zhu, Chengkun Cai, Yuanfeng Song, Xing Chen, Sirui Han, Yike Guo (HKUST / ByteDance / UCL)</p>
+  <p class='summary'>Jointly trains generation and evaluation for open-ended research reports.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2606.04507">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2606.04507_SCORE.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-025" aria-pressed="false" aria-label="Save: Self-Evolving Deep Research via Joint Generation and Evaluation (SCORE)">Save</button></div>
+  <p class="tags">Evaluator</p>
+</article><article class="paper" id="rsi-080" data-id="rsi-080">
+  <div class="paper-top"><span class="paper-meta">2026 / NeurIPS Workshop / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2610.11464">Who Verifies the Verifier? Co-Evolving Inspectable Graders with Self-Improving Agents</a></h3>
+  <p class="authors">Xing Zhang, Guanghui Wang, Yanwei Cui, Ziyuan Li, et al.</p>
+  <p class='summary'>Co-evolves inspectable graders with agents and tests the role of independent reference examples.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2610.11464">Paper<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-080" aria-pressed="false" aria-label="Save: Who Verifies the Verifier? Co-Evolving Inspectable Graders with Self-Improving Agents">Save</button></div>
+  <p class="tags">Evaluator Side</p>
+</article><article class="paper" id="rsi-081" data-id="rsi-081">
+  <div class="paper-top"><span class="paper-meta">2026 / EMNLP Workshop (REALM) / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2610.29005">VeriEvolve: Evaluator-First Evolution for Tool-Using Agents</a></h3>
+  <p class="authors">Yueshen Li, Kamer Ali Yuksel, Gokhan Tur, Dilek Hakkani-Tür, João Pedro Maia</p>
+  <p class='summary'>Builds executable evaluators before evolving tool-use workflows, then revises the evaluators between rounds.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2610.29005">Paper<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-081" aria-pressed="false" aria-label="Save: VeriEvolve: Evaluator-First Evolution for Tool-Using Agents">Save</button></div>
+  <p class="tags">Evaluator Side</p>
+</article><article class="paper" id="rsi-026" data-id="rsi-026">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  <span class='core-label'>Core reading</span></div>
+  <h3><a href="https://arxiv.org/abs/2601.06794">No More Stale Feedback: Co-Evolving Critics for Open-World Agent Learning (ECHO)</a></h3>
+  <p class="authors">Zhicong Li, Lingjie Jiang, Yulan Hu, et al., Yong Liu</p>
+  <p class='summary'>Updates a critic alongside a policy, rewarding feedback that improves subsequent task performance.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2601.06794">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2601.06794_ECHO.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-026" aria-pressed="false" aria-label="Save: No More Stale Feedback: Co-Evolving Critics for Open-World Agent Learning (ECHO)">Save</button></div>
+  <p class="tags">Model</p>
+</article><article class="paper" id="rsi-027" data-id="rsi-027">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2607.22688">Co-Harness: Co-Evolving Harnesses and Model Weights for LLM Agents</a></h3>
+  <p class="authors">Zhengyu Chen, Teng Xiao, Huaisheng Zhu, Yige Yuan, Luan Zhang, Jingang Wang</p>
+  <p class='summary'>Alternates diagnosis of harness failures with model training on improved execution traces.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2607.22688">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2607.22688_CoHarness.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-027" aria-pressed="false" aria-label="Save: Co-Harness: Co-Evolving Harnesses and Model Weights for LLM Agents">Save</button></div>
+  <p class="tags">Model</p>
+</article><article class="paper" id="rsi-028" data-id="rsi-028">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2602.08234">SkillRL: Evolving Agents via Recursive Skill-Augmented Reinforcement Learning</a></h3>
+  <p class="authors">Peng Xia, Jianwen Chen, Hanyang Wang, Jiaqi Liu, et al. (UNC / aiming-lab)</p>
+  <p class='summary'>Distills trajectories into a hierarchical skill library that evolves during reinforcement learning.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2602.08234">Paper<span aria-hidden="true"> ↗</span></a><a href="https://github.com/aiming-lab/SkillRL">Code<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2602.08234_SkillRL.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-028" aria-pressed="false" aria-label="Save: SkillRL: Evolving Agents via Recursive Skill-Augmented Reinforcement Learning">Save</button></div>
+  <p class="tags">Model</p>
+</article><article class="paper" id="rsi-029" data-id="rsi-029">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2605.10663">Evolving-RL: End-to-End Optimization of Experience-Driven Self-Evolving Capability within Agents</a></h3>
+  <p class="authors">Xiaohongshu / Peking University</p>
+  <p class='summary'>Trains a policy to both extract and use experience, with downstream task gains as feedback.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2605.10663">Paper<span aria-hidden="true"> ↗</span></a><a href="https://github.com/Fanzy27/Evolving-RL">Code<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2605.10663_EvolvingRL.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-029" aria-pressed="false" aria-label="Save: Evolving-RL: End-to-End Optimization of Experience-Driven Self-Evolving Capability within Agents">Save</button></div>
+  <p class="tags">Model</p>
+</article><article class="paper" id="rsi-030" data-id="rsi-030">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2605.27276">SIA: Self Improving AI with Harness &amp; Weight Updates</a></h3>
+  <p class="authors">Prannay Hebbar, Yogendra Manawat, Samuel Verboomen, et al. (Hexo Labs)</p>
+  <p class='summary'>Uses a feedback agent to choose between harness edits and weight updates.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2605.27276">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2605.27276_SIA.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-030" aria-pressed="false" aria-label="Save: SIA: Self Improving AI with Harness &amp; Weight Updates">Save</button></div>
+  <p class="tags">Model</p>
+</article><article class="paper" id="rsi-082" data-id="rsi-082">
+  <div class="paper-top"><span class="paper-meta">2025 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2506.10943">Self-Adapting Language Models</a></h3>
+  <p class="authors">Adam Zweiger, Jyothish Pari, Han Guo, Ekin Akyürek, et al.</p>
+  <p class='summary'>Generates self-edits for weight updates and trains the editing policy using downstream performance.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2506.10943">Paper<span aria-hidden="true"> ↗</span></a><a href="https://jyopari.github.io/posts/seal">Project<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-082" aria-pressed="false" aria-label="Save: Self-Adapting Language Models">Save</button></div>
+  <p class="tags">Model Side</p>
+</article><article class="paper" id="rsi-083" data-id="rsi-083">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2610.11655">Harness Evolution Hits a Ceiling: When Weight Training Should Begin</a></h3>
+  <p class="authors">Yuan Tian, Bing Hu, Hao Wang, Binghang Lu, Fang Wu</p>
+  <p class='summary'>Distinguishes process failures from content failures to decide between harness changes and weight training.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2610.11655">Paper<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-083" aria-pressed="false" aria-label="Save: Harness Evolution Hits a Ceiling: When Weight Training Should Begin">Save</button></div>
+  <p class="tags">Model Side</p>
+</article><article class="paper" id="rsi-084" data-id="rsi-084">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2610.22791">Self-Evolving Coding Agents via Harness-Policy Optimization</a></h3>
+  <p class="authors">Zhepei Wei, Wenlin Yao, Baolin Peng, Danqing Wang, et al.</p>
+  <p class='summary'>Alternates harness search with reinforcement learning of a coding agent policy.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2610.22791">Paper<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-084" aria-pressed="false" aria-label="Save: Self-Evolving Coding Agents via Harness-Policy Optimization">Save</button></div>
+  <p class="tags">Model Side</p>
+</article><article class="paper" id="rsi-031" data-id="rsi-031">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  <span class='core-label'>Core reading</span></div>
+  <h3><a href="https://arxiv.org/abs/2608.27454">WikiSkill: Compiling Agent Experience into Persistent Knowledge for Skill Evolution</a></h3>
+  <p class="authors">Liyan Tang, Cyrus Rashtchian, Chun-Sung Ferng, Andrew Tomkins, Da-Cheng Juan, Tu Vu (Google Research / Virginia Tech)</p>
+  <p class='summary'>Separates raw experience, persistent wiki knowledge, and validated, reversible skills.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2608.27454">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2608.27454_WikiSkill.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-031" aria-pressed="false" aria-label="Save: WikiSkill: Compiling Agent Experience into Persistent Knowledge for Skill Evolution">Save</button></div>
+  <p class="tags">Knowledge</p>
+</article><article class="paper" id="rsi-032" data-id="rsi-032">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2608.15165">SkillCommit: Evolving Agent Skills through Behaviorally Validated Scope Expansion</a></h3>
+  <p class="authors">Yu He, Weikai Yang (NJU / HKUST-GZ)</p>
+  <p class='summary'>Promotes instance-level fixes into broader skills only after behavioral validation.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2608.15165">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2608.15165_SkillCommit.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-032" aria-pressed="false" aria-label="Save: SkillCommit: Evolving Agent Skills through Behaviorally Validated Scope Expansion">Save</button></div>
+  <p class="tags">Knowledge</p>
+</article><article class="paper" id="rsi-033" data-id="rsi-033">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2608.16114">HyperSkill: Self-Evolving LLM Agents via Hypergraph-Structured Skill Memory</a></h3>
+  <p class="authors">Ruiyao Xu, Tiankai Yang, Wei-Chieh Huang (Northwestern / USC / UIC)</p>
+  <p class='summary'>Organizes reusable skills as a hypergraph to retain compositional relationships.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2608.16114">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2608.16114_HyperSkill.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-033" aria-pressed="false" aria-label="Save: HyperSkill: Self-Evolving LLM Agents via Hypergraph-Structured Skill Memory">Save</button></div>
+  <p class="tags">Knowledge</p>
+</article><article class="paper" id="rsi-034" data-id="rsi-034">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2608.12720">ERSkill: Evolving for Skill-Guided Adaptive Memory Retrieval</a></h3>
+  <p class="authors">Haolong Chen, Liang Zhang, Zhuo Li, Lei Xue, Guangxu Zhu (CUHK-SZ / SYSU)</p>
+  <p class='summary'>Evolves skills for adaptive retrieval from memory.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2608.12720">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2608.12720_ERSkill.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-034" aria-pressed="false" aria-label="Save: ERSkill: Evolving for Skill-Guided Adaptive Memory Retrieval">Save</button></div>
+  <p class="tags">Knowledge</p>
+</article><article class="paper" id="rsi-035" data-id="rsi-035">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2608.07449">SkillProx: Self-Evolving Agent Skills via Proximal Textual Gradient Descent</a></h3>
+  <p class="authors">Mingxuan Zheng, Yujin Zhou, Chuxue Cao, et al., Sirui Han, Yike Guo (HKUST)</p>
+  <p class='summary'>Uses proximal textual updates to refine a skill library, including deletion.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2608.07449">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2608.07449_SkillProx.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-035" aria-pressed="false" aria-label="Save: SkillProx: Self-Evolving Agent Skills via Proximal Textual Gradient Descent">Save</button></div>
+  <p class="tags">Knowledge</p>
+</article><article class="paper" id="rsi-036" data-id="rsi-036">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2608.15071">Evo-Harness: Context-to-Harness Skill Compilation for Self-Evolving Agents</a></h3>
+  <p class="authors">Tianxin Wei, Zhan Shi, Minhua Lin, Bing He, et al., Hanqing Lu (UIUC / Amazon)</p>
+  <p class='summary'>Compiles execution context into reusable agent harness skills.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2608.15071">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2608.15071_EvoHarness.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-036" aria-pressed="false" aria-label="Save: Evo-Harness: Context-to-Harness Skill Compilation for Self-Evolving Agents">Save</button></div>
+  <p class="tags">Knowledge</p>
+</article><article class="paper" id="rsi-037" data-id="rsi-037">
+  <div class="paper-top"><span class="paper-meta">2026 / ICLR / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2510.04618">Agentic Context Engineering: Evolving Contexts for Self-Improving Language Models (ACE)</a></h3>
+  <p class="authors">Qizheng Zhang, Changran Hu, Shubhangi Upasani, et al., Kunle Olukotun (Stanford / SambaNova)</p>
+  <p class='summary'>Maintains an evolving context playbook through generation, reflection, and curation.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2510.04618">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2510.04618_ACE.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-037" aria-pressed="false" aria-label="Save: Agentic Context Engineering: Evolving Contexts for Self-Improving Language Models (ACE)">Save</button></div>
+  <p class="tags">Knowledge</p>
+</article><article class="paper" id="rsi-038" data-id="rsi-038">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2601.21557">Meta Context Engineering via Agentic Skill Evolution (MCE)</a></h3>
+  <p class="authors">Haoran Ye, Xuning He, Vincent Arak, Haonan Dong, Guojie Song (PKU)</p>
+  <p class='summary'>Searches skill space for context-management mechanisms.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2601.21557">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2601.21557_MCE.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-038" aria-pressed="false" aria-label="Save: Meta Context Engineering via Agentic Skill Evolution (MCE)">Save</button></div>
+  <p class="tags">Knowledge</p>
+</article><article class="paper" id="rsi-085" data-id="rsi-085">
+  <div class="paper-top"><span class="paper-meta">2026 / ICLR / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2509.25140">ReasoningBank: Scaling Agent Self-Evolving with Reasoning Memory</a></h3>
+  <p class="authors">Siru Ouyang, Jun Yan, I-Hung Hsu, Yanfei Chen, et al.</p>
+  <p class='summary'>Distills successful and failed experiences into reusable reasoning memories for future tasks.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2509.25140">Paper<span aria-hidden="true"> ↗</span></a><a href="https://github.com/google-research/reasoning-bank">Code<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-085" aria-pressed="false" aria-label="Save: ReasoningBank: Scaling Agent Self-Evolving with Reasoning Memory">Save</button></div>
+  <p class="tags">Knowledge Side</p>
+</article><article class="paper" id="rsi-086" data-id="rsi-086">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2609.39148">Do Self-Evolving Skills Generalize to Held-Out Tasks?</a></h3>
+  <p class="authors">Xihao Piao, Zifeng Wang, Zhen Chen</p>
+  <p class='summary'>Measures whether improvements in evolved skills transfer from training tasks to held-out tasks.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2609.39148">Paper<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-086" aria-pressed="false" aria-label="Save: Do Self-Evolving Skills Generalize to Held-Out Tasks?">Save</button></div>
+  <p class="tags">Knowledge Side</p>
+</article><article class="paper" id="rsi-087" data-id="rsi-087">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2610.35434">Skill∞: Recursive Self-Improvement for Agent Skill Optimization</a></h3>
+  <p class="authors">Wangcheng Tao, Zhanglu Yan, Han Wu, Weng-Fai Wong</p>
+  <p class='summary'>Uses a meta-skill to optimize task skills, then applies the same process to improve the meta-skill.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2610.35434">Paper<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-087" aria-pressed="false" aria-label="Save: Skill∞: Recursive Self-Improvement for Agent Skill Optimization">Save</button></div>
+  <p class="tags">Knowledge Side</p>
+</article><article class="paper" id="rsi-039" data-id="rsi-039">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  <span class='core-label'>Core reading</span></div>
+  <h3><a href="https://arxiv.org/abs/2605.09998">Continual Harness: Online Adaptation for Self-Improving Foundation Agents</a></h3>
+  <p class="authors">Seth Karten, Joel Zhang, Tersoo Upaa Jr, Ruirong Feng, Wenzhe Li, Chengshuai Shi, Chi Jin, Kiran Vodrahalli (Princeton)</p>
+  <p class='summary'>Refines an agent&#x27;s harness within a continuing episode without resetting the environment.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2605.09998">Paper<span aria-hidden="true"> ↗</span></a><a href="https://sethkarten.ai/continual-harness">Project<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2605.09998_ContinualHarness.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-039" aria-pressed="false" aria-label="Save: Continual Harness: Online Adaptation for Self-Improving Foundation Agents">Save</button></div>
+  <p class="tags">Online</p>
+</article><article class="paper" id="rsi-040" data-id="rsi-040">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2608.23552">Prime Agent: A Self-Improving RLM Harness</a></h3>
+  <p class="authors">Seth Karten, Alex L. Zhang, Kevin Thomas, Sebastian Müller, et al. (Princeton / Prime Intellect / MIT)</p>
+  <p class='summary'>An open implementation of a self-improving harness with persistent execution and resumable sessions.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2608.23552">Paper<span aria-hidden="true"> ↗</span></a><a href="https://github.com/PrimeIntellect-ai/prime-agent">Code<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2608.23552_PrimeAgent.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-040" aria-pressed="false" aria-label="Save: Prime Agent: A Self-Improving RLM Harness">Save</button></div>
+  <p class="tags">Online</p>
+</article><article class="paper" id="rsi-088" data-id="rsi-088">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2611.00463">Exo: An Architecture for Self-Improving Systems at Runtime</a></h3>
+  <p class="authors">Alexander Krentsel, Sylvia Ratnasamy, Ion Stoica, Martin Casado, Ankur Goyal</p>
+  <p class='summary'>Integrates harness and policy updates into runtime execution with a protected mechanism for history and activation.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2611.00463">Paper<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-088" aria-pressed="false" aria-label="Save: Exo: An Architecture for Self-Improving Systems at Runtime">Save</button></div>
+  <p class="tags">Online Side</p>
+</article><article class="paper" id="rsi-041" data-id="rsi-041">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2603.28052">Meta-Harness: End-to-End Optimization of Model Harnesses</a></h3>
+  <p class="authors">Yoonho Lee, Roshen Nair, Qizheng Zhang, Kangwook Lee, Omar Khattab, Chelsea Finn (Stanford / KRAFTON / MIT)</p>
+  <p class='summary'>Uses execution history, source code, and feedback to optimize an entire agent harness.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2603.28052">Paper<span aria-hidden="true"> ↗</span></a><a href="https://github.com/stanford-iris-lab/meta-harness-tbench2-artifact">Code<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2603.28052_MetaHarness.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-041" aria-pressed="false" aria-label="Save: Meta-Harness: End-to-End Optimization of Model Harnesses">Save</button></div>
+  <p class="tags">Harness Engineering (2026)</p>
+</article><article class="paper" id="rsi-042" data-id="rsi-042">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2606.09498">Self-Harness: Harnesses That Improve Themselves</a></h3>
+  <p class="authors">Hangfan Zhang, Shao Zhang, Kangcong Li, et al., Lei Bai, Shuyue Hu</p>
+  <p class='summary'>Accepts bounded harness edits only after checks on both development and held-out splits.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2606.09498">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2606.09498_SelfHarness.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-042" aria-pressed="false" aria-label="Save: Self-Harness: Harnesses That Improve Themselves">Save</button></div>
+  <p class="tags">Harness Engineering (2026)</p>
+</article><article class="paper" id="rsi-043" data-id="rsi-043">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2608.23041">AutoSaddler: Automatic Harness Optimization with Durable Updates from Agent Execution Traces</a></h3>
+  <p class="authors">Sungho Park, Wonjoong Kim, Rongyuan Tan, Jue Zhang, Wook-Shin Han, et al. (POSTECH / KAIST / SUSTech / Microsoft)</p>
+  <p class='summary'>Optimizes harnesses from batches of execution traces and validates durable updates.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2608.23041">Paper<span aria-hidden="true"> ↗</span></a><a href="https://aka.ms/AutoSaddler-website">Project<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2608.23041_AutoSaddler.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-043" aria-pressed="false" aria-label="Save: AutoSaddler: Automatic Harness Optimization with Durable Updates from Agent Execution Traces">Save</button></div>
+  <p class="tags">Harness Engineering (2026)</p>
+</article><article class="paper" id="rsi-044" data-id="rsi-044">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2608.19880">EnvHarness: Awakening Static Worlds for Agent Learning</a></h3>
+  <p class="authors">Chengsong Huang, Zifeng Wang, Rujun Han, Jun Yan, et al., Chen-Yu Lee (WashU / Google Cloud AI)</p>
+  <p class='summary'>Modifies environment interfaces while keeping the agent and original verifier fixed.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2608.19880">Paper<span aria-hidden="true"> ↗</span></a><a href="https://github.com/google-research/envharness">Code<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2608.19880_EnvHarness.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-044" aria-pressed="false" aria-label="Save: EnvHarness: Awakening Static Worlds for Agent Learning">Save</button></div>
+  <p class="tags">Harness Engineering (2026)</p>
+</article><article class="paper" id="rsi-045" data-id="rsi-045">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2608.23473">MetaCaster: Meta-Harness-Optimized Agent for End-to-End Few-Shot Learning of Lightweight Time Series Forecasters</a></h3>
+  <p class="authors">ChengAo Shen, Wenchao Yu, Fangyu Wu, Dongjin Song, Hanghang Tong, et al., Jingchao Ni (UH / NEC Labs)</p>
+  <p class='summary'>Optimizes the harness of an agent that creates training data for lightweight forecasting models.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2608.23473">Paper<span aria-hidden="true"> ↗</span></a><a href="https://github.com/D2I-Group/metacaster">Code<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2608.23473_MetaCaster.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-045" aria-pressed="false" aria-label="Save: MetaCaster: Meta-Harness-Optimized Agent for End-to-End Few-Shot Learning of Lightweight Time Series Forecasters">Save</button></div>
+  <p class="tags">Harness Engineering (2026)</p>
+</article><article class="paper" id="rsi-046" data-id="rsi-046">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2606.05922">Evolving Agents in the Dark: Retrospective Harness Optimization via Self-Preference (RHO)</a></h3>
+  <p class="authors">Wenbo Pan, Shujie Liu, Chin-Yew Lin, et al., Xiaohua Jia (CityU HK / MSRA)</p>
+  <p class='summary'>Uses past trajectories and self-preference to select harness revisions without labeled feedback.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2606.05922">Paper<span aria-hidden="true"> ↗</span></a><a href="https://github.com/wbopan/retro-harness">Code<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2606.05922_RHO.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-046" aria-pressed="false" aria-label="Save: Evolving Agents in the Dark: Retrospective Harness Optimization via Self-Preference (RHO)">Save</button></div>
+  <p class="tags">Harness Engineering (2026)</p>
+</article><article class="paper" id="rsi-047" data-id="rsi-047">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2606.06324">From Failed Trajectories to Reliable LLM Agents: Diagnosing and Repairing Harness Flaws (HarnessFix)</a></h3>
+  <p class="authors">Mengzhuo Chen, Junjie Wang, Zhe Liu, Yawen Wang, Haiming Zheng, Qing Wang</p>
+  <p class='summary'>Diagnoses responsibility for failures and repairs the corresponding harness components.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2606.06324">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2606.06324_HarnessFix.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-047" aria-pressed="false" aria-label="Save: From Failed Trajectories to Reliable LLM Agents: Diagnosing and Repairing Harness Flaws (HarnessFix)">Save</button></div>
+  <p class="tags">Harness Engineering (2026)</p>
+</article><article class="paper" id="rsi-048" data-id="rsi-048">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2604.25850">Agentic Harness Engineering: Observability-Driven Automatic Evolution of Coding-Agent Harnesses (AHE)</a></h3>
+  <p class="authors">Jiahang Lin, Shichun Liu, Chengjun Pan, et al., Tao Gui, Yu-Gang Jiang</p>
+  <p class='summary'>Requires execution evidence and falsifiable predictions for harness changes.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2604.25850">Paper<span aria-hidden="true"> ↗</span></a><a href="https://github.com/china-qijizhifeng/agentic-harness-engineering">Code<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2604.25850_AHE.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-048" aria-pressed="false" aria-label="Save: Agentic Harness Engineering: Observability-Driven Automatic Evolution of Coding-Agent Harnesses (AHE)">Save</button></div>
+  <p class="tags">Harness Engineering (2026)</p>
+</article><article class="paper" id="rsi-049" data-id="rsi-049">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2605.24539">DemoEvolve: Overcoming Sparse Feedback in Agentic Harness Evolution with Demonstrations</a></h3>
+  <p class="authors">Lirong Che, Yuzhe Yang, Peiwen Lin, Chuang Wang, Xueqian Wang, Jian Su</p>
+  <p class='summary'>Adds human demonstrations to harness evolution when outcome feedback is sparse.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2605.24539">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2605.24539_DemoEvolve.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-049" aria-pressed="false" aria-label="Save: DemoEvolve: Overcoming Sparse Feedback in Agentic Harness Evolution with Demonstrations">Save</button></div>
+  <p class="tags">Harness Engineering (2026)</p>
+</article><article class="paper" id="rsi-050" data-id="rsi-050">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2606.01770">Adaptive Auto-Harness: Sustained Self-Improvement for Agentic System Deployment on Open-Ended Task Streams</a></h3>
+  <p class="authors">Zewen Liu, Zhan Shi, Yisi Sang, Bing He, Minhua Lin, Tianxin Wei, et al. (Emory / Amazon)</p>
+  <p class='summary'>Studies continuing self-improvement over open-ended streams of deployment tasks.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2606.01770">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2606.01770_AdaptiveAutoHarness.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-050" aria-pressed="false" aria-label="Save: Adaptive Auto-Harness: Sustained Self-Improvement for Agentic System Deployment on Open-Ended Task Streams">Save</button></div>
+  <p class="tags">Harness Engineering (2026)</p>
+</article><article class="paper" id="rsi-051" data-id="rsi-051">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2608.08466">Hierarchical Self-Improvement: A Framework for Task-Specific Evolvable Agent Harnesses (HSI)</a></h3>
+  <p class="authors">Tailin Zhou (HKUST)</p>
+  <p class='summary'>Maintains task-specific, replaceable harnesses under a fixed meta-evolver.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2608.08466">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2608.08466_HSI.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-051" aria-pressed="false" aria-label="Save: Hierarchical Self-Improvement: A Framework for Task-Specific Evolvable Agent Harnesses (HSI)">Save</button></div>
+  <p class="tags">Harness Engineering (2026)</p>
+</article><article class="paper" id="rsi-052" data-id="rsi-052">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2605.30621">Harness Updating Is Not Harness Benefit: Disentangling Evolution Capabilities in Self-Evolving LLM Agents</a></h3>
+  <p class="authors">Minhua Lin, Juncheng Wu, Zijun Wang, Zhan Shi, Yisi Sang, Bing He, et al.</p>
+  <p class='summary'>Separately measures the ability to produce helpful edits and the ability to benefit from them.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2605.30621">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2605.30621_HarnessUpdatingNotBenefit.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-052" aria-pressed="false" aria-label="Save: Harness Updating Is Not Harness Benefit: Disentangling Evolution Capabilities in Self-Evolving LLM Agents">Save</button></div>
+  <p class="tags">Harness Engineering (2026)</p>
+</article><article class="paper" id="rsi-089" data-id="rsi-089">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2609.24972">RRSI: Regularized Recursive Self-Improvement of Agent Harnesses</a></h3>
+  <p class="authors">Peng Xia, Rujun Han, Zifeng Wang, Yanfei Chen, et al.</p>
+  <p class='summary'>Regularizes harness evolution by controlling edit size, screening proposals, and pruning unhelpful changes.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2609.24972">Paper<span aria-hidden="true"> ↗</span></a><a href="https://github.com/google-research/rrsi">Code<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-089" aria-pressed="false" aria-label="Save: RRSI: Regularized Recursive Self-Improvement of Agent Harnesses">Save</button></div>
+  <p class="tags">Harness Engineering (2026)</p>
+</article><article class="paper" id="rsi-090" data-id="rsi-090">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2610.22466">Harness-Delta Attribution: Dissecting Gains From Harness Evolution</a></h3>
+  <p class="authors">Wenxuan Ding, Qin Lu, Changlong Yu, Sha Li, et al.</p>
+  <p class='summary'>Separates harness-evolution gains into overfitting, additional inference computation, and remaining improvements.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2610.22466">Paper<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-090" aria-pressed="false" aria-label="Save: Harness-Delta Attribution: Dissecting Gains From Harness Evolution">Save</button></div>
+  <p class="tags">Harness Engineering (2026)</p>
+</article><article class="paper" id="rsi-053" data-id="rsi-053">
+  <div class="paper-top"><span class="paper-meta">2026 / Tech Report / Paper</span>
+  </div>
+  <h3><a href="https://huggingface.co/i-Coder/iCoder-27B/blob/main/Coder_Tech_Report.pdf">iCoder: Recursive AI-Led Development of Frontier Industrial Coding Model</a></h3>
+  <p class="authors">Cheng Yang, Jiayang Lyu, Shangyuan Liu, Guibin Zhang, et al. (SJTU / NUS / DP Technology)</p>
+  <p class='summary'>Describes an AI-led pipeline for developing an industrial coding model.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://huggingface.co/i-Coder/iCoder-27B/blob/main/Coder_Tech_Report.pdf">Report<span aria-hidden="true"> ↗</span></a><a href="https://github.com/bingreeky/iCoder">Code<span aria-hidden="true"> ↗</span></a><a href="https://huggingface.co/i-Coder/iCoder-27B">Model<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/iCoder27B_TechReport.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-053" aria-pressed="false" aria-label="Save: iCoder: Recursive AI-Led Development of Frontier Industrial Coding Model">Save</button></div>
+  <p class="tags">Autonomous Research &amp; Industrial Evidence</p>
+</article><article class="paper" id="rsi-054" data-id="rsi-054">
+  <div class="paper-top"><span class="paper-meta">2024 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2408.06292">The AI Scientist: Towards Fully Automated Open-Ended Scientific Discovery</a></h3>
+  <p class="authors">Chris Lu, Cong Lu, Robert Tjarko Lange, Jakob Foerster, Jeff Clune, David Ha (Sakana AI)</p>
+  <p class='summary'>An automated scientific-discovery workflow spanning experiments and reporting.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2408.06292">Paper<span aria-hidden="true"> ↗</span></a><a href="https://github.com/SakanaAI/AI-Scientist">Code<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2408.06292_AIScientist.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-054" aria-pressed="false" aria-label="Save: The AI Scientist: Towards Fully Automated Open-Ended Scientific Discovery">Save</button></div>
+  <p class="tags">Autonomous Research &amp; Industrial Evidence</p>
+</article><article class="paper" id="rsi-055" data-id="rsi-055">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2605.26340">ScientistOne: Towards Human-Level Autonomous Research via Chain-of-Evidence</a></h3>
+  <p class="authors">Rui Meng, Bhavana Dalvi Mishra, Jiefeng Chen, Chun-Liang Li, et al. (Google Cloud AI Research)</p>
+  <p class='summary'>Organizes autonomous research around a chain of evidence.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2605.26340">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2605.26340_ScientistOne.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-055" aria-pressed="false" aria-label="Save: ScientistOne: Towards Human-Level Autonomous Research via Chain-of-Evidence">Save</button></div>
+  <p class="tags">Autonomous Research &amp; Industrial Evidence</p>
+</article><article class="paper" id="rsi-056" data-id="rsi-056">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2606.25996">Autodata: An Agentic Data Scientist to Create High Quality Synthetic Data</a></h3>
+  <p class="authors">Ilia Kulikov, Chenxi Whitehouse, Tianhao Wu, Yixin Nie, et al. (FAIR at Meta)</p>
+  <p class='summary'>Uses an agentic data scientist to produce synthetic training data.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2606.25996">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2606.25996_Autodata.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-056" aria-pressed="false" aria-label="Save: Autodata: An Agentic Data Scientist to Create High Quality Synthetic Data">Save</button></div>
+  <p class="tags">Autonomous Research &amp; Industrial Evidence</p>
+</article><article class="paper" id="rsi-057" data-id="rsi-057">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2601.03315">Why LLMs Aren&#x27;t Scientists Yet: Lessons from Four Autonomous Research Attempts</a></h3>
+  <p class="authors">Dhruv Trehan, Paras Chopra</p>
+  <p class='summary'>Reports lessons and limitations from autonomous research attempts.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2601.03315">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2601.03315_WhyLLMsArentScientistsYet.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-057" aria-pressed="false" aria-label="Save: Why LLMs Aren&#x27;t Scientists Yet: Lessons from Four Autonomous Research Attempts">Save</button></div>
+  <p class="tags">Autonomous Research &amp; Industrial Evidence</p>
+</article><article class="paper" id="rsi-091" data-id="rsi-091">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2610.21055">Athanor: An Agent-Native System for Autonomous Post-Training Research</a></h3>
+  <p class="authors">Yufa Zhou, Yichen Wang, Jiakun Fan, Ziqi Shu, et al.</p>
+  <p class='summary'>Provides an environment for autonomous post-training experiments with frozen evaluation and hidden tasks.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2610.21055">Paper<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-091" aria-pressed="false" aria-label="Save: Athanor: An Agent-Native System for Autonomous Post-Training Research">Save</button></div>
+  <p class="tags">Autonomous Research &amp; Industrial Evidence</p>
+</article><article class="paper" id="rsi-092" data-id="rsi-092">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2610.23344">Language Models Learn to Improve Language Models</a></h3>
+  <p class="authors">Minhua Lin, Zijun Wang, Zewen Liu, Zhaotian Weng, et al.</p>
+  <p class='summary'>Trains language models to propose model improvements using experiment records and periodic real execution.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2610.23344">Paper<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-092" aria-pressed="false" aria-label="Save: Language Models Learn to Improve Language Models">Save</button></div>
+  <p class="tags">Autonomous Research &amp; Industrial Evidence</p>
+</article><article class="paper" id="rsi-058" data-id="rsi-058">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2608.08471">Yesterday&#x27;s Shield, Today&#x27;s Spear: A Self-Evolving Safety Guardrail in Production (SESG)</a></h3>
+  <p class="authors">Cong Ming, Jingyi Chen, Bin Liu, Qi Chu, Tao Gong, Nenghai Yu, Yingfei Xiang, Ronghai Yang</p>
+  <p class='summary'>Studies a self-evolving safety guardrail in a production setting.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2608.08471">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2608.08471_SESG.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-058" aria-pressed="false" aria-label="Save: Yesterday&#x27;s Shield, Today&#x27;s Spear: A Self-Evolving Safety Guardrail in Production (SESG)">Save</button></div>
+  <p class="tags">Safety &amp; Governance</p>
+</article><article class="paper" id="rsi-059" data-id="rsi-059">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2608.09380">OpenLoopEvolve: A Verifiable Self-Evolution Framework for Loop Policies in Long-Horizon Complex Tasks (OLE)</a></h3>
+  <p class="authors">Siqi Wang, Xinlin Li, Zhenglin Li, Li Li</p>
+  <p class='summary'>Uses explicit verification and versioned updates for long-horizon loop policies.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2608.09380">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2608.09380_OpenLoopEvolve.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-059" aria-pressed="false" aria-label="Save: OpenLoopEvolve: A Verifiable Self-Evolution Framework for Loop Policies in Long-Horizon Complex Tasks (OLE)">Save</button></div>
+  <p class="tags">Safety &amp; Governance</p>
+</article><article class="paper" id="rsi-060" data-id="rsi-060">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2607.13070">Falsifiable Release Gates for Self-Improving Systems: Standing Invariants at Scale</a></h3>
+  <p class="authors">Deepak Soni</p>
+  <p class='summary'>Defines falsifiable release checks and persistent invariants for self-improving systems.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2607.13070">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2607.13070_FalsifiableReleaseGates.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-060" aria-pressed="false" aria-label="Save: Falsifiable Release Gates for Self-Improving Systems: Standing Invariants at Scale">Save</button></div>
+  <p class="tags">Safety &amp; Governance</p>
+</article><article class="paper" id="rsi-061" data-id="rsi-061">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2608.22103">Hack-Verifiable Terminal Bench: Evaluating Reward Hacking in Terminal Tasks (HVTB)</a></h3>
+  <p class="authors">Amit Roth, Ivan Bercovich, Yonathan Efroni (TAU / UCSB)</p>
+  <p class='summary'>A terminal benchmark designed to expose reward hacking.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2608.22103">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2608.22103_HVTB.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-061" aria-pressed="false" aria-label="Save: Hack-Verifiable Terminal Bench: Evaluating Reward Hacking in Terminal Tasks (HVTB)">Save</button></div>
+  <p class="tags">Safety &amp; Governance</p>
+</article><article class="paper" id="rsi-062" data-id="rsi-062">
+  <div class="paper-top"><span class="paper-meta">2025 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2512.23760">Audited Skill-Graph Self-Improvement for Agentic LLMs via Verifiable Rewards, Experience Synthesis, and Continual Memory (ASG-SI)</a></h3>
+  <p class="authors">Ken Huang, Jerry Huang</p>
+  <p class='summary'>Combines verifiable rewards, skill graphs, experience synthesis, and continual memory.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2512.23760">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2512.23760_ASG-SI.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-062" aria-pressed="false" aria-label="Save: Audited Skill-Graph Self-Improvement for Agentic LLMs via Verifiable Rewards, Experience Synthesis, and Continual Memory (ASG-SI)">Save</button></div>
+  <p class="tags">Safety &amp; Governance</p>
+</article><article class="paper" id="rsi-063" data-id="rsi-063">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2602.01750">Adversarial Reward Auditing for Active Detection and Mitigation of Reward Hacking (ARA)</a></h3>
+  <p class="authors">Mohammad Beigi, Ming Jin, Junshan Zhang, Qifan Wang, Lifu Huang</p>
+  <p class='summary'>Uses adversarial auditing to detect and mitigate reward hacking.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2602.01750">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2602.01750_ARA.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-063" aria-pressed="false" aria-label="Save: Adversarial Reward Auditing for Active Detection and Mitigation of Reward Hacking (ARA)">Save</button></div>
+  <p class="tags">Safety &amp; Governance</p>
+</article><article class="paper" id="rsi-093" data-id="rsi-093">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2609.17817">Reflections on Trusting Trust, Revisited: Contaminating Self-Modifying AI Coding Agents with Poisoned Benchmarks</a></h3>
+  <p class="authors">Franziska Roesner, Tadayoshi Kohno</p>
+  <p class='summary'>Studies how poisoned self-evaluation benchmarks can contaminate later versions of self-modifying coding agents.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2609.17817">Paper<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-093" aria-pressed="false" aria-label="Save: Reflections on Trusting Trust, Revisited: Contaminating Self-Modifying AI Coding Agents with Poisoned Benchmarks">Save</button></div>
+  <p class="tags">Safety &amp; Governance</p>
+</article><article class="paper" id="rsi-094" data-id="rsi-094">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2610.27735">RSI Control: Can AI Models Perform Covert Sabotage in the Self-Improvement Process?</a></h3>
+  <p class="authors">Kaiwen Zhou, Udari Madhushani Sehwag</p>
+  <p class='summary'>Evaluates covert sabotage during model-development tasks and the limits of monitoring the improvement process.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2610.27735">Paper<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-094" aria-pressed="false" aria-label="Save: RSI Control: Can AI Models Perform Covert Sabotage in the Self-Improvement Process?">Save</button></div>
+  <p class="tags">Safety &amp; Governance</p>
+</article><article class="paper" id="rsi-095" data-id="rsi-095">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2610.38392">Masked Erosion: How Acceptance Gates Lose Redundant Safeguards in Self-Improving Agents</a></h3>
+  <p class="authors">Hau-Sing So, Daixian Liu, Weicai Long</p>
+  <p class='summary'>Investigates how acceptance rules can gradually remove redundant safeguards from evolving agents.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2610.38392">Paper<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-095" aria-pressed="false" aria-label="Save: Masked Erosion: How Acceptance Gates Lose Redundant Safeguards in Self-Improving Agents">Save</button></div>
+  <p class="tags">Safety &amp; Governance</p>
+</article><article class="paper" id="rsi-064" data-id="rsi-064">
+  <div class="paper-top"><span class="paper-meta">2024 / COLM / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2310.02304">Self-Taught Optimizer (STOP): Recursively Self-Improving Code Generation</a></h3>
+  <p class="authors">Eric Zelikman, Eliana Lorch, Lester Mackey, Adam Tauman Kalai (Stanford / MSR / OpenAI)</p>
+  <p class='summary'>Recursively improves a code-generation optimizer.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2310.02304">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2310.02304_STOP.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-064" aria-pressed="false" aria-label="Save: Self-Taught Optimizer (STOP): Recursively Self-Improving Code Generation">Save</button></div>
+  <p class="tags">Program Evolution Lineage</p>
+</article><article class="paper" id="rsi-065" data-id="rsi-065">
+  <div class="paper-top"><span class="paper-meta">2025 / ICLR / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2408.08435">Automated Design of Agentic Systems (ADAS)</a></h3>
+  <p class="authors">Shengran Hu, Cong Lu, Jeff Clune</p>
+  <p class='summary'>Searches for agentic system designs through executable code.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2408.08435">Paper<span aria-hidden="true"> ↗</span></a><a href="https://github.com/ShengranHu/ADAS">Code<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2408.08435_ADAS.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-065" aria-pressed="false" aria-label="Save: Automated Design of Agentic Systems (ADAS)">Save</button></div>
+  <p class="tags">Program Evolution Lineage</p>
+</article><article class="paper" id="rsi-066" data-id="rsi-066">
+  <div class="paper-top"><span class="paper-meta">2025 / ICLR / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2410.10762">AFlow: Automating Agentic Workflow Generation</a></h3>
+  <p class="authors">Jiayi Zhang, Jinyu Xiang, Zhaoyang Yu, Fengwei Teng, Xiong-Hui Chen, et al.</p>
+  <p class='summary'>Automates the generation and optimization of agent workflows.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2410.10762">Paper<span aria-hidden="true"> ↗</span></a><a href="https://github.com/FoundationAgents/AFlow">Code<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2410.10762_AFlow.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-066" aria-pressed="false" aria-label="Save: AFlow: Automating Agentic Workflow Generation">Save</button></div>
+  <p class="tags">Program Evolution Lineage</p>
+</article><article class="paper" id="rsi-067" data-id="rsi-067">
+  <div class="paper-top"><span class="paper-meta">2025 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2506.13131">AlphaEvolve: A Coding Agent for Scientific and Algorithmic Discovery</a></h3>
+  <p class="authors">Alexander Novikov, Ngân Vũ, Marvin Eisenberger, Emilien Dupont, Po-Sen Huang, et al. (Google DeepMind)</p>
+  <p class='summary'>Evolves programs for scientific and algorithmic discovery.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2506.13131">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2506.13131_AlphaEvolve.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-067" aria-pressed="false" aria-label="Save: AlphaEvolve: A Coding Agent for Scientific and Algorithmic Discovery">Save</button></div>
+  <p class="tags">Program Evolution Lineage</p>
+</article><article class="paper" id="rsi-068" data-id="rsi-068">
+  <div class="paper-top"><span class="paper-meta">2026 / ICLR (Oral) / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2507.19457">GEPA: Reflective Prompt Evolution Can Outperform Reinforcement Learning</a></h3>
+  <p class="authors">Lakshya A Agrawal, Shangyin Tan, Dilara Soylu, Noah Ziems, et al.</p>
+  <p class='summary'>Uses natural-language reflection to evolve prompts.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2507.19457">Paper<span aria-hidden="true"> ↗</span></a><a href="https://github.com/gepa-ai/gepa">Code<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2507.19457_GEPA.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-068" aria-pressed="false" aria-label="Save: GEPA: Reflective Prompt Evolution Can Outperform Reinforcement Learning">Save</button></div>
+  <p class="tags">Program Evolution Lineage</p>
+</article><article class="paper" id="rsi-069" data-id="rsi-069">
+  <div class="paper-top"><span class="paper-meta">2025 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2509.19349">ShinkaEvolve: Towards Open-Ended and Sample-Efficient Program Evolution</a></h3>
+  <p class="authors">Robert Tjarko Lange, Yuki Imajuku, Edoardo Cetin (Sakana AI)</p>
+  <p class='summary'>Combines parent selection, novelty filtering, and recorded search experience for program evolution.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2509.19349">Paper<span aria-hidden="true"> ↗</span></a><a href="https://github.com/SakanaAI/ShinkaEvolve">Code<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2509.19349_ShinkaEvolve.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-069" aria-pressed="false" aria-label="Save: ShinkaEvolve: Towards Open-Ended and Sample-Efficient Program Evolution">Save</button></div>
+  <p class="tags">Program Evolution Lineage</p>
+</article><article class="paper" id="rsi-070" data-id="rsi-070">
+  <div class="paper-top"><span class="paper-meta">2023 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2309.11690">Explosive Growth from AI Automation: A Review of the Arguments</a></h3>
+  <p class="authors">Ege Erdil, Tamay Besiroglu (Epoch AI)</p>
+  <p class='summary'>Reviews arguments for and against rapid growth driven by AI automation.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2309.11690">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2309.11690_ExplosiveGrowthReview.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-070" aria-pressed="false" aria-label="Save: Explosive Growth from AI Automation: A Review of the Arguments">Save</button></div>
+  <p class="tags">Macro Debate &amp; Measurement</p>
+</article><article class="paper" id="rsi-071" data-id="rsi-071">
+  <div class="paper-top"><span class="paper-meta">2025 / Forethought Research / Paper</span>
+  </div>
+  <h3><a href="https://www.forethought.org/research/will-ai-r-and-d-automation-cause-a-software-intelligence-explosion">Will AI R&amp;D Automation Cause a Software Intelligence Explosion?</a></h3>
+  <p class="authors">Daniel Eth, Tom Davidson</p>
+  <p class='summary'>Models returns to automating software research and development.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://www.forethought.org/research/will-ai-r-and-d-automation-cause-a-software-intelligence-explosion">Report<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-071" aria-pressed="false" aria-label="Save: Will AI R&amp;D Automation Cause a Software Intelligence Explosion?">Save</button></div>
+  <p class="tags">Macro Debate &amp; Measurement</p>
+</article><article class="paper" id="rsi-072" data-id="rsi-072">
+  <div class="paper-top"><span class="paper-meta">2025 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2503.14499">Measuring AI Ability to Complete Long Software Tasks</a></h3>
+  <p class="authors">Thomas Kwa, Ben West, Joel Becker, et al. (METR)</p>
+  <p class='summary'>Measures the duration of software tasks that AI systems can complete reliably.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2503.14499">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2503.14499_METR_LongTasks.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-072" aria-pressed="false" aria-label="Save: Measuring AI Ability to Complete Long Software Tasks">Save</button></div>
+  <p class="tags">Macro Debate &amp; Measurement</p>
+</article><article class="paper" id="rsi-096" data-id="rsi-096">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2609.11873">The Last AI Built by Humans: Toward Genuine Recursive Self-Improvement</a></h3>
+  <p class="authors">Yi Duan et al.</p>
+  <p class='summary'>Proposes a capability-headroom measure and a staged roadmap from improvement execution to recursive meta-improvement.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2609.11873">Paper<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2609.11873_TheLastAI.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-096" aria-pressed="false" aria-label="Save: The Last AI Built by Humans: Toward Genuine Recursive Self-Improvement">Save</button></div>
+  <p class="tags">Macro Debate &amp; Measurement</p>
+</article><article class="paper" id="rsi-097" data-id="rsi-097">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2609.15802">The Economics of Recursive Self-Improvement</a></h3>
+  <p class="authors">Tom Cunningham, Lukas Althoff, Basil Halperin, Brian Jabarian, et al.</p>
+  <p class='summary'>Models feedback loops in AI development and distinguishes narrow research gains from broader economic capabilities.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2609.15802">Paper<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-097" aria-pressed="false" aria-label="Save: The Economics of Recursive Self-Improvement">Save</button></div>
+  <p class="tags">Macro Debate &amp; Measurement</p>
+</article><article class="paper" id="rsi-098" data-id="rsi-098">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2610.09239">The Winner&#x27;s Curse in LLM Self-Improvement Loops: Selection Noise, Lock-in, and Acceptance Rules</a></h3>
+  <p class="authors">Litao Hu, Yutong Tang</p>
+  <p class='summary'>Studies selection noise, repeated evaluation, and acceptance rules in self-improvement loops.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2610.09239">Paper<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-098" aria-pressed="false" aria-label="Save: The Winner&#x27;s Curse in LLM Self-Improvement Loops: Selection Noise, Lock-in, and Acceptance Rules">Save</button></div>
+  <p class="tags">Macro Debate &amp; Measurement</p>
+</article><article class="paper" id="rsi-099" data-id="rsi-099">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2610.14662">Does Failure Feedback Direct Agent Self-Modification?</a></h3>
+  <p class="authors">Rong He</p>
+  <p class='summary'>Tests whether modifications preferentially repair the failures supplied as feedback and whether those repairs generalize.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2610.14662">Paper<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-099" aria-pressed="false" aria-label="Save: Does Failure Feedback Direct Agent Self-Modification?">Save</button></div>
+  <p class="tags">Macro Debate &amp; Measurement</p>
+</article><article class="paper" id="rsi-100" data-id="rsi-100">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2610.27610">Auditing the Product, Not the Recursion: The Evaluation Evidence Behind Recursive Self-Improvement Claims</a></h3>
+  <p class="authors">Zihan Chen, Di Zhu, Lei Nico Zheng</p>
+  <p class='summary'>Audits how RSI studies evaluate improved artifacts and whether they test improvements to the recursive process itself.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2610.27610">Paper<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-100" aria-pressed="false" aria-label="Save: Auditing the Product, Not the Recursion: The Evaluation Evidence Behind Recursive Self-Improvement Claims">Save</button></div>
+  <p class="tags">Macro Debate &amp; Measurement</p>
+</article><article class="paper" id="rsi-073" data-id="rsi-073">
+  <div class="paper-top"><span class="paper-meta">2026 / Human-Agent-Society / Tool</span>
+  </div>
+  <h3><a href="https://github.com/Human-Agent-Society/reef">Reef: Continual learning infra for self-improving agents</a></h3>
+  <p class="authors">Human-Agent-Society (Wenhao Chai, Paul Liang, Ao Qu, Zhenting Qi, et al.)</p>
+  <p class='summary'>Connects serving, feedback, learning recipes, candidate evaluation, and versioned release.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://github.com/Human-Agent-Society/reef">Code<span aria-hidden="true"> ↗</span></a><a href="https://reefinfra.ai/docs/">Docs<span aria-hidden="true"> ↗</span></a><a href="https://pypi.org/project/reef-infra/">Package<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-073" aria-pressed="false" aria-label="Save: Reef: Continual learning infra for self-improving agents">Save</button></div>
+  <p class="tags">Open-Source Systems &amp; Infrastructure</p>
+</article><article class="paper" id="rsi-074" data-id="rsi-074">
+  <div class="paper-top"><span class="paper-meta">2026 / v0.3.0 / Tool</span>
+  </div>
+  <h3><a href="https://github.com/proteus-evolve/Proteus">Proteus: A Harness-Agnostic Self-Evolution Framework for AI Agents</a></h3>
+  <p class="authors">Proteus Authors</p>
+  <p class='summary'>A framework for changing declared harness regions with validation and versioned snapshots.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://github.com/proteus-evolve/Proteus">Code<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-074" aria-pressed="false" aria-label="Save: Proteus: A Harness-Agnostic Self-Evolution Framework for AI Agents">Save</button></div>
+  <p class="tags">Open-Source Systems &amp; Infrastructure</p>
+</article><article class="paper" id="rsi-101" data-id="rsi-101">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Paper</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2610.10310">RSIGym: A Flexible Environment for Recursive Self-Improvement</a></h3>
+  <p class="authors">Fanqing Meng, Lingxiao Du, Haocheng Lu, Qiguang Chen, et al.</p>
+  <p class='summary'>Provides reusable training, inference, evaluation, and sandbox services for studying multiple self-improvement tracks.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2610.10310">Paper<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-101" aria-pressed="false" aria-label="Save: RSIGym: A Flexible Environment for Recursive Self-Improvement">Save</button></div>
+  <p class="tags">Open-Source Systems &amp; Infrastructure</p>
+</article><article class="paper" id="rsi-102" data-id="rsi-102">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Benchmark</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2608.31111">Aspire: Can Models Self-Evolve from Vague Goals?</a></h3>
+  <p class="authors">Yuhao Wu, Jingyuan Zhang, Jiajun Shi, et al.</p>
+  <p class='summary'>Evaluates whether agents can turn broad capability goals into useful data, updates, and held-out improvements.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2608.31111">Paper<span aria-hidden="true"> ↗</span></a><a href="https://self-developing-agents.github.io/">Project<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2608.31111_Aspire.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-102" aria-pressed="false" aria-label="Save: Aspire: Can Models Self-Evolve from Vague Goals?">Save</button></div>
+  <p class="tags">Self-Improvement Benchmarks</p>
+</article><article class="paper" id="rsi-103" data-id="rsi-103">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Benchmark</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2608.31100">S³Gym: Can LLMs Turn Self-Testing and Self-Judging into Self-Improvement?</a></h3>
+  <p class="authors">Jiajun Shi, Siyuan Tao, Yuhao Wu, et al.</p>
+  <p class='summary'>Separates exploration from held-out evaluation to study self-testing, memory, and parameter updates in text games.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2608.31100">Paper<span aria-hidden="true"> ↗</span></a><a href="https://self-developing-agents.github.io/">Project<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2608.31100_S3Gym.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-103" aria-pressed="false" aria-label="Save: S³Gym: Can LLMs Turn Self-Testing and Self-Judging into Self-Improvement?">Save</button></div>
+  <p class="tags">Self-Improvement Benchmarks</p>
+</article><article class="paper" id="rsi-104" data-id="rsi-104">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Benchmark</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2609.01437">HarnessDev: Can LLMs Create and Evolve Their Own Agent Harness?</a></h3>
+  <p class="authors">Yuhao Wu, Jingyuan Zhang, Jiajun Shi, et al.</p>
+  <p class='summary'>Evaluates the creation and evolution of executable agent harnesses, including generalization and version selection.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2609.01437">Paper<span aria-hidden="true"> ↗</span></a><a href="https://self-developing-agents.github.io/">Project<span aria-hidden="true"> ↗</span></a><a href="https://raw.githubusercontent.com/asimfish/awesome_rsi/main/papers/en/2609.01437_HarnessDev.pdf">PDF<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-104" aria-pressed="false" aria-label="Save: HarnessDev: Can LLMs Create and Evolve Their Own Agent Harness?">Save</button></div>
+  <p class="tags">Self-Improvement Benchmarks</p>
+</article><article class="paper" id="rsi-105" data-id="rsi-105">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Benchmark</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2608.03764">GDPevo: Evaluating Agent Self-Evolution on Real Business Tasks</a></h3>
+  <p class="authors">Leijun Zhou, Zhihao Liu, Xiang Qu, Chenxu Liu, et al.</p>
+  <p class='summary'>Recombines business rules across training and held-out tasks to measure transferable self-evolution.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2608.03764">Paper<span aria-hidden="true"> ↗</span></a><a href="https://github.com/Prism-Shadow/GDPevo">Code<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-105" aria-pressed="false" aria-label="Save: GDPevo: Evaluating Agent Self-Evolution on Real Business Tasks">Save</button></div>
+  <p class="tags">Self-Improvement Benchmarks</p>
+</article><article class="paper" id="rsi-106" data-id="rsi-106">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Benchmark</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2608.06144">FinEvo-Bench: A Longitudinal Benchmark for Self-Evolving Agents in Professional Financial Workflows</a></h3>
+  <p class="authors">Bo Deng, Kang Zhou, Lifan Guo, Chongyang Tao, et al.</p>
+  <p class='summary'>Evaluates continuing agent improvement across interleaved professional workflows with paired state-reset controls.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2608.06144">Paper<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-106" aria-pressed="false" aria-label="Save: FinEvo-Bench: A Longitudinal Benchmark for Self-Evolving Agents in Professional Financial Workflows">Save</button></div>
+  <p class="tags">Self-Improvement Benchmarks</p>
+</article><article class="paper" id="rsi-107" data-id="rsi-107">
+  <div class="paper-top"><span class="paper-meta">2026 / arXiv / Benchmark</span>
+  </div>
+  <h3><a href="https://arxiv.org/abs/2610.33624">RSI Arena: Towards Recursive Self-Improvement with Human Feedback</a></h3>
+  <p class="authors">Yue Huang, Yanbo Wang, Lichi Li, Yuanyuan Chen, et al.</p>
+  <p class='summary'>Compares autonomous model training under shared resource budgets and a later round of human preference feedback.</p>
+  <div class="paper-bottom"><div class="paper-links"><a href="https://arxiv.org/abs/2610.33624">Paper<span aria-hidden="true"> ↗</span></a></div>
+  <button class="save js-only" type="button" data-save="rsi-107" aria-pressed="false" aria-label="Save: RSI Arena: Towards Recursive Self-Improvement with Human Feedback">Save</button></div>
+  <p class="tags">Self-Improvement Benchmarks</p>
+</article></div>
+<div id="empty" class="empty" hidden><h3>No matching references</h3><p>Try a broader search or clear the filters. Save a reference to add it to your reading list.</p><button type="button" id="empty-reset" class="primary-link">Clear all filters</button></div>
+<button type="button" id="more" class="load-more js-only" hidden>Show more references</button>
+<p class="catalog-note">Listed years follow the source catalog; publication and first-preprint dates may differ.</p>
+</div>
+</section>
+</main>
+<div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+<dialog id="share-dialog"><form method="dialog"><h2>Share this view</h2><p>Copy this link to keep your search and filters.</p><label for="share-url">Filter link</label><input id="share-url" readonly><button type="submit" class="primary-link">Done</button></form></dialog>
+<footer class="site-footer"><span>Awesome Recursive Self-Improvement<br><small>Collection snapshot: 2026-11-06 · <a href="LICENSE">CC BY 4.0</a></small></span><a href="#main">Back to top ↑</a></footer>
+<script type="application/json" id="catalog">{"repo": "awesome_rsi", "papers": [{"title": "Harness Engineering for Self-Improvement", "venue": "Lil'Log", "year": 2026, "authors": "Lilian Weng", "links": [{"label": "Article", "url": "https://lilianweng.github.io/posts/2026-07-04-harness/"}], "core": true, "id": "rsi-001", "summary": "An overview of optimizing prompts, context, workflows, agent code, and the improvement mechanism itself.", "category": "Foundations & surveys", "tags": ["Core Readings"], "kind": "Article", "categories": ["Foundations & surveys"]}, {"title": "When AI Builds Itself: Anthropic's Progress toward Recursive Self-Improvement", "venue": "Anthropic Institute", "year": 2026, "authors": "Marina Favaro, Jack Clark", "links": [{"label": "Article", "url": "https://www.anthropic.com/institute/recursive-self-improvement"}], "core": true, "id": "rsi-002", "summary": "An industry account of AI-assisted engineering and research, with a distinction between executing experiments and choosing them.", "category": "Foundations & surveys", "tags": ["Core Readings"], "kind": "Article", "categories": ["Foundations & surveys"]}, {"title": "Speculations Concerning the First Ultraintelligent Machine", "venue": "Advances in Computers Vol. 6", "year": 1965, "authors": "Irving John Good", "links": [{"label": "Paper", "url": "http://incompleteideas.net/papers/Good65ultraintelligent.pdf"}, {"label": "PDF", "url": "papers/classics/1965_Good_UltraintelligentMachine.pdf"}], "core": false, "id": "rsi-003", "summary": "The original positive-feedback argument: a sufficiently capable machine could help design a more capable successor.", "category": "Foundations & surveys", "tags": ["Origins (1965–2014)"], "kind": "Paper", "categories": ["Foundations & surveys"]}, {"title": "General Intelligence and Seed AI 2.3", "venue": "Singularity Institute", "year": 2001, "authors": "Eliezer Yudkowsky", "links": [{"label": "Archive", "url": "https://web.archive.org/web/20120805130100/singularity.org/files/GISAI.html"}, {"label": "PDF", "url": "papers/classics/2001_Yudkowsky_GISAI.pdf"}], "core": false, "id": "rsi-004", "summary": "Examines the abilities and continuing opportunities needed for a seed AI to improve itself.", "category": "Foundations & surveys", "tags": ["Origins (1965–2014)"], "kind": "Paper", "categories": ["Foundations & surveys"]}, {"title": "Gödel Machines: Self-Referential Universal Problem Solvers Making Provably Optimal Self-Improvements", "venue": "arXiv", "year": 2003, "authors": "Jürgen Schmidhuber", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/cs/0309048"}, {"label": "PDF", "url": "papers/classics/2003_Schmidhuber_GoedelMachines.pdf"}], "core": false, "id": "rsi-005", "summary": "A formal system that permits self-modification after proving an increase in expected utility.", "category": "Foundations & surveys", "tags": ["Origins (1965–2014)"], "kind": "Paper", "categories": ["Foundations & surveys"]}, {"title": "Superintelligence: Paths, Dangers, Strategies", "venue": "Oxford University Press", "year": 2014, "authors": "Nick Bostrom", "links": [{"label": "Book", "url": "https://global.oup.com/academic/product/superintelligence-9780199678112"}], "core": false, "id": "rsi-006", "summary": "Develops a framework for optimization power, resistance to improvement, and recursive capability growth.", "category": "Foundations & surveys", "tags": ["Origins (1965–2014)"], "kind": "Book", "categories": ["Foundations & surveys"]}, {"title": "The Coming Technological Singularity: How to Survive in the Post-Human Era", "venue": "VISION-21 Symposium", "year": 1993, "authors": "Vernor Vinge", "links": [{"label": "Essay", "url": "https://edoras.sdsu.edu/~vinge/misc/singularity.html"}], "core": false, "id": "rsi-007", "summary": "Explores several possible routes to intelligence beyond human capabilities.", "category": "Foundations & surveys", "tags": ["Origins (1965–2014)"], "kind": "Paper", "categories": ["Foundations & surveys"]}, {"title": "The Basic AI Drives", "venue": "AGI-08", "year": 2008, "authors": "Stephen M. Omohundro", "links": [{"label": "Paper", "url": "https://selfawaresystems.com/wp-content/uploads/2008/01/ai_drives_final.pdf"}, {"label": "PDF", "url": "papers/classics/2008_Omohundro_BasicAIDrives.pdf"}], "core": false, "id": "rsi-008", "summary": "Analyzes instrumental incentives such as resource acquisition, self-preservation, and goal preservation.", "category": "Foundations & surveys", "tags": ["Origins (1965–2014)"], "kind": "Paper", "categories": ["Foundations & surveys"]}, {"title": "The Singularity: A Philosophical Analysis", "venue": "Journal of Consciousness Studies", "year": 2010, "authors": "David J. Chalmers", "links": [{"label": "Paper", "url": "http://consc.net/papers/singularity.pdf"}, {"label": "PDF", "url": "papers/classics/2010_Chalmers_Singularity.pdf"}], "core": false, "id": "rsi-009", "summary": "Separates the premises of intelligence-explosion arguments and examines potential limiting factors.", "category": "Foundations & surveys", "tags": ["Origins (1965–2014)"], "kind": "Paper", "categories": ["Foundations & surveys"]}, {"title": "Intelligence Explosion Microeconomics", "venue": "MIRI Technical Report", "year": 2013, "authors": "Eliezer Yudkowsky", "links": [{"label": "Paper", "url": "https://intelligence.org/files/IEM.pdf"}, {"label": "PDF", "url": "papers/classics/2013_Yudkowsky_IEM.pdf"}], "core": false, "id": "rsi-010", "summary": "Studies returns to reinvesting cognitive capability and resistance to further improvement.", "category": "Foundations & surveys", "tags": ["Origins (1965–2014)"], "kind": "Paper", "categories": ["Foundations & surveys"]}, {"title": "Voyager: An Open-Ended Embodied Agent with Large Language Models", "venue": "arXiv", "year": 2023, "authors": "Guanzhi Wang, Yuqi Xie, Yunfan Jiang, Ajay Mandlekar, et al. (NVIDIA / Caltech / Stanford)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2305.16291"}, {"label": "Code", "url": "https://github.com/MineDojo/Voyager"}, {"label": "PDF", "url": "papers/en/2305.16291_Voyager.pdf"}], "core": false, "id": "rsi-011", "summary": "Builds a growing library of executable skills through interaction in Minecraft.", "category": "Memory & skills", "tags": ["Bridge (2023–2025)"], "kind": "Paper", "categories": ["Memory & skills"]}, {"title": "Gödel Agent: A Self-Referential Agent Framework for Recursively Self-Improvement", "venue": "arXiv", "year": 2024, "authors": "Xunjian Yin, Xinyi Wang, Liangming Pan, Li Lin, Xiaojun Wan, William Yang Wang (PKU / UCSB)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2410.04444"}, {"label": "Code", "url": "https://github.com/Arvid-pku/Godel_Agent"}, {"label": "PDF", "url": "papers/en/2410.04444_GodelAgent.pdf"}], "core": false, "id": "rsi-012", "summary": "Uses an LLM to inspect and modify an agent's own implementation during execution.", "category": "Agent code & harnesses", "tags": ["Bridge (2023–2025)"], "kind": "Paper", "categories": ["Agent code & harnesses"]}, {"title": "A Self-Improving Coding Agent (SICA)", "venue": "arXiv", "year": 2025, "authors": "Maxime Robeyns, Martin Szummer, Laurence Aitchison (Bristol / iGent AI)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2504.15228"}, {"label": "Code", "url": "https://github.com/MaximeRobeyns/self_improving_coding_agent"}, {"label": "PDF", "url": "papers/en/2504.15228_SICA.pdf"}], "core": false, "id": "rsi-013", "summary": "Lets a coding agent revise its own code, with explicit utility, a version archive, and asynchronous supervision.", "category": "Agent code & harnesses", "tags": ["Bridge (2023–2025)"], "kind": "Paper", "categories": ["Agent code & harnesses"]}, {"title": "A Survey of Self-Evolving Agents: What, When, How, and Where to Evolve on the Path to Artificial Super Intelligence", "venue": "TMLR", "year": 2026, "authors": "Huan-ang Gao, Jiayi Geng, Wenyue Hua, Mengkang Hu, et al.", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2507.21046"}, {"label": "Code", "url": "https://github.com/CharlesQ9/Self-Evolving-Agents"}, {"label": "PDF", "url": "papers/en/2507.21046_SelfEvolvingAgentsSurvey.pdf"}], "core": false, "id": "rsi-014", "summary": "Organizes self-evolving agents by what, when, how, and where they change.", "category": "Foundations & surveys", "tags": ["Surveys"], "kind": "Survey", "categories": ["Foundations & surveys"]}, {"title": "Co-Evolution in Agentic Systems: Toward Self-Directed Evolution Beyond Human Design", "venue": "arXiv", "year": 2026, "authors": "Qing Zong, Jiayu Liu, Junhao Shen, Zecong Tang, Linsi Wu, et al., Yangqiu Song (HKUST / UIUC / CUHK / HKU / PKU)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2608.10299"}, {"label": "PDF", "url": "papers/en/2608.10299_CoEvolutionSurvey.pdf"}], "core": false, "id": "rsi-015", "summary": "Surveys interactions among evolving agents, environments, and improvement mechanisms.", "category": "Foundations & surveys", "tags": ["Surveys"], "kind": "Survey", "categories": ["Foundations & surveys"]}, {"title": "Self-Evolving Coding Agents", "venue": "arXiv", "year": 2026, "authors": "Hao Zhou, Haichuan Hu, Ye Shang, Quanjun Zhang (NJUST / NJU, iSEngLab)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2608.03392"}, {"label": "Collection", "url": "https://github.com/iSEngLab/Awesome-Self-Evolving-Coding-Agents"}, {"label": "PDF", "url": "papers/en/2608.03392_SelfEvolvingCodingAgentsSurvey.pdf"}], "core": false, "id": "rsi-016", "summary": "Surveys evolution targets, timing, and evidence in coding agents, including risks from unreliable tests.", "category": "Foundations & surveys", "tags": ["Surveys"], "kind": "Survey", "categories": ["Foundations & surveys"]}, {"id": "rsi-075", "title": "Safety in Self-Evolving Agents: A Survey", "year": 2026, "venue": "arXiv", "authors": "Jiahao Chen, Zhou Feng, Oubo Ma, Yichen Yan, et al.", "core": false, "category": "Foundations & surveys", "tags": ["Surveys"], "summary": "Surveys how reusable agent state can become unsafe as models, memory, tools, skills, and workflows evolve.", "kind": "Survey", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2610.00093"}], "categories": ["Foundations & surveys"]}, {"title": "Darwin Gödel Machine: Open-Ended Evolution of Self-Improving Agents", "venue": "ICLR", "year": 2026, "authors": "Jenny Zhang, Shengran Hu, Cong Lu, Robert Lange, Jeff Clune", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2505.22954"}, {"label": "Code", "url": "https://github.com/jennyzzt/dgm"}, {"label": "PDF", "url": "papers/en/2505.22954_DGM.pdf"}], "core": true, "id": "rsi-017", "summary": "Searches an archive of self-modifying coding agents using empirical evaluation.", "category": "Agent code & harnesses", "tags": ["Framework"], "kind": "Paper", "categories": ["Agent code & harnesses"]}, {"title": "MOSS: Self-Evolution through Source-Level Rewriting in Autonomous Agent Systems", "venue": "arXiv", "year": 2026, "authors": "Qianshu Cai, Yonggang Zhang, Xianzhang Jia, Huajiang Zheng, Wei Xue, Jun Song, Xinmei Tian, Yike Guo (USTC / HKGAI / HKUST / HKBU)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2605.22794"}, {"label": "Code", "url": "https://github.com/hkgai-official/Moss"}, {"label": "PDF", "url": "papers/en/2605.22794_MOSS.pdf"}], "core": true, "id": "rsi-018", "summary": "Uses production failure records to propose source-code changes, with isolated replay, approval, and rollback.", "category": "Agent code & harnesses", "tags": ["Framework"], "kind": "Paper", "categories": ["Agent code & harnesses"]}, {"title": "HyperAgents", "venue": "arXiv", "year": 2026, "authors": "Jenny Zhang, Bingchen Zhao, Wannan Yang, Jakob Foerster, Jeff Clune, Minqi Jiang, Sam Devlin, Tatiana Shavrina (UBC / Vector / Edinburgh / NYU)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2603.19461"}, {"label": "PDF", "url": "papers/en/2603.19461_Hyperagents.pdf"}], "core": false, "id": "rsi-019", "summary": "Adds a meta-agent that controls how a task agent is modified.", "category": "Agent code & harnesses", "tags": ["Framework"], "kind": "Paper", "categories": ["Agent code & harnesses"]}, {"title": "Metaⁿ: Recursive Self-Improvement through Emergent Depth", "venue": "arXiv", "year": 2026, "authors": "Zae Myung Kim, Young-Jun Lee, Seungyeon Jwa, Dongyeop Kang (UMN / SNU)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2608.24735"}, {"label": "Code", "url": "https://github.com/minnesotanlp/meta-n"}, {"label": "PDF", "url": "papers/en/2608.24735_Metan.pdf"}], "core": false, "id": "rsi-020", "summary": "Applies a fixed meta-operation repeatedly to traces and code, creating successive improvement layers.", "category": "Agent code & harnesses", "tags": ["Framework"], "kind": "Paper", "categories": ["Agent code & harnesses"]}, {"id": "rsi-076", "title": "Mendel Gödel Machine: Recursive Self-Improving Coding Agents via Comparative Evolution", "year": 2026, "venue": "arXiv", "authors": "Changzhi Liu, Yilun Liu, Sikuan Yan, Volker Tresp, Yunpu Ma", "core": false, "category": "Agent code & harnesses", "tags": ["Framework Side"], "summary": "Uses comparisons across tasks and agent lineages to guide mutations in self-improving coding agents.", "kind": "Paper", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2608.07645"}, {"label": "Code", "url": "https://github.com/RealLcz/MGM"}], "categories": ["Agent code & harnesses"]}, {"id": "rsi-077", "title": "Recursive self-improvement of AI research agents", "year": 2026, "venue": "arXiv", "authors": "Dhruv Srikanth, Bingchen Zhao, Dixing Xu, Yuxiang Wu, Zhengyao Jiang", "core": false, "category": "Autonomous research", "tags": ["Framework Side"], "summary": "Studies research agents that revise their own code and select changes using hidden evaluation tasks.", "kind": "Paper", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2609.26457"}], "categories": ["Autonomous research"]}, {"id": "rsi-078", "title": "Predict Before You Modify: Learning Improvement Dynamics for Self-Evolving Agents", "year": 2026, "venue": "arXiv", "authors": "Zixuan Xie, Chang Xu, Yuhua Jiang, Li Zhao", "core": false, "category": "Agent code & harnesses", "tags": ["Framework Side"], "summary": "Learns a persistent model of improvement dynamics to predict the effects of candidate agent modifications.", "kind": "Paper", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2610.13991"}], "categories": ["Agent code & harnesses"]}, {"id": "rsi-079", "title": "VERSE: Verified Self-Evolving Optimizer for Agent Harnesses", "year": 2026, "venue": "arXiv", "authors": "Zekai Wang, Yingqiang Ge, Zekun Wang, Hai Wang, et al.", "core": false, "category": "Agent code & harnesses", "tags": ["Framework Side"], "summary": "Evolves an agent harness and its optimizer while checking candidate changes through execution.", "kind": "Paper", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2610.02616"}, {"label": "Code", "url": "https://github.com/wzekai/VERSE"}], "categories": ["Agent code & harnesses"]}, {"title": "EvoLM: Self-Evolving Language Models through Co-Evolved Discriminative Rubrics", "venue": "arXiv", "year": 2026, "authors": "Shuyue Stella Li, Rui Xin, Teng Xiao, Yike Wang, Rulin Shao, et al., Yulia Tsvetkov (UW / AI2)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2605.03871"}, {"label": "Code", "url": "https://github.com/stellalisy/EvoLM"}, {"label": "PDF", "url": "papers/en/2605.03871_EvoLM.pdf"}], "core": true, "id": "rsi-021", "summary": "Alternates policy learning with the evolution of discriminative evaluation rubrics.", "category": "Evaluators & feedback", "tags": ["Evaluator"], "kind": "Paper", "categories": ["Evaluators & feedback"]}, {"title": "The Red Queen Gödel Machine: Co-Evolving Agents and Their Evaluators", "venue": "arXiv", "year": 2026, "authors": "Alex Iacob, Andrej Jovanović, William F. Shen, et al., Nicholas D. Lane (Cambridge / NVIDIA / Flower Labs)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2606.26294"}, {"label": "PDF", "url": "papers/en/2606.26294_RQGM.pdf"}], "core": true, "id": "rsi-022", "summary": "Co-evolves agents and evaluators, checking candidate evaluators against human-labeled reference data.", "category": "Evaluators & feedback", "tags": ["Evaluator"], "kind": "Paper", "categories": ["Evaluators & feedback"]}, {"title": "Who Grades the Grader? Co-Evolving Evaluation Metrics and Skills for Self-Improving LLM Agents", "venue": "arXiv", "year": 2026, "authors": "Xing Zhang, Guanghui Wang, Yanwei Cui, Ziyuan Li, Wei Qiu, Bing Zhu, Peiyang He (AWS / HSBC)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2607.12790"}, {"label": "Code", "url": "https://github.com/amazon-science/Self-Evolving-Agents-Double-Ratchet"}, {"label": "PDF", "url": "papers/en/2607.12790_WhoGradesTheGrader.pdf"}], "core": true, "id": "rsi-023", "summary": "Studies how evolving evaluation metrics can drift even when downstream task scores remain high.", "category": "Evaluators & feedback", "tags": ["Evaluator"], "kind": "Paper", "categories": ["Evaluators & feedback"]}, {"title": "Metrics That Write Themselves: Evolving an Evaluator from Its Own Blind Spots (EvalCEGAR)", "venue": "arXiv", "year": 2026, "authors": "Xing Zhang, Yanwei Cui, Guanghui Wang, Zhihao Lin, Peiyang He (AWS)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2608.18744"}, {"label": "PDF", "url": "papers/en/2608.18744_EvalCEGAR.pdf"}], "core": false, "id": "rsi-024", "summary": "Refines evaluation operators using answer pairs that receive the same score despite different reference outcomes.", "category": "Evaluators & feedback", "tags": ["Evaluator"], "kind": "Paper", "categories": ["Evaluators & feedback"]}, {"title": "Self-Evolving Deep Research via Joint Generation and Evaluation (SCORE)", "venue": "arXiv", "year": 2026, "authors": "Han Zhu, Chengkun Cai, Yuanfeng Song, Xing Chen, Sirui Han, Yike Guo (HKUST / ByteDance / UCL)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2606.04507"}, {"label": "PDF", "url": "papers/en/2606.04507_SCORE.pdf"}], "core": false, "id": "rsi-025", "summary": "Jointly trains generation and evaluation for open-ended research reports.", "category": "Evaluators & feedback", "tags": ["Evaluator"], "kind": "Paper", "categories": ["Evaluators & feedback"]}, {"id": "rsi-080", "title": "Who Verifies the Verifier? Co-Evolving Inspectable Graders with Self-Improving Agents", "year": 2026, "venue": "NeurIPS Workshop", "authors": "Xing Zhang, Guanghui Wang, Yanwei Cui, Ziyuan Li, et al.", "core": false, "category": "Evaluators & feedback", "tags": ["Evaluator Side"], "summary": "Co-evolves inspectable graders with agents and tests the role of independent reference examples.", "kind": "Paper", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2610.11464"}], "categories": ["Evaluators & feedback"]}, {"id": "rsi-081", "title": "VeriEvolve: Evaluator-First Evolution for Tool-Using Agents", "year": 2026, "venue": "EMNLP Workshop (REALM)", "authors": "Yueshen Li, Kamer Ali Yuksel, Gokhan Tur, Dilek Hakkani-Tür, João Pedro Maia", "core": false, "category": "Evaluators & feedback", "tags": ["Evaluator Side"], "summary": "Builds executable evaluators before evolving tool-use workflows, then revises the evaluators between rounds.", "kind": "Paper", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2610.29005"}], "categories": ["Evaluators & feedback"]}, {"title": "No More Stale Feedback: Co-Evolving Critics for Open-World Agent Learning (ECHO)", "venue": "arXiv", "year": 2026, "authors": "Zhicong Li, Lingjie Jiang, Yulan Hu, et al., Yong Liu", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2601.06794"}, {"label": "PDF", "url": "papers/en/2601.06794_ECHO.pdf"}], "core": true, "id": "rsi-026", "summary": "Updates a critic alongside a policy, rewarding feedback that improves subsequent task performance.", "category": "Model training", "tags": ["Model"], "kind": "Paper", "categories": ["Model training"]}, {"title": "Co-Harness: Co-Evolving Harnesses and Model Weights for LLM Agents", "venue": "arXiv", "year": 2026, "authors": "Zhengyu Chen, Teng Xiao, Huaisheng Zhu, Yige Yuan, Luan Zhang, Jingang Wang", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2607.22688"}, {"label": "PDF", "url": "papers/en/2607.22688_CoHarness.pdf"}], "core": false, "id": "rsi-027", "summary": "Alternates diagnosis of harness failures with model training on improved execution traces.", "category": "Model training", "tags": ["Model"], "kind": "Paper", "categories": ["Model training"]}, {"title": "SkillRL: Evolving Agents via Recursive Skill-Augmented Reinforcement Learning", "venue": "arXiv", "year": 2026, "authors": "Peng Xia, Jianwen Chen, Hanyang Wang, Jiaqi Liu, et al. (UNC / aiming-lab)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2602.08234"}, {"label": "Code", "url": "https://github.com/aiming-lab/SkillRL"}, {"label": "PDF", "url": "papers/en/2602.08234_SkillRL.pdf"}], "core": false, "id": "rsi-028", "summary": "Distills trajectories into a hierarchical skill library that evolves during reinforcement learning.", "category": "Model training", "tags": ["Model"], "kind": "Paper", "categories": ["Model training"]}, {"title": "Evolving-RL: End-to-End Optimization of Experience-Driven Self-Evolving Capability within Agents", "venue": "arXiv", "year": 2026, "authors": "Xiaohongshu / Peking University", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2605.10663"}, {"label": "Code", "url": "https://github.com/Fanzy27/Evolving-RL"}, {"label": "PDF", "url": "papers/en/2605.10663_EvolvingRL.pdf"}], "core": false, "id": "rsi-029", "summary": "Trains a policy to both extract and use experience, with downstream task gains as feedback.", "category": "Model training", "tags": ["Model"], "kind": "Paper", "categories": ["Model training"]}, {"title": "SIA: Self Improving AI with Harness & Weight Updates", "venue": "arXiv", "year": 2026, "authors": "Prannay Hebbar, Yogendra Manawat, Samuel Verboomen, et al. (Hexo Labs)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2605.27276"}, {"label": "PDF", "url": "papers/en/2605.27276_SIA.pdf"}], "core": false, "id": "rsi-030", "summary": "Uses a feedback agent to choose between harness edits and weight updates.", "category": "Model training", "tags": ["Model"], "kind": "Paper", "categories": ["Model training"]}, {"id": "rsi-082", "title": "Self-Adapting Language Models", "year": 2025, "venue": "arXiv", "authors": "Adam Zweiger, Jyothish Pari, Han Guo, Ekin Akyürek, et al.", "core": false, "category": "Model training", "tags": ["Model Side"], "summary": "Generates self-edits for weight updates and trains the editing policy using downstream performance.", "kind": "Paper", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2506.10943"}, {"label": "Project", "url": "https://jyopari.github.io/posts/seal"}], "categories": ["Model training"]}, {"id": "rsi-083", "title": "Harness Evolution Hits a Ceiling: When Weight Training Should Begin", "year": 2026, "venue": "arXiv", "authors": "Yuan Tian, Bing Hu, Hao Wang, Binghang Lu, Fang Wu", "core": false, "category": "Model training", "tags": ["Model Side"], "summary": "Distinguishes process failures from content failures to decide between harness changes and weight training.", "kind": "Paper", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2610.11655"}], "categories": ["Model training"]}, {"id": "rsi-084", "title": "Self-Evolving Coding Agents via Harness-Policy Optimization", "year": 2026, "venue": "arXiv", "authors": "Zhepei Wei, Wenlin Yao, Baolin Peng, Danqing Wang, et al.", "core": false, "category": "Model training", "tags": ["Model Side"], "summary": "Alternates harness search with reinforcement learning of a coding agent policy.", "kind": "Paper", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2610.22791"}], "categories": ["Model training"]}, {"title": "WikiSkill: Compiling Agent Experience into Persistent Knowledge for Skill Evolution", "venue": "arXiv", "year": 2026, "authors": "Liyan Tang, Cyrus Rashtchian, Chun-Sung Ferng, Andrew Tomkins, Da-Cheng Juan, Tu Vu (Google Research / Virginia Tech)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2608.27454"}, {"label": "PDF", "url": "papers/en/2608.27454_WikiSkill.pdf"}], "core": true, "id": "rsi-031", "summary": "Separates raw experience, persistent wiki knowledge, and validated, reversible skills.", "category": "Memory & skills", "tags": ["Knowledge"], "kind": "Paper", "categories": ["Memory & skills"]}, {"title": "SkillCommit: Evolving Agent Skills through Behaviorally Validated Scope Expansion", "venue": "arXiv", "year": 2026, "authors": "Yu He, Weikai Yang (NJU / HKUST-GZ)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2608.15165"}, {"label": "PDF", "url": "papers/en/2608.15165_SkillCommit.pdf"}], "core": false, "id": "rsi-032", "summary": "Promotes instance-level fixes into broader skills only after behavioral validation.", "category": "Memory & skills", "tags": ["Knowledge"], "kind": "Paper", "categories": ["Memory & skills"]}, {"title": "HyperSkill: Self-Evolving LLM Agents via Hypergraph-Structured Skill Memory", "venue": "arXiv", "year": 2026, "authors": "Ruiyao Xu, Tiankai Yang, Wei-Chieh Huang (Northwestern / USC / UIC)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2608.16114"}, {"label": "PDF", "url": "papers/en/2608.16114_HyperSkill.pdf"}], "core": false, "id": "rsi-033", "summary": "Organizes reusable skills as a hypergraph to retain compositional relationships.", "category": "Memory & skills", "tags": ["Knowledge"], "kind": "Paper", "categories": ["Memory & skills"]}, {"title": "ERSkill: Evolving for Skill-Guided Adaptive Memory Retrieval", "venue": "arXiv", "year": 2026, "authors": "Haolong Chen, Liang Zhang, Zhuo Li, Lei Xue, Guangxu Zhu (CUHK-SZ / SYSU)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2608.12720"}, {"label": "PDF", "url": "papers/en/2608.12720_ERSkill.pdf"}], "core": false, "id": "rsi-034", "summary": "Evolves skills for adaptive retrieval from memory.", "category": "Memory & skills", "tags": ["Knowledge"], "kind": "Paper", "categories": ["Memory & skills"]}, {"title": "SkillProx: Self-Evolving Agent Skills via Proximal Textual Gradient Descent", "venue": "arXiv", "year": 2026, "authors": "Mingxuan Zheng, Yujin Zhou, Chuxue Cao, et al., Sirui Han, Yike Guo (HKUST)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2608.07449"}, {"label": "PDF", "url": "papers/en/2608.07449_SkillProx.pdf"}], "core": false, "id": "rsi-035", "summary": "Uses proximal textual updates to refine a skill library, including deletion.", "category": "Memory & skills", "tags": ["Knowledge"], "kind": "Paper", "categories": ["Memory & skills"]}, {"title": "Evo-Harness: Context-to-Harness Skill Compilation for Self-Evolving Agents", "venue": "arXiv", "year": 2026, "authors": "Tianxin Wei, Zhan Shi, Minhua Lin, Bing He, et al., Hanqing Lu (UIUC / Amazon)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2608.15071"}, {"label": "PDF", "url": "papers/en/2608.15071_EvoHarness.pdf"}], "core": false, "id": "rsi-036", "summary": "Compiles execution context into reusable agent harness skills.", "category": "Memory & skills", "tags": ["Knowledge"], "kind": "Paper", "categories": ["Memory & skills"]}, {"title": "Agentic Context Engineering: Evolving Contexts for Self-Improving Language Models (ACE)", "venue": "ICLR", "year": 2026, "authors": "Qizheng Zhang, Changran Hu, Shubhangi Upasani, et al., Kunle Olukotun (Stanford / SambaNova)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2510.04618"}, {"label": "PDF", "url": "papers/en/2510.04618_ACE.pdf"}], "core": false, "id": "rsi-037", "summary": "Maintains an evolving context playbook through generation, reflection, and curation.", "category": "Memory & skills", "tags": ["Knowledge"], "kind": "Paper", "categories": ["Memory & skills"]}, {"title": "Meta Context Engineering via Agentic Skill Evolution (MCE)", "venue": "arXiv", "year": 2026, "authors": "Haoran Ye, Xuning He, Vincent Arak, Haonan Dong, Guojie Song (PKU)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2601.21557"}, {"label": "PDF", "url": "papers/en/2601.21557_MCE.pdf"}], "core": false, "id": "rsi-038", "summary": "Searches skill space for context-management mechanisms.", "category": "Memory & skills", "tags": ["Knowledge"], "kind": "Paper", "categories": ["Memory & skills"]}, {"id": "rsi-085", "title": "ReasoningBank: Scaling Agent Self-Evolving with Reasoning Memory", "year": 2026, "venue": "ICLR", "authors": "Siru Ouyang, Jun Yan, I-Hung Hsu, Yanfei Chen, et al.", "core": false, "category": "Memory & skills", "tags": ["Knowledge Side"], "summary": "Distills successful and failed experiences into reusable reasoning memories for future tasks.", "kind": "Paper", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2509.25140"}, {"label": "Code", "url": "https://github.com/google-research/reasoning-bank"}], "categories": ["Memory & skills"]}, {"id": "rsi-086", "title": "Do Self-Evolving Skills Generalize to Held-Out Tasks?", "year": 2026, "venue": "arXiv", "authors": "Xihao Piao, Zifeng Wang, Zhen Chen", "core": false, "category": "Memory & skills", "tags": ["Knowledge Side"], "summary": "Measures whether improvements in evolved skills transfer from training tasks to held-out tasks.", "kind": "Paper", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2609.39148"}], "categories": ["Memory & skills"]}, {"id": "rsi-087", "title": "Skill∞: Recursive Self-Improvement for Agent Skill Optimization", "year": 2026, "venue": "arXiv", "authors": "Wangcheng Tao, Zhanglu Yan, Han Wu, Weng-Fai Wong", "core": false, "category": "Memory & skills", "tags": ["Knowledge Side"], "summary": "Uses a meta-skill to optimize task skills, then applies the same process to improve the meta-skill.", "kind": "Paper", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2610.35434"}], "categories": ["Memory & skills"]}, {"title": "Continual Harness: Online Adaptation for Self-Improving Foundation Agents", "venue": "arXiv", "year": 2026, "authors": "Seth Karten, Joel Zhang, Tersoo Upaa Jr, Ruirong Feng, Wenzhe Li, Chengshuai Shi, Chi Jin, Kiran Vodrahalli (Princeton)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2605.09998"}, {"label": "Project", "url": "https://sethkarten.ai/continual-harness"}, {"label": "PDF", "url": "papers/en/2605.09998_ContinualHarness.pdf"}], "core": true, "id": "rsi-039", "summary": "Refines an agent's harness within a continuing episode without resetting the environment.", "category": "Online adaptation", "tags": ["Online"], "kind": "Paper", "categories": ["Online adaptation"]}, {"title": "Prime Agent: A Self-Improving RLM Harness", "venue": "arXiv", "year": 2026, "authors": "Seth Karten, Alex L. Zhang, Kevin Thomas, Sebastian Müller, et al. (Princeton / Prime Intellect / MIT)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2608.23552"}, {"label": "Code", "url": "https://github.com/PrimeIntellect-ai/prime-agent"}, {"label": "PDF", "url": "papers/en/2608.23552_PrimeAgent.pdf"}], "core": false, "id": "rsi-040", "summary": "An open implementation of a self-improving harness with persistent execution and resumable sessions.", "category": "Online adaptation", "tags": ["Online"], "kind": "Paper", "categories": ["Online adaptation"]}, {"id": "rsi-088", "title": "Exo: An Architecture for Self-Improving Systems at Runtime", "year": 2026, "venue": "arXiv", "authors": "Alexander Krentsel, Sylvia Ratnasamy, Ion Stoica, Martin Casado, Ankur Goyal", "core": false, "category": "Online adaptation", "tags": ["Online Side"], "summary": "Integrates harness and policy updates into runtime execution with a protected mechanism for history and activation.", "kind": "Paper", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2611.00463"}], "categories": ["Online adaptation"]}, {"title": "Meta-Harness: End-to-End Optimization of Model Harnesses", "venue": "arXiv", "year": 2026, "authors": "Yoonho Lee, Roshen Nair, Qizheng Zhang, Kangwook Lee, Omar Khattab, Chelsea Finn (Stanford / KRAFTON / MIT)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2603.28052"}, {"label": "Code", "url": "https://github.com/stanford-iris-lab/meta-harness-tbench2-artifact"}, {"label": "PDF", "url": "papers/en/2603.28052_MetaHarness.pdf"}], "core": false, "id": "rsi-041", "summary": "Uses execution history, source code, and feedback to optimize an entire agent harness.", "category": "Agent code & harnesses", "tags": ["Harness Engineering (2026)"], "kind": "Paper", "categories": ["Agent code & harnesses"]}, {"title": "Self-Harness: Harnesses That Improve Themselves", "venue": "arXiv", "year": 2026, "authors": "Hangfan Zhang, Shao Zhang, Kangcong Li, et al., Lei Bai, Shuyue Hu", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2606.09498"}, {"label": "PDF", "url": "papers/en/2606.09498_SelfHarness.pdf"}], "core": false, "id": "rsi-042", "summary": "Accepts bounded harness edits only after checks on both development and held-out splits.", "category": "Agent code & harnesses", "tags": ["Harness Engineering (2026)"], "kind": "Paper", "categories": ["Agent code & harnesses"]}, {"title": "AutoSaddler: Automatic Harness Optimization with Durable Updates from Agent Execution Traces", "venue": "arXiv", "year": 2026, "authors": "Sungho Park, Wonjoong Kim, Rongyuan Tan, Jue Zhang, Wook-Shin Han, et al. (POSTECH / KAIST / SUSTech / Microsoft)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2608.23041"}, {"label": "Project", "url": "https://aka.ms/AutoSaddler-website"}, {"label": "PDF", "url": "papers/en/2608.23041_AutoSaddler.pdf"}], "core": false, "id": "rsi-043", "summary": "Optimizes harnesses from batches of execution traces and validates durable updates.", "category": "Agent code & harnesses", "tags": ["Harness Engineering (2026)"], "kind": "Paper", "categories": ["Agent code & harnesses"]}, {"title": "EnvHarness: Awakening Static Worlds for Agent Learning", "venue": "arXiv", "year": 2026, "authors": "Chengsong Huang, Zifeng Wang, Rujun Han, Jun Yan, et al., Chen-Yu Lee (WashU / Google Cloud AI)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2608.19880"}, {"label": "Code", "url": "https://github.com/google-research/envharness"}, {"label": "PDF", "url": "papers/en/2608.19880_EnvHarness.pdf"}], "core": false, "id": "rsi-044", "summary": "Modifies environment interfaces while keeping the agent and original verifier fixed.", "category": "Online adaptation", "tags": ["Harness Engineering (2026)"], "kind": "Paper", "categories": ["Online adaptation"]}, {"title": "MetaCaster: Meta-Harness-Optimized Agent for End-to-End Few-Shot Learning of Lightweight Time Series Forecasters", "venue": "arXiv", "year": 2026, "authors": "ChengAo Shen, Wenchao Yu, Fangyu Wu, Dongjin Song, Hanghang Tong, et al., Jingchao Ni (UH / NEC Labs)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2608.23473"}, {"label": "Code", "url": "https://github.com/D2I-Group/metacaster"}, {"label": "PDF", "url": "papers/en/2608.23473_MetaCaster.pdf"}], "core": false, "id": "rsi-045", "summary": "Optimizes the harness of an agent that creates training data for lightweight forecasting models.", "category": "Autonomous research", "tags": ["Harness Engineering (2026)"], "kind": "Paper", "categories": ["Autonomous research"]}, {"title": "Evolving Agents in the Dark: Retrospective Harness Optimization via Self-Preference (RHO)", "venue": "arXiv", "year": 2026, "authors": "Wenbo Pan, Shujie Liu, Chin-Yew Lin, et al., Xiaohua Jia (CityU HK / MSRA)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2606.05922"}, {"label": "Code", "url": "https://github.com/wbopan/retro-harness"}, {"label": "PDF", "url": "papers/en/2606.05922_RHO.pdf"}], "core": false, "id": "rsi-046", "summary": "Uses past trajectories and self-preference to select harness revisions without labeled feedback.", "category": "Agent code & harnesses", "tags": ["Harness Engineering (2026)"], "kind": "Paper", "categories": ["Agent code & harnesses"]}, {"title": "From Failed Trajectories to Reliable LLM Agents: Diagnosing and Repairing Harness Flaws (HarnessFix)", "venue": "arXiv", "year": 2026, "authors": "Mengzhuo Chen, Junjie Wang, Zhe Liu, Yawen Wang, Haiming Zheng, Qing Wang", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2606.06324"}, {"label": "PDF", "url": "papers/en/2606.06324_HarnessFix.pdf"}], "core": false, "id": "rsi-047", "summary": "Diagnoses responsibility for failures and repairs the corresponding harness components.", "category": "Agent code & harnesses", "tags": ["Harness Engineering (2026)"], "kind": "Paper", "categories": ["Agent code & harnesses"]}, {"title": "Agentic Harness Engineering: Observability-Driven Automatic Evolution of Coding-Agent Harnesses (AHE)", "venue": "arXiv", "year": 2026, "authors": "Jiahang Lin, Shichun Liu, Chengjun Pan, et al., Tao Gui, Yu-Gang Jiang", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2604.25850"}, {"label": "Code", "url": "https://github.com/china-qijizhifeng/agentic-harness-engineering"}, {"label": "PDF", "url": "papers/en/2604.25850_AHE.pdf"}], "core": false, "id": "rsi-048", "summary": "Requires execution evidence and falsifiable predictions for harness changes.", "category": "Agent code & harnesses", "tags": ["Harness Engineering (2026)"], "kind": "Paper", "categories": ["Agent code & harnesses"]}, {"title": "DemoEvolve: Overcoming Sparse Feedback in Agentic Harness Evolution with Demonstrations", "venue": "arXiv", "year": 2026, "authors": "Lirong Che, Yuzhe Yang, Peiwen Lin, Chuang Wang, Xueqian Wang, Jian Su", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2605.24539"}, {"label": "PDF", "url": "papers/en/2605.24539_DemoEvolve.pdf"}], "core": false, "id": "rsi-049", "summary": "Adds human demonstrations to harness evolution when outcome feedback is sparse.", "category": "Agent code & harnesses", "tags": ["Harness Engineering (2026)"], "kind": "Paper", "categories": ["Agent code & harnesses"]}, {"title": "Adaptive Auto-Harness: Sustained Self-Improvement for Agentic System Deployment on Open-Ended Task Streams", "venue": "arXiv", "year": 2026, "authors": "Zewen Liu, Zhan Shi, Yisi Sang, Bing He, Minhua Lin, Tianxin Wei, et al. (Emory / Amazon)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2606.01770"}, {"label": "PDF", "url": "papers/en/2606.01770_AdaptiveAutoHarness.pdf"}], "core": false, "id": "rsi-050", "summary": "Studies continuing self-improvement over open-ended streams of deployment tasks.", "category": "Online adaptation", "tags": ["Harness Engineering (2026)"], "kind": "Paper", "categories": ["Online adaptation"]}, {"title": "Hierarchical Self-Improvement: A Framework for Task-Specific Evolvable Agent Harnesses (HSI)", "venue": "arXiv", "year": 2026, "authors": "Tailin Zhou (HKUST)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2608.08466"}, {"label": "PDF", "url": "papers/en/2608.08466_HSI.pdf"}], "core": false, "id": "rsi-051", "summary": "Maintains task-specific, replaceable harnesses under a fixed meta-evolver.", "category": "Agent code & harnesses", "tags": ["Harness Engineering (2026)"], "kind": "Paper", "categories": ["Agent code & harnesses"]}, {"title": "Harness Updating Is Not Harness Benefit: Disentangling Evolution Capabilities in Self-Evolving LLM Agents", "venue": "arXiv", "year": 2026, "authors": "Minhua Lin, Juncheng Wu, Zijun Wang, Zhan Shi, Yisi Sang, Bing He, et al.", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2605.30621"}, {"label": "PDF", "url": "papers/en/2605.30621_HarnessUpdatingNotBenefit.pdf"}], "core": false, "id": "rsi-052", "summary": "Separately measures the ability to produce helpful edits and the ability to benefit from them.", "category": "Agent code & harnesses", "tags": ["Harness Engineering (2026)"], "kind": "Paper", "categories": ["Agent code & harnesses"]}, {"id": "rsi-089", "title": "RRSI: Regularized Recursive Self-Improvement of Agent Harnesses", "year": 2026, "venue": "arXiv", "authors": "Peng Xia, Rujun Han, Zifeng Wang, Yanfei Chen, et al.", "core": false, "category": "Agent code & harnesses", "tags": ["Harness Engineering (2026)"], "summary": "Regularizes harness evolution by controlling edit size, screening proposals, and pruning unhelpful changes.", "kind": "Paper", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2609.24972"}, {"label": "Code", "url": "https://github.com/google-research/rrsi"}], "categories": ["Agent code & harnesses"]}, {"id": "rsi-090", "title": "Harness-Delta Attribution: Dissecting Gains From Harness Evolution", "year": 2026, "venue": "arXiv", "authors": "Wenxuan Ding, Qin Lu, Changlong Yu, Sha Li, et al.", "core": false, "category": "Safety & measurement", "tags": ["Harness Engineering (2026)"], "summary": "Separates harness-evolution gains into overfitting, additional inference computation, and remaining improvements.", "kind": "Paper", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2610.22466"}], "categories": ["Safety & measurement"]}, {"title": "iCoder: Recursive AI-Led Development of Frontier Industrial Coding Model", "venue": "Tech Report", "year": 2026, "authors": "Cheng Yang, Jiayang Lyu, Shangyuan Liu, Guibin Zhang, et al. (SJTU / NUS / DP Technology)", "links": [{"label": "Report", "url": "https://huggingface.co/i-Coder/iCoder-27B/blob/main/Coder_Tech_Report.pdf"}, {"label": "Code", "url": "https://github.com/bingreeky/iCoder"}, {"label": "Model", "url": "https://huggingface.co/i-Coder/iCoder-27B"}, {"label": "PDF", "url": "papers/en/iCoder27B_TechReport.pdf"}], "core": false, "id": "rsi-053", "summary": "Describes an AI-led pipeline for developing an industrial coding model.", "category": "Autonomous research", "tags": ["Autonomous Research & Industrial Evidence"], "kind": "Paper", "categories": ["Autonomous research"]}, {"title": "The AI Scientist: Towards Fully Automated Open-Ended Scientific Discovery", "venue": "arXiv", "year": 2024, "authors": "Chris Lu, Cong Lu, Robert Tjarko Lange, Jakob Foerster, Jeff Clune, David Ha (Sakana AI)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2408.06292"}, {"label": "Code", "url": "https://github.com/SakanaAI/AI-Scientist"}, {"label": "PDF", "url": "papers/en/2408.06292_AIScientist.pdf"}], "core": false, "id": "rsi-054", "summary": "An automated scientific-discovery workflow spanning experiments and reporting.", "category": "Autonomous research", "tags": ["Autonomous Research & Industrial Evidence"], "kind": "Paper", "categories": ["Autonomous research"]}, {"title": "ScientistOne: Towards Human-Level Autonomous Research via Chain-of-Evidence", "venue": "arXiv", "year": 2026, "authors": "Rui Meng, Bhavana Dalvi Mishra, Jiefeng Chen, Chun-Liang Li, et al. (Google Cloud AI Research)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2605.26340"}, {"label": "PDF", "url": "papers/en/2605.26340_ScientistOne.pdf"}], "core": false, "id": "rsi-055", "summary": "Organizes autonomous research around a chain of evidence.", "category": "Autonomous research", "tags": ["Autonomous Research & Industrial Evidence"], "kind": "Paper", "categories": ["Autonomous research"]}, {"title": "Autodata: An Agentic Data Scientist to Create High Quality Synthetic Data", "venue": "arXiv", "year": 2026, "authors": "Ilia Kulikov, Chenxi Whitehouse, Tianhao Wu, Yixin Nie, et al. (FAIR at Meta)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2606.25996"}, {"label": "PDF", "url": "papers/en/2606.25996_Autodata.pdf"}], "core": false, "id": "rsi-056", "summary": "Uses an agentic data scientist to produce synthetic training data.", "category": "Autonomous research", "tags": ["Autonomous Research & Industrial Evidence"], "kind": "Paper", "categories": ["Autonomous research"]}, {"title": "Why LLMs Aren't Scientists Yet: Lessons from Four Autonomous Research Attempts", "venue": "arXiv", "year": 2026, "authors": "Dhruv Trehan, Paras Chopra", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2601.03315"}, {"label": "PDF", "url": "papers/en/2601.03315_WhyLLMsArentScientistsYet.pdf"}], "core": false, "id": "rsi-057", "summary": "Reports lessons and limitations from autonomous research attempts.", "category": "Autonomous research", "tags": ["Autonomous Research & Industrial Evidence"], "kind": "Paper", "categories": ["Autonomous research"]}, {"id": "rsi-091", "title": "Athanor: An Agent-Native System for Autonomous Post-Training Research", "year": 2026, "venue": "arXiv", "authors": "Yufa Zhou, Yichen Wang, Jiakun Fan, Ziqi Shu, et al.", "core": false, "category": "Autonomous research", "tags": ["Autonomous Research & Industrial Evidence"], "summary": "Provides an environment for autonomous post-training experiments with frozen evaluation and hidden tasks.", "kind": "Paper", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2610.21055"}], "categories": ["Autonomous research"]}, {"id": "rsi-092", "title": "Language Models Learn to Improve Language Models", "year": 2026, "venue": "arXiv", "authors": "Minhua Lin, Zijun Wang, Zewen Liu, Zhaotian Weng, et al.", "core": false, "category": "Autonomous research", "tags": ["Autonomous Research & Industrial Evidence"], "summary": "Trains language models to propose model improvements using experiment records and periodic real execution.", "kind": "Paper", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2610.23344"}], "categories": ["Autonomous research"]}, {"title": "Yesterday's Shield, Today's Spear: A Self-Evolving Safety Guardrail in Production (SESG)", "venue": "arXiv", "year": 2026, "authors": "Cong Ming, Jingyi Chen, Bin Liu, Qi Chu, Tao Gong, Nenghai Yu, Yingfei Xiang, Ronghai Yang", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2608.08471"}, {"label": "PDF", "url": "papers/en/2608.08471_SESG.pdf"}], "core": false, "id": "rsi-058", "summary": "Studies a self-evolving safety guardrail in a production setting.", "category": "Safety & measurement", "tags": ["Safety & Governance"], "kind": "Paper", "categories": ["Safety & measurement"]}, {"title": "OpenLoopEvolve: A Verifiable Self-Evolution Framework for Loop Policies in Long-Horizon Complex Tasks (OLE)", "venue": "arXiv", "year": 2026, "authors": "Siqi Wang, Xinlin Li, Zhenglin Li, Li Li", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2608.09380"}, {"label": "PDF", "url": "papers/en/2608.09380_OpenLoopEvolve.pdf"}], "core": false, "id": "rsi-059", "summary": "Uses explicit verification and versioned updates for long-horizon loop policies.", "category": "Safety & measurement", "tags": ["Safety & Governance"], "kind": "Paper", "categories": ["Safety & measurement"]}, {"title": "Falsifiable Release Gates for Self-Improving Systems: Standing Invariants at Scale", "venue": "arXiv", "year": 2026, "authors": "Deepak Soni", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2607.13070"}, {"label": "PDF", "url": "papers/en/2607.13070_FalsifiableReleaseGates.pdf"}], "core": false, "id": "rsi-060", "summary": "Defines falsifiable release checks and persistent invariants for self-improving systems.", "category": "Safety & measurement", "tags": ["Safety & Governance"], "kind": "Paper", "categories": ["Safety & measurement"]}, {"title": "Hack-Verifiable Terminal Bench: Evaluating Reward Hacking in Terminal Tasks (HVTB)", "venue": "arXiv", "year": 2026, "authors": "Amit Roth, Ivan Bercovich, Yonathan Efroni (TAU / UCSB)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2608.22103"}, {"label": "PDF", "url": "papers/en/2608.22103_HVTB.pdf"}], "core": false, "id": "rsi-061", "summary": "A terminal benchmark designed to expose reward hacking.", "category": "Safety & measurement", "tags": ["Safety & Governance"], "kind": "Paper", "categories": ["Safety & measurement"]}, {"title": "Audited Skill-Graph Self-Improvement for Agentic LLMs via Verifiable Rewards, Experience Synthesis, and Continual Memory (ASG-SI)", "venue": "arXiv", "year": 2025, "authors": "Ken Huang, Jerry Huang", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2512.23760"}, {"label": "PDF", "url": "papers/en/2512.23760_ASG-SI.pdf"}], "core": false, "id": "rsi-062", "summary": "Combines verifiable rewards, skill graphs, experience synthesis, and continual memory.", "category": "Safety & measurement", "tags": ["Safety & Governance"], "kind": "Paper", "categories": ["Safety & measurement"]}, {"title": "Adversarial Reward Auditing for Active Detection and Mitigation of Reward Hacking (ARA)", "venue": "arXiv", "year": 2026, "authors": "Mohammad Beigi, Ming Jin, Junshan Zhang, Qifan Wang, Lifu Huang", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2602.01750"}, {"label": "PDF", "url": "papers/en/2602.01750_ARA.pdf"}], "core": false, "id": "rsi-063", "summary": "Uses adversarial auditing to detect and mitigate reward hacking.", "category": "Safety & measurement", "tags": ["Safety & Governance"], "kind": "Paper", "categories": ["Safety & measurement"]}, {"id": "rsi-093", "title": "Reflections on Trusting Trust, Revisited: Contaminating Self-Modifying AI Coding Agents with Poisoned Benchmarks", "year": 2026, "venue": "arXiv", "authors": "Franziska Roesner, Tadayoshi Kohno", "core": false, "category": "Safety & measurement", "tags": ["Safety & Governance"], "summary": "Studies how poisoned self-evaluation benchmarks can contaminate later versions of self-modifying coding agents.", "kind": "Paper", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2609.17817"}], "categories": ["Safety & measurement"]}, {"id": "rsi-094", "title": "RSI Control: Can AI Models Perform Covert Sabotage in the Self-Improvement Process?", "year": 2026, "venue": "arXiv", "authors": "Kaiwen Zhou, Udari Madhushani Sehwag", "core": false, "category": "Safety & measurement", "tags": ["Safety & Governance"], "summary": "Evaluates covert sabotage during model-development tasks and the limits of monitoring the improvement process.", "kind": "Paper", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2610.27735"}], "categories": ["Safety & measurement"]}, {"id": "rsi-095", "title": "Masked Erosion: How Acceptance Gates Lose Redundant Safeguards in Self-Improving Agents", "year": 2026, "venue": "arXiv", "authors": "Hau-Sing So, Daixian Liu, Weicai Long", "core": false, "category": "Safety & measurement", "tags": ["Safety & Governance"], "summary": "Investigates how acceptance rules can gradually remove redundant safeguards from evolving agents.", "kind": "Paper", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2610.38392"}], "categories": ["Safety & measurement"]}, {"title": "Self-Taught Optimizer (STOP): Recursively Self-Improving Code Generation", "venue": "COLM", "year": 2024, "authors": "Eric Zelikman, Eliana Lorch, Lester Mackey, Adam Tauman Kalai (Stanford / MSR / OpenAI)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2310.02304"}, {"label": "PDF", "url": "papers/en/2310.02304_STOP.pdf"}], "core": false, "id": "rsi-064", "summary": "Recursively improves a code-generation optimizer.", "category": "Program & workflow search", "tags": ["Program Evolution Lineage"], "kind": "Paper", "categories": ["Program & workflow search"]}, {"title": "Automated Design of Agentic Systems (ADAS)", "venue": "ICLR", "year": 2025, "authors": "Shengran Hu, Cong Lu, Jeff Clune", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2408.08435"}, {"label": "Code", "url": "https://github.com/ShengranHu/ADAS"}, {"label": "PDF", "url": "papers/en/2408.08435_ADAS.pdf"}], "core": false, "id": "rsi-065", "summary": "Searches for agentic system designs through executable code.", "category": "Program & workflow search", "tags": ["Program Evolution Lineage"], "kind": "Paper", "categories": ["Program & workflow search"]}, {"title": "AFlow: Automating Agentic Workflow Generation", "venue": "ICLR", "year": 2025, "authors": "Jiayi Zhang, Jinyu Xiang, Zhaoyang Yu, Fengwei Teng, Xiong-Hui Chen, et al.", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2410.10762"}, {"label": "Code", "url": "https://github.com/FoundationAgents/AFlow"}, {"label": "PDF", "url": "papers/en/2410.10762_AFlow.pdf"}], "core": false, "id": "rsi-066", "summary": "Automates the generation and optimization of agent workflows.", "category": "Program & workflow search", "tags": ["Program Evolution Lineage"], "kind": "Paper", "categories": ["Program & workflow search"]}, {"title": "AlphaEvolve: A Coding Agent for Scientific and Algorithmic Discovery", "venue": "arXiv", "year": 2025, "authors": "Alexander Novikov, Ngân Vũ, Marvin Eisenberger, Emilien Dupont, Po-Sen Huang, et al. (Google DeepMind)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2506.13131"}, {"label": "PDF", "url": "papers/en/2506.13131_AlphaEvolve.pdf"}], "core": false, "id": "rsi-067", "summary": "Evolves programs for scientific and algorithmic discovery.", "category": "Program & workflow search", "tags": ["Program Evolution Lineage"], "kind": "Paper", "categories": ["Program & workflow search"]}, {"title": "GEPA: Reflective Prompt Evolution Can Outperform Reinforcement Learning", "venue": "ICLR (Oral)", "year": 2026, "authors": "Lakshya A Agrawal, Shangyin Tan, Dilara Soylu, Noah Ziems, et al.", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2507.19457"}, {"label": "Code", "url": "https://github.com/gepa-ai/gepa"}, {"label": "PDF", "url": "papers/en/2507.19457_GEPA.pdf"}], "core": false, "id": "rsi-068", "summary": "Uses natural-language reflection to evolve prompts.", "category": "Program & workflow search", "tags": ["Program Evolution Lineage"], "kind": "Paper", "categories": ["Program & workflow search"]}, {"title": "ShinkaEvolve: Towards Open-Ended and Sample-Efficient Program Evolution", "venue": "arXiv", "year": 2025, "authors": "Robert Tjarko Lange, Yuki Imajuku, Edoardo Cetin (Sakana AI)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2509.19349"}, {"label": "Code", "url": "https://github.com/SakanaAI/ShinkaEvolve"}, {"label": "PDF", "url": "papers/en/2509.19349_ShinkaEvolve.pdf"}], "core": false, "id": "rsi-069", "summary": "Combines parent selection, novelty filtering, and recorded search experience for program evolution.", "category": "Program & workflow search", "tags": ["Program Evolution Lineage"], "kind": "Paper", "categories": ["Program & workflow search"]}, {"title": "Explosive Growth from AI Automation: A Review of the Arguments", "venue": "arXiv", "year": 2023, "authors": "Ege Erdil, Tamay Besiroglu (Epoch AI)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2309.11690"}, {"label": "PDF", "url": "papers/en/2309.11690_ExplosiveGrowthReview.pdf"}], "core": false, "id": "rsi-070", "summary": "Reviews arguments for and against rapid growth driven by AI automation.", "category": "Safety & measurement", "tags": ["Macro Debate & Measurement"], "kind": "Paper", "categories": ["Safety & measurement"]}, {"title": "Will AI R&D Automation Cause a Software Intelligence Explosion?", "venue": "Forethought Research", "year": 2025, "authors": "Daniel Eth, Tom Davidson", "links": [{"label": "Report", "url": "https://www.forethought.org/research/will-ai-r-and-d-automation-cause-a-software-intelligence-explosion"}], "core": false, "id": "rsi-071", "summary": "Models returns to automating software research and development.", "category": "Safety & measurement", "tags": ["Macro Debate & Measurement"], "kind": "Paper", "categories": ["Safety & measurement"]}, {"title": "Measuring AI Ability to Complete Long Software Tasks", "venue": "arXiv", "year": 2025, "authors": "Thomas Kwa, Ben West, Joel Becker, et al. (METR)", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2503.14499"}, {"label": "PDF", "url": "papers/en/2503.14499_METR_LongTasks.pdf"}], "core": false, "id": "rsi-072", "summary": "Measures the duration of software tasks that AI systems can complete reliably.", "category": "Safety & measurement", "tags": ["Macro Debate & Measurement"], "kind": "Paper", "categories": ["Safety & measurement"]}, {"id": "rsi-096", "title": "The Last AI Built by Humans: Toward Genuine Recursive Self-Improvement", "year": 2026, "venue": "arXiv", "authors": "Yi Duan et al.", "core": false, "category": "Safety & measurement", "tags": ["Macro Debate & Measurement"], "summary": "Proposes a capability-headroom measure and a staged roadmap from improvement execution to recursive meta-improvement.", "kind": "Paper", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2609.11873"}, {"label": "PDF", "url": "papers/en/2609.11873_TheLastAI.pdf"}], "categories": ["Safety & measurement"]}, {"id": "rsi-097", "title": "The Economics of Recursive Self-Improvement", "year": 2026, "venue": "arXiv", "authors": "Tom Cunningham, Lukas Althoff, Basil Halperin, Brian Jabarian, et al.", "core": false, "category": "Safety & measurement", "tags": ["Macro Debate & Measurement"], "summary": "Models feedback loops in AI development and distinguishes narrow research gains from broader economic capabilities.", "kind": "Paper", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2609.15802"}], "categories": ["Safety & measurement"]}, {"id": "rsi-098", "title": "The Winner's Curse in LLM Self-Improvement Loops: Selection Noise, Lock-in, and Acceptance Rules", "year": 2026, "venue": "arXiv", "authors": "Litao Hu, Yutong Tang", "core": false, "category": "Safety & measurement", "tags": ["Macro Debate & Measurement"], "summary": "Studies selection noise, repeated evaluation, and acceptance rules in self-improvement loops.", "kind": "Paper", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2610.09239"}], "categories": ["Safety & measurement"]}, {"id": "rsi-099", "title": "Does Failure Feedback Direct Agent Self-Modification?", "year": 2026, "venue": "arXiv", "authors": "Rong He", "core": false, "category": "Safety & measurement", "tags": ["Macro Debate & Measurement"], "summary": "Tests whether modifications preferentially repair the failures supplied as feedback and whether those repairs generalize.", "kind": "Paper", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2610.14662"}], "categories": ["Safety & measurement"]}, {"id": "rsi-100", "title": "Auditing the Product, Not the Recursion: The Evaluation Evidence Behind Recursive Self-Improvement Claims", "year": 2026, "venue": "arXiv", "authors": "Zihan Chen, Di Zhu, Lei Nico Zheng", "core": false, "category": "Safety & measurement", "tags": ["Macro Debate & Measurement"], "summary": "Audits how RSI studies evaluate improved artifacts and whether they test improvements to the recursive process itself.", "kind": "Paper", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2610.27610"}], "categories": ["Safety & measurement"]}, {"title": "Reef: Continual learning infra for self-improving agents", "venue": "Human-Agent-Society", "year": 2026, "authors": "Human-Agent-Society (Wenhao Chai, Paul Liang, Ao Qu, Zhenting Qi, et al.)", "links": [{"label": "Code", "url": "https://github.com/Human-Agent-Society/reef"}, {"label": "Docs", "url": "https://reefinfra.ai/docs/"}, {"label": "Package", "url": "https://pypi.org/project/reef-infra/"}], "core": false, "id": "rsi-073", "summary": "Connects serving, feedback, learning recipes, candidate evaluation, and versioned release.", "category": "Tools & infrastructure", "tags": ["Open-Source Systems & Infrastructure"], "kind": "Tool", "categories": ["Tools & infrastructure"]}, {"title": "Proteus: A Harness-Agnostic Self-Evolution Framework for AI Agents", "venue": "v0.3.0", "year": 2026, "authors": "Proteus Authors", "links": [{"label": "Code", "url": "https://github.com/proteus-evolve/Proteus"}], "core": false, "id": "rsi-074", "summary": "A framework for changing declared harness regions with validation and versioned snapshots.", "category": "Tools & infrastructure", "tags": ["Open-Source Systems & Infrastructure"], "kind": "Tool", "categories": ["Tools & infrastructure"]}, {"id": "rsi-101", "title": "RSIGym: A Flexible Environment for Recursive Self-Improvement", "year": 2026, "venue": "arXiv", "authors": "Fanqing Meng, Lingxiao Du, Haocheng Lu, Qiguang Chen, et al.", "core": false, "category": "Tools & infrastructure", "tags": ["Open-Source Systems & Infrastructure"], "summary": "Provides reusable training, inference, evaluation, and sandbox services for studying multiple self-improvement tracks.", "kind": "Paper", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2610.10310"}], "categories": ["Tools & infrastructure"]}, {"id": "rsi-102", "title": "Aspire: Can Models Self-Evolve from Vague Goals?", "year": 2026, "venue": "arXiv", "authors": "Yuhao Wu, Jingyuan Zhang, Jiajun Shi, et al.", "core": false, "category": "Safety & measurement", "tags": ["Self-Improvement Benchmarks"], "summary": "Evaluates whether agents can turn broad capability goals into useful data, updates, and held-out improvements.", "kind": "Benchmark", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2608.31111"}, {"label": "Project", "url": "https://self-developing-agents.github.io/"}, {"label": "PDF", "url": "papers/en/2608.31111_Aspire.pdf"}], "categories": ["Safety & measurement"]}, {"id": "rsi-103", "title": "S³Gym: Can LLMs Turn Self-Testing and Self-Judging into Self-Improvement?", "year": 2026, "venue": "arXiv", "authors": "Jiajun Shi, Siyuan Tao, Yuhao Wu, et al.", "core": false, "category": "Safety & measurement", "tags": ["Self-Improvement Benchmarks"], "summary": "Separates exploration from held-out evaluation to study self-testing, memory, and parameter updates in text games.", "kind": "Benchmark", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2608.31100"}, {"label": "Project", "url": "https://self-developing-agents.github.io/"}, {"label": "PDF", "url": "papers/en/2608.31100_S3Gym.pdf"}], "categories": ["Safety & measurement"]}, {"id": "rsi-104", "title": "HarnessDev: Can LLMs Create and Evolve Their Own Agent Harness?", "year": 2026, "venue": "arXiv", "authors": "Yuhao Wu, Jingyuan Zhang, Jiajun Shi, et al.", "core": false, "category": "Safety & measurement", "tags": ["Self-Improvement Benchmarks"], "summary": "Evaluates the creation and evolution of executable agent harnesses, including generalization and version selection.", "kind": "Benchmark", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2609.01437"}, {"label": "Project", "url": "https://self-developing-agents.github.io/"}, {"label": "PDF", "url": "papers/en/2609.01437_HarnessDev.pdf"}], "categories": ["Safety & measurement"]}, {"id": "rsi-105", "title": "GDPevo: Evaluating Agent Self-Evolution on Real Business Tasks", "year": 2026, "venue": "arXiv", "authors": "Leijun Zhou, Zhihao Liu, Xiang Qu, Chenxu Liu, et al.", "core": false, "category": "Safety & measurement", "tags": ["Self-Improvement Benchmarks"], "summary": "Recombines business rules across training and held-out tasks to measure transferable self-evolution.", "kind": "Benchmark", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2608.03764"}, {"label": "Code", "url": "https://github.com/Prism-Shadow/GDPevo"}], "categories": ["Safety & measurement"]}, {"id": "rsi-106", "title": "FinEvo-Bench: A Longitudinal Benchmark for Self-Evolving Agents in Professional Financial Workflows", "year": 2026, "venue": "arXiv", "authors": "Bo Deng, Kang Zhou, Lifan Guo, Chongyang Tao, et al.", "core": false, "category": "Safety & measurement", "tags": ["Self-Improvement Benchmarks"], "summary": "Evaluates continuing agent improvement across interleaved professional workflows with paired state-reset controls.", "kind": "Benchmark", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2608.06144"}], "categories": ["Safety & measurement"]}, {"id": "rsi-107", "title": "RSI Arena: Towards Recursive Self-Improvement with Human Feedback", "year": 2026, "venue": "arXiv", "authors": "Yue Huang, Yanbo Wang, Lichi Li, Yuanyuan Chen, et al.", "core": false, "category": "Safety & measurement", "tags": ["Self-Improvement Benchmarks"], "summary": "Compares autonomous model training under shared resource budgets and a later round of human preference feedback.", "kind": "Benchmark", "links": [{"label": "Paper", "url": "https://arxiv.org/abs/2610.33624"}], "categories": ["Safety & measurement"]}]}</script><script src="assets/library.js" defer></script>
+</body>
+</html>
