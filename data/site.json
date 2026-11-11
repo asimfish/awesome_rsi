@@ -1,0 +1,122 @@
+{
+  "repo": "awesome_rsi",
+  "brand": "Recursive SI",
+  "title": "Awesome Recursive Self-Improvement",
+  "eyebrow": "A research collection / 02",
+  "headline": "Study the loop.\nTrace the change.",
+  "description": "Explore how AI systems revise their code, feedback, weights, and memory. A curated collection of research, evaluation methods, and open-source systems.",
+  "short": "Self-improving agents, evolving evaluators, skills, and harnesses.",
+  "accent": "#355e91",
+  "categories": [
+    [
+      "Foundations & surveys",
+      "Origins, definitions, and research overviews."
+    ],
+    [
+      "Agent code & harnesses",
+      "Changes to agent implementations and orchestration."
+    ],
+    [
+      "Evaluators & feedback",
+      "How feedback is learned, checked, and revised."
+    ],
+    [
+      "Model training",
+      "Weight updates and joint optimization."
+    ],
+    [
+      "Memory & skills",
+      "Persistent knowledge, context, and reusable skills."
+    ],
+    [
+      "Online adaptation",
+      "Updates during continuing interaction and environment changes."
+    ],
+    [
+      "Program & workflow search",
+      "Search over programs, prompts, and agent workflows."
+    ],
+    [
+      "Autonomous research",
+      "Systems that conduct experiments and develop models."
+    ],
+    [
+      "Safety & measurement",
+      "Verification, release criteria, failure modes, and measurement."
+    ],
+    [
+      "Tools & infrastructure",
+      "Runnable systems and supporting infrastructure."
+    ]
+  ],
+  "coreLabel": "Core readings",
+  "snapshot": "2026-11-06",
+  "guide": [
+    {
+      "title": "Identify what changes",
+      "text": "Start with the artifact being updated: agent code, a prompt, a skill library, a memory, an evaluator, model weights, or the environment. These changes require different evidence and should not be treated as interchangeable.",
+      "links": [
+        [
+          "Foundations & surveys",
+          "index.html?category=Foundations+%26+surveys#library"
+        ]
+      ]
+    },
+    {
+      "title": "Follow a short reading route",
+      "text": "Begin with the self-evolving agents survey for vocabulary. Then read Darwin Gödel Machine for code evolution, Who Grades the Grader for evaluator drift, WikiSkill for persistent knowledge, and Continual Harness for adaptation during interaction.",
+      "links": [
+        [
+          "Self-evolving agents survey",
+          "https://arxiv.org/abs/2507.21046"
+        ],
+        [
+          "Core readings",
+          "index.html?core=1#library"
+        ]
+      ]
+    },
+    {
+      "title": "Separate improvement from evaluation",
+      "text": "Record who proposes a change, what feedback guides it, and how the candidate is accepted. If the evaluator also evolves, examine the independent evidence used to check it. Higher task scores alone may not establish that evaluation remains reliable.",
+      "links": [
+        [
+          "Who Grades the Grader",
+          "https://arxiv.org/abs/2607.12790"
+        ],
+        [
+          "Evaluators & feedback",
+          "index.html?category=Evaluators+%26+feedback#library"
+        ]
+      ]
+    },
+    {
+      "title": "Compare systems on common axes",
+      "text": "Use the change target, update timing, feedback source, acceptance rule, and persistence across tasks as separate comparison axes. The browser uses ten subject areas; paper, survey, article, book, and tool labels indicate the kind of resource.",
+      "links": [
+        [
+          "Online adaptation",
+          "index.html?category=Online+adaptation#library"
+        ],
+        [
+          "Memory & skills",
+          "index.html?category=Memory+%26+skills#library"
+        ]
+      ]
+    },
+    {
+      "title": "Inspect evidence and failure modes",
+      "text": "Look for held-out evaluation, component ablations, cost accounting, repeated improvement rounds, and state-reset controls. Distinguish results from a paper, an industry account, and a working software repository. A successful update is not by itself evidence of sustained recursive improvement.",
+      "links": [
+        [
+          "Safety & measurement",
+          "index.html?category=Safety+%26+measurement#library"
+        ],
+        [
+          "Tools & infrastructure",
+          "index.html?category=Tools+%26+infrastructure#library"
+        ]
+      ]
+    }
+  ]
+}
